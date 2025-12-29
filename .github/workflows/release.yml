@@ -3,20 +3,20 @@ name: Release
 on:
   push:
     branches:
-      - main  # 当推送到 main 分支时触发
-  workflow_dispatch:  # 允许手动触发
+      - main # 当推送到 main 分支时触发
+  workflow_dispatch: # 允许手动触发
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # 需要创建 Release 和上传文件的权限
-    
+      contents: write # 需要创建 Release 和上传文件的权限
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整历史，用于生成 changelog
+          fetch-depth: 0 # 获取完整历史，用于生成 changelog
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -26,8 +26,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -71,13 +71,13 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          
+
           if [ -z "$PREV_TAG" ]; then
             NOTES=$(git log --pretty=format:"- %s (%h)" --no-merges)
           else
             NOTES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
           fi
-          
+
           {
             echo "## 插件更新"
             echo ""
@@ -93,7 +93,7 @@ jobs:
               fi
             done
           } > release_notes.md
-          
+
           cat release_notes.md
 
       - name: Create tag and release
@@ -108,4 +108,3 @@ jobs:
             packed/index.json
           draft: false
           prerelease: ${{ contains(steps.version.outputs.version, '-') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
-
