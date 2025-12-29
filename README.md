@@ -163,6 +163,32 @@ npm run package-plugin crawler_plugins/plugins/<插件名称>
 
 ---
 
+## 开发文档
+
+### 插件开发指南
+
+详细的插件开发指南，包括：
+- 插件目录结构
+- 打包插件的方法
+- 插件文件格式说明（manifest.json、config.json、crawl.rhai）
+- 变量类型和配置说明
+
+📖 [README_PLUGIN_DEV.md](README_PLUGIN_DEV.md)
+
+### Rhai API 文档
+
+完整的 Rhai 爬虫 API 参考文档，包括：
+- 页面导航函数（`to()`, `back()`, `to_json()`）
+- 页面信息函数（`current_url()`, `current_html()`）
+- 元素查询函数（`query()`, `get_attr()`, `query_by_text()`）
+- URL 处理函数（`resolve_url()`, `is_image_url()`）
+- 图片处理函数（`download_image()`）
+- 完整示例和注意事项
+
+📖 [RHAI_API.md](RHAI_API.md)
+
+---
+
 ## 仓库信息
 
 **远程仓库**: git@github.com:kabegame/crawler-plugins.git  
@@ -178,4 +204,6 @@ npm run package-plugin crawler_plugins/plugins/<插件名称>
 2. 提供完整的 manifest.json 配置
 3. 编写清晰的 README.md 文档
 4. 包含用户文档（doc_root/doc.md）
+
+开发新插件前，请先阅读 [插件开发指南](README_PLUGIN_DEV.md) 和 [Rhai API 文档](RHAI_API.md)。
 
