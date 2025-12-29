@@ -22,7 +22,7 @@ plugins/
 
 ```bash
 # 打包指定插件目录
-npm run package-plugin crawler_plugins/plugins/sample-collector
+npm run package-plugin crawler-plugins/plugins/sample-collector
 
 # 在插件仓库中打包所有插件
 npm run package
@@ -40,7 +40,7 @@ npm run tauri:dev:watch
 ```
 
 这会：
-1. 自动打包 `crawler_plugins/plugins/` 下的所有插件为 `.kgpg` 文件
+1. 自动打包 `crawler-plugins/plugins/` 下的所有插件为 `.kgpg` 文件
 2. 启动 Tauri 开发模式
 3. 监听插件文件变化并自动重新打包
 

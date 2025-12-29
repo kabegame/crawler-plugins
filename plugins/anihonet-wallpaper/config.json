@@ -6,14 +6,18 @@
       "type": "int",
       "name": "起始页面",
       "descripts": "要拉取的起始页面",
-      "default": 1
+      "default": 1,
+      "min": 1,
+      "max": 5
     },
     {
       "key": "max_pages",
       "type": "int",
       "name": "最大页数",
       "descripts": "最多爬取多少页",
-      "default": 10
+      "default": 5,
+      "min": 1,
+      "max": 5
     },
     {
       "key": "image_quality",

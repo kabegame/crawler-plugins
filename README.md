@@ -29,7 +29,7 @@ anihonet-wallpaper/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler_plugins/plugins/anihonet-wallpaper
+npm run package-plugin crawler-plugins/plugins/anihonet-wallpaper
 ```
 
 ---
@@ -67,7 +67,7 @@ local-folder-import/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler_plugins/plugins/local-folder-import
+npm run package-plugin crawler-plugins/plugins/local-folder-import
 ```
 
 ---
@@ -99,7 +99,7 @@ single-file-import/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler_plugins/plugins/single-file-import
+npm run package-plugin crawler-plugins/plugins/single-file-import
 ```
 
 ---
@@ -115,7 +115,7 @@ npm run package-plugin crawler_plugins/plugins/single-file-import
 git submodule update --init --recursive
 
 # 更新 submodule 到最新版本
-git submodule update --remote crawler_plugins
+git submodule update --remote crawler-plugins
 
 # 更新所有 submodules
 git submodule update --remote
@@ -156,10 +156,10 @@ node package-plugin.js anihonet-wallpaper
 在主项目根目录执行：
 
 ```bash
-npm run package-plugin crawler_plugins/plugins/<插件名称>
+npm run package-plugin crawler-plugins/plugins/<插件名称>
 ```
 
-打包后的文件将生成在 `crawler_plugins/packed/<插件名称>.kgpg`
+打包后的文件将生成在 `crawler-plugins/packed/<插件名称>.kgpg`
 
 ---
 

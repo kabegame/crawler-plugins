@@ -1,0 +1,129 @@
+name: Release Enhanced
+
+on:
+  push:
+    branches:
+      - main  # 当推送到 main 分支时触发
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Is this a prerelease?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Version: ${VERSION}"
+          echo "Tag: ${TAG}"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "⚠️  Tag $TAG already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "✅ Tag $TAG does not exist, proceeding with release"
+          fi
+
+      - name: Package plugins
+        if: steps.check_tag.outputs.exists == 'false'
+        run: pnpm run package
+
+      - name: Generate index.json
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
+          node generate-index.js "${{ github.repository_owner }}" "$REPO_NAME"
+          cat packed/index.json
+
+      - name: Extract plugin info
+        if: steps.check_tag.outputs.exists == 'false'
+        id: plugin_info
+        run: |
+          echo "plugins<<EOF" >> $GITHUB_OUTPUT
+          for file in packed/*.kgpg; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .kgpg)
+              size=$(du -h "$file" | cut -f1)
+              echo "- **$filename** ($size)" >> $GITHUB_OUTPUT
+            fi
+          done
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        if: steps.check_tag.outputs.exists == 'false'
+        id: changelog
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          
+          if [ -z "$PREV_TAG" ]; then
+            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          {
+            echo "changelog<<EOF"
+            echo "## 📦 插件包"
+            echo ""
+            echo "${{ steps.plugin_info.outputs.plugins }}"
+            echo ""
+            echo "## 📝 更新内容"
+            echo ""
+            if [ -z "$CHANGES" ]; then
+              echo "- 无变更记录"
+            else
+              echo "$CHANGES"
+            fi
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Create tag and release
+        if: steps.check_tag.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          files: |
+            packed/*.kgpg
+            packed/index.json
+          draft: false
+          prerelease: ${{ github.event.inputs.prerelease || contains(steps.version.outputs.version, '-') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+

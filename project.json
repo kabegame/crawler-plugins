@@ -1,0 +1,21 @@
+{
+  "name": "crawler-plugins",
+  "targets": {
+    "package": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node package-plugin.js",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "{projectRoot}/plugins/**/*"
+      ],
+      "outputs": [
+        "{projectRoot}/packed/**/*"
+      ]
+    }
+  }
+}
+
