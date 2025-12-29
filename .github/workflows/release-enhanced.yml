@@ -3,11 +3,11 @@ name: Release Enhanced
 on:
   push:
     branches:
-      - main  # 当推送到 main 分支时触发
+      - main # 当推送到 main 分支时触发
   workflow_dispatch:
     inputs:
       prerelease:
-        description: 'Is this a prerelease?'
+        description: "Is this a prerelease?"
         required: false
         default: false
         type: boolean
@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,13 +27,13 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -91,13 +91,13 @@ jobs:
         run: |
           TAG="${{ steps.version.outputs.tag }}"
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-          
+
           if [ -z "$PREV_TAG" ]; then
             CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
           else
             CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
           fi
-          
+
           {
             echo "changelog<<EOF"
             echo "## 📦 插件包"
@@ -126,4 +126,3 @@ jobs:
             packed/index.json
           draft: false
           prerelease: ${{ github.event.inputs.prerelease || contains(steps.version.outputs.version, '-') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
-
