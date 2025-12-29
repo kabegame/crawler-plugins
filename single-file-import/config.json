@@ -1,0 +1,13 @@
+{
+  "baseUrl": "file://",
+  "var": [
+    {
+      "key": "file_path",
+      "type": "file",
+      "name": "图片文件",
+      "descripts": "选择一个本地图片文件路径（仅导入这一张）"
+    }
+  ]
+}
+
+

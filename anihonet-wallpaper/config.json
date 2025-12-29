@@ -1,0 +1,55 @@
+{
+  "baseUrl": "https://anihonetwallpaper.com",
+  "var": [
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "descripts": "要拉取的起始页面",
+      "default": 1
+    },
+    {
+      "key": "max_pages",
+      "type": "int",
+      "name": "最大页数",
+      "descripts": "最多爬取多少页",
+      "default": 10
+    },
+    {
+      "key": "image_quality",
+      "type": "options",
+      "name": "图片质量",
+      "descripts": "选择图片质量",
+      "options": [
+        { "name": "high", "variable": "high" },
+        { "name": "medium", "variable": "medium" },
+        { "name": "low", "variable": "low" }
+      ],
+      "default": "high"
+    },
+    {
+      "key": "wallpaper_type",
+      "type": "options",
+      "name": "壁纸类型",
+      "descripts": "选择要爬取的壁纸类型：桌面壁纸（imgpc）或手机壁纸（sp）",
+      "options": [
+        { "name": "桌面壁纸", "variable": "imgpc" },
+        { "name": "手机壁纸", "variable": "sp" }
+      ],
+      "default": "imgpc"
+    },
+    {
+      "key": "ranking_period",
+      "type": "options",
+      "name": "排行榜周期",
+      "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
+      "options": [
+        { "name": "日榜", "variable": "daily" },
+        { "name": "周榜", "variable": "weekly" },
+        { "name": "月榜", "variable": "monthly" },
+        { "name": "年榜", "variable": "annual" }
+      ],
+      "default": "daily"
+    }
+  ]
+}

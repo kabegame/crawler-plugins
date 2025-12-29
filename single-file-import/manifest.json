@@ -1,0 +1,8 @@
+{
+  "name": "单文件导入",
+  "version": "1.0.0",
+  "description": "从本地选择单个图片文件导入到图库（仅入队一次）",
+  "author": "Kabegame"
+}
+
+
