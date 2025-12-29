@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // 插件目录和输出目录
-const PLUGIN_DIR = __dirname;
+const PLUGIN_DIR = path.join(__dirname, "plugins");
 const OUTPUT_DIR = path.join(__dirname, "packed");
 
 function packagePlugin(pluginDir, outputFile) {
@@ -107,7 +107,7 @@ async function packageAllPlugins() {
     .filter((entry) => {
       // 排除非插件目录
       const dirName = entry.name;
-      return dirName !== "node_modules" && dirName !== "packed" && dirName !== ".git";
+      return dirName !== "node_modules" && dirName !== "packed" && dirName !== ".git" && dirName !== "plugins";
     })
     .map((entry) => entry.name);
 

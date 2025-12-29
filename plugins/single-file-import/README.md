@@ -18,6 +18,6 @@
 npm run package-plugin
 ```
 
-打包后输出到 `test_plugin_packed/single-file-import.kgpg`。
+打包后输出到 `packed/single-file-import.kgpg`。
 
 
