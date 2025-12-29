@@ -1,0 +1,14 @@
+{
+  "name": "crawler-plugins",
+  "version": "1.0.0",
+  "description": "Kabegame 爬虫插件仓库",
+  "type": "module",
+  "scripts": {
+    "package": "node package-plugin.js",
+    "package:single": "node package-plugin.js"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1"
+  }
+}
+

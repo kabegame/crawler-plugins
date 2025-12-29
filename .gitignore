@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Packed plugins
+packed/
+
+# OS files
+.DS_Store
+Thumbs.db
+

@@ -120,6 +120,36 @@ git submodule update --remote
 
 ### 打包插件
 
+#### 在插件仓库中打包
+
+本仓库提供了打包工具，可以将插件打包为 `.kgpg` 格式（ZIP 压缩格式）。
+
+**安装依赖**（首次使用）：
+
+```bash
+npm install
+```
+
+**打包所有插件**：
+
+```bash
+npm run package
+# 或
+node package-plugin.js
+```
+
+**打包单个插件**：
+
+```bash
+node package-plugin.js <插件名称>
+# 例如：
+node package-plugin.js anihonet-wallpaper
+```
+
+打包后的文件将生成在 `packed/<插件名称>.kgpg` 目录中。
+
+#### 在主项目中使用
+
 在主项目根目录执行：
 
 ```bash
