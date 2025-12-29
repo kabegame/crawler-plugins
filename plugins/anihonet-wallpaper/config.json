@@ -20,18 +20,6 @@
       "max": 5
     },
     {
-      "key": "image_quality",
-      "type": "options",
-      "name": "图片质量",
-      "descripts": "选择图片质量",
-      "options": [
-        { "name": "high", "variable": "high" },
-        { "name": "medium", "variable": "medium" },
-        { "name": "low", "variable": "low" }
-      ],
-      "default": "high"
-    },
-    {
       "key": "wallpaper_type",
       "type": "options",
       "name": "壁纸类型",

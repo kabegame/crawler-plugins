@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "package": "node package-plugin.js",
-    "package:single": "node package-plugin.js"
+    "package:single": "node package-plugin.js",
+    "generate-index": "node generate-index.js",
+    "release": "npm run package && npm run generate-index"
   },
   "devDependencies": {
-    "archiver": "^7.0.1"
+    "archiver": "^7.0.1",
+    "glob": "^11.0.0"
   }
 }
-

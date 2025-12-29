@@ -151,6 +151,45 @@ node package-plugin.js anihonet-wallpaper
 
 打包后的文件将生成在 `packed/<插件名称>.kgpg` 目录中。
 
+**生成插件索引文件（index.json）**：
+
+索引文件用于 GitHub Release，包含所有插件的下载链接和元数据。版本信息自动从 `package.json` 读取。
+
+```bash
+# 生成索引文件（版本从 package.json 读取）
+npm run generate-index
+
+# 手动指定仓库信息（可选）
+node generate-index.js kabegame crawler-plugins
+```
+
+生成的 `index.json` 将保存在 `packed/index.json`，格式符合后端期望：
+- 版本信息从 `package.json` 的 `version` 字段读取，自动添加 `v` 前缀（如 `1.0.0` → `v1.0.0`）
+- 使用 camelCase 字段名（`downloadUrl`, `sizeBytes`）
+- 包含 SHA256 校验和
+- 下载 URL 指向 GitHub Release：`https://github.com/kabegame/crawler-plugins/releases/download/{tag}/{plugin}.kgpg`
+
+**一键打包并生成索引**：
+
+```bash
+npm run release
+```
+
+这将先打包所有插件，然后生成索引文件。
+
+**发布新版本**：
+
+1. 更新 `package.json` 中的 `version` 字段（如 `1.0.0` → `1.1.0`）
+2. 提交更改并推送到 `main` 分支
+3. GitHub Actions 会自动：
+   - 从 `package.json` 读取版本号
+   - 创建 tag（格式：`v{version}`，如 `v1.1.0`）
+   - 打包所有插件
+   - 生成 `index.json`
+   - 创建 GitHub Release 并上传文件
+
+如果 tag 已存在，workflow 会跳过发布以避免重复。
+
 #### 在主项目中使用
 
 在主项目根目录执行：

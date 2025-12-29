@@ -10,10 +10,17 @@
       "cache": true,
       "inputs": [
         "default",
-        "{projectRoot}/plugins/**/*"
+        "^default",
+        "{projectRoot}/plugins/**/manifest.json",
+        "{projectRoot}/plugins/**/config.json",
+        "{projectRoot}/plugins/**/crawl.rhai",
+        "{projectRoot}/plugins/**/icon.ico",
+        "{projectRoot}/plugins/**/doc_root/doc.md",
+        "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
+        "{projectRoot}/package-plugin.js"
       ],
       "outputs": [
-        "{projectRoot}/packed/**/*"
+        "{projectRoot}/packed/**/*.kgpg"
       ]
     }
   }

@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Packed plugins (构建产物，由 CI/CD 自动生成)
+packed/
+
 # OS files
 .DS_Store
 Thumbs.db
