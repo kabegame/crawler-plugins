@@ -11,7 +11,8 @@
 **描述**: anihonet动漫壁纸收集源插件  
 **作者**: Kabegame
 
-**路径**: `anihonet-wallpaper/`
+**路径**: `anihonet-wallpaper/`  
+**详细文档**: [anihonet-wallpaper/README.md](anihonet-wallpaper/README.md)
 
 **文件结构**:
 ```
@@ -40,7 +41,8 @@ npm run package-plugin crawler_plugins/anihonet-wallpaper
 **描述**: 从本地文件夹导入图片文件到图库  
 **作者**: Kabegame
 
-**路径**: `local-folder-import/`
+**路径**: `local-folder-import/`  
+**详细文档**: [local-folder-import/README.md](local-folder-import/README.md)
 
 **功能**:
 - 扫描指定文件夹内的图片文件（非递归）
@@ -77,7 +79,8 @@ npm run package-plugin crawler_plugins/local-folder-import
 **描述**: 从本地选择单个图片文件导入到图库（仅入队一次）  
 **作者**: Kabegame
 
-**路径**: `single-file-import/`
+**路径**: `single-file-import/`  
+**详细文档**: [single-file-import/README.md](single-file-import/README.md)
 
 **功能**:
 - 从本地选择单个图片文件导入到图库
@@ -156,7 +159,7 @@ node package-plugin.js anihonet-wallpaper
 npm run package-plugin crawler_plugins/<插件名称>
 ```
 
-打包后的文件将生成在 `test_plugin_packed/<插件名称>.kgpg`
+打包后的文件将生成在 `crawler_plugins/packed/<插件名称>.kgpg`
 
 ---
 
