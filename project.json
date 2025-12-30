@@ -15,12 +15,32 @@
         "{projectRoot}/plugins/**/config.json",
         "{projectRoot}/plugins/**/crawl.rhai",
         "{projectRoot}/plugins/**/icon.ico",
+        "{projectRoot}/plugins/**/icon.png",
         "{projectRoot}/plugins/**/doc_root/doc.md",
         "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
         "{projectRoot}/package-plugin.js"
       ],
       "outputs": [
-        "{projectRoot}/packed/**/*.kgpg"
+        "{projectRoot}/packed/**/*"
+      ]
+    },
+    "package-local": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node package-plugin.js --only single-file-import local-folder-import",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/package.json",
+        "{projectRoot}/pnpm-lock.yaml",
+        "{projectRoot}/package-plugin.js",
+        "{projectRoot}/project.json",
+        "{projectRoot}/plugins/single-file-import/**",
+        "{projectRoot}/plugins/local-folder-import/**"
+      ],
+      "outputs": [
+        "{projectRoot}/packed/**/*"
       ]
     }
   }

@@ -149,6 +149,16 @@ node package-plugin.js <插件名称>
 node package-plugin.js anihonet-wallpaper
 ```
 
+**仅打包指定插件（多选，用于开发提速）**：
+
+```bash
+# 只打包这两个插件，并清理 packed 目录下其它 .kgpg（避免开发模式下被应用加载到）
+node package-plugin.js --only single-file-import local-folder-import
+
+# 也支持逗号分隔
+node package-plugin.js --only single-file-import,local-folder-import
+```
+
 打包后的文件将生成在 `packed/<插件名称>.kgpg` 目录中。
 
 **生成插件索引文件（index.json）**：
@@ -168,6 +178,7 @@ node generate-index.js kabegame crawler-plugins
 - 使用 camelCase 字段名（`downloadUrl`, `sizeBytes`）
 - 包含 SHA256 校验和
 - 下载 URL 指向 GitHub Release：`https://github.com/kabegame/crawler-plugins/releases/download/{tag}/{plugin}.kgpg`
+- 可选图标：每个插件目录可放置 `icon.png`，发布时会复制为 Release 资产 `packed/<plugin>.icon.png`，并在条目中写入 `iconUrl`
 
 **一键打包并生成索引**：
 

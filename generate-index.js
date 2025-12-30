@@ -4,7 +4,7 @@
  * 生成插件索引文件 index.json
  * 版本信息从 package.json 读取
  * 用法: node generate-index.js [repo_owner] [repo_name]
- * 
+ *
  * 示例: node generate-index.js kabegame crawler-plugins
  */
 
@@ -23,6 +23,10 @@ const OUTPUT_DIR = path.join(__dirname, "packed");
 const INDEX_FILE = path.join(OUTPUT_DIR, "index.json");
 const PACKAGE_JSON = path.join(__dirname, "package.json");
 
+// 插件图标：每个插件目录下放置 icon.png；发布到 Release 时输出为 packed/<id>.icon.png
+const PLUGIN_ICON_SOURCE_NAME = "icon.png";
+const PLUGIN_ICON_PACKED_SUFFIX = ".icon.png";
+
 // 从 package.json 读取版本信息
 let packageVersion = "latest";
 try {
@@ -39,10 +43,16 @@ try {
 // 注意：GitHub Actions 在 push 到 main 时 GITHUB_REF_NAME=main，会导致生成的 index.json 写成 main。
 // 这里优先使用 "vX.Y.Z" 这种 tag；否则回退到 package.json 的版本推导出的 tag。
 const envRefName = process.env.GITHUB_REF_NAME;
-const envTag = envRefName && /^v\d+\.\d+\.\d+.*$/i.test(envRefName) ? envRefName : null;
-const RELEASE_TAG = envTag || (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
-const REPO_OWNER = process.argv[2] || process.env.GITHUB_REPOSITORY_OWNER || "kabegame";
-const REPO_NAME = process.argv[3] || process.env.GITHUB_REPOSITORY?.split("/")[1] || "crawler-plugins";
+const envTag =
+  envRefName && /^v\d+\.\d+\.\d+.*$/i.test(envRefName) ? envRefName : null;
+const RELEASE_TAG =
+  envTag || (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
+const REPO_OWNER =
+  process.argv[2] || process.env.GITHUB_REPOSITORY_OWNER || "kabegame";
+const REPO_NAME =
+  process.argv[3] ||
+  process.env.GITHUB_REPOSITORY?.split("/")[1] ||
+  "crawler-plugins";
 
 // GitHub Release 下载 URL 模板
 // 格式: https://github.com/{owner}/{repo}/releases/download/{tag}/{filename}
@@ -53,7 +63,7 @@ function formatFileSize(bytes) {
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
 }
 
 function calculateSHA256(filePath) {
@@ -101,6 +111,9 @@ function generateIndex() {
     const pluginDir = path.join(PLUGIN_DIR, pluginName);
     const manifestPath = path.join(pluginDir, "manifest.json");
     const kgpgFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
+    const iconSourceFile = path.join(pluginDir, PLUGIN_ICON_SOURCE_NAME);
+    const iconPackedName = `${pluginName}${PLUGIN_ICON_PACKED_SUFFIX}`;
+    const iconPackedFile = path.join(OUTPUT_DIR, iconPackedName);
 
     // 检查 manifest.json 是否存在
     if (!fs.existsSync(manifestPath)) {
@@ -139,9 +152,17 @@ function generateIndex() {
         sha256: sha256, // SHA256 校验和，必需字段
       };
 
+      // iconUrl（可选）：仅当 icon 文件存在时写入，避免 index.json 指向不存在的资源
+      // 优先以 packed/<id>.icon.png 为准（Release 资产），否则回退到插件目录检测（便于本地开发生成索引时提示）
+      if (fs.existsSync(iconPackedFile) || fs.existsSync(iconSourceFile)) {
+        pluginInfo.iconUrl = `${GITHUB_RELEASE_BASE}/${iconPackedName}`;
+      }
+
       plugins.push(pluginInfo);
       console.log(
-        `✅ ${pluginName}: ${pluginInfo.name} v${pluginInfo.version} (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`
+        `✅ ${pluginName}: ${pluginInfo.name} v${
+          pluginInfo.version
+        } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`
       );
     } catch (error) {
       console.error(`❌ ${pluginName}: ${error.message}`);
@@ -176,4 +197,3 @@ try {
   console.error("❌ 生成索引失败:", error.message);
   process.exit(1);
 }
-
