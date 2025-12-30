@@ -40,6 +40,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
+        #　ロックファイルは正確だけど、なぜかアクションがエラーを報告するので、--no-frozen-lockfile を使用
         run: pnpm install --no-frozen-lockfile
 
       - name: Get version from package.json
@@ -70,6 +71,9 @@ jobs:
 
       - name: Generate index.json
         if: steps.check_tag.outputs.exists == 'false'
+        env:
+          # 让 generate-index.js 使用即将发布的 tag，而不是 push 分支名（如 main）
+          GITHUB_REF_NAME: ${{ steps.version.outputs.tag }}
         run: |
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
           node generate-index.js "${{ github.repository_owner }}" "$REPO_NAME"

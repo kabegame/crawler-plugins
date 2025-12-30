@@ -190,6 +190,21 @@ npm run release
 
 如果 tag 已存在，workflow 会跳过发布以避免重复。
 
+**Git Hooks（自动打 tag）**：
+
+本仓库配置了 `pre-push` git hook，在 `git push` 前会自动尝试根据 `package.json` 的版本创建 tag（格式：`v{version}`）。如果 tag 已存在则跳过，不会阻断 push。
+
+首次使用需要启用 hooks：
+
+```bash
+# 安装依赖（会自动运行 prepare 脚本安装 husky）
+pnpm install
+# 或手动运行
+pnpm prepare
+```
+
+之后每次 `git push` 时，hook 会自动尝试创建对应的 tag（如果不存在）。
+
 #### 在主项目中使用
 
 在主项目根目录执行：

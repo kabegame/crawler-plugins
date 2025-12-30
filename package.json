@@ -1,16 +1,18 @@
 {
   "name": "crawler-plugins",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Kabegame 爬虫插件仓库",
   "type": "module",
   "scripts": {
     "package": "node package-plugin.js",
     "package:single": "node package-plugin.js",
     "generate-index": "node generate-index.js",
-    "release": "npm run package && npm run generate-index"
+    "release": "npm run package && npm run generate-index",
+    "prepare": "husky"
   },
   "devDependencies": {
     "archiver": "^7.0.1",
-    "glob": "^10.5.0"
+    "glob": "^10.5.0",
+    "husky": "^9.1.7"
   }
 }

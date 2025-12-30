@@ -35,7 +35,12 @@ try {
 // 从环境变量或参数获取 Release 信息
 // 默认仓库: https://github.com/kabegame/crawler-plugins
 // Release tag 格式: v{version}，例如 v1.0.0
-const RELEASE_TAG = process.env.GITHUB_REF_NAME || (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
+//
+// 注意：GitHub Actions 在 push 到 main 时 GITHUB_REF_NAME=main，会导致生成的 index.json 写成 main。
+// 这里优先使用 "vX.Y.Z" 这种 tag；否则回退到 package.json 的版本推导出的 tag。
+const envRefName = process.env.GITHUB_REF_NAME;
+const envTag = envRefName && /^v\d+\.\d+\.\d+.*$/i.test(envRefName) ? envRefName : null;
+const RELEASE_TAG = envTag || (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
 const REPO_OWNER = process.argv[2] || process.env.GITHUB_REPOSITORY_OWNER || "kabegame";
 const REPO_NAME = process.argv[3] || process.env.GITHUB_REPOSITORY?.split("/")[1] || "crawler-plugins";
 
@@ -122,11 +127,13 @@ function generateIndex() {
 
       // 构建插件信息（符合后端期望的格式）
       // 后端期望字段: id, name, version, description, downloadUrl, sizeBytes, sha256
+      // 额外包含 author 字段以保持与 manifest.json 的一致性
       const pluginInfo = {
         id: pluginName,
         name: manifest.name || pluginName,
         version: manifest.version || "1.0.0",
         description: manifest.description || "",
+        author: manifest.author || "", // 从 manifest.json 读取作者信息
         downloadUrl: `${GITHUB_RELEASE_BASE}/${pluginName}.kgpg`, // camelCase，符合后端期望
         sizeBytes: fileSize, // 数字格式，符合后端期望
         sha256: sha256, // SHA256 校验和，必需字段
