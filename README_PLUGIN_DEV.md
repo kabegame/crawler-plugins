@@ -10,6 +10,7 @@
 plugins/
 └── sample-collector/
     ├── manifest.json    # 必需：插件元数据
+    ├── icon.png         # 可选：插件图标（仅支持 PNG）
     ├── config.json      # 可选：插件配置
     ├── doc.md          # 可选：用户文档
     ├── crawl.rhai      # 可选：爬取脚本（Rhai 脚本格式）

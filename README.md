@@ -20,7 +20,7 @@ anihonet-wallpaper/
 ├── manifest.json    # 插件元数据
 ├── config.json      # 插件配置
 ├── crawl.rhai       # 爬虫脚本
-├── icon.ico         # 插件图标
+├── icon.png         # 插件图标（仅支持 PNG）
 ├── doc_root/        # 文档目录
 │   ├── doc.md       # 用户文档
 │   └── 1 (64).jpeg  # 示例图片
@@ -29,7 +29,7 @@ anihonet-wallpaper/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler-plugins/plugins/anihonet-wallpaper
+pnpm run package-plugin crawler-plugins/plugins/anihonet-wallpaper
 ```
 
 ---
@@ -67,7 +67,7 @@ local-folder-import/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler-plugins/plugins/local-folder-import
+pnpm run package-plugin crawler-plugins/plugins/local-folder-import
 ```
 
 ---
@@ -99,7 +99,7 @@ single-file-import/
 
 **引用方式**:
 ```bash
-npm run package-plugin crawler-plugins/plugins/single-file-import
+pnpm run package-plugin crawler-plugins/plugins/single-file-import
 ```
 
 ---
@@ -130,13 +130,13 @@ git submodule update --remote
 **安装依赖**（首次使用）：
 
 ```bash
-npm install
+pnpm install
 ```
 
 **打包所有插件**：
 
 ```bash
-npm run package
+pnpm run package
 # 或
 node package-plugin.js
 ```
@@ -167,7 +167,7 @@ node package-plugin.js --only single-file-import,local-folder-import
 
 ```bash
 # 生成索引文件（版本从 package.json 读取）
-npm run generate-index
+pnpm run generate-index
 
 # 手动指定仓库信息（可选）
 node generate-index.js kabegame crawler-plugins
@@ -178,12 +178,12 @@ node generate-index.js kabegame crawler-plugins
 - 使用 camelCase 字段名（`downloadUrl`, `sizeBytes`）
 - 包含 SHA256 校验和
 - 下载 URL 指向 GitHub Release：`https://github.com/kabegame/crawler-plugins/releases/download/{tag}/{plugin}.kgpg`
-- 可选图标：每个插件目录可放置 `icon.png`，发布时会复制为 Release 资产 `packed/<plugin>.icon.png`，并在条目中写入 `iconUrl`
+- 可选图标（仅支持 PNG）：每个插件目录可放置 `icon.png`，发布时会复制为 Release 资产 `packed/<plugin>.icon.png`，并在条目中写入 `iconUrl`
 
 **一键打包并生成索引**：
 
 ```bash
-npm run release
+pnpm run release
 ```
 
 这将先打包所有插件，然后生成索引文件。
@@ -221,7 +221,7 @@ pnpm prepare
 在主项目根目录执行：
 
 ```bash
-npm run package-plugin crawler-plugins/plugins/<插件名称>
+pnpm run package-plugin crawler-plugins/plugins/<插件名称>
 ```
 
 打包后的文件将生成在 `crawler-plugins/packed/<插件名称>.kgpg`

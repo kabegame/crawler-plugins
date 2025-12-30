@@ -65,6 +65,7 @@
 ```
 anihonet-wallpaper/
 ├── manifest.json    # 插件元数据
+├── icon.png         # 插件图标（可选，仅支持 PNG）
 ├── config.json      # 插件配置
 ├── crawl.rhai       # 爬取脚本
 ├── doc_root/

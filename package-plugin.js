@@ -131,7 +131,6 @@ function getDefaultPatterns() {
     "{projectRoot}/plugins/**/manifest.json",
     "{projectRoot}/plugins/**/config.json",
     "{projectRoot}/plugins/**/crawl.rhai",
-    "{projectRoot}/plugins/**/icon.ico",
     "{projectRoot}/plugins/**/icon.png",
     "{projectRoot}/plugins/**/doc_root/doc.md",
     "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",

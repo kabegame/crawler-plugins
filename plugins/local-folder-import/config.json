@@ -11,15 +11,15 @@
       "key": "file_extensions",
       "type": "list",
       "name": "文件扩展名",
-      "descripts": "要导入的文件扩展名列表（不包含点号）",
+      "descripts": "要导入的图片扩展名列表（不包含点号）",
       "default": ["jpg", "jpeg", "png", "gif", "webp", "bmp"],
       "options": ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico"]
     },
     {
       "key": "recursive",
       "type": "boolean",
-      "name": "递归扫描",
-      "descripts": "是否递归扫描子文件夹",
+      "name": "包括子文件",
+      "descripts": "是否包括所有子文件夹",
       "default": false
     }
   ]
