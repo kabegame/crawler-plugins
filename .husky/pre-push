@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Non-blocking: even if script errors, we continue pushing.
 node scripts/git/ensure-tag.mjs || true
 
