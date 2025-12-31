@@ -2,10 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - main # 当推送到 main 分支时触发
     tags:
-      - "v*" # 当推送以 v 开头的 tag 时触发
+      - "v*" # 仅当推送以 v 开头的 tag 时触发（pre-push hook 会自动创建并推送 tag）
   workflow_dispatch:
     inputs:
       prerelease:
@@ -55,28 +53,27 @@ jobs:
           echo "Version: ${VERSION}"
           echo "Tag: ${TAG}"
 
-      - name: Check if should release
-        id: check_tag
+      - name: Check if release exists
+        id: check_release
         run: |
           TAG="${{ steps.version.outputs.tag }}"
-          # 如果是 tag push 触发，直接执行 release
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "✅ Tag push detected, proceeding with release"
-          elif git rev-parse "$TAG" >/dev/null 2>&1; then
+          # 检查 GitHub Release 是否已存在（而不是 tag）
+          if gh release view "$TAG" &>/dev/null; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "⚠️  Tag $TAG already exists, skipping release"
+            echo "⚠️  Release $TAG already exists, skipping"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "✅ Tag $TAG does not exist, proceeding with release"
+            echo "✅ Release $TAG does not exist, proceeding"
           fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Package plugins
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         run: pnpm run package
 
       - name: Generate index.json
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         env:
           # 让 generate-index.js 使用即将发布的 tag，而不是 push 分支名（如 main）
           GITHUB_REF_NAME: ${{ steps.version.outputs.tag }}
@@ -86,7 +83,7 @@ jobs:
           cat packed/index.json
 
       - name: Extract plugin info
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         id: plugin_info
         run: |
           echo "plugins<<EOF" >> $GITHUB_OUTPUT
@@ -100,7 +97,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Generate changelog
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         id: changelog
         run: |
           TAG="${{ steps.version.outputs.tag }}"
@@ -129,7 +126,7 @@ jobs:
           } >> $GITHUB_OUTPUT
 
       - name: Create tag and release
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_release.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.tag }}
