@@ -21,9 +21,9 @@ import { glob } from "glob";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// 插件目录和输出目录
+// 插件目录和输出目录（默认输出到 packed，可通过参数覆盖）
 const PLUGIN_DIR = path.join(__dirname, "plugins");
-const OUTPUT_DIR = path.join(__dirname, "packed");
+const DEFAULT_OUTPUT_DIR = path.join(__dirname, "packed");
 const PROJECT_JSON = path.join(__dirname, "project.json");
 
 const PLUGIN_ICON_SOURCE_NAME = "icon.png";
@@ -34,14 +34,50 @@ function parseArgs(argv) {
   const result = {
     mode: "all", // all | single | only
     pluginNames: [],
+    outDir: undefined, // string | undefined
   };
 
   if (!argv || argv.length === 0) return result;
 
+  // 先解析通用参数（例如 --outDir），其余留给 mode 解析
+  const rest = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+
+    // 支持：--outDir=xxx / --out-dir=xxx / --outputDir=xxx / --output-dir=xxx
+    const m = a.match(
+      /^--(?:outDir|outdir|out-dir|outputDir|output-dir)=(.+)$/
+    );
+    if (m) {
+      result.outDir = m[1];
+      continue;
+    }
+
+    // 支持：--outDir xxx / --out-dir xxx / --outputDir xxx / --output-dir xxx
+    if (
+      a === "--outDir" ||
+      a === "--outdir" ||
+      a === "--out-dir" ||
+      a === "--outputDir" ||
+      a === "--output-dir"
+    ) {
+      const v = argv[i + 1];
+      if (!v) {
+        console.error("❌ 参数错误：--outDir 后必须提供目录路径");
+        process.exit(1);
+      }
+      result.outDir = v;
+      i++;
+      continue;
+    }
+
+    rest.push(a);
+  }
+
   // --only mode (multi plugin)
-  const onlyIdx = argv.findIndex((a) => a === "--only" || a === "--plugins");
+  const onlyIdx = rest.findIndex((a) => a === "--only" || a === "--plugins");
   if (onlyIdx !== -1) {
-    const after = argv.slice(onlyIdx + 1);
+    const after = rest.slice(onlyIdx + 1);
     const names = after
       .flatMap((s) => s.split(","))
       .map((s) => s.trim())
@@ -56,22 +92,24 @@ function parseArgs(argv) {
   }
 
   // Legacy: single plugin by first arg
-  const first = argv[0];
+  const first = rest[0];
   if (first && !first.startsWith("-")) {
     result.mode = "single";
     result.pluginNames = [first];
     return result;
   }
 
-  console.error(`❌ 未识别的参数: ${argv.join(" ")}`);
+  if (rest.length === 0) return result;
+
+  console.error(`❌ 未识别的参数: ${rest.join(" ")}`);
   process.exit(1);
 }
 
-function cleanupPackedKgpgFiles(keepNames = null) {
-  if (!fs.existsSync(OUTPUT_DIR)) return;
-  const files = fs.readdirSync(OUTPUT_DIR);
+function cleanupPackedKgpgFiles(outputDir, keepNames = null) {
+  if (!fs.existsSync(outputDir)) return;
+  const files = fs.readdirSync(outputDir);
   for (const file of files) {
-    const filePath = path.join(OUTPUT_DIR, file);
+    const filePath = path.join(outputDir, file);
     const stat = fs.statSync(filePath);
     if (!stat.isFile() || !file.endsWith(".kgpg")) continue;
 
@@ -83,11 +121,11 @@ function cleanupPackedKgpgFiles(keepNames = null) {
   }
 }
 
-function cleanupPackedPluginIconFiles(keepNames = null) {
-  if (!fs.existsSync(OUTPUT_DIR)) return;
-  const files = fs.readdirSync(OUTPUT_DIR);
+function cleanupPackedPluginIconFiles(outputDir, keepNames = null) {
+  if (!fs.existsSync(outputDir)) return;
+  const files = fs.readdirSync(outputDir);
   for (const file of files) {
-    const filePath = path.join(OUTPUT_DIR, file);
+    const filePath = path.join(outputDir, file);
     const stat = fs.statSync(filePath);
     if (!stat.isFile() || !file.endsWith(PLUGIN_ICON_PACKED_SUFFIX)) continue;
 
@@ -368,32 +406,29 @@ async function packagePlugin(pluginDir, outputFile) {
   });
 }
 
-function copyPluginIconToPacked(pluginDir, pluginName) {
+function copyPluginIconToPacked(pluginDir, pluginName, outputDir) {
   const src = path.join(pluginDir, PLUGIN_ICON_SOURCE_NAME);
   if (!fs.existsSync(src)) {
     return false;
   }
-  if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   }
-  const dst = path.join(
-    OUTPUT_DIR,
-    `${pluginName}${PLUGIN_ICON_PACKED_SUFFIX}`
-  );
+  const dst = path.join(outputDir, `${pluginName}${PLUGIN_ICON_PACKED_SUFFIX}`);
   fs.copyFileSync(src, dst);
   return true;
 }
 
-async function packageAllPlugins() {
+async function packageAllPlugins(outputDir) {
   console.log("📦 开始打包插件...\n");
 
   // 确保输出目录存在
-  if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   } else {
     // 清空输出目录中的 .kgpg 文件
-    cleanupPackedKgpgFiles(null);
-    cleanupPackedPluginIconFiles(null);
+    cleanupPackedKgpgFiles(outputDir, null);
+    cleanupPackedPluginIconFiles(outputDir, null);
   }
 
   // 读取插件目录下的所有文件夹
@@ -422,11 +457,11 @@ async function packageAllPlugins() {
   // 打包每个插件
   const promises = pluginDirs.map(async (pluginName) => {
     const pluginDir = path.join(PLUGIN_DIR, pluginName);
-    const outputFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
+    const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
 
     try {
       await packagePlugin(pluginDir, outputFile);
-      copyPluginIconToPacked(pluginDir, pluginName);
+      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
       return { name: pluginName, success: true };
     } catch (error) {
       console.error(`❌ ${pluginName}: ${error.message}`);
@@ -445,14 +480,14 @@ async function packageAllPlugins() {
   if (failCount > 0) {
     console.log(`   ❌ 失败: ${failCount}`);
   }
-  console.log(`\n📁 输出目录: ${OUTPUT_DIR}\n`);
+  console.log(`\n📁 输出目录: ${outputDir}\n`);
 
   if (failCount > 0) {
     process.exit(1);
   }
 }
 
-async function packageSinglePlugin(pluginName) {
+async function packageSinglePlugin(pluginName, outputDir) {
   console.log(`📦 开始打包插件: ${pluginName}\n`);
 
   const pluginDir = path.join(PLUGIN_DIR, pluginName);
@@ -464,15 +499,15 @@ async function packageSinglePlugin(pluginName) {
   }
 
   // 确保输出目录存在
-  if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const outputFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
+  const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
 
   try {
     await packagePlugin(pluginDir, outputFile);
-    copyPluginIconToPacked(pluginDir, pluginName);
+    copyPluginIconToPacked(pluginDir, pluginName, outputDir);
     console.log(`\n📁 输出文件: ${outputFile}\n`);
   } catch (error) {
     console.error(`❌ 打包失败: ${error.message}`);
@@ -480,7 +515,7 @@ async function packageSinglePlugin(pluginName) {
   }
 }
 
-async function packageOnlyPlugins(pluginNames) {
+async function packageOnlyPlugins(pluginNames, outputDir) {
   console.log(
     `📦 开始打包指定插件 (${pluginNames.length} 个): ${pluginNames.join(
       ", "
@@ -488,12 +523,12 @@ async function packageOnlyPlugins(pluginNames) {
   );
 
   // 确保输出目录存在
-  if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
   } else {
     // 只保留目标插件（避免开发模式下“残留旧插件”被应用读到）
-    cleanupPackedKgpgFiles(pluginNames);
-    cleanupPackedPluginIconFiles(pluginNames);
+    cleanupPackedKgpgFiles(outputDir, pluginNames);
+    cleanupPackedPluginIconFiles(outputDir, pluginNames);
   }
 
   const results = [];
@@ -508,10 +543,10 @@ async function packageOnlyPlugins(pluginNames) {
       });
       continue;
     }
-    const outputFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
+    const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
     try {
       await packagePlugin(pluginDir, outputFile);
-      copyPluginIconToPacked(pluginDir, pluginName);
+      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
       results.push({ name: pluginName, success: true });
     } catch (error) {
       console.error(`❌ ${pluginName}: ${error.message}`);
@@ -524,25 +559,34 @@ async function packageOnlyPlugins(pluginNames) {
   const failCount = results.filter((r) => !r.success).length;
   console.log(`   ✅ 成功: ${successCount}`);
   if (failCount > 0) console.log(`   ❌ 失败: ${failCount}`);
-  console.log(`\n📁 输出目录: ${OUTPUT_DIR}\n`);
+  console.log(`\n📁 输出目录: ${outputDir}\n`);
 
   if (failCount > 0) process.exit(1);
 }
 
 // 主函数
 const args = parseArgs(process.argv.slice(2));
+const outputDir = args.outDir
+  ? path.resolve(process.cwd(), args.outDir)
+  : DEFAULT_OUTPUT_DIR;
+
+// 给自定义 outDir 一个显眼提示，避免误操作（例如指向生产数据目录）
+if (args.outDir) {
+  console.log(`📁 使用自定义输出目录: ${outputDir}\n`);
+}
+
 if (args.mode === "single") {
-  packageSinglePlugin(args.pluginNames[0]).catch((error) => {
+  packageSinglePlugin(args.pluginNames[0], outputDir).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });
 } else if (args.mode === "only") {
-  packageOnlyPlugins(args.pluginNames).catch((error) => {
+  packageOnlyPlugins(args.pluginNames, outputDir).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });
 } else {
-  packageAllPlugins().catch((error) => {
+  packageAllPlugins(outputDir).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });

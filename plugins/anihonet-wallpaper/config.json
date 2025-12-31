@@ -14,7 +14,7 @@
       "key": "max_pages",
       "type": "int",
       "name": "最大页数",
-      "descripts": "最多爬取多少页",
+      "descripts": "要拉去的结束页面",
       "default": 5,
       "min": 1,
       "max": 5

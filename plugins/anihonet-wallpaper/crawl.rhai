@@ -3,6 +3,26 @@
 
 // wallpaper_type 为 options 类型，值为 "imgpc"（桌面壁纸）或 "sp"（手机壁纸）
 
+// 从 URL 中提取“文件名”（忽略 query/hash，只取最后一个 '/' 之后的部分）
+fn extract_filename(url) {
+    // 先去掉 query / hash
+    let no_query = url.split("?")[0];
+    let no_hash = no_query.split("#")[0];
+
+    // 再取最后一段路径作为文件名
+    let parts = no_hash.split("/");
+    if parts.len() == 0 { return ""; }
+    return parts[parts.len() - 1];
+}
+
+// 判断图片是否为手机（android）版本。
+// 约定：文件名包含 "android" => 手机壁纸；否则 => 桌面壁纸。
+fn is_android_image(url) {
+    let filename = extract_filename(url);
+    // 使用 Rust regex 语法，(?i) 表示大小写不敏感
+    return re_is_match("(?i)android", filename);
+}
+
 // 计算总页数
 fn total_pages() {
     return max_pages - start_page + 1;
@@ -22,6 +42,10 @@ fn process_element(element) {
     let href = attrs["href"];
     let full_image = resolve_url(href);
     if is_image_url(full_image) {
+        let is_android = is_android_image(full_image);
+        // 根据用户选择的 wallpaper_type 决定是否下载
+        if wallpaper_type == "sp" && !is_android { return; }
+        if wallpaper_type == "imgpc" && is_android { return; }
         download_image(full_image);
     }
 }

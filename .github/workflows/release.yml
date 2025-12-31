@@ -1,9 +1,11 @@
-name: Release Enhanced
+name: Release
 
 on:
   push:
     branches:
       - main # 当推送到 main 分支时触发
+    tags:
+      - "v*" # 当推送以 v 开头的 tag 时触发
   workflow_dispatch:
     inputs:
       prerelease:
@@ -130,6 +132,7 @@ jobs:
           name: Release ${{ steps.version.outputs.tag }}
           body: ${{ steps.changelog.outputs.changelog }}
           files: |
+            packed/*.icon.png
             packed/*.kgpg
             packed/index.json
           draft: false
