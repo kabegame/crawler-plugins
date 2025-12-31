@@ -1,6 +1,6 @@
 {
   "name": "crawler-plugins",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Kabegame 爬虫插件仓库",
   "type": "module",
   "scripts": {
