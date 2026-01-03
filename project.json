@@ -24,7 +24,7 @@
     "package-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --outDir ..\\\\data\\\\plugins_directory",
+        "command": "node package-plugin.js --outDir ..\\\\data\\\\plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -39,7 +39,7 @@
         "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
         "{projectRoot}/package-plugin.js"
       ],
-      "outputs": ["{workspaceRoot}/data/plugins_directory/**/*"]
+      "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
     },
     "package-local": {
       "executor": "nx:run-commands",
@@ -61,7 +61,7 @@
     "package-local-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only single-file-import local-folder-import --outDir ..\\\\data\\\\plugins_directory",
+        "command": "node package-plugin.js --only single-file-import local-folder-import --outDir ..\\\\data\\\\plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -73,7 +73,44 @@
         "{projectRoot}/plugins/single-file-import/**",
         "{projectRoot}/plugins/local-folder-import/**"
       ],
-      "outputs": ["{workspaceRoot}/data/plugins_directory/**/*"]
+      "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
+    },
+    "package-to-resources": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node package-plugin.js --outDir ..\\\\src-tauri\\\\resources\\\\plugins --kgpg-only",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "inputs": [
+        "default",
+        "^default",
+        "{projectRoot}/plugins/**/manifest.json",
+        "{projectRoot}/plugins/**/config.json",
+        "{projectRoot}/plugins/**/crawl.rhai",
+        "{projectRoot}/plugins/**/icon.png",
+        "{projectRoot}/plugins/**/doc_root/doc.md",
+        "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
+        "{projectRoot}/package-plugin.js"
+      ],
+      "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
+    },
+    "package-local-to-resources": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node package-plugin.js --only single-file-import local-folder-import --outDir ..\\\\src-tauri\\\\resources\\\\plugins --kgpg-only",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/package.json",
+        "{projectRoot}/pnpm-lock.yaml",
+        "{projectRoot}/package-plugin.js",
+        "{projectRoot}/project.json",
+        "{projectRoot}/plugins/single-file-import/**",
+        "{projectRoot}/plugins/local-folder-import/**"
+      ],
+      "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
     }
   }
 }

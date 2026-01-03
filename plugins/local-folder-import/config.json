@@ -1,5 +1,4 @@
 {
-  "baseUrl": "file://",
   "var": [
     {
       "key": "folder_path",

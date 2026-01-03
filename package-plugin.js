@@ -35,6 +35,7 @@ function parseArgs(argv) {
     mode: "all", // all | single | only
     pluginNames: [],
     outDir: undefined, // string | undefined
+    kgpgOnly: false, // boolean: 如果为 true，只输出 .kgpg 文件，不复制图标文件
   };
 
   if (!argv || argv.length === 0) return result;
@@ -68,6 +69,12 @@ function parseArgs(argv) {
       }
       result.outDir = v;
       i++;
+      continue;
+    }
+
+    // 支持：--kgpg-only / --kgpgOnly (只输出 .kgpg 文件，不复制图标文件)
+    if (a === "--kgpg-only" || a === "--kgpgOnly") {
+      result.kgpgOnly = true;
       continue;
     }
 
@@ -419,7 +426,8 @@ function copyPluginIconToPacked(pluginDir, pluginName, outputDir) {
   return true;
 }
 
-async function packageAllPlugins(outputDir) {
+async function packageAllPlugins(outputDir, options = {}) {
+  const { kgpgOnly = false } = options;
   console.log("📦 开始打包插件...\n");
 
   // 确保输出目录存在
@@ -461,7 +469,9 @@ async function packageAllPlugins(outputDir) {
 
     try {
       await packagePlugin(pluginDir, outputFile);
-      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+      if (!kgpgOnly) {
+        copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+      }
       return { name: pluginName, success: true };
     } catch (error) {
       console.error(`❌ ${pluginName}: ${error.message}`);
@@ -487,7 +497,8 @@ async function packageAllPlugins(outputDir) {
   }
 }
 
-async function packageSinglePlugin(pluginName, outputDir) {
+async function packageSinglePlugin(pluginName, outputDir, options = {}) {
+  const { kgpgOnly = false } = options;
   console.log(`📦 开始打包插件: ${pluginName}\n`);
 
   const pluginDir = path.join(PLUGIN_DIR, pluginName);
@@ -507,7 +518,9 @@ async function packageSinglePlugin(pluginName, outputDir) {
 
   try {
     await packagePlugin(pluginDir, outputFile);
-    copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+    if (!kgpgOnly) {
+      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+    }
     console.log(`\n📁 输出文件: ${outputFile}\n`);
   } catch (error) {
     console.error(`❌ 打包失败: ${error.message}`);
@@ -515,7 +528,8 @@ async function packageSinglePlugin(pluginName, outputDir) {
   }
 }
 
-async function packageOnlyPlugins(pluginNames, outputDir) {
+async function packageOnlyPlugins(pluginNames, outputDir, options = {}) {
+  const { kgpgOnly = false } = options;
   console.log(
     `📦 开始打包指定插件 (${pluginNames.length} 个): ${pluginNames.join(
       ", "
@@ -526,9 +540,11 @@ async function packageOnlyPlugins(pluginNames, outputDir) {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   } else {
-    // 只保留目标插件（避免开发模式下“残留旧插件”被应用读到）
+    // 只保留目标插件（避免开发模式下"残留旧插件"被应用读到）
     cleanupPackedKgpgFiles(outputDir, pluginNames);
-    cleanupPackedPluginIconFiles(outputDir, pluginNames);
+    if (!kgpgOnly) {
+      cleanupPackedPluginIconFiles(outputDir, pluginNames);
+    }
   }
 
   const results = [];
@@ -546,7 +562,9 @@ async function packageOnlyPlugins(pluginNames, outputDir) {
     const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
     try {
       await packagePlugin(pluginDir, outputFile);
-      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+      if (!kgpgOnly) {
+        copyPluginIconToPacked(pluginDir, pluginName, outputDir);
+      }
       results.push({ name: pluginName, success: true });
     } catch (error) {
       console.error(`❌ ${pluginName}: ${error.message}`);
@@ -570,23 +588,29 @@ const outputDir = args.outDir
   ? path.resolve(process.cwd(), args.outDir)
   : DEFAULT_OUTPUT_DIR;
 
+const options = { kgpgOnly: args.kgpgOnly };
+
 // 给自定义 outDir 一个显眼提示，避免误操作（例如指向生产数据目录）
 if (args.outDir) {
   console.log(`📁 使用自定义输出目录: ${outputDir}\n`);
 }
 
+if (args.kgpgOnly) {
+  console.log(`ℹ️  仅输出 .kgpg 文件（跳过图标文件）\n`);
+}
+
 if (args.mode === "single") {
-  packageSinglePlugin(args.pluginNames[0], outputDir).catch((error) => {
+  packageSinglePlugin(args.pluginNames[0], outputDir, options).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });
 } else if (args.mode === "only") {
-  packageOnlyPlugins(args.pluginNames, outputDir).catch((error) => {
+  packageOnlyPlugins(args.pluginNames, outputDir, options).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });
 } else {
-  packageAllPlugins(outputDir).catch((error) => {
+  packageAllPlugins(outputDir, options).catch((error) => {
     console.error("❌ 打包失败:", error.message);
     process.exit(1);
   });

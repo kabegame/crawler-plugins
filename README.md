@@ -143,11 +143,11 @@ node package-plugin.js
 
 **指定输出目录（可选）**：
 
-默认输出到 `crawler-plugins/packed/`。如果你希望把 `.kgpg` 直接输出到其它目录（例如主仓库开发模式的 `data/plugins_directory/`），可以使用 `--outDir`：
+默认输出到 `crawler-plugins/packed/`。如果你希望把 `.kgpg` 直接输出到其它目录（例如主仓库开发模式的 `data/plugins-directory/`），可以使用 `--outDir`：
 
 ```bash
-# 输出到 <repo>/data/plugins_directory
-node package-plugin.js --outDir ../data/plugins_directory
+# 输出到 <repo>/data/plugins-directory
+node package-plugin.js --outDir ../data/plugins-directory
 ```
 
 **打包单个插件**：
@@ -161,7 +161,7 @@ node package-plugin.js anihonet-wallpaper
 **打包单个插件并指定输出目录（可选）**：
 
 ```bash
-node package-plugin.js anihonet-wallpaper --outDir ../data/plugins_directory
+node package-plugin.js anihonet-wallpaper --outDir ../data/plugins-directory
 ```
 
 **仅打包指定插件（多选，用于开发提速）**：
@@ -177,7 +177,7 @@ node package-plugin.js --only single-file-import,local-folder-import
 **仅打包指定插件并指定输出目录（可选）**：
 
 ```bash
-node package-plugin.js --only single-file-import local-folder-import --outDir ../data/plugins_directory
+node package-plugin.js --only single-file-import local-folder-import --outDir ../data/plugins-directory
 ```
 
 打包后的文件将生成在 `packed/<插件名称>.kgpg` 目录中。
