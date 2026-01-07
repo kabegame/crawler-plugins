@@ -3,9 +3,6 @@
 /**
  * 生成插件索引文件 index.json
  * 版本信息从 package.json 读取
- * 用法: node generate-index.js [repo_owner] [repo_name]
- *
- * 示例: node generate-index.js kabegame crawler-plugins
  */
 
 import fs from "fs";
@@ -13,6 +10,8 @@ import path from "path";
 import { createHash } from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import chalk from "chalk";
+import { Command } from "commander";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -23,40 +22,8 @@ const OUTPUT_DIR = path.join(__dirname, "packed");
 const INDEX_FILE = path.join(OUTPUT_DIR, "index.json");
 const PACKAGE_JSON = path.join(__dirname, "package.json");
 
-// 插件图标：每个插件目录下放置 icon.png；发布到 Release 时输出为 packed/<id>.icon.png
-const PLUGIN_ICON_SOURCE_NAME = "icon.png";
-const PLUGIN_ICON_PACKED_SUFFIX = ".icon.png";
-
-// 从 package.json 读取版本信息
-let packageVersion = "latest";
-try {
-  const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf-8"));
-  packageVersion = packageJson.version || "latest";
-} catch (error) {
-  console.warn(`⚠️  无法读取 package.json，使用默认版本: ${packageVersion}`);
-}
-
-// 从环境变量或参数获取 Release 信息
-// 默认仓库: https://github.com/kabegame/crawler-plugins
-// Release tag 格式: v{version}，例如 v1.0.0
-//
-// 注意：GitHub Actions 在 push 到 main 时 GITHUB_REF_NAME=main，会导致生成的 index.json 写成 main。
-// 这里优先使用 "vX.Y.Z" 这种 tag；否则回退到 package.json 的版本推导出的 tag。
-const envRefName = process.env.GITHUB_REF_NAME;
-const envTag =
-  envRefName && /^v\d+\.\d+\.\d+.*$/i.test(envRefName) ? envRefName : null;
-const RELEASE_TAG =
-  envTag || (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
-const REPO_OWNER =
-  process.argv[2] || process.env.GITHUB_REPOSITORY_OWNER || "kabegame";
-const REPO_NAME =
-  process.argv[3] ||
-  process.env.GITHUB_REPOSITORY?.split("/")[1] ||
-  "crawler-plugins";
-
-// GitHub Release 下载 URL 模板
-// 格式: https://github.com/{owner}/{repo}/releases/download/{tag}/{filename}
-const GITHUB_RELEASE_BASE = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${RELEASE_TAG}`;
+// 注意：KGPG v2 已将"列表 icon + 基础 manifest"写入 .kgpg 固定头部，可通过 HTTP Range 直接读取。
+// 因此不再生成/引用 packed/<id>.icon.png 这类额外图标文件。
 
 function formatFileSize(bytes) {
   if (bytes === 0) return "0 B";
@@ -73,12 +40,47 @@ function calculateSHA256(filePath) {
   return hashSum.digest("hex");
 }
 
-function generateIndex() {
-  console.log("📝 生成插件索引文件...");
-  console.log(`   仓库: ${REPO_OWNER}/${REPO_NAME}`);
-  console.log(`   版本 (package.json): ${packageVersion}`);
-  console.log(`   Release Tag: ${RELEASE_TAG}`);
-  console.log(`   下载基础 URL: ${GITHUB_RELEASE_BASE}\n`);
+function generateIndex(options) {
+  // 从 package.json 读取版本信息
+  let packageVersion = "latest";
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf-8"));
+    packageVersion = packageJson.version || "latest";
+  } catch (error) {
+    console.warn(
+      chalk.yellow(`⚠️  无法读取 package.json，使用默认版本: ${packageVersion}`)
+    );
+  }
+
+  // 从环境变量或参数获取 Release 信息
+  // 默认仓库: https://github.com/kabegame/crawler-plugins
+  // Release tag 格式: v{version}，例如 v1.0.0
+  //
+  // 注意：GitHub Actions 在 push 到 main 时 GITHUB_REF_NAME=main，会导致生成的 index.json 写成 main。
+  // 这里优先使用 "vX.Y.Z" 这种 tag；否则回退到 package.json 的版本推导出的 tag。
+  const envRefName = process.env.GITHUB_REF_NAME;
+  const envTag =
+    envRefName && /^v\d+\.\d+\.\d+.*$/i.test(envRefName) ? envRefName : null;
+  const RELEASE_TAG =
+    options.tag ||
+    envTag ||
+    (packageVersion !== "latest" ? `v${packageVersion}` : "latest");
+  const REPO_OWNER =
+    options.repoOwner || process.env.GITHUB_REPOSITORY_OWNER || "kabegame";
+  const REPO_NAME =
+    options.repoName ||
+    process.env.GITHUB_REPOSITORY?.split("/")[1] ||
+    "crawler-plugins";
+
+  // GitHub Release 下载 URL 模板
+  // 格式: https://github.com/{owner}/{repo}/releases/download/{tag}/{filename}
+  const GITHUB_RELEASE_BASE = `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${RELEASE_TAG}`;
+
+  console.log(chalk.blue("📝 生成插件索引文件..."));
+  console.log(chalk.cyan(`   仓库: ${REPO_OWNER}/${REPO_NAME}`));
+  console.log(chalk.cyan(`   版本 (package.json): ${packageVersion}`));
+  console.log(chalk.cyan(`   Release Tag: ${RELEASE_TAG}`));
+  console.log(chalk.cyan(`   下载基础 URL: ${GITHUB_RELEASE_BASE}\n`));
 
   // 确保输出目录存在
   if (!fs.existsSync(OUTPUT_DIR)) {
@@ -101,7 +103,7 @@ function generateIndex() {
     .map((entry) => entry.name);
 
   if (pluginDirs.length === 0) {
-    console.error("❌ 未找到任何插件目录");
+    console.error(chalk.red("❌ 未找到任何插件目录"));
     process.exit(1);
   }
 
@@ -111,19 +113,20 @@ function generateIndex() {
     const pluginDir = path.join(PLUGIN_DIR, pluginName);
     const manifestPath = path.join(pluginDir, "manifest.json");
     const kgpgFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
-    const iconSourceFile = path.join(pluginDir, PLUGIN_ICON_SOURCE_NAME);
-    const iconPackedName = `${pluginName}${PLUGIN_ICON_PACKED_SUFFIX}`;
-    const iconPackedFile = path.join(OUTPUT_DIR, iconPackedName);
 
     // 检查 manifest.json 是否存在
     if (!fs.existsSync(manifestPath)) {
-      console.warn(`⚠️  跳过 ${pluginName}: manifest.json 不存在`);
+      console.warn(
+        chalk.yellow(`⚠️  跳过 ${pluginName}: manifest.json 不存在`)
+      );
       continue;
     }
 
     // 检查 .kgpg 文件是否存在
     if (!fs.existsSync(kgpgFile)) {
-      console.warn(`⚠️  跳过 ${pluginName}: ${pluginName}.kgpg 不存在`);
+      console.warn(
+        chalk.yellow(`⚠️  跳过 ${pluginName}: ${pluginName}.kgpg 不存在`)
+      );
       continue;
     }
 
@@ -147,25 +150,24 @@ function generateIndex() {
         version: manifest.version || "1.0.0",
         description: manifest.description || "",
         author: manifest.author || "", // 从 manifest.json 读取作者信息
+        // KGPG 包格式版本：用于客户端选择解析策略（过高按最高支持版本解析，过低按低版本解析）
+        // 当前所有打包固定为 v2
+        packageVersion: 2,
         downloadUrl: `${GITHUB_RELEASE_BASE}/${pluginName}.kgpg`, // camelCase，符合后端期望
         sizeBytes: fileSize, // 数字格式，符合后端期望
         sha256: sha256, // SHA256 校验和，必需字段
       };
 
-      // iconUrl（可选）：仅当 icon 文件存在时写入，避免 index.json 指向不存在的资源
-      // 优先以 packed/<id>.icon.png 为准（Release 资产），否则回退到插件目录检测（便于本地开发生成索引时提示）
-      if (fs.existsSync(iconPackedFile) || fs.existsSync(iconSourceFile)) {
-        pluginInfo.iconUrl = `${GITHUB_RELEASE_BASE}/${iconPackedName}`;
-      }
-
       plugins.push(pluginInfo);
       console.log(
-        `✅ ${pluginName}: ${pluginInfo.name} v${
-          pluginInfo.version
-        } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`
+        chalk.green(
+          `✅ ${pluginName}: ${pluginInfo.name} v${
+            pluginInfo.version
+          } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`
+        )
       );
     } catch (error) {
-      console.error(`❌ ${pluginName}: ${error.message}`);
+      console.error(chalk.red(`❌ ${pluginName}: ${error.message}`));
     }
   }
 
@@ -185,15 +187,38 @@ function generateIndex() {
   // 写入 index.json
   fs.writeFileSync(INDEX_FILE, JSON.stringify(index, null, 2), "utf-8");
 
-  console.log(`\n📄 索引文件已生成: ${INDEX_FILE}`);
-  console.log(`   包含 ${plugins.length} 个插件\n`);
+  console.log(chalk.green(`\n📄 索引文件已生成: ${INDEX_FILE}`));
+  console.log(chalk.cyan(`   包含 ${plugins.length} 个插件\n`));
 
   return INDEX_FILE;
 }
 
-try {
-  generateIndex();
-} catch (error) {
-  console.error("❌ 生成索引失败:", error.message);
-  process.exit(1);
-}
+// 创建 Commander 程序
+const program = new Command();
+
+program
+  .name("generate-index.js")
+  .description("生成插件索引文件 index.json")
+  .version("1.0.0")
+  .option(
+    "--repo-owner <owner>",
+    "GitHub 仓库所有者（默认: kabegame）",
+    "kabegame"
+  )
+  .option(
+    "--repo-name <name>",
+    "GitHub 仓库名称（默认: crawler-plugins）",
+    "crawler-plugins"
+  )
+  .option("--tag <tag>", "Release 标签（默认: 从 package.json 或环境变量推导）")
+  .action((options) => {
+    try {
+      generateIndex(options);
+    } catch (error) {
+      console.error(chalk.red(`❌ 生成索引失败: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+// 解析命令行参数
+program.parse();

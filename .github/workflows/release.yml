@@ -1,140 +1,68 @@
-name: Release
+name: Release plugins from packed/
 
 on:
   push:
     tags:
-      - "v*" # 仅当推送以 v 开头的 tag 时触发（pre-push hook 会自动创建并推送 tag）
+      - "v*"
   workflow_dispatch:
     inputs:
-      prerelease:
-        description: "Is this a prerelease?"
+      tag:
+        description: "Release tag (e.g. v1.2.3). If empty, uses package.json version."
         required: false
-        default: false
-        type: boolean
+        default: ""
+
+permissions:
+  contents: write
 
 jobs:
-  build-and-release:
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    # 指定 Node.js 版本
-    strategy:
-      matrix:
-        node-version: [20]
-
+  release:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-
-      - name: Install dependencies
-        #　ロックファイルは正確だけど、なぜかアクションがエラーを報告するので、--no-frozen-lockfile を使用
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Get version from package.json
+      - name: Resolve tag
         id: version
+        shell: bash
         run: |
-          VERSION=$(node -p "require('./package.json').version")
-          TAG="v${VERSION}"
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION=$(node -p "require('./package.json').version")
+            TAG="v${VERSION}"
+          fi
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
-          echo "Version: ${VERSION}"
-          echo "Tag: ${TAG}"
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "Release tag: ${TAG}"
 
-      - name: Check if release exists
-        id: check_release
+      - name: Validate packed artifacts
+        shell: bash
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          # 检查 GitHub Release 是否已存在（而不是 tag）
-          if gh release view "$TAG" &>/dev/null; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-            echo "⚠️  Release $TAG already exists, skipping"
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-            echo "✅ Release $TAG does not exist, proceeding"
+          if [ ! -d "packed" ]; then
+            echo "❌ packed/ not found. Please commit packed/ to repo before releasing."
+            exit 1
           fi
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Package plugins
-        if: steps.check_release.outputs.exists == 'false'
-        run: pnpm run package
-
-      - name: Generate index.json
-        if: steps.check_release.outputs.exists == 'false'
-        env:
-          # 让 generate-index.js 使用即将发布的 tag，而不是 push 分支名（如 main）
-          GITHUB_REF_NAME: ${{ steps.version.outputs.tag }}
-        run: |
-          REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2)
-          node generate-index.js "${{ github.repository_owner }}" "$REPO_NAME"
-          cat packed/index.json
-
-      - name: Extract plugin info
-        if: steps.check_release.outputs.exists == 'false'
-        id: plugin_info
-        run: |
-          echo "plugins<<EOF" >> $GITHUB_OUTPUT
-          for file in packed/*.kgpg; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file" .kgpg)
-              size=$(du -h "$file" | cut -f1)
-              echo "- **$filename** ($size)" >> $GITHUB_OUTPUT
-            fi
-          done
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Generate changelog
-        if: steps.check_release.outputs.exists == 'false'
-        id: changelog
-        run: |
-          TAG="${{ steps.version.outputs.tag }}"
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
-
-          if [ -z "$PREV_TAG" ]; then
-            CHANGES=$(git log --pretty=format:"- %s (%h)" --no-merges)
-          else
-            CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          if [ ! -f "packed/index.json" ]; then
+            echo "❌ packed/index.json not found. Please commit packed/index.json before releasing."
+            exit 1
           fi
+          COUNT=$(ls -1 packed/*.kgpg 2>/dev/null | wc -l | tr -d ' ')
+          if [ "${COUNT}" -le 0 ]; then
+            echo "❌ no *.kgpg found in packed/. Please commit packed/*.kgpg before releasing."
+            exit 1
+          fi
+          echo "✅ packed ok: ${COUNT} kgpg files"
 
-          {
-            echo "changelog<<EOF"
-            echo "## 📦 插件包"
-            echo ""
-            echo "${{ steps.plugin_info.outputs.plugins }}"
-            echo ""
-            echo "## 📝 更新内容"
-            echo ""
-            if [ -z "$CHANGES" ]; then
-              echo "- 无变更记录"
-            else
-              echo "$CHANGES"
-            fi
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
-
-      - name: Create tag and release
-        if: steps.check_release.outputs.exists == 'false'
-        uses: softprops/action-gh-release@v1
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: Release ${{ steps.version.outputs.tag }}
-          body: ${{ steps.changelog.outputs.changelog }}
+          name: ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
           files: |
-            packed/*.icon.png
-            packed/*.kgpg
             packed/index.json
-          draft: false
-          prerelease: ${{ github.event.inputs.prerelease || contains(steps.version.outputs.version, '-') || contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+            packed/*.kgpg

@@ -34,72 +34,40 @@ pnpm run package-plugin crawler-plugins/plugins/anihonet-wallpaper
 
 ---
 
-### 2. local-folder-import
+### 2. local-import
 
-**名称**: 本地文件夹导入  
+**名称**: 本地导入  
 **版本**: 1.0.0  
-**描述**: 从本地文件夹导入图片文件到图库  
+**描述**: 导入本地图片：支持拖入单个图片文件或整个文件夹（可选递归）  
 **作者**: Kabegame
 
-**路径**: `plugins/local-folder-import/`  
-**详细文档**: [plugins/local-folder-import/README.md](plugins/local-folder-import/README.md)
+**路径**: `plugins/local-import/`  
+**详细文档**: [plugins/local-import/README.md](plugins/local-import/README.md)
 
 **功能**:
-- 扫描指定文件夹内的图片文件（非递归）
-- 支持配置文件扩展名列表
-- 自动复制文件到图库目录
-- 如果源文件和目标文件相同，自动跳过
+- 导入单文件：一次 `download_image(file_path)`
+- 导入文件夹：扫描文件夹（可选递归）后逐个 `download_image`
 
-**配置变量**:
-- `folder_path` (path 类型): 要导入的本地文件夹路径
-- `file_extensions` (list 类型): 要导入的文件扩展名列表，默认为 ["jpg", "jpeg", "png", "gif", "webp", "bmp"]
+**配置变量**（二选一）:
+- `file_path`：图片文件路径（优先）
+- `folder_path`：文件夹路径
+- `recursive`：是否递归扫描子文件夹（仅文件夹导入生效）
+- `file_extensions`：扩展名列表（仅文件夹导入生效）
 
 **文件结构**:
 ```
-local-folder-import/
+local-import/
 ├── manifest.json    # 插件元数据
 ├── config.json      # 插件配置
-├── crawl.rhai       # 爬虫脚本
+├── crawl.rhai       # 脚本
 ├── doc_root/        # 文档目录
 │   └── doc.md       # 用户文档
 └── README.md        # 开发文档
 ```
 
 **引用方式**:
-```bash
-pnpm run package-plugin crawler-plugins/plugins/local-folder-import
-```
-
----
-
-### 3. single-file-import
-
-**名称**: 单文件导入  
-**版本**: 1.0.0  
-**描述**: 从本地选择单个图片文件导入到图库（仅入队一次）  
-**作者**: Kabegame
-
-**路径**: `plugins/single-file-import/`  
-**详细文档**: [plugins/single-file-import/README.md](plugins/single-file-import/README.md)
-
-**功能**:
-- 从本地选择单个图片文件导入到图库
-- 脚本只入队一次，避免重复导入
-
-**文件结构**:
-```
-single-file-import/
-├── manifest.json    # 插件元数据
-├── config.json      # 插件配置
-├── crawl.rhai       # 爬虫脚本
-├── doc_root/        # 文档目录
-│   └── doc.md       # 用户文档
-└── README.md        # 开发文档
-```
-
-**引用方式**:
-```bash
-pnpm run package-plugin crawler-plugins/plugins/single-file-import
+```powershell
+pnpm run package-plugin crawler-plugins/plugins/local-import
 ```
 
 ---
@@ -199,7 +167,7 @@ node generate-index.js kabegame crawler-plugins
 - 使用 camelCase 字段名（`downloadUrl`, `sizeBytes`）
 - 包含 SHA256 校验和
 - 下载 URL 指向 GitHub Release：`https://github.com/kabegame/crawler-plugins/releases/download/{tag}/{plugin}.kgpg`
-- 可选图标（仅支持 PNG）：每个插件目录可放置 `icon.png`，发布时会复制为 Release 资产 `packed/<plugin>.icon.png`，并在条目中写入 `iconUrl`
+- 图标：KGPG v2 已将列表图标写入 `.kgpg` 固定头部，可通过 HTTP Range 直接读取；`index.json` 不再需要 `iconUrl`，也不再生成 `packed/<plugin>.icon.png`
 
 **一键打包并生成索引**：
 

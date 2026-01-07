@@ -1,0 +1,28 @@
+{
+  "var": [
+    {
+      "key": "path",
+      "type": "path",
+      "name": "本地路径",
+      "descripts": "选择本地图片文件 / ZIP / 文件夹（自动识别；同一项里可选文件或文件夹）",
+      "options": ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico", "zip"]
+    },
+    {
+      "key": "file_extensions",
+      "type": "list",
+      "name": "文件扩展名",
+      "descripts": "要导入的图片扩展名列表（不包含点号，仅在导入文件夹时生效）",
+      "default": ["jpg", "jpeg", "png", "gif", "webp", "bmp"],
+      "options": ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico"]
+    },
+    {
+      "key": "recursive",
+      "type": "boolean",
+      "name": "包括子文件",
+      "descripts": "导入文件夹时，是否递归包含所有子文件夹",
+      "default": false
+    }
+  ]
+}
+
+

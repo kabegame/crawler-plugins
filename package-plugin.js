@@ -3,20 +3,16 @@
 /**
  * 打包插件为 .kgpg 格式
  * 根据 project.json 中的 inputs 字段路径模式计算需要打包的文件
- * 用法:
- *   node package-plugin.js              # 打包所有插件
- *   node package-plugin.js <插件名称>   # 打包指定插件
- *   node package-plugin.js --only <插件名...>  # 只打包指定插件（会清理 packed 下的其它 .kgpg）
- *   node package-plugin.js --only a,b          # 逗号分隔也支持
  */
 
 import fs from "fs";
 import path from "path";
-import { createWriteStream } from "fs";
-import archiver from "archiver";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { glob } from "glob";
+import { spawnSync } from "child_process";
+import chalk from "chalk";
+import { Command } from "commander";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,90 +22,44 @@ const PLUGIN_DIR = path.join(__dirname, "plugins");
 const DEFAULT_OUTPUT_DIR = path.join(__dirname, "packed");
 const PROJECT_JSON = path.join(__dirname, "project.json");
 
-const PLUGIN_ICON_SOURCE_NAME = "icon.png";
 const PLUGIN_ICON_PACKED_SUFFIX = ".icon.png";
 
-function parseArgs(argv) {
-  // argv: process.argv.slice(2)
-  const result = {
-    mode: "all", // all | single | only
-    pluginNames: [],
-    outDir: undefined, // string | undefined
-    kgpgOnly: false, // boolean: 如果为 true，只输出 .kgpg 文件，不复制图标文件
-  };
+// 统一实现：改为调用 Rust sidecar `kabegame-cli plugin pack`
+const WORKSPACE_ROOT = path.resolve(__dirname, "..");
+const TAURI_DIR = path.join(WORKSPACE_ROOT, "src-tauri");
+const CARGO_TOML = path.join(TAURI_DIR, "Cargo.toml");
+const CLI_EXE = path.join(
+  TAURI_DIR,
+  "target",
+  "debug",
+  process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli"
+);
 
-  if (!argv || argv.length === 0) return result;
-
-  // 先解析通用参数（例如 --outDir），其余留给 mode 解析
-  const rest = [];
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-
-    // 支持：--outDir=xxx / --out-dir=xxx / --outputDir=xxx / --output-dir=xxx
-    const m = a.match(
-      /^--(?:outDir|outdir|out-dir|outputDir|output-dir)=(.+)$/
-    );
-    if (m) {
-      result.outDir = m[1];
-      continue;
-    }
-
-    // 支持：--outDir xxx / --out-dir xxx / --outputDir xxx / --output-dir xxx
-    if (
-      a === "--outDir" ||
-      a === "--outdir" ||
-      a === "--out-dir" ||
-      a === "--outputDir" ||
-      a === "--output-dir"
-    ) {
-      const v = argv[i + 1];
-      if (!v) {
-        console.error("❌ 参数错误：--outDir 后必须提供目录路径");
-        process.exit(1);
-      }
-      result.outDir = v;
-      i++;
-      continue;
-    }
-
-    // 支持：--kgpg-only / --kgpgOnly (只输出 .kgpg 文件，不复制图标文件)
-    if (a === "--kgpg-only" || a === "--kgpgOnly") {
-      result.kgpgOnly = true;
-      continue;
-    }
-
-    rest.push(a);
+let cliBuilt = false;
+function ensureCliBuilt() {
+  if (cliBuilt && fs.existsSync(CLI_EXE)) return;
+  console.log(chalk.blue("🔧 构建 kabegame-cli（用于打包 .kgpg）..."));
+  const r = spawnSync(
+    "cargo",
+    ["build", "--manifest-path", CARGO_TOML, "--bin", "kabegame-cli"],
+    { cwd: TAURI_DIR, stdio: "inherit" }
+  );
+  if (r.status !== 0) {
+    throw new Error("构建 kabegame-cli 失败（请确认 Rust 工具链可用）");
   }
+  cliBuilt = true;
+}
 
-  // --only mode (multi plugin)
-  const onlyIdx = rest.findIndex((a) => a === "--only" || a === "--plugins");
-  if (onlyIdx !== -1) {
-    const after = rest.slice(onlyIdx + 1);
-    const names = after
-      .flatMap((s) => s.split(","))
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (names.length === 0) {
-      console.error("❌ 参数错误：--only 后必须提供至少一个插件名");
-      process.exit(1);
-    }
-    result.mode = "only";
-    result.pluginNames = Array.from(new Set(names));
-    return result;
+function cliPackPlugin(pluginDir, outputFile) {
+  ensureCliBuilt();
+  const r = spawnSync(
+    CLI_EXE,
+    ["plugin", "pack", "--plugin-dir", pluginDir, "--output", outputFile],
+    { cwd: WORKSPACE_ROOT, stdio: "inherit" }
+  );
+  if (r.status !== 0) {
+    throw new Error(`kabegame-cli 打包失败: ${path.basename(outputFile)}`);
   }
-
-  // Legacy: single plugin by first arg
-  const first = rest[0];
-  if (first && !first.startsWith("-")) {
-    result.mode = "single";
-    result.pluginNames = [first];
-    return result;
-  }
-
-  if (rest.length === 0) return result;
-
-  console.error(`❌ 未识别的参数: ${rest.join(" ")}`);
-  process.exit(1);
 }
 
 function cleanupPackedKgpgFiles(outputDir, keepNames = null) {
@@ -152,7 +102,9 @@ function getInputPatterns() {
     const projectJson = JSON.parse(fs.readFileSync(PROJECT_JSON, "utf-8"));
     const packageTarget = projectJson.targets?.package;
     if (!packageTarget || !packageTarget.inputs) {
-      console.warn("⚠️  无法从 project.json 读取 inputs，使用默认模式");
+      console.warn(
+        chalk.yellow("⚠️  无法从 project.json 读取 inputs，使用默认模式")
+      );
       return getDefaultPatterns();
     }
 
@@ -163,7 +115,9 @@ function getInputPatterns() {
 
     return patterns;
   } catch (error) {
-    console.warn(`⚠️  读取 project.json 失败: ${error.message}，使用默认模式`);
+    console.warn(
+      chalk.yellow(`⚠️  读取 project.json 失败: ${error.message}，使用默认模式`)
+    );
     return getDefaultPatterns();
   }
 }
@@ -223,7 +177,9 @@ async function collectPluginFiles(pluginDir) {
 
         // 验证文件确实存在
         if (!fs.existsSync(absolutePath)) {
-          console.warn(`⚠️  文件不存在，跳过: ${normalizedRelative}`);
+          console.warn(
+            chalk.yellow(`⚠️  文件不存在，跳过: ${normalizedRelative}`)
+          );
           continue;
         }
 
@@ -236,7 +192,9 @@ async function collectPluginFiles(pluginDir) {
         }
       }
     } catch (error) {
-      console.warn(`⚠️  模式匹配失败 ${pattern}: ${error.message}`);
+      console.warn(
+        chalk.yellow(`⚠️  模式匹配失败 ${pattern}: ${error.message}`)
+      );
     }
   }
 
@@ -349,86 +307,31 @@ async function packagePlugin(pluginDir, outputFile) {
       return;
     }
 
-    // 读取 manifest.json 获取插件名称
-    let manifest;
+    // 必需文件：crawl.rhai
+    const crawlPath = path.join(pluginDir, "crawl.rhai");
+    if (!fs.existsSync(crawlPath)) {
+      reject(new Error(`缺少必需文件: crawl.rhai`));
+      return;
+    }
+
     try {
-      manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
-    } catch (error) {
-      reject(new Error(`无法解析 manifest.json: ${error.message}`));
-      return;
-    }
-
-    // 根据 project.json 的 inputs 模式收集文件
-    let pluginFiles;
-    try {
-      pluginFiles = await collectPluginFiles(pluginDir);
-    } catch (error) {
-      reject(new Error(`收集插件文件失败: ${error.message}`));
-      return;
-    }
-
-    // 检查必需文件是否存在
-    const requiredFiles = ["manifest.json", "crawl.rhai"];
-    const missingFiles = requiredFiles.filter(
-      (file) => !pluginFiles.some((f) => f.relativePath === file)
-    );
-
-    if (missingFiles.length > 0) {
-      reject(new Error(`缺少必需文件: ${missingFiles.join(", ")}`));
-      return;
-    }
-
-    // 创建 ZIP 文件
-    const output = createWriteStream(outputFile);
-    const archive = archiver("zip", {
-      zlib: { level: 9 }, // 最高压缩级别
-    });
-
-    output.on("close", () => {
-      const sizeKB = (archive.pointer() / 1024).toFixed(2);
+      if (!fs.existsSync(path.dirname(outputFile))) {
+        fs.mkdirSync(path.dirname(outputFile), { recursive: true });
+      }
+      cliPackPlugin(pluginDir, outputFile);
+      const finalSizeKB = (fs.statSync(outputFile).size / 1024).toFixed(2);
       console.log(
-        `✅ ${path.basename(outputFile)} (${sizeKB} KB, ${
-          pluginFiles.length
-        } 个文件)`
+        chalk.green(`✅ ${path.basename(outputFile)} (${finalSizeKB} KB)`)
       );
       resolve(outputFile);
-    });
-
-    archive.on("error", (err) => {
-      reject(err);
-    });
-
-    archive.pipe(output);
-
-    // 添加所有收集到的文件
-    for (const fileInfo of pluginFiles) {
-      if (fs.existsSync(fileInfo.absolutePath)) {
-        archive.file(fileInfo.absolutePath, { name: fileInfo.relativePath });
-      } else {
-        console.warn(`⚠️  文件不存在，跳过: ${fileInfo.relativePath}`);
-      }
+    } catch (e) {
+      reject(e);
     }
-
-    archive.finalize();
   });
 }
 
-function copyPluginIconToPacked(pluginDir, pluginName, outputDir) {
-  const src = path.join(pluginDir, PLUGIN_ICON_SOURCE_NAME);
-  if (!fs.existsSync(src)) {
-    return false;
-  }
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
-  const dst = path.join(outputDir, `${pluginName}${PLUGIN_ICON_PACKED_SUFFIX}`);
-  fs.copyFileSync(src, dst);
-  return true;
-}
-
-async function packageAllPlugins(outputDir, options = {}) {
-  const { kgpgOnly = false } = options;
-  console.log("📦 开始打包插件...\n");
+async function packageAllPlugins(outputDir) {
+  console.log(chalk.blue("📦 开始打包插件...\n"));
 
   // 确保输出目录存在
   if (!fs.existsSync(outputDir)) {
@@ -436,6 +339,7 @@ async function packageAllPlugins(outputDir, options = {}) {
   } else {
     // 清空输出目录中的 .kgpg 文件
     cleanupPackedKgpgFiles(outputDir, null);
+    // 旧的 <id>.icon.png 已废弃，清理掉，避免残留干扰发布
     cleanupPackedPluginIconFiles(outputDir, null);
   }
 
@@ -456,11 +360,11 @@ async function packageAllPlugins(outputDir, options = {}) {
     .map((entry) => entry.name);
 
   if (pluginDirs.length === 0) {
-    console.log("⚠️  未找到任何插件目录");
+    console.log(chalk.yellow("⚠️  未找到任何插件目录"));
     process.exit(0);
   }
 
-  console.log(`找到 ${pluginDirs.length} 个插件目录:\n`);
+  console.log(chalk.cyan(`找到 ${pluginDirs.length} 个插件目录:\n`));
 
   // 打包每个插件
   const promises = pluginDirs.map(async (pluginName) => {
@@ -469,12 +373,10 @@ async function packageAllPlugins(outputDir, options = {}) {
 
     try {
       await packagePlugin(pluginDir, outputFile);
-      if (!kgpgOnly) {
-        copyPluginIconToPacked(pluginDir, pluginName, outputDir);
-      }
+      // v2：不再输出 <id>.icon.png（图标在 .kgpg 固定头部）
       return { name: pluginName, success: true };
     } catch (error) {
-      console.error(`❌ ${pluginName}: ${error.message}`);
+      console.error(chalk.red(`❌ ${pluginName}: ${error.message}`));
       return { name: pluginName, success: false, error: error.message };
     }
   });
@@ -482,30 +384,29 @@ async function packageAllPlugins(outputDir, options = {}) {
   const results = await Promise.all(promises);
 
   // 输出总结
-  console.log("\n📊 打包总结:");
+  console.log(chalk.blue("\n📊 打包总结:"));
   const successCount = results.filter((r) => r.success).length;
   const failCount = results.filter((r) => !r.success).length;
 
-  console.log(`   ✅ 成功: ${successCount}`);
+  console.log(chalk.green(`   ✅ 成功: ${successCount}`));
   if (failCount > 0) {
-    console.log(`   ❌ 失败: ${failCount}`);
+    console.log(chalk.red(`   ❌ 失败: ${failCount}`));
   }
-  console.log(`\n📁 输出目录: ${outputDir}\n`);
+  console.log(chalk.cyan(`\n📁 输出目录: ${outputDir}\n`));
 
   if (failCount > 0) {
     process.exit(1);
   }
 }
 
-async function packageSinglePlugin(pluginName, outputDir, options = {}) {
-  const { kgpgOnly = false } = options;
-  console.log(`📦 开始打包插件: ${pluginName}\n`);
+async function packageSinglePlugin(pluginName, outputDir) {
+  console.log(chalk.blue(`📦 开始打包插件: ${pluginName}\n`));
 
   const pluginDir = path.join(PLUGIN_DIR, pluginName);
 
   // 检查插件目录是否存在
   if (!fs.existsSync(pluginDir)) {
-    console.error(`❌ 插件目录不存在: ${pluginDir}`);
+    console.error(chalk.red(`❌ 插件目录不存在: ${pluginDir}`));
     process.exit(1);
   }
 
@@ -518,22 +419,20 @@ async function packageSinglePlugin(pluginName, outputDir, options = {}) {
 
   try {
     await packagePlugin(pluginDir, outputFile);
-    if (!kgpgOnly) {
-      copyPluginIconToPacked(pluginDir, pluginName, outputDir);
-    }
-    console.log(`\n📁 输出文件: ${outputFile}\n`);
+    console.log(chalk.cyan(`\n📁 输出文件: ${outputFile}\n`));
   } catch (error) {
-    console.error(`❌ 打包失败: ${error.message}`);
+    console.error(chalk.red(`❌ 打包失败: ${error.message}`));
     process.exit(1);
   }
 }
 
-async function packageOnlyPlugins(pluginNames, outputDir, options = {}) {
-  const { kgpgOnly = false } = options;
+async function packageOnlyPlugins(pluginNames, outputDir) {
   console.log(
-    `📦 开始打包指定插件 (${pluginNames.length} 个): ${pluginNames.join(
-      ", "
-    )}\n`
+    chalk.blue(
+      `📦 开始打包指定插件 (${pluginNames.length} 个): ${pluginNames.join(
+        ", "
+      )}\n`
+    )
   );
 
   // 确保输出目录存在
@@ -542,16 +441,15 @@ async function packageOnlyPlugins(pluginNames, outputDir, options = {}) {
   } else {
     // 只保留目标插件（避免开发模式下"残留旧插件"被应用读到）
     cleanupPackedKgpgFiles(outputDir, pluginNames);
-    if (!kgpgOnly) {
-      cleanupPackedPluginIconFiles(outputDir, pluginNames);
-    }
+    // 旧的 <id>.icon.png 已废弃，清理掉
+    cleanupPackedPluginIconFiles(outputDir, pluginNames);
   }
 
   const results = [];
   for (const pluginName of pluginNames) {
     const pluginDir = path.join(PLUGIN_DIR, pluginName);
     if (!fs.existsSync(pluginDir)) {
-      console.error(`❌ 插件目录不存在: ${pluginDir}`);
+      console.error(chalk.red(`❌ 插件目录不存在: ${pluginDir}`));
       results.push({
         name: pluginName,
         success: false,
@@ -562,56 +460,80 @@ async function packageOnlyPlugins(pluginNames, outputDir, options = {}) {
     const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
     try {
       await packagePlugin(pluginDir, outputFile);
-      if (!kgpgOnly) {
-        copyPluginIconToPacked(pluginDir, pluginName, outputDir);
-      }
       results.push({ name: pluginName, success: true });
     } catch (error) {
-      console.error(`❌ ${pluginName}: ${error.message}`);
+      console.error(chalk.red(`❌ ${pluginName}: ${error.message}`));
       results.push({ name: pluginName, success: false, error: error.message });
     }
   }
 
-  console.log("\n📊 打包总结:");
+  console.log(chalk.blue("\n📊 打包总结:"));
   const successCount = results.filter((r) => r.success).length;
   const failCount = results.filter((r) => !r.success).length;
-  console.log(`   ✅ 成功: ${successCount}`);
-  if (failCount > 0) console.log(`   ❌ 失败: ${failCount}`);
-  console.log(`\n📁 输出目录: ${outputDir}\n`);
+  console.log(chalk.green(`   ✅ 成功: ${successCount}`));
+  if (failCount > 0) console.log(chalk.red(`   ❌ 失败: ${failCount}`));
+  console.log(chalk.cyan(`\n📁 输出目录: ${outputDir}\n`));
 
   if (failCount > 0) process.exit(1);
 }
 
-// 主函数
-const args = parseArgs(process.argv.slice(2));
-const outputDir = args.outDir
-  ? path.resolve(process.cwd(), args.outDir)
-  : DEFAULT_OUTPUT_DIR;
+// 创建 Commander 程序
+const program = new Command();
 
-const options = { kgpgOnly: args.kgpgOnly };
+program
+  .name("package-plugin.js")
+  .description("打包插件为 .kgpg 格式")
+  .version("1.0.0")
+  // 统一使用 --out-dir，支持多种别名格式
+  .option("--out-dir <dir>", "输出目录（默认: packed）")
+  .option("--outDir <dir>", "输出目录（别名）")
+  .option("--output-dir <dir>", "输出目录（别名）")
+  .option("--outputDir <dir>", "输出目录（别名）")
+  .option(
+    "--only <plugins...>",
+    "只打包指定插件（会清理 packed 下的其它 .kgpg）"
+  )
+  .option("--plugins <plugins...>", "只打包指定插件（--only 的别名）")
+  .argument("[pluginName]", "插件名称（如果提供，则只打包该插件）")
+  .action(async (pluginName, options) => {
+    // 处理输出目录：统一从 --out-dir 及其别名中获取
+    // commander 会将 --out-dir 和 --outDir 都映射到 options.outDir
+    // 将 --output-dir 和 --outputDir 都映射到 options.outputDir
+    let outputDir = DEFAULT_OUTPUT_DIR;
+    const outDirValue = options.outDir || options.outputDir;
+    if (outDirValue) {
+      outputDir = path.resolve(process.cwd(), outDirValue);
+    }
 
-// 给自定义 outDir 一个显眼提示，避免误操作（例如指向生产数据目录）
-if (args.outDir) {
-  console.log(`📁 使用自定义输出目录: ${outputDir}\n`);
-}
+    if (outputDir !== DEFAULT_OUTPUT_DIR) {
+      console.log(chalk.cyan(`📁 使用自定义输出目录: ${outputDir}\n`));
+    }
 
-if (args.kgpgOnly) {
-  console.log(`ℹ️  仅输出 .kgpg 文件（跳过图标文件）\n`);
-}
+    // 处理插件列表：统一从 --only 或 --plugins 获取
+    const pluginList = options.only || options.plugins || [];
 
-if (args.mode === "single") {
-  packageSinglePlugin(args.pluginNames[0], outputDir, options).catch((error) => {
-    console.error("❌ 打包失败:", error.message);
-    process.exit(1);
+    // 判断模式：--only/--plugins -> only 模式，pluginName -> single 模式，否则 -> all 模式
+    if (pluginList.length > 0) {
+      // --only/--plugins 模式
+      const pluginNames = pluginList
+        .flatMap((s) => s.split(","))
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (pluginNames.length === 0) {
+        console.error(
+          chalk.red("❌ 参数错误：--only/--plugins 后必须提供至少一个插件名")
+        );
+        process.exit(1);
+      }
+      await packageOnlyPlugins(pluginNames, outputDir);
+    } else if (pluginName && !pluginName.startsWith("-")) {
+      // 单个插件模式
+      await packageSinglePlugin(pluginName, outputDir);
+    } else {
+      // 打包所有插件
+      await packageAllPlugins(outputDir);
+    }
   });
-} else if (args.mode === "only") {
-  packageOnlyPlugins(args.pluginNames, outputDir, options).catch((error) => {
-    console.error("❌ 打包失败:", error.message);
-    process.exit(1);
-  });
-} else {
-  packageAllPlugins(outputDir, options).catch((error) => {
-    console.error("❌ 打包失败:", error.message);
-    process.exit(1);
-  });
-}
+
+// 解析命令行参数
+program.parse();
