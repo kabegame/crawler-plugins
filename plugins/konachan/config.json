@@ -1,0 +1,45 @@
+{
+  "baseUrl": "https://konachan.net",
+  "selector": null,
+  "var": [
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "descripts": "要拉取的起始页面",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": null
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "default": 5,
+      "options": null,
+      "min": 1,
+      "max": null
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "name": "质量",
+      "descripts": "图片质量，这个网站质量都挺高的",
+      "default": "medium",
+      "options": [
+        {
+          "name": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "variable": "medium"
+        }
+      ],
+      "min": null,
+      "max": null
+    }
+  ]
+}

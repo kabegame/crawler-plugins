@@ -41,8 +41,12 @@ function ensureCliBuilt() {
   console.log(chalk.blue("🔧 构建 kabegame-cli（用于打包 .kgpg）..."));
   const r = spawnSync(
     "cargo",
-    ["build", "--manifest-path", CARGO_TOML, "--bin", "kabegame-cli"],
-    { cwd: TAURI_DIR, stdio: "inherit" }
+    ["build", "--manifest-path", CARGO_TOML, "-p", "kabegame-cli"],
+    {
+      cwd: TAURI_DIR,
+      stdio: "inherit",
+      env: { ...process.env },
+    }
   );
   if (r.status !== 0) {
     throw new Error("构建 kabegame-cli 失败（请确认 Rust 工具链可用）");

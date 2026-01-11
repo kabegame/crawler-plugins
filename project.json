@@ -1,21 +1,16 @@
 {
   "name": "crawler-plugins",
   "namedInputs": {
-    "pluginFiles": [
-      "{projectRoot}/plugins/**/manifest.json",
-      "{projectRoot}/plugins/**/config.json",
-      "{projectRoot}/plugins/**/crawl.rhai",
-      "{projectRoot}/plugins/**/icon.png",
-      "{projectRoot}/plugins/**/doc_root/doc.md",
-      "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}"
-    ],
-    "localImportFiles": ["{projectRoot}/plugins/local-import/**"],
+    "pluginFiles": ["{projectRoot}/plugins/**/*"],
+    "localImportFiles": ["{projectRoot}/plugins/local-import/**/*"],
     "packageScript": ["{projectRoot}/package-plugin.js"],
     "packageConfig": [
       "{projectRoot}/package.json",
       "{projectRoot}/pnpm-lock.yaml",
       "{projectRoot}/project.json"
-    ]
+    ],
+    "normalInputs": ["pluginFiles", "packageScript", "packageConfig"],
+    "localInputs": ["localImportFiles", "packageScript", "packageConfig"]
   },
   "targets": {
     "package": {
@@ -25,7 +20,7 @@
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["default", "^default", "pluginFiles", "packageScript"],
+      "inputs": ["normalInputs"],
       "outputs": ["{projectRoot}/packed/**/*"]
     },
     "package-local": {
@@ -35,47 +30,47 @@
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["packageConfig", "packageScript", "localImportFiles"],
+      "inputs": ["localInputs"],
       "outputs": ["{projectRoot}/packed/**/*"]
     },
     "package-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --out-dir ..\\\\data\\\\plugins-directory",
+        "command": "node package-plugin.js --out-dir ../data/plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["default", "^default", "pluginFiles", "packageScript"],
+      "inputs": ["normalInputs"],
       "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
     },
     "package-local-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only local-import --out-dir ..\\\\data\\\\plugins-directory",
+        "command": "node package-plugin.js --only local-import --out-dir ../data/plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["packageConfig", "packageScript", "localImportFiles"],
+      "inputs": ["localInputs"],
       "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
     },
     "package-to-resources": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --out-dir ..\\\\src-tauri\\\\resources\\\\plugins",
+        "command": "node package-plugin.js --out-dir ../src-tauri/app-main/resources/plugins",
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["default", "^default", "pluginFiles", "packageScript"],
+      "inputs": ["normalInputs"],
       "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
     },
     "package-local-to-resources": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only local-import --out-dir ..\\\\src-tauri\\\\resources\\\\plugins",
+        "command": "node package-plugin.js --only local-import --out-dir ../src-tauri/app-main/resources/plugins",
         "cwd": "{projectRoot}"
       },
       "cache": true,
-      "inputs": ["packageConfig", "packageScript", "localImportFiles"],
+      "inputs": ["localInputs"],
       "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
     }
   }

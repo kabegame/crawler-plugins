@@ -59,7 +59,12 @@ if !is_folder {
     // - file:///xxx 的 file URL
     // - 直接的本地路径（若存在）
     try {
-        download_image(input_path);
+        // zip：显式走 archive 导入（便于未来扩展更多 archive 类型）
+        if input_path.ends_with(".zip") || input_path.ends_with(".ZIP") {
+            download_archive(input_path, "zip");
+        } else {
+            download_image(input_path);
+        }
     } catch (err) {
         throw "错误：加入下载队列失败 - " + err;
     }
