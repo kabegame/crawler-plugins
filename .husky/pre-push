@@ -1,3 +1,18 @@
 # Non-blocking: even if script errors, we continue pushing.
+
+# 1. 打包插件并生成 index.json
+echo "[pre-push] Building plugins and generating index.json..."
+npm run release || true
+
+# 2. 如果 packed/ 有更改，自动提交
+if git diff --quiet packed/ 2>/dev/null && git diff --cached --quiet packed/ 2>/dev/null; then
+  echo "[pre-push] packed/ is up to date"
+else
+  echo "[pre-push] packed/ has changes, committing..."
+  git add packed/
+  git commit -m "chore: update packed plugins and index.json" --no-verify || true
+fi
+
+# 3. 尝试创建并推送 tag
 node scripts/git/ensure-tag.mjs || true
 

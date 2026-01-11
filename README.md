@@ -26,12 +26,6 @@ anihonet-wallpaper/
 │   └── 1 (64).jpeg  # 示例图片
 └── README.md        # 开发文档
 ```
-
-**引用方式**:
-```bash
-pnpm run package-plugin crawler-plugins/plugins/anihonet-wallpaper
-```
-
 ---
 
 ### 2. local-import
@@ -65,11 +59,38 @@ local-import/
 └── README.md        # 开发文档
 ```
 
-**引用方式**:
-```powershell
-pnpm run package-plugin crawler-plugins/plugins/local-import
-```
+---
 
+### 3. konachan
+
+**名称**: konachan动漫壁纸  
+**版本**: 1.0.0  
+**描述**: konachan动漫壁纸收集源插件  
+
+**路径**: `plugins/konachan/`
+
+**功能**:
+- 从 `konachan.net` 网站爬取动漫壁纸
+- 支持选择页面范围（起始页面到结束页面）
+- 支持选择图片质量（高/中）
+- 一次最多爬取 100 页（防止过度爬取）
+
+**配置变量**:
+- `start_page`：起始页面（最小值为 1）
+- `end_page`：结束页面（一次最多爬取 100 页）
+- `quality`：图片质量（高/中）
+
+**文件结构**:
+```
+konachan/
+├── manifest.json    # 插件元数据
+├── config.json      # 插件配置
+├── crawl.rhai       # 爬虫脚本
+├── icon.png         # 插件图标（仅支持 PNG）
+└── doc_root/        # 文档目录
+    ├── doc.md       # 用户文档
+    └── image.jpg    # 示例图片
+```
 ---
 
 ## 使用方法
@@ -181,18 +202,25 @@ pnpm run release
 
 1. 更新 `package.json` 中的 `version` 字段（如 `1.0.0` → `1.1.0`）
 2. 提交更改并推送到 `main` 分支
-3. GitHub Actions 会自动：
-   - 从 `package.json` 读取版本号
-   - 创建 tag（格式：`v{version}`，如 `v1.1.0`）
-   - 打包所有插件
+3. `pre-push` hook 会自动：
+   - 打包所有插件（生成 `.kgpg` 文件）
    - 生成 `index.json`
+   - 如果 `packed/` 有更改，自动提交
+   - 创建 tag（格式：`v{version}`）并推送
+4. GitHub Actions 会自动：
+   - 验证 `packed/` 目录下的文件
    - 创建 GitHub Release 并上传文件
 
-如果 tag 已存在，workflow 会跳过发布以避免重复。
+如果 tag 已存在，会跳过创建以避免重复。
 
-**Git Hooks（自动打 tag）**：
+**Git Hooks（自动打包 + 打 tag）**：
 
-本仓库配置了 `pre-push` git hook，在 `git push` 前会自动尝试根据 `package.json` 的版本创建 tag（格式：`v{version}`）。如果 tag 已存在则跳过，不会阻断 push。
+本仓库配置了 `pre-push` git hook，在 `git push` 前会自动：
+1. 打包所有插件并生成 `index.json`
+2. 如果 `packed/` 有更改，自动提交
+3. 根据 `package.json` 的版本创建 tag（格式：`v{version}`）
+
+所有操作都是非阻塞的，失败不会阻断 push。
 
 首次使用需要启用 hooks：
 
@@ -203,7 +231,7 @@ pnpm install
 pnpm prepare
 ```
 
-之后每次 `git push` 时，hook 会自动尝试创建对应的 tag（如果不存在）。
+之后每次 `git push` 时，hook 会自动执行打包、生成索引、提交和创建 tag。
 
 #### 在主项目中使用
 
