@@ -20,7 +20,7 @@ fn is_android_image(url) {
 
 // 计算总页数
 fn total_pages() {
-    return max_pages - start_page + 1;
+    return end_page - start_page + 1;
 }
 
 // 验证 wallpaper_type 值
@@ -58,7 +58,7 @@ fn process_detail_page(href) {
 }
 
 // 抓取某一类（imgpc/sp）的排行榜页
-fn crawl_kind(kind, start_page, max_pages, period) {
+fn crawl_kind(kind, start_page, end_page, period) {
     let pg = start_page;
     while pg <= end_page {
         let start_url = `https://anihonetwallpaper.com/ranking-${period}-${kind}/${pg}`;
