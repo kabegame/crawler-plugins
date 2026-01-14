@@ -1,8 +1,3 @@
-// 示例爬取脚本
-// 用户可以在脚本中自定义所有变量和逻辑
-
-// wallpaper_type 为 options 类型，值为 "imgpc"（桌面壁纸）或 "sp"（手机壁纸）
-
 // 从 URL 中提取“文件名”（忽略 query/hash，只取最后一个 '/' 之后的部分）
 fn extract_filename(url) {
     // 先去掉 query / hash
@@ -65,7 +60,7 @@ fn process_detail_page(href) {
 // 抓取某一类（imgpc/sp）的排行榜页
 fn crawl_kind(kind, start_page, max_pages, period) {
     let pg = start_page;
-    while pg <= max_pages {
+    while pg <= end_page {
         let start_url = `https://anihonetwallpaper.com/ranking-${period}-${kind}/${pg}`;
         to(start_url);
 
@@ -88,4 +83,4 @@ fn crawl_kind(kind, start_page, max_pages, period) {
 }
 
 // 根据用户选择的壁纸类型爬取对应的排行榜
-crawl_kind(wallpaper_type, start_page, max_pages, ranking_period);
+crawl_kind(wallpaper_type, start_page, end_page, ranking_period);
