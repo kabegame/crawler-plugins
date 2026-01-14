@@ -1,23 +1,23 @@
 {
-  "version": "v2.0.2",
-  "generated_at": "2026-01-14T03:48:24.362Z",
+  "version": "v2.0.3",
+  "generated_at": "2026-01-14T10:48:24.291Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.2",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.3",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
       "name": "anihonet动漫壁纸",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "description": "anihonet动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.2/anihonet-wallpaper.kgpg",
-      "sizeBytes": 56119,
-      "sha256": "06328dda0bd6579af112fb04950e7ca991c6e1da7a5d75e5924b6a8d6b0b8b47"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/anihonet-wallpaper.kgpg",
+      "sizeBytes": 121290,
+      "sha256": "60dd471884db5df08123148944ec1896ca85f7375401551383db9da4ea040d7e"
     },
     {
       "id": "konachan",
@@ -26,20 +26,20 @@
       "description": "konachan动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.2/konachan.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "454310b1c9b66663e36e8b953282b5c9b411f61aa35d3273f7f7e292288c2a2e"
+      "sha256": "a8a5d4744d0d8f4d7e29c45a117606c417a6fe4dc602975d258e1d543015e556"
     },
     {
       "id": "local-import",
       "name": "本地导入",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "导入本地图片：支持拖入单个图片文件或整个文件夹（可选递归）",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.2/local-import.kgpg",
-      "sizeBytes": 55983,
-      "sha256": "ba60be733ceff00608118e5dd94fc24666a59b7be5cdc83edd7775184920b8d2"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/local-import.kgpg",
+      "sizeBytes": 55982,
+      "sha256": "57b07e58544076398ab8bd49f58869acee1933b9e143028d90761697c992f27b"
     }
   ]
 }
