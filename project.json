@@ -3,11 +3,11 @@
   "namedInputs": {
     "pluginFiles": ["{projectRoot}/plugins/**/*"],
     "localImportFiles": ["{projectRoot}/plugins/local-import/**/*"],
-    "packageScript": ["{projectRoot}/package-plugin.js"],
+    "packageScript": ["{projectRoot}/package-plugin.ts"],
     "packageConfig": [
-      "{projectRoot}/package.json",
+      "{projectRoot}/package.tson",
       "{projectRoot}/pnpm-lock.yaml",
-      "{projectRoot}/project.json"
+      "{projectRoot}/project.tson"
     ],
     "normalInputs": ["pluginFiles", "packageScript", "packageConfig"],
     "localInputs": ["localImportFiles", "packageScript", "packageConfig"]
@@ -16,7 +16,7 @@
     "package": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js",
+        "command": "bun package-plugin.ts",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -26,7 +26,7 @@
     "package-local": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only local-import",
+        "command": "bun package-plugin.ts --only local-import",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -36,7 +36,7 @@
     "package-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --out-dir ../data/plugins-directory",
+        "command": "bun package-plugin.ts --out-dir ../data/plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -46,7 +46,7 @@
     "package-local-to-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only local-import --out-dir ../data/plugins-directory",
+        "command": "bun package-plugin.ts --only local-import --out-dir ../data/plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
@@ -56,22 +56,22 @@
     "package-to-resources": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --out-dir ../src-tauri/app-main/resources/plugins",
+        "command": "bun package-plugin.ts --out-dir ../src-tauri/app-main/resources/plugins",
         "cwd": "{projectRoot}"
       },
       "cache": true,
       "inputs": ["normalInputs"],
-      "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
+      "outputs": ["{workspaceRoot}/src-tauri/app-main/resources/plugins/**/*"]
     },
     "package-local-to-resources": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node package-plugin.js --only local-import --out-dir ../src-tauri/app-main/resources/plugins",
+        "command": "bun package-plugin.ts --only local-import --out-dir ../src-tauri/app-main/resources/plugins",
         "cwd": "{projectRoot}"
       },
       "cache": true,
       "inputs": ["localInputs"],
-      "outputs": ["{workspaceRoot}/src-tauri/resources/plugins/**/*"]
+      "outputs": ["{workspaceRoot}/src-tauri/app-main/resources/plugins/**/*"]
     }
   }
 }

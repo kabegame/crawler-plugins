@@ -59,9 +59,26 @@ if !is_folder {
     // - file:///xxx 的 file URL
     // - 直接的本地路径（若存在）
     try {
-        // zip：显式走 archive 导入（便于未来扩展更多 archive 类型）
-        if input_path.ends_with(".zip") || input_path.ends_with(".ZIP") {
-            download_archive(input_path, "zip");
+        // archive：显式走 archive 导入（便于未来扩展更多 archive 类型）
+        let lower_path = "";
+        try {
+            lower_path = input_path.to_lower();
+        } catch (err) {
+            // fallback if to_lower not available (older rhai?)
+            lower_path = input_path;
+        }
+
+        let supported_types = get_supported_archive_types();
+        let is_archive = false;
+        for t in supported_types {
+            if lower_path.ends_with("." + t) {
+                is_archive = true;
+                break;
+            }
+        }
+
+        if is_archive {
+            download_archive(input_path, ());
         } else {
             download_image(input_path);
         }

@@ -1,12 +1,12 @@
 {
-  "version": "v2.0.3",
-  "generated_at": "2026-01-14T10:48:35.115Z",
+  "version": "v2.0.4",
+  "generated_at": "2026-01-22T13:20:39.627Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.3",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.4",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
@@ -15,9 +15,9 @@
       "description": "anihonet动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/anihonet-wallpaper.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/anihonet-wallpaper.kgpg",
       "sizeBytes": 121290,
-      "sha256": "f91b7df9d843a51e3f06ac593c66cb3971f908dff738f7df44d5fe441b12bda7"
+      "sha256": "b8c4a97ce4821fa3358262a012f43391fc2119eca8ae243eaa4380657d21288d"
     },
     {
       "id": "konachan",
@@ -26,20 +26,9 @@
       "description": "konachan动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/konachan.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "da901fbce5a14334b98172ec9b9dc5bb5f961e3b44f1a444e1018526909a988d"
-    },
-    {
-      "id": "local-import",
-      "name": "本地导入",
-      "version": "1.0.1",
-      "description": "导入本地图片：支持拖入单个图片文件或整个文件夹（可选递归）",
-      "author": "Kabegame",
-      "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.3/local-import.kgpg",
-      "sizeBytes": 55982,
-      "sha256": "7678da86be63b9856ca6f902bb94abb12476239e358e5dca51e5e4168eb5afbc"
+      "sha256": "fc9a6f8966ddc38ccdaee397e90a99c8d4a6a952b26aa99b8faab19449972697"
     }
   ]
 }
