@@ -4,10 +4,10 @@
   "description": "Kabegame 爬虫插件仓库",
   "type": "module",
   "scripts": {
-    "package": "bun run package-plugin.ts",
-    "package:single": "bun run package-plugin.ts",
-    "generate-index": "bun run generate-index.ts",
-    "release": "bun run package && bun run generate-index",
+    "package": "bun package-plugin.ts",
+    "package:single": "bun package-plugin.ts",
+    "generate-index": "bun generate-index.ts",
+    "release": "bun nx package && bun run generate-index",
     "prepare": "husky"
   },
   "devDependencies": {
