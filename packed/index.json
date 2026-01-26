@@ -1,6 +1,6 @@
 {
   "version": "v2.0.4",
-  "generated_at": "2026-01-22T13:20:39.627Z",
+  "generated_at": "2026-01-26T02:28:26.700Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -17,7 +17,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/anihonet-wallpaper.kgpg",
       "sizeBytes": 121290,
-      "sha256": "b8c4a97ce4821fa3358262a012f43391fc2119eca8ae243eaa4380657d21288d"
+      "sha256": "b7ba4543b33910c204c2cb6b24a7aa347e6472775ff8ba0843a0d116dea55ba4"
     },
     {
       "id": "konachan",
@@ -28,7 +28,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "fc9a6f8966ddc38ccdaee397e90a99c8d4a6a952b26aa99b8faab19449972697"
+      "sha256": "20e5fe963c0d27b1ab33a2291cd1a8fc04e475c26c9a14dcad8523830bd2971b"
     }
   ]
 }
