@@ -33,26 +33,6 @@
       "inputs": ["localInputs"],
       "outputs": ["{projectRoot}/packed/**/*"]
     },
-    "package-to-data": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun package-plugin.ts --out-dir ../data/plugins-directory",
-        "cwd": "{projectRoot}"
-      },
-      "cache": true,
-      "inputs": ["normalInputs"],
-      "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
-    },
-    "package-local-to-data": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun package-plugin.ts --only local-import --out-dir ../data/plugins-directory",
-        "cwd": "{projectRoot}"
-      },
-      "cache": true,
-      "inputs": ["localInputs"],
-      "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
-    },
     "package-to-resources": {
       "executor": "nx:run-commands",
       "options": {
