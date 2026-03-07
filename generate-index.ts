@@ -86,11 +86,15 @@ function generateIndex(options: GenerateIndexOptions): string {
   // 从 package.json 读取版本信息
   let packageVersion = "latest";
   try {
-    const packageJson: PackageJson = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf-8"));
+    const packageJson: PackageJson = JSON.parse(
+      fs.readFileSync(PACKAGE_JSON, "utf-8"),
+    );
     packageVersion = packageJson.version || "latest";
   } catch (error) {
     console.warn(
-      chalk.yellow(`⚠️  无法读取 package.json，使用默认版本: ${packageVersion}`)
+      chalk.yellow(
+        `⚠️  无法读取 package.json，使用默认版本: ${packageVersion}`,
+      ),
     );
   }
 
@@ -129,17 +133,6 @@ function generateIndex(options: GenerateIndexOptions): string {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  // 读取 builtin 插件列表
-  let builtinPlugins: string[] = [];
-  try {
-    builtinPlugins = JSON.parse(fs.readFileSync(BUILTIN_JSON, "utf-8"));
-    console.log(chalk.cyan(`   Builtin 插件: ${builtinPlugins.join(", ")}\n`));
-  } catch (error) {
-    console.warn(
-      chalk.yellow(`⚠️  无法读取 builtin.json，使用空列表`)
-    );
-  }
-
   // 读取所有插件目录
   const entries = fs.readdirSync(PLUGIN_DIR, { withFileTypes: true });
   const pluginDirs = entries
@@ -152,10 +145,6 @@ function generateIndex(options: GenerateIndexOptions): string {
         dirName !== ".git" &&
         dirName !== "plugins"
       );
-    })
-    .filter((entry) => {
-      // 过滤掉 builtin 插件
-      return !builtinPlugins.includes(entry.name);
     })
     .map((entry) => entry.name);
 
@@ -174,7 +163,7 @@ function generateIndex(options: GenerateIndexOptions): string {
     // 检查 manifest.json 是否存在
     if (!fs.existsSync(manifestPath)) {
       console.warn(
-        chalk.yellow(`⚠️  跳过 ${pluginName}: manifest.json 不存在`)
+        chalk.yellow(`⚠️  跳过 ${pluginName}: manifest.json 不存在`),
       );
       continue;
     }
@@ -182,14 +171,16 @@ function generateIndex(options: GenerateIndexOptions): string {
     // 检查 .kgpg 文件是否存在
     if (!fs.existsSync(kgpgFile)) {
       console.warn(
-        chalk.yellow(`⚠️  跳过 ${pluginName}: ${pluginName}.kgpg 不存在`)
+        chalk.yellow(`⚠️  跳过 ${pluginName}: ${pluginName}.kgpg 不存在`),
       );
       continue;
     }
 
     try {
       // 读取 manifest.json
-      const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+      const manifest: Manifest = JSON.parse(
+        fs.readFileSync(manifestPath, "utf-8"),
+      );
 
       // 获取文件大小
       const stats = fs.statSync(kgpgFile);
@@ -220,8 +211,8 @@ function generateIndex(options: GenerateIndexOptions): string {
         chalk.green(
           `✅ ${pluginName}: ${pluginInfo.name} v${
             pluginInfo.version
-          } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`
-        )
+          } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`,
+        ),
       );
     } catch (error) {
       console.error(chalk.red(`❌ ${pluginName}: ${(error as Error).message}`));
@@ -260,12 +251,12 @@ program
   .option(
     "--repo-owner <owner>",
     "GitHub 仓库所有者（默认: kabegame）",
-    "kabegame"
+    "kabegame",
   )
   .option(
     "--repo-name <name>",
     "GitHub 仓库名称（默认: crawler-plugins）",
-    "crawler-plugins"
+    "crawler-plugins",
   )
   .option("--tag <tag>", "Release 标签（默认: 从 package.json 或环境变量推导）")
   .action((options: GenerateIndexOptions) => {
