@@ -1,12 +1,12 @@
 {
-  "version": "v2.0.4",
-  "generated_at": "2026-03-03T07:40:05.264Z",
+  "version": "v2.0.5",
+  "generated_at": "2026-03-07T08:27:01.354Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.4",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.5",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
@@ -15,9 +15,9 @@
       "description": "anihonet动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/anihonet-wallpaper.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.5/anihonet-wallpaper.kgpg",
       "sizeBytes": 121290,
-      "sha256": "a383cc0a47860cbd817cc09337fbd275d506fc3404efd5cd3fa35268255d85ae"
+      "sha256": "3cabccc7888234f1ce3c9bee0c7867b75a20b6fdc8f5444831b80bf3af1627a7"
     },
     {
       "id": "konachan",
@@ -26,9 +26,9 @@
       "description": "konachan动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.4/konachan.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.5/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "78a56ecd781a2d6af6471c759c86cfb379861fe357149c8610756824cb5bac53"
+      "sha256": "989dcba26422cebf96358099f80e88661635a5030353e9cefa8cd132d6ce48ed"
     }
   ]
 }
