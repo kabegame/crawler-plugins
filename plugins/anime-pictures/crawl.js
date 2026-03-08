@@ -1,5 +1,25 @@
 // anime-pictures WebView 爬虫：基于 page_label 的 switch 流程
-// API: 全局 ctx { vars, currentContext, add_progress, download_image, to, exit, error }
+// API: 全局 ctx { vars, currentContext, add_progress, download_image, to, exit, error, requestShowWebview }
+
+/** 判断当前是否为挑战页（如 Cloudflare "Just a moment..."） */
+function isChallengePage(ctx) {
+  const title = (document.title || "").trim();
+  const bodyText = (document.body && document.body.innerText) ? document.body.innerText.slice(0, 2000) : "";
+  const isChallenge =
+    /just a moment|cloudflare|challenge|checking your browser/i.test(title) ||
+    /just a moment|cloudflare|checking your browser/i.test(bodyText);
+  return !!isChallenge;
+}
+
+/** 若为挑战页：请求打开 webview、等待 20 秒后再继续，并 log 相关信息 */
+async function ensurePastChallenge(ctx) {
+  if (!isChallengePage(ctx)) return;
+  ctx.log("[anime-pictures] 检测到挑战页（如 Cloudflare 验证），请求打开 WebView 窗口并等待 20 秒");
+  await ctx.requestShowWebview();
+  await ctx.sleep(20000);
+  ctx.log("[anime-pictures] 等待结束，重新查询页面元素");
+  await ctx.waitForDom();
+}
 
 async function run() {
   const step = ctx.pageLabel;
@@ -26,6 +46,9 @@ async function run() {
 }
 
 async function handleInitial(ctx) {
+  await ctx.waitForDom();
+  await ensurePastChallenge(ctx);
+
   // 跳转到列表页，并标记下一步为 list
   const state = ctx.pageState;
   if (!state.page) {
