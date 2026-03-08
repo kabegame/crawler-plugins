@@ -1,6 +1,6 @@
 {
   "version": "v3.0.0",
-  "generated_at": "2026-03-08T13:56:11.784Z",
+  "generated_at": "2026-03-08T15:19:34.164Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -17,18 +17,18 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anihonet-wallpaper.kgpg",
       "sizeBytes": 121290,
-      "sha256": "ecbe1a6d522e1b338fb4e3da7118843a9a9971f5ad9d128585727783610e48fe"
+      "sha256": "3d8f3cd7c01b2a4211b6b5c256c6575290d38fd9fa35516db92e7b101d42c8d0"
     },
     {
       "id": "anime-pictures",
       "name": "anime-pictures动漫图库",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
       "author": "Kabegame",
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anime-pictures.kgpg",
-      "sizeBytes": 1982816,
-      "sha256": "305dc400ca556663eb3e60622542574257c5ac9316a17ac60a29ed0243c622ae"
+      "sizeBytes": 1983211,
+      "sha256": "947efb8f0dd3c190dc369ce520610d1f1723437981d86d2ec322453eb9b8c691"
     },
     {
       "id": "konachan",
@@ -39,7 +39,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "23b098de8b535a06ebb35076500bfaf9ad58e82912ac14fe1bcb6bc8c3979975"
+      "sha256": "27abf519a571ae20a9f51218be2f44c69d7794f185dadda11926c94852430776"
     },
     {
       "id": "ziworld",
@@ -50,7 +50,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/ziworld.kgpg",
       "sizeBytes": 54774,
-      "sha256": "c0e4a3bcf9026e9484029952b00b8481abab88a33de47965918a16f928697d9b"
+      "sha256": "1516adadd2d7a421327d3e947f5d922dbfa8fcb6bc2a48c839edecc33c5f32a0"
     }
   ]
 }
