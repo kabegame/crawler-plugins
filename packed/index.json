@@ -1,12 +1,12 @@
 {
-  "version": "v2.0.5",
-  "generated_at": "2026-03-07T08:27:05.049Z",
+  "version": "v3.0.0",
+  "generated_at": "2026-03-08T13:50:41.307Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v2.0.5",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v3.0.0",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
@@ -15,9 +15,20 @@
       "description": "anihonet动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.5/anihonet-wallpaper.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anihonet-wallpaper.kgpg",
       "sizeBytes": 121290,
-      "sha256": "3cabccc7888234f1ce3c9bee0c7867b75a20b6fdc8f5444831b80bf3af1627a7"
+      "sha256": "23879243a66488b9098e3dbdf28c9e32d3ba6bd5686132b8a8e12a7dfeeeb352"
+    },
+    {
+      "id": "anime-pictures",
+      "name": "anime-pictures动漫图库",
+      "version": "0.1.0",
+      "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
+      "author": "Kabegame",
+      "packageVersion": 2,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anime-pictures.kgpg",
+      "sizeBytes": 1982816,
+      "sha256": "04f4c778b297c17e5b54731640e35d46d5481fc9a3d11e6a5fc90749aa142a82"
     },
     {
       "id": "konachan",
@@ -26,9 +37,20 @@
       "description": "konachan动漫壁纸收集源插件",
       "author": "程闽",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v2.0.5/konachan.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/konachan.kgpg",
       "sizeBytes": 104752,
-      "sha256": "989dcba26422cebf96358099f80e88661635a5030353e9cefa8cd132d6ce48ed"
+      "sha256": "fe9c74a47f03552150108c363271a3bd1a1df4eea791a95e43683886ac57164c"
+    },
+    {
+      "id": "ziworld",
+      "name": "ziworld高质量壁纸",
+      "version": "0.1.0",
+      "description": "ziworld高质量壁纸收集源插件",
+      "author": "Kabegame",
+      "packageVersion": 2,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/ziworld.kgpg",
+      "sizeBytes": 54777,
+      "sha256": "6e2e1e635f8b4f54aead505c8d223c197f3abec94a9908859a3078c0ff0e45ed"
     }
   ]
 }
