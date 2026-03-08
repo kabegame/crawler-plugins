@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
+## [3.0.0]
+### Added
+- 新增webview后端插件
+- 新增 anime-pictures 插件，可以按标签下载图片
+- 新增 ziworld 插件，可以快速下载高质量壁纸
+
 ## [2.0.4] - 2026-01-22
 ### Changed
 - **迁移到 Bun 运行时**：将所有脚本从 Node.js 迁移到 Bun，提升构建和运行性能

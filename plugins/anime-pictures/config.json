@@ -1,0 +1,30 @@
+{
+    "baseUrl": "https://anime-pictures.net",
+    "var": [
+        {
+            "key": "startPage",
+            "type": "int",
+            "name": "起始页面",
+            "descripts": "要拉取的起始页面",
+            "default": 0,
+            "min": 0,
+            "max": null
+        },
+        {
+            "key": "endPage",
+            "type": "int",
+            "name": "结束页数",
+            "descripts": "要拉取的结束页面",
+            "default": 5,
+            "min": 0,
+            "max": null
+        },
+        {
+            "key": "tag",
+            "type": "string",
+            "name": "标签",
+            "descripts": "要拉取的标签（默认无标签爬全站）",
+            "default": ""
+        }
+    ]
+}

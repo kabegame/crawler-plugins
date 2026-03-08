@@ -7,65 +7,55 @@
 ### 1. anihonet-wallpaper
 
 **名称**: anihonet动漫壁纸  
-**版本**: 1.0.0  
+**版本**: 1.1.1  
 **描述**: anihonet动漫壁纸收集源插件  
-**作者**: Kabegame
+**作者**: 程闽
 
 **路径**: `plugins/anihonet-wallpaper/`  
 **详细文档**: [plugins/anihonet-wallpaper/README.md](plugins/anihonet-wallpaper/README.md)
 
-**文件结构**:
-```
-anihonet-wallpaper/
-├── manifest.json    # 插件元数据
-├── config.json      # 插件配置
-├── crawl.rhai       # 爬虫脚本
-├── icon.png         # 插件图标（仅支持 PNG）
-├── doc_root/        # 文档目录
-│   ├── doc.md       # 用户文档
-│   └── 1 (64).jpeg  # 示例图片
-└── README.md        # 开发文档
-```
+**功能**:
+- 从 anihonetwallpaper.com 爬取动漫壁纸
+- 支持桌面壁纸 / 手机壁纸类型
+- 支持日榜、周榜、月榜、年榜
+
+**配置变量**:
+- `start_page` / `end_page`：起始页、结束页
+- `wallpaper_type`：桌面壁纸（imgpc）/ 手机壁纸（sp）
+- `ranking_period`：日榜（daily）/ 周榜（weekly）/ 月榜（monthly）/ 年榜（annual）
+
+![image](./images/animehonet.png)
 ---
 
-### 2. local-import
+### 2. anime-pictures
 
-**名称**: 本地导入  
-**版本**: 1.0.0  
-**描述**: 导入本地图片：支持拖入单个图片文件或整个文件夹（可选递归）  
+**名称**: anime-pictures动漫图库  
+**版本**: 0.1.0  
+**描述**: anime-pictures动漫图库收集源插件（可按标签检索）  
 **作者**: Kabegame
 
-**路径**: `plugins/local-import/`  
-**详细文档**: [plugins/local-import/README.md](plugins/local-import/README.md)
+**路径**: `plugins/anime-pictures/`  
+**用户文档**: [plugins/anime-pictures/doc_root/doc.md](plugins/anime-pictures/doc_root/doc.md)
 
 **功能**:
-- 导入单文件：一次 `download_image(file_path)`
-- 导入文件夹：扫描文件夹（可选递归）后逐个 `download_image`
+- 从 [anime-pictures.net](https://anime-pictures.net) 按标签与页面范围批量下载壁纸
+- 支持按站点标签筛选（如角色名、作品名）
+- 单次任务建议不超过 100 页
 
-**配置变量**（二选一）:
-- `file_path`：图片文件路径（优先）
-- `folder_path`：文件夹路径
-- `recursive`：是否递归扫描子文件夹（仅文件夹导入生效）
-- `file_extensions`：扩展名列表（仅文件夹导入生效）
+**配置变量**:
+- `startPage`：起始页面（从 0 开始）
+- `endPage`：结束页数（包含该页）
+- `tag`：站点搜索标签，留空则按当前列表页爬取
 
-**文件结构**:
-```
-local-import/
-├── manifest.json    # 插件元数据
-├── config.json      # 插件配置
-├── crawl.rhai       # 脚本
-├── doc_root/        # 文档目录
-│   └── doc.md       # 用户文档
-└── README.md        # 开发文档
-```
-
+![image](./images/anime-pictures.png)
 ---
 
 ### 3. konachan
 
 **名称**: konachan动漫壁纸  
-**版本**: 1.0.0  
+**版本**: 1.0.1  
 **描述**: konachan动漫壁纸收集源插件  
+**作者**: 程闽
 
 **路径**: `plugins/konachan/`
 
@@ -80,17 +70,28 @@ local-import/
 - `end_page`：结束页面（一次最多爬取 100 页）
 - `quality`：图片质量（高/中）
 
-**文件结构**:
-```
-konachan/
-├── manifest.json    # 插件元数据
-├── config.json      # 插件配置
-├── crawl.rhai       # 爬虫脚本
-├── icon.png         # 插件图标（仅支持 PNG）
-└── doc_root/        # 文档目录
-    ├── doc.md       # 用户文档
-    └── image.jpg    # 示例图片
-```
+![image](./images/konachan.png)
+---
+
+### 4. ziworld
+
+**名称**: ziworld高质量壁纸  
+**版本**: 0.1.0  
+**描述**: ziworld高质量壁纸收集源插件  
+**作者**: Kabegame
+
+**路径**: `plugins/ziworld/`  
+**用户文档**: [plugins/ziworld/doc_root/doc.md](plugins/ziworld/doc_root/doc.md)
+
+**功能**:
+- 从 [ziworld](https://t.ziworld.top/date.json) 抓取图片壁纸
+- 按目录多选拉取（如 PC、背景、二次元、移动端、原神、崩坏等）
+- 站点有视频壁纸，但不支持下载
+
+**配置变量**:
+- `category`：目录多选（checkbox），勾选要拉取的目录。可选值包括：PC、背景、二次元、移动端、手机壁纸、横版壁纸、头像、萌图MP、萌图PC、原神、崩坏、鸣潮、七濑胡桃、未归类等
+
+![image](./images/ziworld.png)
 ---
 
 ## 使用方法
@@ -119,13 +120,13 @@ git submodule update --remote
 **安装依赖**（首次使用）：
 
 ```bash
-pnpm install
+bun install
 ```
 
-**打包所有插件**：
+**打包所有插件**（注意必须要包含在kabegame主项目中，否则没有cli无法打包）
 
 ```bash
-pnpm run package
+bun run package
 # 或
 node package-plugin.js
 ```
@@ -260,7 +261,7 @@ pnpm run package-plugin crawler-plugins/plugins/<插件名称>
 ### Rhai API 文档
 
 完整的 Rhai 爬虫 API 参考文档，包括：
-- 页面导航函数（`to()`, `back()`, `to_json()`）
+- 页面导航函数（`to()`, `back()`）与数据拉取（`fetch_json()`）
 - 页面信息函数（`current_url()`, `current_html()`）
 - 元素查询函数（`query()`, `get_attr()`, `query_by_text()`）
 - URL 处理函数（`resolve_url()`, `is_image_url()`）
@@ -287,5 +288,5 @@ pnpm run package-plugin crawler-plugins/plugins/<插件名称>
 3. 编写清晰的 README.md 文档
 4. 包含用户文档（doc_root/doc.md）
 
-开发新插件前，请先阅读 [插件开发指南](README_PLUGIN_DEV.md) 和 [Rhai API 文档](RHAI_API.md)。
+开发新插件前，请先阅读kabegame仓库的 [插件开发指南](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) 和 [Rhai API 文档](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md)。
 
