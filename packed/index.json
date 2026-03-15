@@ -1,6 +1,6 @@
 {
   "version": "v3.1.1",
-  "generated_at": "2026-03-15T06:51:59.405Z",
+  "generated_at": "2026-03-15T17:00:30.018Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -17,7 +17,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anihonet-wallpaper.kgpg",
       "sizeBytes": 121295,
-      "sha256": "afa9f509fba78f80764c6ccca3666feaf458ce4a4801dc1a3942fa39a1ea1396"
+      "sha256": "30a781ec9e0b1441aaddd5bac30623971473f6bc8a0a903d7f576cd681dfae9c"
     },
     {
       "id": "anime-pictures",
@@ -28,7 +28,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anime-pictures.kgpg",
       "sizeBytes": 1983338,
-      "sha256": "55ff91793a1c011baaec8eb095529d9ad7ec76be6c7c2533bd9d01567a06323f"
+      "sha256": "38acaf047d2544cbcc8df2383d8ee4e69857ade56b68e2b30097bfe527362a0b"
     },
     {
       "id": "konachan",
@@ -39,18 +39,18 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/konachan.kgpg",
       "sizeBytes": 104746,
-      "sha256": "379c0aec9973ba22d0f0dfe98bf703830d149ce174a2a9acc00c4f804c0e98ec"
+      "sha256": "7079211ce71c13c0dd5b0a914d31f705e0affa8a95647c54c8eb4881dac33d7d"
     },
     {
       "id": "pixiv",
       "name": "Pixiv",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
       "author": "Kabegame",
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/pixiv.kgpg",
-      "sizeBytes": 13961158,
-      "sha256": "d018d9a196e70ed20f5956894d49106345892944e1e17e1328f76cf77d5e0546"
+      "sizeBytes": 13961260,
+      "sha256": "44577fb197a86eca52871c10c696af826d8a749275771141946a14bcd043bffa"
     },
     {
       "id": "twodwallpapers",
@@ -61,7 +61,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/twodwallpapers.kgpg",
       "sizeBytes": 8244879,
-      "sha256": "665632421fd2e260bba7f96af6c13d8116ce078ae1476a7d8d968305669629bb"
+      "sha256": "dceda3f4d4ab0f0dddd9a8d797c4d66fc52c5562d670f736154d6c035c50a8a9"
     },
     {
       "id": "ziworld",
@@ -72,7 +72,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/ziworld.kgpg",
       "sizeBytes": 54942,
-      "sha256": "097f9878b4e950bf9c7c785eca3bb76b03ff8d651a6a10362c85aaf9d7ed447e"
+      "sha256": "0ef43c0d2a280fccd359f1734a7fc4ac0a663f59216a5b6a6220d1b6d2d88d57"
     }
   ]
 }
