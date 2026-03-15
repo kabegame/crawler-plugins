@@ -1,56 +1,78 @@
 {
-  "version": "v3.0.0",
-  "generated_at": "2026-03-08T13:56:11.784Z",
+  "version": "v3.1.0",
+  "generated_at": "2026-03-15T06:46:34.685Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v3.0.0",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v3.1.0",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
       "name": "anihonet动漫壁纸",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "description": "anihonet动漫壁纸收集源插件",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anihonet-wallpaper.kgpg",
-      "sizeBytes": 121290,
-      "sha256": "ecbe1a6d522e1b338fb4e3da7118843a9a9971f5ad9d128585727783610e48fe"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/anihonet-wallpaper.kgpg",
+      "sizeBytes": 121295,
+      "sha256": "bbbb0d74e57b29f76cc3139bd1f0be81d18601d90ee70103bb4e2779455c2d36"
     },
     {
       "id": "anime-pictures",
       "name": "anime-pictures动漫图库",
-      "version": "0.1.0",
+      "version": "0.1.2",
       "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/anime-pictures.kgpg",
-      "sizeBytes": 1982816,
-      "sha256": "305dc400ca556663eb3e60622542574257c5ac9316a17ac60a29ed0243c622ae"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/anime-pictures.kgpg",
+      "sizeBytes": 1983338,
+      "sha256": "e03b2b1fffaa802c2b45e727f27c5777db1371455d883bc457973d7392b8b095"
     },
     {
       "id": "konachan",
       "name": "konachan动漫壁纸",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "description": "konachan动漫壁纸收集源插件",
-      "author": "程闽",
+      "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/konachan.kgpg",
-      "sizeBytes": 104752,
-      "sha256": "23b098de8b535a06ebb35076500bfaf9ad58e82912ac14fe1bcb6bc8c3979975"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/konachan.kgpg",
+      "sizeBytes": 104746,
+      "sha256": "2171db8e3873a28240c06769d61ce7771caa219bc9b674e4a000c12c3aba6e53"
+    },
+    {
+      "id": "pixiv",
+      "name": "Pixiv",
+      "version": "1.0.0",
+      "description": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
+      "author": "Kabegame",
+      "packageVersion": 2,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/pixiv.kgpg",
+      "sizeBytes": 13961158,
+      "sha256": "75140f073b1068ce30dc4ed7ca71d9559b6bd3e8d62051a532d719c35bb1f8d3"
+    },
+    {
+      "id": "twodwallpapers",
+      "name": "2dwallpapers二次元壁纸",
+      "version": "0.1.0",
+      "description": "2dwallpapers 壁纸网站爬虫",
+      "author": "Kabegame",
+      "packageVersion": 2,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/twodwallpapers.kgpg",
+      "sizeBytes": 8244879,
+      "sha256": "af21474b316000880f7cebba7dafc862e79d640effc22fac7f182161d4ee973c"
     },
     {
       "id": "ziworld",
       "name": "ziworld高质量壁纸",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "description": "ziworld高质量壁纸收集源插件",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.0.0/ziworld.kgpg",
-      "sizeBytes": 54774,
-      "sha256": "c0e4a3bcf9026e9484029952b00b8481abab88a33de47965918a16f928697d9b"
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.0/ziworld.kgpg",
+      "sizeBytes": 54942,
+      "sha256": "66990ca1edbb3043edab03f455a5a499186002b578edd75e5b46c594e4dd0c69"
     }
   ]
 }
