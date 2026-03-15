@@ -1,6 +1,6 @@
 {
   "version": "v3.1.1",
-  "generated_at": "2026-03-15T06:49:00.176Z",
+  "generated_at": "2026-03-15T06:51:59.405Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -17,7 +17,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anihonet-wallpaper.kgpg",
       "sizeBytes": 121295,
-      "sha256": "686f179533e644ef6b00a3218ae12eea83189cc002260fa92ef3df623ead330d"
+      "sha256": "afa9f509fba78f80764c6ccca3666feaf458ce4a4801dc1a3942fa39a1ea1396"
     },
     {
       "id": "anime-pictures",
@@ -28,7 +28,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anime-pictures.kgpg",
       "sizeBytes": 1983338,
-      "sha256": "d796b80abffa0558a114d92f43dea3b0533c79873d811c5e58a1a3884debd0de"
+      "sha256": "55ff91793a1c011baaec8eb095529d9ad7ec76be6c7c2533bd9d01567a06323f"
     },
     {
       "id": "konachan",
@@ -39,7 +39,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/konachan.kgpg",
       "sizeBytes": 104746,
-      "sha256": "ebf37005615844dfac1c4d7b8af4f44814c65118b604fd5d7767a57d2987b8f1"
+      "sha256": "379c0aec9973ba22d0f0dfe98bf703830d149ce174a2a9acc00c4f804c0e98ec"
     },
     {
       "id": "pixiv",
@@ -50,7 +50,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/pixiv.kgpg",
       "sizeBytes": 13961158,
-      "sha256": "eb8a5a41351bc234df4201b555fe879338c53c4060da9a26574ac2122234e012"
+      "sha256": "d018d9a196e70ed20f5956894d49106345892944e1e17e1328f76cf77d5e0546"
     },
     {
       "id": "twodwallpapers",
@@ -61,7 +61,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/twodwallpapers.kgpg",
       "sizeBytes": 8244879,
-      "sha256": "437fef7c4591ca4607434d8487a8b35a49ddfe5eb27060f54d29477ffc2aae3b"
+      "sha256": "665632421fd2e260bba7f96af6c13d8116ce078ae1476a7d8d968305669629bb"
     },
     {
       "id": "ziworld",
@@ -72,7 +72,7 @@
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/ziworld.kgpg",
       "sizeBytes": 54942,
-      "sha256": "d30354cc05d6b6f5df47661866e672a2bc2a73b3a9ecee3bf5ba1488a22bbdf5"
+      "sha256": "097f9878b4e950bf9c7c785eca3bb76b03ff8d651a6a10362c85aaf9d7ed447e"
     }
   ]
 }
