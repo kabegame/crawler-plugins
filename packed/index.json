@@ -1,12 +1,12 @@
 {
-  "version": "v3.1.1",
-  "generated_at": "2026-03-15T17:00:30.018Z",
+  "version": "v3.1.2",
+  "generated_at": "2026-03-15T17:11:38.589Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
     "url": "https://github.com/kabegame/crawler-plugins"
   },
-  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v3.1.1",
+  "release_url": "https://github.com/kabegame/crawler-plugins/releases/tag/v3.1.2",
   "plugins": [
     {
       "id": "anihonet-wallpaper",
@@ -15,9 +15,9 @@
       "description": "anihonet动漫壁纸收集源插件",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anihonet-wallpaper.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/anihonet-wallpaper.kgpg",
       "sizeBytes": 121295,
-      "sha256": "30a781ec9e0b1441aaddd5bac30623971473f6bc8a0a903d7f576cd681dfae9c"
+      "sha256": "14bf5beb9136fb7818b5f1dc64a6b8d323f9d1d60afa4e99196819e268928784"
     },
     {
       "id": "anime-pictures",
@@ -26,9 +26,9 @@
       "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/anime-pictures.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/anime-pictures.kgpg",
       "sizeBytes": 1983338,
-      "sha256": "38acaf047d2544cbcc8df2383d8ee4e69857ade56b68e2b30097bfe527362a0b"
+      "sha256": "ee1d1d4835bc6b2e8e9e9946059d8700c2550c0e78779418e0b7f8fb8d72fa4a"
     },
     {
       "id": "konachan",
@@ -37,9 +37,9 @@
       "description": "konachan动漫壁纸收集源插件",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/konachan.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/konachan.kgpg",
       "sizeBytes": 104746,
-      "sha256": "7079211ce71c13c0dd5b0a914d31f705e0affa8a95647c54c8eb4881dac33d7d"
+      "sha256": "fe8f1e4d35c25f3a4ad80749525c221a75109d80d661856c7146fdebee353539"
     },
     {
       "id": "pixiv",
@@ -48,9 +48,9 @@
       "description": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/pixiv.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/pixiv.kgpg",
       "sizeBytes": 13961260,
-      "sha256": "44577fb197a86eca52871c10c696af826d8a749275771141946a14bcd043bffa"
+      "sha256": "c8538d42384dc90908f2639e4b8af0b4cf90177fd76e4572930a798c4363eb47"
     },
     {
       "id": "twodwallpapers",
@@ -59,9 +59,9 @@
       "description": "2dwallpapers 壁纸网站爬虫",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/twodwallpapers.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/twodwallpapers.kgpg",
       "sizeBytes": 8244879,
-      "sha256": "dceda3f4d4ab0f0dddd9a8d797c4d66fc52c5562d670f736154d6c035c50a8a9"
+      "sha256": "fcf698d1718234741ac7008c8c081c8e1cae0759c3a225ebf6ffd1c071f2c96a"
     },
     {
       "id": "ziworld",
@@ -70,9 +70,9 @@
       "description": "ziworld高质量壁纸收集源插件",
       "author": "Kabegame",
       "packageVersion": 2,
-      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.1/ziworld.kgpg",
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.1.2/ziworld.kgpg",
       "sizeBytes": 54942,
-      "sha256": "0ef43c0d2a280fccd359f1734a7fc4ac0a663f59216a5b6a6220d1b6d2d88d57"
+      "sha256": "82a291d41f2faeb6a4be2d58e64ea08ef9cca561c1db08f33a82cf99daea8877"
     }
   ]
 }
