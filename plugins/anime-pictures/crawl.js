@@ -1,5 +1,5 @@
 // anime-pictures WebView 爬虫：基于 page_label 的 switch 流程
-// API: 全局 ctx { vars, currentContext, add_progress, download_image, to, exit, error, requestShowWebview }
+// API: 全局 ctx { vars, currentContext, addProgress, downloadImage, to, exit, error, requestShowWebview }
 
 /** 判断当前是否为挑战页（如 Cloudflare "Just a moment..."） */
 function isChallengePage(ctx) {
@@ -39,7 +39,6 @@ async function run() {
       break;
     case "exit":
     default:
-      await ctx.sleep(100000);
       // 脚本结束退出。
       await ctx.exit();
   }
@@ -49,52 +48,69 @@ async function handleInitial(ctx) {
   await ctx.waitForDom();
   await ensurePastChallenge(ctx);
 
-  // 跳转到列表页，并标记下一步为 list
-  const state = ctx.pageState;
-  if (!state.page) {
-    await ctx.updatePageState({ page: ctx.vars?.startPage ?? 0 });
-  }
-  const page = state.page;
+  const state = ctx.state;
+
+  // 获得开始页面设置，0为默认值
   const startPage = ctx.vars?.startPage ?? 0;
-  const endPage = ctx.vars?.endPage ?? startPage;
-  if (page === startPage) {
+
+  // 执行初始化动作
+  if (!state.page) {
+    await ctx.updateState({ page: startPage, startPage });
+    const endPage = ctx.vars?.endPage ?? startPage;
     if (endPage >= startPage + 100) {
       throw "在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪";
     } else if (endPage < startPage) {
       throw "结束页面需要比开始页面大";
     }
-  } else if (page > endPage) {
-    await ctx.exit();
-    return;
   }
-  await ctx.updatePageState({ page: page + 1 });
 
-  const allPages = ctx.$$('.numeric-pages > *') || [];
-  const totalPages = Math.max(0, ...allPages.map(p => p.textContent)
-    .filter(t => t !== '')
-    .map(t => parseInt(t, 10)));
-  
-  const maxPage = Math.min(totalPages, endPage);
-  const totalPagesToCrawl = maxPage - startPage + 1;
-  const percentPerPage = totalPagesToCrawl > 0 ? 100 / totalPagesToCrawl : 0;
+  // 获取当前页面
+  const page = state.page;
+
+  // 获得结束页面，第一次来到initial可能没有设置
+  const endPage = state.endPage;
+
+  if (endPage) {
+    if (page > endPage) {
+      await ctx.exit();
+      return;  
+    }
+  }
+
+  // 准备进入下一页
+  await ctx.updateState({ page: page + 1 });
 
   const tag = ctx.vars?.tag?.trim() ?? "";
   const tagParam = tag ? encodeURIComponent(tag) : "";
-  ctx.sleep(5000);
-  ctx.log(`当前页面: ${page}, 总页数: ${totalPages}, 最大页数: ${maxPage}, 标签: ${tag}`);
+  await ctx.sleep(2000);
+  ctx.log(`当前页面: ${page}, 标签: ${tag}`);
   await ctx.to(`/posts?page=${page}${tagParam ? `&search_tag=${tagParam}` : ""}`, 
-    { pageLabel: "posts", pageState: { nth: 1, percentPerPage } }
+    { pageLabel: "posts", pageState: { nth: 1 } }
   );
 }
 
 async function handlePosts(ctx) {
   await ctx.waitForDom();
-  const state = ctx.pageState || {};
-  const nth = state.nth ?? 1;
+  const state = ctx.state;
+
+  // 不知道最后一页是多少
+  if (state.endPage === undefined) {
+    const endPageConfig = ctx.vars?.endPage ?? state.startPage;
+    const totalPages = Math.max(...ctx.$$('.numeric_pages > *').map(e => parseInt(e.textContent)).filter(v => !isNaN(v)));
+    const endPage = Math.min(endPageConfig, totalPages);
+    const totalPage = (endPage - state.startPage + 1);
+    await ctx.updateState({ endPage, percentPerPage: 100 / totalPage })
+    ctx.log(`最大页数: ${endPage}，总页数: ${totalPage}`)
+  }
+
+  const pageState = ctx.pageState;
+  const nth = pageState.nth ?? 1;
 
   const items = ctx.$$('.img-block > a');
 
-  ctx.log(`本页图片数量: ${items.length}`);
+  if (nth === 1) {
+    ctx.log(`本页图片数量: ${items.length}`);
+  }
 
   const item = items[nth - 1];
 
@@ -103,19 +119,19 @@ async function handlePosts(ctx) {
     return;
   }
 
-  const percentPerPage = state.percentPerPage ?? 0;
+  const percentPerPage = state.percentPerPage;
   const percentPerImage = (percentPerPage > 0 && items.length > 0)
     ? percentPerPage / items.length
     : 0;
   if (percentPerImage > 0) {
-    await ctx.add_progress(percentPerImage);
+    await ctx.addProgress(percentPerImage);
   }
 
   ctx.log(`下载第${nth}张图片`);
 
   await ctx.updatePageState({ nth: nth + 1 });
   const href = item.getAttribute("href");
-  ctx.sleep(5000);
+  await ctx.sleep(2000);
   await ctx.to(href, { pageLabel: "detail" });
 }
 
@@ -126,7 +142,7 @@ async function handleDetail(ctx) {
   if (downloadIcon) {
     const href = downloadIcon.getAttribute("href");
     ctx.log(`下载图片: ${href}`);
-    await ctx.download_image(href, { cookie: true });
+    await ctx.downloadImage(href, { cookie: true });
   }
   await ctx.back();
 }

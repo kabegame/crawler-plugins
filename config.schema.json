@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kabegame.github.io/schemas/crawler-plugin-config.json",
+  "title": "Crawler Plugin Config",
+  "description": "插件配置（KGPG 内 config.json）。变量会注入到 Rhai 脚本或 ctx.vars。详见 docs/RHAI_API.md",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "baseUrl": {
+      "type": "string",
+      "description": "插件基础 URL，会注入为脚本中的 base_url"
+    },
+    "selector": {
+      "type": ["string", "null"],
+      "description": "已废弃，选择器应在 crawl.rhai 中定义"
+    },
+    "var": {
+      "type": "array",
+      "description": "变量定义数组，顺序即表单展示顺序",
+      "items": { "$ref": "#/$defs/VarDefinition" }
+    }
+  },
+  "$defs": {
+    "WhenCondition": {
+      "type": "object",
+      "description": "条件显示：key 为某个 options 类型变量的 key，value 为匹配值数组；多 key 为 AND",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      }
+    },
+    "VarDefinition": {
+      "oneOf": [
+        { "$ref": "#/$defs/VarInt" },
+        { "$ref": "#/$defs/VarFloat" },
+        { "$ref": "#/$defs/VarString" },
+        { "$ref": "#/$defs/VarBoolean" },
+        { "$ref": "#/$defs/VarOptions" },
+        { "$ref": "#/$defs/VarList" },
+        { "$ref": "#/$defs/VarCheckbox" }
+      ]
+    },
+    "VarInt": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中直接使用" },
+        "type": { "const": "int" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "integer", "description": "默认值" },
+        "min": { "type": "integer", "description": "最小值" },
+        "max": { "type": "integer", "description": "最大值" },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarFloat": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中直接使用" },
+        "type": { "const": "float" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "number", "description": "默认值" },
+        "min": { "type": "number", "description": "最小值" },
+        "max": { "type": "number", "description": "最大值" },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarString": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中直接使用" },
+        "type": { "const": "string" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "string", "description": "默认值" },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarBoolean": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中直接使用" },
+        "type": { "const": "boolean" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "boolean", "description": "默认值" },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarOptions": {
+      "type": "object",
+      "required": ["key", "type", "name", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中得到字符串（variable）" },
+        "type": { "const": "options" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "string", "description": "默认选中的 variable 值" },
+        "options": {
+          "description": "选项列表，推荐 { name, variable }，兼容纯字符串",
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "variable"],
+                "additionalProperties": false,
+                "properties": { "name": { "type": "string" }, "variable": { "type": "string" } }
+              }
+            }
+          ]
+        },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarList": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中得到字符串数组" },
+        "type": { "const": "list" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "默认选中的项"
+        },
+        "options": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "建议项/可选项，保持 string[]，勿用 name/variable"
+        },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarCheckbox": {
+      "type": "object",
+      "required": ["key", "type", "name", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名，脚本中为 foo.a、foo.b 等 bool" },
+        "type": { "const": "checkbox" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": {
+          "description": "默认勾选：string[] 表示勾选项，或 object { variable: bool }",
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "object", "additionalProperties": { "type": "boolean" } }
+          ]
+        },
+        "options": {
+          "description": "多选选项，推荐 { name, variable }，兼容纯字符串",
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "variable"],
+                "additionalProperties": false,
+                "properties": { "name": { "type": "string" }, "variable": { "type": "string" } }
+              }
+            }
+          ]
+        },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    }
+  }
+}

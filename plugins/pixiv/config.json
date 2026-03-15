@@ -1,0 +1,121 @@
+{
+  "$schema": "../../config.schema.json",
+  "baseUrl": "https://www.pixiv.net",
+  "var": [
+    {
+      "key": "source",
+      "type": "options",
+      "name": "爬取类型",
+      "default": "ranking",
+      "options": [
+        { "name": "排行榜", "variable": "ranking" },
+        { "name": "个人收藏", "variable": "bookmark" },
+        { "name": "画师作品", "variable": "user" },
+        { "name": "关键词搜索", "variable": "keyword" }
+      ]
+    },
+    {
+      "key": "user_id",
+      "type": "string",
+      "name": "用户 UID",
+      "descripts": "Pixiv 用户 ID，不清楚请点击插件查看文档",
+      "when": { "source": ["bookmark", "user", "ranking"] }
+    },
+    {
+      "key": "ranking_mode",
+      "type": "options",
+      "name": "排行榜类型",
+      "default": "daily",
+      "options": [
+        { "name": "日榜", "variable": "daily" },
+        { "name": "周榜", "variable": "weekly" },
+        { "name": "月榜", "variable": "monthly" },
+        { "name": "男性向", "variable": "male" },
+        { "name": "女性向", "variable": "female" },
+        { "name": "AI 日榜", "variable": "daily_ai" },
+        { "name": "日榜 R18", "variable": "daily_r18" },
+        { "name": "周榜 R18", "variable": "weekly_r18" },
+        { "name": "男性向 R18", "variable": "male_r18" },
+        { "name": "女性向 R18", "variable": "female_r18" },
+        { "name": "AI 日榜 R18", "variable": "daily_r18_ai" }
+      ],
+      "when": { "source": ["ranking"] }
+    },
+    {
+      "key": "content_mode",
+      "type": "options",
+      "name": "内容类型",
+      "default": "all",
+      "options": [
+        { "name": "全部", "variable": "all" },
+        { "name": "插画", "variable": "illust" },
+        { "name": "漫画", "variable": "manga" },
+        { "name": "动图", "variable": "ugoira" }
+      ],
+      "when": { "source": ["ranking"], "ranking_mode": ["daily", "weekly", "daily_ai"] }
+    },
+    {
+      "key": "start_date",
+      "type": "string",
+      "name": "起始日期",
+      "descripts": "格式 YYYYMMDD，如 20240501",
+      "default": "",
+      "when": { "source": ["ranking"] }
+    },
+    {
+      "key": "date_range",
+      "type": "int",
+      "name": "日期范围（天）",
+      "default": 1,
+      "min": 1,
+      "max": 30,
+      "when": { "source": ["ranking"] }
+    },
+    {
+      "key": "artist_id",
+      "type": "string",
+      "name": "画师 UID",
+      "descripts": "要爬取的画师的 Pixiv UID",
+      "when": { "source": ["user"] }
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "descripts": "支持高级搜索语法，如 (Lucy OR 边缘行者) AND 5000users",
+      "when": { "source": ["keyword"] }
+    },
+    {
+      "key": "search_mode",
+      "type": "options",
+      "name": "搜索模式",
+      "default": "safe",
+      "options": [
+        { "name": "安全", "variable": "safe" },
+        { "name": "R18", "variable": "r18" },
+        { "name": "全部", "variable": "all" }
+      ],
+      "when": { "source": ["keyword"] }
+    },
+    {
+      "key": "keyword_order",
+      "type": "options",
+      "name": "排序方式",
+      "default": "date",
+      "descripts": "按人气排序需要 Pixiv Premium 账户",
+      "options": [
+        { "name": "按日期", "variable": "date" },
+        { "name": "按人气", "variable": "popular" }
+      ],
+      "when": { "source": ["keyword"] }
+    },
+    {
+      "key": "num_images",
+      "type": "int",
+      "name": "最大下载数",
+      "default": 50,
+      "min": 1,
+      "max": 1000
+    }
+  ]
+}

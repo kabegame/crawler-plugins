@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kabegame.github.io/schemas/crawler-plugin-manifest.json",
+  "title": "Crawler Plugin Manifest",
+  "description": "插件元数据（KGPG 内 manifest.json）。详见 docs/PLUGIN_FORMAT.md、docs/RHAI_API.md",
+  "type": "object",
+  "required": ["name", "version", "description", "author"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "插件名称，用于列表展示"
+    },
+    "version": {
+      "type": "string",
+      "description": "语义化版本，如 1.0.0"
+    },
+    "description": {
+      "type": "string",
+      "description": "插件描述"
+    },
+    "author": {
+      "type": "string",
+      "description": "作者名"
+    }
+  }
+}

@@ -37,9 +37,7 @@
           "name": "手机壁纸",
           "variable": "sp"
         }
-      ],
-      "min": null,
-      "max": null
+      ]
     },
     {
       "key": "ranking_period",
