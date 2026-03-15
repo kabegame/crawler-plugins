@@ -1,6 +1,7 @@
 // Pixiv 爬虫：排行榜 / 收藏 / 画师 / 关键词
 // Cookie 需在「高级设置 → HTTP 头」中填写
 
+set_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
 set_header("Referer", "https://www.pixiv.net/");
 set_header("Origin", "https://www.pixiv.net");
 set_header("x-requested-with", "XMLHttpRequest");

@@ -94,6 +94,59 @@
 ![image](./images/ziworld.png)
 ---
 
+### 5. pixiv
+
+**名称**: Pixiv  
+**版本**: 1.0.1  
+**描述**: Pixiv 插画爬虫：排行榜、收藏、画师、关键词  
+**作者**: Kabegame
+
+**路径**: `plugins/pixiv/`  
+**用户文档**: [plugins/pixiv/doc_root/doc.md](plugins/pixiv/doc_root/doc.md)
+
+**功能**:
+- 从 [pixiv.net](https://www.pixiv.net) 爬取插画，支持四种模式：排行榜、个人收藏、画师作品、关键词搜索
+- 排行榜支持日/周/月榜、男性向/女性向、AI 日榜及 R18 等类型
+- 关键词支持高级搜索语法（如 `(Lucy OR 边缘行者) AND 5000users`）
+- 部分模式需在「高级设置 → HTTP 头」中配置 Cookie，详见用户文档
+
+**配置变量**:
+- `source`：爬取类型（排行榜 / 个人收藏 / 画师作品 / 关键词搜索）
+- `user_id`：用户 UID（收藏、画师等模式）
+- `ranking_mode`：排行榜类型（日榜、周榜、月榜、男性向、女性向、AI 日榜及 R18 等）
+- `content_mode`：内容类型（全部 / 插画 / 漫画 / 动图，仅部分排行榜）
+- `start_date` / `date_range`：起始日期（YYYYMMDD）、日期范围（天）
+- `artist_id`：画师 UID（画师作品模式）
+- `keyword` / `search_mode` / `keyword_order`：关键词、搜索模式（安全/R18/全部）、排序方式
+- `num_images`：最大下载数（1～1000）
+
+![image](./images/pixiv.png)
+---
+
+### 6. twodwallpapers
+
+**名称**: 2dwallpapers二次元壁纸  
+**版本**: 0.1.0  
+**描述**: 2dwallpapers 壁纸网站爬虫  
+**作者**: Kabegame
+
+**路径**: `plugins/twodwallpapers/`  
+**用户文档**: [plugins/twodwallpapers/doc_root/doc.md](plugins/twodwallpapers/doc_root/doc.md)
+
+**功能**:
+- 从 [2dwallpapers.com](https://2dwallpapers.com) 爬取动漫、游戏等二次元壁纸
+- 支持大目录（动漫壁纸 / 游戏壁纸 / 未分类）与子目录关键字过滤
+- 支持多种排序：最新、最多查看、最多喜欢、最多收藏、最近更新、随机
+
+**配置变量**:
+- `category`：大目录（动漫壁纸 / 游戏壁纸 / 未分类）
+- `sub_cate_key`：子目录关键字（可选，按名称过滤子分类，支持正则如 `Genshin|Honkai`）
+- `max_num`：爬取总数（1～1000）
+- `orderby`：排序方式（最新 / 最多查看 / 最多喜欢 / 最多收藏 / 最近更新 / 随机）
+
+![image](./images/twodwallpapers.png)
+---
+
 ## 使用方法
 
 ### 作为 Git Submodule
