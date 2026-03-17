@@ -8,13 +8,19 @@
       "type": "options",
       "name": "目录",
       "name.en": "Category",
+      "name.ja": "カテゴリ",
+      "name.ko": "카테고리",
+      "name.zhtw": "目錄",
       "descripts": "爬取某一种壁纸",
       "descripts.en": "Wallpaper category to crawl",
+      "descripts.ja": "取得する壁紙カテゴリ",
+      "descripts.ko": "수집할 벽지 카테고리",
+      "descripts.zhtw": "爬取某一種壁紙",
       "default": "anime-wallpapers",
       "options": [
-        { "name": "动漫壁纸", "name.en": "Anime", "variable": "anime-wallpapers" },
-        { "name": "游戏壁纸", "name.en": "Game", "variable": "game-wallpapers" },
-        { "name": "未分类", "name.en": "Uncategorized", "variable": "uncategorized" }
+        { "name": "动漫壁纸", "name.en": "Anime", "name.ja": "アニメ", "name.ko": "애니메이션", "name.zhtw": "動漫壁紙", "variable": "anime-wallpapers" },
+        { "name": "游戏壁纸", "name.en": "Game", "name.ja": "ゲーム", "name.ko": "게임", "name.zhtw": "遊戲壁紙", "variable": "game-wallpapers" },
+        { "name": "未分类", "name.en": "Uncategorized", "name.ja": "未分類", "name.ko": "미분류", "name.zhtw": "未分類", "variable": "uncategorized" }
       ]
     },
     {
@@ -22,8 +28,14 @@
       "type": "string",
       "name": "子目录关键字",
       "name.en": "Subcategory keyword",
+      "name.ja": "サブカテゴリキーワード",
+      "name.ko": "하위 카테고리 키워드",
+      "name.zhtw": "子目錄關鍵字",
       "descripts": "按名称过滤包含的子目录",
       "descripts.en": "Filter subcategories by name",
+      "descripts.ja": "名前でサブカテゴリを絞り込み",
+      "descripts.ko": "이름으로 하위 카테고리 필터",
+      "descripts.zhtw": "依名稱過濾包含的子目錄",
       "default": ""
     },
     {
@@ -31,8 +43,14 @@
       "type": "int",
       "name": "爬取总数",
       "name.en": "Max count",
+      "name.ja": "最大取得数",
+      "name.ko": "최대 수집 수",
+      "name.zhtw": "爬取總數",
       "descripts": "最大爬取的总图片张数",
       "descripts.en": "Maximum number of images to crawl",
+      "descripts.ja": "取得する画像の最大枚数",
+      "descripts.ko": "수집할 최대 이미지 수",
+      "descripts.zhtw": "最大爬取的總圖片張數",
       "default": 100,
       "min": 1,
       "max": 1000
@@ -42,14 +60,17 @@
       "type": "options",
       "name": "排序方式",
       "name.en": "Sort by",
+      "name.ja": "並び順",
+      "name.ko": "정렬 기준",
+      "name.zhtw": "排序方式",
       "default": "date",
       "options": [
-        { "name": "最新", "name.en": "Latest", "variable": "date" },
-        { "name": "最多查看", "name.en": "Most views", "variable": "views" },
-        { "name": "最多喜欢", "name.en": "Most likes", "variable": "likes" },
-        { "name": "最多收藏", "name.en": "Most saved", "variable": "follow_num" },
-        { "name": "最近更新", "name.en": "Recently updated", "variable": "modified" },
-        { "name": "随机", "name.en": "Random", "variable": "rand" }
+        { "name": "最新", "name.en": "Latest", "name.ja": "最新", "name.ko": "최신", "name.zhtw": "最新", "variable": "date" },
+        { "name": "最多查看", "name.en": "Most views", "name.ja": "閲覧数順", "name.ko": "조회수순", "name.zhtw": "最多查看", "variable": "views" },
+        { "name": "最多喜欢", "name.en": "Most likes", "name.ja": "いいね順", "name.ko": "좋아요순", "name.zhtw": "最多喜歡", "variable": "likes" },
+        { "name": "最多收藏", "name.en": "Most saved", "name.ja": "保存数順", "name.ko": "저장순", "name.zhtw": "最多收藏", "variable": "follow_num" },
+        { "name": "最近更新", "name.en": "Recently updated", "name.ja": "更新順", "name.ko": "최근 업데이트", "name.zhtw": "最近更新", "variable": "modified" },
+        { "name": "随机", "name.en": "Random", "name.ja": "ランダム", "name.ko": "무작위", "name.zhtw": "隨機", "variable": "rand" }
       ]
     }
   ]

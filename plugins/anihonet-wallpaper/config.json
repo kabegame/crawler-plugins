@@ -7,8 +7,14 @@
       "type": "int",
       "name": "起始页面",
       "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
       "descripts": "要拉取的起始页面",
       "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
       "default": 1,
       "options": null,
       "min": 1,
@@ -19,8 +25,14 @@
       "type": "int",
       "name": "结束页数",
       "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
       "descripts": "要拉取的结束页面",
       "descripts.en": "End page to crawl to",
+      "descripts.ja": "取得終了ページ",
+      "descripts.ko": "가져올 끝 페이지",
+      "descripts.zhtw": "要拉取的結束頁面",
       "default": 5,
       "options": null,
       "min": 1,
@@ -31,12 +43,32 @@
       "type": "options",
       "name": "壁纸类型",
       "name.en": "Wallpaper type",
+      "name.ja": "壁紙タイプ",
+      "name.ko": "벽지 유형",
+      "name.zhtw": "壁紙類型",
       "descripts": "选择要爬取的壁纸类型：桌面壁纸（imgpc）或手机壁纸（sp）",
       "descripts.en": "Desktop (imgpc) or mobile (sp) wallpapers",
+      "descripts.ja": "デスクトップ（imgpc）またはモバイル（sp）壁紙",
+      "descripts.ko": "데스크톱(imgpc) 또는 모바일(sp) 벽지",
+      "descripts.zhtw": "選擇要爬取的壁紙類型：桌面壁紙（imgpc）或手機壁紙（sp）",
       "default": "imgpc",
       "options": [
-        { "name": "桌面壁纸", "name.en": "Desktop", "variable": "imgpc" },
-        { "name": "手机壁纸", "name.en": "Mobile", "variable": "sp" }
+        {
+          "name": "桌面壁纸",
+          "name.en": "Desktop",
+          "name.ja": "デスクトップ",
+          "name.ko": "데스크톱",
+          "name.zhtw": "桌面壁紙",
+          "variable": "imgpc"
+        },
+        {
+          "name": "手机壁纸",
+          "name.en": "Mobile",
+          "name.ja": "モバイル",
+          "name.ko": "모바일",
+          "name.zhtw": "手機壁紙",
+          "variable": "sp"
+        }
       ]
     },
     {
@@ -44,14 +76,48 @@
       "type": "options",
       "name": "排行榜周期",
       "name.en": "Ranking period",
+      "name.ja": "ランキング期間",
+      "name.ko": "랭킹 기간",
+      "name.zhtw": "排行榜週期",
       "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
       "descripts.en": "Daily, weekly, monthly or annual ranking",
+      "descripts.ja": "日間・週間・月間・年間ランキング",
+      "descripts.ko": "일간·주간·월간·연간 랭킹",
+      "descripts.zhtw": "選擇要爬取的排行榜週期：日榜、週榜、月榜或年榜",
       "default": "daily",
       "options": [
-        { "name": "日榜", "name.en": "Daily", "variable": "daily" },
-        { "name": "周榜", "name.en": "Weekly", "variable": "weekly" },
-        { "name": "月榜", "name.en": "Monthly", "variable": "monthly" },
-        { "name": "年榜", "name.en": "Annual", "variable": "annual" }
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "daily"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "weekly"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "monthly"
+        },
+        {
+          "name": "年榜",
+          "name.en": "Annual",
+          "name.ja": "年間",
+          "name.ko": "연간",
+          "name.zhtw": "年榜",
+          "variable": "annual"
+        }
       ],
       "min": null,
       "max": null

@@ -7,12 +7,15 @@
       "type": "options",
       "name": "爬取类型",
       "name.en": "Source type",
+      "name.ja": "取得タイプ",
+      "name.ko": "수집 유형",
+      "name.zhtw": "爬取類型",
       "default": "ranking",
       "options": [
-        { "name": "排行榜", "name.en": "Ranking", "variable": "ranking" },
-        { "name": "个人收藏", "name.en": "Bookmarks", "variable": "bookmark" },
-        { "name": "画师作品", "name.en": "Artist works", "variable": "user" },
-        { "name": "关键词搜索", "name.en": "Keyword search", "variable": "keyword" }
+        { "name": "排行榜", "name.en": "Ranking", "name.ja": "ランキング", "name.ko": "랭킹", "name.zhtw": "排行榜", "variable": "ranking" },
+        { "name": "个人收藏", "name.en": "Bookmarks", "name.ja": "ブックマーク", "name.ko": "북마크", "name.zhtw": "個人收藏", "variable": "bookmark" },
+        { "name": "画师作品", "name.en": "Artist works", "name.ja": "作家作品", "name.ko": "작가 작품", "name.zhtw": "畫師作品", "variable": "user" },
+        { "name": "关键词搜索", "name.en": "Keyword search", "name.ja": "キーワード検索", "name.ko": "키워드 검색", "name.zhtw": "關鍵字搜尋", "variable": "keyword" }
       ]
     },
     {
@@ -20,8 +23,14 @@
       "type": "string",
       "name": "用户 UID",
       "name.en": "User UID",
+      "name.ja": "ユーザー UID",
+      "name.ko": "사용자 UID",
+      "name.zhtw": "用戶 UID",
       "descripts": "Pixiv 用户 ID，不清楚请点击插件查看文档",
       "descripts.en": "Pixiv user ID. See plugin doc for details.",
+      "descripts.ja": "Pixiv ユーザー ID。詳細はプラグイン説明をご覧ください。",
+      "descripts.ko": "Pixiv 사용자 ID. 자세한 내용은 플러그인 문서를 참조하세요.",
+      "descripts.zhtw": "Pixiv 用戶 ID，不清楚請點擊插件查看說明",
       "when": { "source": ["bookmark", "user", "ranking"] }
     },
     {
@@ -29,19 +38,22 @@
       "type": "options",
       "name": "排行榜类型",
       "name.en": "Ranking mode",
+      "name.ja": "ランキング種別",
+      "name.ko": "랭킹 유형",
+      "name.zhtw": "排行榜類型",
       "default": "daily",
       "options": [
-        { "name": "日榜", "name.en": "Daily", "variable": "daily" },
-        { "name": "周榜", "name.en": "Weekly", "variable": "weekly" },
-        { "name": "月榜", "name.en": "Monthly", "variable": "monthly" },
-        { "name": "男性向", "name.en": "Male", "variable": "male" },
-        { "name": "女性向", "name.en": "Female", "variable": "female" },
-        { "name": "AI 日榜", "name.en": "AI Daily", "variable": "daily_ai" },
-        { "name": "日榜 R18", "name.en": "Daily R18", "variable": "daily_r18" },
-        { "name": "周榜 R18", "name.en": "Weekly R18", "variable": "weekly_r18" },
-        { "name": "男性向 R18", "name.en": "Male R18", "variable": "male_r18" },
-        { "name": "女性向 R18", "name.en": "Female R18", "variable": "female_r18" },
-        { "name": "AI 日榜 R18", "name.en": "AI Daily R18", "variable": "daily_r18_ai" }
+        { "name": "日榜", "name.en": "Daily", "name.ja": "日間", "name.ko": "일간", "name.zhtw": "日榜", "variable": "daily" },
+        { "name": "周榜", "name.en": "Weekly", "name.ja": "週間", "name.ko": "주간", "name.zhtw": "週榜", "variable": "weekly" },
+        { "name": "月榜", "name.en": "Monthly", "name.ja": "月間", "name.ko": "월간", "name.zhtw": "月榜", "variable": "monthly" },
+        { "name": "男性向", "name.en": "Male", "name.ja": "男性向け", "name.ko": "남성향", "name.zhtw": "男性向", "variable": "male" },
+        { "name": "女性向", "name.en": "Female", "name.ja": "女性向け", "name.ko": "여성향", "name.zhtw": "女性向", "variable": "female" },
+        { "name": "AI 日榜", "name.en": "AI Daily", "name.ja": "AI 日間", "name.ko": "AI 일간", "name.zhtw": "AI 日榜", "variable": "daily_ai" },
+        { "name": "日榜 R18", "name.en": "Daily R18", "name.ja": "日間 R18", "name.ko": "일간 R18", "name.zhtw": "日榜 R18", "variable": "daily_r18" },
+        { "name": "周榜 R18", "name.en": "Weekly R18", "name.ja": "週間 R18", "name.ko": "주간 R18", "name.zhtw": "週榜 R18", "variable": "weekly_r18" },
+        { "name": "男性向 R18", "name.en": "Male R18", "name.ja": "男性向け R18", "name.ko": "남성향 R18", "name.zhtw": "男性向 R18", "variable": "male_r18" },
+        { "name": "女性向 R18", "name.en": "Female R18", "name.ja": "女性向け R18", "name.ko": "여성향 R18", "name.zhtw": "女性向 R18", "variable": "female_r18" },
+        { "name": "AI 日榜 R18", "name.en": "AI Daily R18", "name.ja": "AI 日間 R18", "name.ko": "AI 일간 R18", "name.zhtw": "AI 日榜 R18", "variable": "daily_r18_ai" }
       ],
       "when": { "source": ["ranking"] }
     },
@@ -50,12 +62,15 @@
       "type": "options",
       "name": "内容类型",
       "name.en": "Content type",
+      "name.ja": "コンテンツタイプ",
+      "name.ko": "콘텐츠 유형",
+      "name.zhtw": "內容類型",
       "default": "all",
       "options": [
-        { "name": "全部", "name.en": "All", "variable": "all" },
-        { "name": "插画", "name.en": "Illust", "variable": "illust" },
-        { "name": "漫画", "name.en": "Manga", "variable": "manga" },
-        { "name": "动图", "name.en": "Ugoira", "variable": "ugoira" }
+        { "name": "全部", "name.en": "All", "name.ja": "すべて", "name.ko": "전체", "name.zhtw": "全部", "variable": "all" },
+        { "name": "插画", "name.en": "Illust", "name.ja": "イラスト", "name.ko": "일러스트", "name.zhtw": "插畫", "variable": "illust" },
+        { "name": "漫画", "name.en": "Manga", "name.ja": "漫画", "name.ko": "만화", "name.zhtw": "漫畫", "variable": "manga" },
+        { "name": "动图", "name.en": "Ugoira", "name.ja": "うごイラ", "name.ko": "움직이는 일러스트", "name.zhtw": "動圖", "variable": "ugoira" }
       ],
       "when": { "source": ["ranking"], "ranking_mode": ["daily", "weekly", "daily_ai"] }
     },
@@ -64,8 +79,14 @@
       "type": "string",
       "name": "起始日期",
       "name.en": "Start date",
+      "name.ja": "開始日",
+      "name.ko": "시작일",
+      "name.zhtw": "起始日期",
       "descripts": "格式 YYYYMMDD，如 20240501",
       "descripts.en": "Format YYYYMMDD, e.g. 20240501",
+      "descripts.ja": "形式 YYYYMMDD（例：20240501）",
+      "descripts.ko": "형식 YYYYMMDD (예: 20240501)",
+      "descripts.zhtw": "格式 YYYYMMDD，如 20240501",
       "default": "",
       "when": { "source": ["ranking"] }
     },
@@ -74,6 +95,9 @@
       "type": "int",
       "name": "日期范围（天）",
       "name.en": "Date range (days)",
+      "name.ja": "日数範囲",
+      "name.ko": "날짜 범위(일)",
+      "name.zhtw": "日期範圍（天）",
       "default": 1,
       "min": 1,
       "max": 30,
@@ -84,8 +108,14 @@
       "type": "string",
       "name": "画师 UID",
       "name.en": "Artist UID",
+      "name.ja": "作家 UID",
+      "name.ko": "작가 UID",
+      "name.zhtw": "畫師 UID",
       "descripts": "要爬取的画师的 Pixiv UID",
       "descripts.en": "Pixiv artist UID to crawl",
+      "descripts.ja": "取得する作家の Pixiv UID",
+      "descripts.ko": "수집할 작가의 Pixiv UID",
+      "descripts.zhtw": "要爬取的畫師 Pixiv UID",
       "when": { "source": ["user"] }
     },
     {
@@ -93,8 +123,14 @@
       "type": "string",
       "name": "搜索关键词",
       "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
       "descripts": "支持高级搜索语法，如 (Lucy OR 边缘行者) AND 5000users",
       "descripts.en": "Supports advanced syntax, e.g. (Lucy OR 边缘行者) AND 5000users",
+      "descripts.ja": "高度な検索構文対応（例：(Lucy OR 边缘行者) AND 5000users）",
+      "descripts.ko": "고급 검색 문법 지원 (예: (Lucy OR 边缘行者) AND 5000users)",
+      "descripts.zhtw": "支援進階搜尋語法，如 (Lucy OR 邊緣行者) AND 5000users",
       "when": { "source": ["keyword"] }
     },
     {
@@ -102,11 +138,14 @@
       "type": "options",
       "name": "搜索模式",
       "name.en": "Search mode",
+      "name.ja": "検索モード",
+      "name.ko": "검색 모드",
+      "name.zhtw": "搜尋模式",
       "default": "safe",
       "options": [
-        { "name": "安全", "name.en": "Safe", "variable": "safe" },
-        { "name": "R18", "name.en": "R18", "variable": "r18" },
-        { "name": "全部", "name.en": "All", "variable": "all" }
+        { "name": "安全", "name.en": "Safe", "name.ja": "全年齢", "name.ko": "안전", "name.zhtw": "安全", "variable": "safe" },
+        { "name": "R18", "name.en": "R18", "name.ja": "R18", "name.ko": "R18", "name.zhtw": "R18", "variable": "r18" },
+        { "name": "全部", "name.en": "All", "name.ja": "すべて", "name.ko": "전체", "name.zhtw": "全部", "variable": "all" }
       ],
       "when": { "source": ["keyword"] }
     },
@@ -115,12 +154,18 @@
       "type": "options",
       "name": "排序方式",
       "name.en": "Sort order",
+      "name.ja": "並び順",
+      "name.ko": "정렬 순서",
+      "name.zhtw": "排序方式",
       "default": "date",
       "descripts": "按人气排序需要 Pixiv Premium 账户",
       "descripts.en": "Popular sort requires Pixiv Premium",
+      "descripts.ja": "人気順は Pixiv Premium が必要です",
+      "descripts.ko": "인기순 정렬은 Pixiv Premium이 필요합니다",
+      "descripts.zhtw": "依人氣排序需 Pixiv Premium 帳戶",
       "options": [
-        { "name": "按日期", "name.en": "By date", "variable": "date" },
-        { "name": "按人气", "name.en": "By popularity", "variable": "popular" }
+        { "name": "按日期", "name.en": "By date", "name.ja": "日付順", "name.ko": "날짜순", "name.zhtw": "按日期", "variable": "date" },
+        { "name": "按人气", "name.en": "By popularity", "name.ja": "人気順", "name.ko": "인기순", "name.zhtw": "按人氣", "variable": "popular" }
       ],
       "when": { "source": ["keyword"] }
     },
@@ -129,6 +174,9 @@
       "type": "int",
       "name": "最大下载数",
       "name.en": "Max download count",
+      "name.ja": "最大ダウンロード数",
+      "name.ko": "최대 다운로드 수",
+      "name.zhtw": "最大下載數",
       "default": 50,
       "min": 1,
       "max": 1000
