@@ -6,7 +6,9 @@
       "key": "start_page",
       "type": "int",
       "name": "起始页面",
+      "name.en": "Start page",
       "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
       "default": 1,
       "options": null,
       "min": 1,
@@ -16,7 +18,9 @@
       "key": "end_page",
       "type": "int",
       "name": "结束页数",
+      "name.en": "End page",
       "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "descripts.en": "End page. Keep at most 100 pages per run.",
       "default": 5,
       "options": null,
       "min": 1,
@@ -26,17 +30,13 @@
       "key": "quality",
       "type": "options",
       "name": "质量",
+      "name.en": "Quality",
       "descripts": "图片质量，这个网站质量都挺高的",
+      "descripts.en": "Image quality",
       "default": "medium",
       "options": [
-        {
-          "name": "高",
-          "variable": "high"
-        },
-        {
-          "name": "中",
-          "variable": "medium"
-        }
+        { "name": "高", "name.en": "High", "variable": "high" },
+        { "name": "中", "name.en": "Medium", "variable": "medium" }
       ]
     }
   ]

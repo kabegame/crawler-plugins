@@ -6,7 +6,9 @@
       "key": "start_page",
       "type": "int",
       "name": "起始页面",
+      "name.en": "Start page",
       "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
       "default": 1,
       "options": null,
       "min": 1,
@@ -16,7 +18,9 @@
       "key": "end_page",
       "type": "int",
       "name": "结束页数",
+      "name.en": "End page",
       "descripts": "要拉取的结束页面",
+      "descripts.en": "End page to crawl to",
       "default": 5,
       "options": null,
       "min": 1,
@@ -26,42 +30,28 @@
       "key": "wallpaper_type",
       "type": "options",
       "name": "壁纸类型",
+      "name.en": "Wallpaper type",
       "descripts": "选择要爬取的壁纸类型：桌面壁纸（imgpc）或手机壁纸（sp）",
+      "descripts.en": "Desktop (imgpc) or mobile (sp) wallpapers",
       "default": "imgpc",
       "options": [
-        {
-          "name": "桌面壁纸",
-          "variable": "imgpc"
-        },
-        {
-          "name": "手机壁纸",
-          "variable": "sp"
-        }
+        { "name": "桌面壁纸", "name.en": "Desktop", "variable": "imgpc" },
+        { "name": "手机壁纸", "name.en": "Mobile", "variable": "sp" }
       ]
     },
     {
       "key": "ranking_period",
       "type": "options",
       "name": "排行榜周期",
+      "name.en": "Ranking period",
       "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
+      "descripts.en": "Daily, weekly, monthly or annual ranking",
       "default": "daily",
       "options": [
-        {
-          "name": "日榜",
-          "variable": "daily"
-        },
-        {
-          "name": "周榜",
-          "variable": "weekly"
-        },
-        {
-          "name": "月榜",
-          "variable": "monthly"
-        },
-        {
-          "name": "年榜",
-          "variable": "annual"
-        }
+        { "name": "日榜", "name.en": "Daily", "variable": "daily" },
+        { "name": "周榜", "name.en": "Weekly", "variable": "weekly" },
+        { "name": "月榜", "name.en": "Monthly", "variable": "monthly" },
+        { "name": "年榜", "name.en": "Annual", "variable": "annual" }
       ],
       "min": null,
       "max": null

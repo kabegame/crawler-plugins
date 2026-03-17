@@ -5,23 +5,17 @@
   "description": "插件元数据（KGPG 内 manifest.json）。详见 docs/PLUGIN_FORMAT.md、docs/RHAI_API.md",
   "type": "object",
   "required": ["name", "version", "description", "author"],
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
     "name": {
       "type": "string",
-      "description": "插件名称，用于列表展示"
+      "description": "插件名称（默认值，无点后缀）。多语言用 name.zh、name.ja 等键"
     },
-    "version": {
-      "type": "string",
-      "description": "语义化版本，如 1.0.0"
-    },
+    "version": { "type": "string", "description": "语义化版本，如 1.0.0" },
     "description": {
       "type": "string",
-      "description": "插件描述"
+      "description": "插件描述（默认值）。多语言用 description.zh、description.ja 等键"
     },
-    "author": {
-      "type": "string",
-      "description": "作者名"
-    }
+    "author": { "type": "string", "description": "作者名" }
   }
 }
