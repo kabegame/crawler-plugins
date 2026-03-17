@@ -6,38 +6,42 @@
       "key": "source",
       "type": "options",
       "name": "爬取类型",
+      "name.en": "Source type",
       "default": "ranking",
       "options": [
-        { "name": "排行榜", "variable": "ranking" },
-        { "name": "个人收藏", "variable": "bookmark" },
-        { "name": "画师作品", "variable": "user" },
-        { "name": "关键词搜索", "variable": "keyword" }
+        { "name": "排行榜", "name.en": "Ranking", "variable": "ranking" },
+        { "name": "个人收藏", "name.en": "Bookmarks", "variable": "bookmark" },
+        { "name": "画师作品", "name.en": "Artist works", "variable": "user" },
+        { "name": "关键词搜索", "name.en": "Keyword search", "variable": "keyword" }
       ]
     },
     {
       "key": "user_id",
       "type": "string",
       "name": "用户 UID",
+      "name.en": "User UID",
       "descripts": "Pixiv 用户 ID，不清楚请点击插件查看文档",
+      "descripts.en": "Pixiv user ID. See plugin doc for details.",
       "when": { "source": ["bookmark", "user", "ranking"] }
     },
     {
       "key": "ranking_mode",
       "type": "options",
       "name": "排行榜类型",
+      "name.en": "Ranking mode",
       "default": "daily",
       "options": [
-        { "name": "日榜", "variable": "daily" },
-        { "name": "周榜", "variable": "weekly" },
-        { "name": "月榜", "variable": "monthly" },
-        { "name": "男性向", "variable": "male" },
-        { "name": "女性向", "variable": "female" },
-        { "name": "AI 日榜", "variable": "daily_ai" },
-        { "name": "日榜 R18", "variable": "daily_r18" },
-        { "name": "周榜 R18", "variable": "weekly_r18" },
-        { "name": "男性向 R18", "variable": "male_r18" },
-        { "name": "女性向 R18", "variable": "female_r18" },
-        { "name": "AI 日榜 R18", "variable": "daily_r18_ai" }
+        { "name": "日榜", "name.en": "Daily", "variable": "daily" },
+        { "name": "周榜", "name.en": "Weekly", "variable": "weekly" },
+        { "name": "月榜", "name.en": "Monthly", "variable": "monthly" },
+        { "name": "男性向", "name.en": "Male", "variable": "male" },
+        { "name": "女性向", "name.en": "Female", "variable": "female" },
+        { "name": "AI 日榜", "name.en": "AI Daily", "variable": "daily_ai" },
+        { "name": "日榜 R18", "name.en": "Daily R18", "variable": "daily_r18" },
+        { "name": "周榜 R18", "name.en": "Weekly R18", "variable": "weekly_r18" },
+        { "name": "男性向 R18", "name.en": "Male R18", "variable": "male_r18" },
+        { "name": "女性向 R18", "name.en": "Female R18", "variable": "female_r18" },
+        { "name": "AI 日榜 R18", "name.en": "AI Daily R18", "variable": "daily_r18_ai" }
       ],
       "when": { "source": ["ranking"] }
     },
@@ -45,12 +49,13 @@
       "key": "content_mode",
       "type": "options",
       "name": "内容类型",
+      "name.en": "Content type",
       "default": "all",
       "options": [
-        { "name": "全部", "variable": "all" },
-        { "name": "插画", "variable": "illust" },
-        { "name": "漫画", "variable": "manga" },
-        { "name": "动图", "variable": "ugoira" }
+        { "name": "全部", "name.en": "All", "variable": "all" },
+        { "name": "插画", "name.en": "Illust", "variable": "illust" },
+        { "name": "漫画", "name.en": "Manga", "variable": "manga" },
+        { "name": "动图", "name.en": "Ugoira", "variable": "ugoira" }
       ],
       "when": { "source": ["ranking"], "ranking_mode": ["daily", "weekly", "daily_ai"] }
     },
@@ -58,7 +63,9 @@
       "key": "start_date",
       "type": "string",
       "name": "起始日期",
+      "name.en": "Start date",
       "descripts": "格式 YYYYMMDD，如 20240501",
+      "descripts.en": "Format YYYYMMDD, e.g. 20240501",
       "default": "",
       "when": { "source": ["ranking"] }
     },
@@ -66,6 +73,7 @@
       "key": "date_range",
       "type": "int",
       "name": "日期范围（天）",
+      "name.en": "Date range (days)",
       "default": 1,
       "min": 1,
       "max": 30,
@@ -75,25 +83,30 @@
       "key": "artist_id",
       "type": "string",
       "name": "画师 UID",
+      "name.en": "Artist UID",
       "descripts": "要爬取的画师的 Pixiv UID",
+      "descripts.en": "Pixiv artist UID to crawl",
       "when": { "source": ["user"] }
     },
     {
       "key": "keyword",
       "type": "string",
       "name": "搜索关键词",
+      "name.en": "Search keyword",
       "descripts": "支持高级搜索语法，如 (Lucy OR 边缘行者) AND 5000users",
+      "descripts.en": "Supports advanced syntax, e.g. (Lucy OR 边缘行者) AND 5000users",
       "when": { "source": ["keyword"] }
     },
     {
       "key": "search_mode",
       "type": "options",
       "name": "搜索模式",
+      "name.en": "Search mode",
       "default": "safe",
       "options": [
-        { "name": "安全", "variable": "safe" },
-        { "name": "R18", "variable": "r18" },
-        { "name": "全部", "variable": "all" }
+        { "name": "安全", "name.en": "Safe", "variable": "safe" },
+        { "name": "R18", "name.en": "R18", "variable": "r18" },
+        { "name": "全部", "name.en": "All", "variable": "all" }
       ],
       "when": { "source": ["keyword"] }
     },
@@ -101,11 +114,13 @@
       "key": "keyword_order",
       "type": "options",
       "name": "排序方式",
+      "name.en": "Sort order",
       "default": "date",
       "descripts": "按人气排序需要 Pixiv Premium 账户",
+      "descripts.en": "Popular sort requires Pixiv Premium",
       "options": [
-        { "name": "按日期", "variable": "date" },
-        { "name": "按人气", "variable": "popular" }
+        { "name": "按日期", "name.en": "By date", "variable": "date" },
+        { "name": "按人气", "name.en": "By popularity", "variable": "popular" }
       ],
       "when": { "source": ["keyword"] }
     },
@@ -113,6 +128,7 @@
       "key": "num_images",
       "type": "int",
       "name": "最大下载数",
+      "name.en": "Max download count",
       "default": 50,
       "min": 1,
       "max": 1000

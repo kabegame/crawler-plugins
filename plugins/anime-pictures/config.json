@@ -5,7 +5,9 @@
             "key": "startPage",
             "type": "int",
             "name": "起始页面",
+            "name.en": "Start page",
             "descripts": "要拉取的起始页面",
+            "descripts.en": "Start page to crawl from",
             "default": 0,
             "min": 0,
             "max": null
@@ -14,7 +16,9 @@
             "key": "endPage",
             "type": "int",
             "name": "结束页数",
+            "name.en": "End page",
             "descripts": "要拉取的结束页面",
+            "descripts.en": "End page to crawl to",
             "default": 5,
             "min": 0,
             "max": null
@@ -23,7 +27,9 @@
             "key": "tag",
             "type": "string",
             "name": "标签",
+            "name.en": "Tag",
             "descripts": "要拉取的标签（默认无标签爬全站）",
+            "descripts.en": "Tag to filter (empty = all)",
             "default": ""
         }
     ]

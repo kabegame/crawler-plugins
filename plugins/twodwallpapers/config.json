@@ -7,35 +7,32 @@
       "key": "category",
       "type": "options",
       "name": "目录",
+      "name.en": "Category",
       "descripts": "爬取某一种壁纸",
+      "descripts.en": "Wallpaper category to crawl",
       "default": "anime-wallpapers",
       "options": [
-        {
-          "name": "动漫壁纸",
-          "variable": "anime-wallpapers"
-        },
-        {
-          "name": "游戏壁纸",
-          "variable": "game-wallpapers"
-        },
-        {
-          "name": "未分类",
-          "variable": "uncategorized"
-        }
+        { "name": "动漫壁纸", "name.en": "Anime", "variable": "anime-wallpapers" },
+        { "name": "游戏壁纸", "name.en": "Game", "variable": "game-wallpapers" },
+        { "name": "未分类", "name.en": "Uncategorized", "variable": "uncategorized" }
       ]
     },
     {
       "key": "sub_cate_key",
       "type": "string",
       "name": "子目录关键字",
+      "name.en": "Subcategory keyword",
       "descripts": "按名称过滤包含的子目录",
+      "descripts.en": "Filter subcategories by name",
       "default": ""
     },
     {
       "key": "max_num",
       "type": "int",
       "name": "爬取总数",
+      "name.en": "Max count",
       "descripts": "最大爬取的总图片张数",
+      "descripts.en": "Maximum number of images to crawl",
       "default": 100,
       "min": 1,
       "max": 1000
@@ -44,32 +41,15 @@
       "key": "orderby",
       "type": "options",
       "name": "排序方式",
+      "name.en": "Sort by",
       "default": "date",
       "options": [
-        {
-          "name": "最新",
-          "variable": "date"
-        },
-        {
-          "name": "最多查看",
-          "variable": "views"
-        },
-        {
-          "name": "最多喜欢",
-          "variable": "likes"
-        },
-        {
-          "name": "最多收藏",
-          "variable": "follow_num"
-        },
-        {
-          "name": "最近更新",
-          "variable": "modified"
-        },
-        {
-          "name": "随机",
-          "variable": "rand"
-        }
+        { "name": "最新", "name.en": "Latest", "variable": "date" },
+        { "name": "最多查看", "name.en": "Most views", "variable": "views" },
+        { "name": "最多喜欢", "name.en": "Most likes", "variable": "likes" },
+        { "name": "最多收藏", "name.en": "Most saved", "variable": "follow_num" },
+        { "name": "最近更新", "name.en": "Recently updated", "variable": "modified" },
+        { "name": "随机", "name.en": "Random", "variable": "rand" }
       ]
     }
   ]

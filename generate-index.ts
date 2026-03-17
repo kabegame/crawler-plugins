@@ -31,8 +31,10 @@ interface PackageJson {
 }
 
 interface Manifest {
+  /** 默认名称（扁平键 name） */
   name?: string;
   version?: string;
+  /** 默认描述（扁平键 description） */
   description?: string;
   author?: string;
 }
