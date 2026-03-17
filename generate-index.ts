@@ -30,25 +30,38 @@ interface PackageJson {
   version?: string;
 }
 
+/** 从 manifest 中复制 name / name.zh / description / description.zh 等扁平键到目标对象（供 index.json 写入，由后端解析生成 i18n 对象） */
+function copyFlatI18nKeys(
+  manifest: Record<string, unknown>,
+  target: Record<string, unknown>,
+  baseKey: string,
+): void {
+  if (typeof manifest[baseKey] === "string") target[baseKey] = manifest[baseKey];
+  const prefix = baseKey + ".";
+  for (const [k, v] of Object.entries(manifest)) {
+    if (typeof v !== "string") continue;
+    if (k === baseKey || k.startsWith(prefix)) target[k] = v;
+  }
+}
+
 interface Manifest {
-  /** 默认名称（扁平键 name） */
   name?: string;
   version?: string;
-  /** 默认描述（扁平键 description） */
   description?: string;
   author?: string;
+  [key: string]: unknown;
 }
 
 interface PluginInfo {
   id: string;
-  name: string;
   version: string;
-  description: string;
   author: string;
   packageVersion: number;
   downloadUrl: string;
   sizeBytes: number;
   sha256: string;
+  /** 扁平键 name / name.zh / name.en 等，由后端解析为 i18n 对象 */
+  [key: string]: unknown;
 }
 
 interface IndexData {
@@ -179,10 +192,11 @@ function generateIndex(options: GenerateIndexOptions): string {
     }
 
     try {
-      // 读取 manifest.json
-      const manifest: Manifest = JSON.parse(
+      // 读取 manifest.json（保留全部键，以便复制 name/name.zh、description/description.zh 等扁平键到 index）
+      const manifestRaw = JSON.parse(
         fs.readFileSync(manifestPath, "utf-8"),
-      );
+      ) as Record<string, unknown>;
+      const manifest = manifestRaw as Manifest;
 
       // 获取文件大小
       const stats = fs.statSync(kgpgFile);
@@ -191,27 +205,27 @@ function generateIndex(options: GenerateIndexOptions): string {
       // 计算 SHA256 校验和
       const sha256 = calculateSHA256(kgpgFile);
 
-      // 构建插件信息（符合后端期望的格式）
-      // 后端期望字段: id, name, version, description, downloadUrl, sizeBytes, sha256
-      // 额外包含 author 字段以保持与 manifest.json 的一致性
+      // 构建插件信息：固定字段 + 扁平键 name/name.zh、description/description.zh 等（后端解析生成 i18n 对象）
       const pluginInfo: PluginInfo = {
         id: pluginName,
-        name: manifest.name || pluginName,
         version: manifest.version || "1.0.0",
-        description: manifest.description || "",
-        author: manifest.author || "", // 从 manifest.json 读取作者信息
-        // KGPG 包格式版本：用于客户端选择解析策略（过高按最高支持版本解析，过低按低版本解析）
-        // 当前所有打包固定为 v2
+        author: (manifest.author as string) || "",
         packageVersion: 2,
-        downloadUrl: `${GITHUB_RELEASE_BASE}/${pluginName}.kgpg`, // camelCase，符合后端期望
-        sizeBytes: fileSize, // 数字格式，符合后端期望
-        sha256: sha256, // SHA256 校验和，必需字段
+        downloadUrl: `${GITHUB_RELEASE_BASE}/${pluginName}.kgpg`,
+        sizeBytes: fileSize,
+        sha256: sha256,
       };
+      copyFlatI18nKeys(manifestRaw, pluginInfo, "name");
+      copyFlatI18nKeys(manifestRaw, pluginInfo, "description");
 
       plugins.push(pluginInfo);
+      const displayName =
+        (manifest.name as string) ||
+        (manifest["name.zh"] as string) ||
+        pluginName;
       console.log(
         chalk.green(
-          `✅ ${pluginName}: ${pluginInfo.name} v${
+          `✅ ${pluginName}: ${displayName} v${
             pluginInfo.version
           } (${formatFileSize(fileSize)}, SHA256: ${sha256.substring(0, 8)}...)`,
         ),
