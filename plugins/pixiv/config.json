@@ -26,12 +26,12 @@
       "name.ja": "ユーザー UID",
       "name.ko": "사용자 UID",
       "name.zhtw": "用戶 UID",
-      "descripts": "Pixiv 用户 ID，不清楚请点击插件查看文档",
-      "descripts.en": "Pixiv user ID. See plugin doc for details.",
-      "descripts.ja": "Pixiv ユーザー ID。詳細はプラグイン説明をご覧ください。",
-      "descripts.ko": "Pixiv 사용자 ID. 자세한 내용은 플러그인 문서를 참조하세요.",
-      "descripts.zhtw": "Pixiv 用戶 ID，不清楚請點擊插件查看說明",
-      "when": { "source": ["bookmark", "user", "ranking"] }
+      "descripts": "收藏：被爬取用户 UID（仅用于 URL，与 PixivCrawler 一致不发送 x-user-id）。画师：登录账号 UID，对应 PixivCrawler 的 x-user-id，必填。",
+      "descripts.en": "Bookmarks: target user UID (URL only; no x-user-id, same as PixivCrawler). Artist: your account UID for x-user-id (required, like PixivCrawler user_config.user_id).",
+      "descripts.ja": "ブックマーク：対象ユーザー UID（URL のみ、PixivCrawler と同様 x-user-id なし）。作家：ログイン UID（x-user-id 用、必須）。",
+      "descripts.ko": "북마크: 대상 UID(URL만, PixivCrawler처럼 x-user-id 없음). 작가: 로그인 UID(x-user-id, 필수).",
+      "descripts.zhtw": "收藏：被爬取用戶 UID（僅 URL，與 PixivCrawler 一致不送 x-user-id）。畫師：登入帳號 UID（x-user-id，必填）。",
+      "when": { "source": ["bookmark", "user"] }
     },
     {
       "key": "ranking_mode",

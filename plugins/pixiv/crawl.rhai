@@ -32,9 +32,6 @@ fn collect_illust_ids() {
         if start_date == "" {
             throw "排行榜模式请填写起始日期（格式 YYYYMMDD）";
         }
-        if user_id != "" && (ranking_mode == "daily_r18" || ranking_mode == "weekly_r18" || ranking_mode == "male_r18" || ranking_mode == "female_r18" || ranking_mode == "daily_r18_ai") {
-            set_header("x-user-id", user_id);
-        }
         let effective_content = content_mode;
         if ranking_mode == "monthly" || ranking_mode == "daily_r18" || ranking_mode == "weekly_r18" || ranking_mode == "male_r18" || ranking_mode == "female_r18" || ranking_mode == "daily_r18_ai" {
             effective_content = "all";
@@ -72,7 +69,6 @@ fn collect_illust_ids() {
         if user_id == "" {
             throw "收藏模式请填写用户 UID";
         }
-        set_header("x-user-id", user_id);
         let limit = 48;
         let offset = 0;
         while offset < num_images {
@@ -103,6 +99,9 @@ fn collect_illust_ids() {
     } else if source == "user" {
         if artist_id == "" {
             throw "画师模式请填写画师 UID";
+        }
+        if user_id == "" {
+            throw "画师模式请填写登录用户 UID（x-user-id，与 PixivCrawler 一致）";
         }
         set_header("x-user-id", user_id);
         let url = "https://www.pixiv.net/ajax/user/" + artist_id + "/profile/all?lang=zh";
