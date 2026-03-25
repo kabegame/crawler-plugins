@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+# Non-blocking: release 失败不阻断提交（与原先 pre-push 策略一致）
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || ROOT=.
+cd "$ROOT" || exit 0
+
+INDEX_JSON="packed/index.json"
+
+strip_v() {
+  echo "$1" | sed 's/^v//'
+}
+
+PKG_VER=""
+IDX_VER=""
+if [ -f package.json ]; then
+  PKG_VER=$(bun -e 'console.log(JSON.parse(require("fs").readFileSync("package.json","utf8")).version)' 2>/dev/null) || true
+fi
+if [ -f "$INDEX_JSON" ]; then
+  IDX_VER=$(bun -e 'console.log(JSON.parse(require("fs").readFileSync("packed/index.json","utf8")).version)' 2>/dev/null) || true
+fi
+
+SKIP=false
+if [ -f "$INDEX_JSON" ] && [ -n "$PKG_VER" ] && [ -n "$IDX_VER" ]; then
+  if [ "$(strip_v "$IDX_VER")" = "$(strip_v "$PKG_VER")" ]; then
+    SKIP=true
+  fi
+fi
+
+if [ "$SKIP" = true ]; then
+  echo "[pre-commit] $INDEX_JSON version matches package.json ($PKG_VER); skip release."
+else
+  echo "[pre-commit] Building plugins and generating index.json..."
+  bun run release || true
+fi
+
+if git diff --quiet packed/ 2>/dev/null && git diff --cached --quiet packed/ 2>/dev/null; then
+  echo "[pre-commit] packed/ is up to date"
+else
+  echo "[pre-commit] staging packed/ for this commit..."
+  git add packed/
+fi

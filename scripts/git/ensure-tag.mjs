@@ -1,11 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import { execFileSync } from "child_process";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 function execGit(args, opts = {}) {
   return execFileSync("git", args, {
@@ -49,42 +44,30 @@ function tagExists(tag) {
 }
 
 function main() {
-  // 设计目标：
-  // - push 前"尝试打 tag"，但任何失败都不阻断 push（exit 0）
-  // - tag 来源：package.json 的 version -> vX.Y.Z
+  // 仅确保本地存在 vX.Y.Z 注释 tag。
+  // 人读日志 → stderr；若本次新建了 tag，stdout 仅输出一行 tag 名（供 pre-push 决定是否 git push tag）。
   try {
     const root = repoRoot();
     const version = readPackageVersion(root);
     const tag = toTag(version);
 
     if (tagExists(tag)) {
-      process.stdout.write(`[pre-push] tag '${tag}' already exists, skip\n`);
+      process.stderr.write(`[ensure-tag] tag '${tag}' already exists, skip\n`);
       return;
     }
 
-    // 创建一个注释 tag，便于在 GitHub Release 里展示
     const create = tryExecGit(["tag", "-a", tag, "-m", `crawler-plugins ${tag}`], { cwd: root });
     if (create.ok) {
-      process.stdout.write(`[pre-push] created tag '${tag}'\n`);
-      // 尝试推送 tag 到远程（不阻断 push，失败也不影响）
-      const push = tryExecGit(["push", "origin", tag], { cwd: root });
-      if (push.ok) {
-        process.stdout.write(`[pre-push] pushed tag '${tag}' to remote\n`);
-      } else {
-        process.stderr.write(
-          `[pre-push] warn: failed to push tag '${tag}' to remote (non-blocking)\n${push.stderr || push.stdout}\n`
-        );
-      }
+      process.stderr.write(`[ensure-tag] created local tag '${tag}'\n`);
+      process.stdout.write(`${tag}\n`);
     } else {
-      // 常见：并发/已有 tag/仓库状态问题；不阻断 push
       process.stderr.write(
-        `[pre-push] warn: failed to create tag '${tag}', skip (non-blocking)\n${create.stderr || create.stdout}\n`
+        `[ensure-tag] warn: failed to create tag '${tag}', skip (non-blocking)\n${create.stderr || create.stdout}\n`
       );
     }
   } catch (e) {
-    process.stderr.write(`[pre-push] warn: ensure-tag failed, skip (non-blocking)\n${e?.message ?? e}\n`);
+    process.stderr.write(`[ensure-tag] warn: ensure-tag failed, skip (non-blocking)\n${e?.message ?? e}\n`);
   }
 }
 
 main();
-
