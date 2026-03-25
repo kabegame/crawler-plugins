@@ -1,0 +1,14 @@
+{
+  "name": "PixAI",
+  "name.zh": "PixAI",
+  "name.en": "PixAI",
+  "name.ja": "PixAI",
+  "name.ko": "PixAI",
+  "version": "0.1.0",
+  "description": "PixAI AI art community crawler: trending models and artworks. In many cases the quality can surpass Pixiv.",
+  "description.zh": "PixAI AI 画像社区爬虫：遍历趋势模型与作品。某种意义上作品质量常优于 Pixiv。",
+  "description.en": "PixAI AI art community crawler: trending models and artworks. In many cases the quality can surpass Pixiv.",
+  "description.ja": "PixAI AI画像コミュニティ：トレンドモデルと作品を取得。ある意味で Pixiv より高品質な作品が多い場合があります。",
+  "description.ko": "PixAI AI 이미지 커뮤니티: 트렌드 모델과 작품을 수집합니다. 어떤 의미에서 Pixiv보다 품질이 나은 경우가 많습니다.",
+  "author": "Kabegame"
+}

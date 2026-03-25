@@ -1,0 +1,15 @@
+{
+  "$schema": "./manifest.schema.json",
+  "name": "wallpapers-craft 壁纸",
+  "name.zh": "wallpapers-craft 壁纸",
+  "name.en": "wallpapers-craft wallpapers",
+  "name.ja": "wallpapers-craft 壁紙",
+  "name.ko": "wallpapers-craft 배경화면",
+  "version": "0.1.0",
+  "description": "wallpaperscraft 网站壁纸爬虫",
+  "description.zh": "wallpaperscraft 网站壁纸爬虫",
+  "description.en": "Crawler for wallpaperscraft wallpapers",
+  "description.ja": "wallpaperscraft 壁紙サイトクローラー",
+  "description.ko": "wallpaperscraft 배경화면 사이트 크롤러",
+  "author": "Kabegame"
+}

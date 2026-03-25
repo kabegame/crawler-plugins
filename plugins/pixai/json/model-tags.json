@@ -1,0 +1,363 @@
+{
+  "data": {
+      "tags": {
+          "edges": [
+              {
+                  "cursor": "gaJpZNcAFhS1MnEVq+A=",
+                  "node": {
+                      "id": "1591095796618865632",
+                      "name": "Realistic Style",
+                      "displayName": "Realistic Style",
+                      "mediaId": "317969880751193666",
+                      "createdAt": "2023-03-11T00:56:55.289Z",
+                      "updatedAt": "2024-05-13T07:45:47.926Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:52.336Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAF7DMv8W6S2Y=",
+                  "node": {
+                      "id": "1707089382801558374",
+                      "name": "Palworld",
+                      "displayName": "Palworld",
+                      "mediaId": "416789819182419308",
+                      "createdAt": "2024-01-25T02:54:02.042Z",
+                      "updatedAt": "2025-09-29T13:40:50.361Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:54:26.498Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFbHFTPaSRlM=",
+                  "node": {
+                      "id": "1563247480019240531",
+                      "name": "Anime Style",
+                      "displayName": "Anime Style",
+                      "mediaId": "317969880700861950",
+                      "createdAt": "2022-12-24T04:37:39.966Z",
+                      "updatedAt": "2025-08-11T09:39:23.648Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:09.831Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFgFQrQn6wfY=",
+                  "node": {
+                      "id": "1585637247938118134",
+                      "name": "Game",
+                      "displayName": "Game",
+                      "mediaId": "317973196401867886",
+                      "createdAt": "2023-02-23T23:26:35.802Z",
+                      "updatedAt": "2023-06-29T07:24:58.768Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:06.914Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFj1FjoHKUnI=",
+                  "node": {
+                      "id": "1602513520778957426",
+                      "name": "Genshin Impact",
+                      "displayName": "Genshin Impact",
+                      "mediaId": "317969472635926389",
+                      "createdAt": "2023-04-11T13:06:52.650Z",
+                      "updatedAt": "2023-06-29T06:43:23.586Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:55.134Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFlE2m2mqW6w=",
+                  "node": {
+                      "id": "1608126583068580780",
+                      "name": "Anime Character",
+                      "displayName": "Anime Character",
+                      "mediaId": "317973126675758253",
+                      "createdAt": "2023-04-27T00:51:11.931Z",
+                      "updatedAt": "2023-06-29T08:03:37.771Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:53.561Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFhMoJLu08Ng=",
+                  "node": {
+                      "id": "1590659231625048280",
+                      "name": "Pose",
+                      "displayName": "Pose",
+                      "mediaId": "317973675262906921",
+                      "createdAt": "2023-03-09T20:02:10.167Z",
+                      "updatedAt": "2023-06-28T16:57:53.452Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:19.593Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFlLHcaBPWRk=",
+                  "node": {
+                      "id": "1608567307759474969",
+                      "name": "Blue Archive",
+                      "displayName": "Blue Archive",
+                      "mediaId": "318267727072524296",
+                      "createdAt": "2023-04-28T06:02:28.905Z",
+                      "updatedAt": "2025-09-29T13:40:51.235Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:56.468Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFjmOLW+U6Mg=",
+                  "node": {
+                      "id": "1601467468303624392",
+                      "name": "Fate Series",
+                      "displayName": "Fate Series",
+                      "mediaId": "318268972489921621",
+                      "createdAt": "2023-04-08T15:50:14.577Z",
+                      "updatedAt": "2023-06-29T04:32:52.173Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:43.041Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFdyhHy+ybJw=",
+                  "node": {
+                      "id": "1575311124989111452",
+                      "name": "NIKKE",
+                      "displayName": "NIKKE",
+                      "mediaId": "317977637367207299",
+                      "createdAt": "2023-01-26T11:34:16.993Z",
+                      "updatedAt": "2023-06-28T21:50:19.166Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:48.416Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFf4fC+bHVlQ=",
+                  "node": {
+                      "id": "1584738254857918036",
+                      "name": "Arknights",
+                      "displayName": "Arknights",
+                      "mediaId": "317974157456486715",
+                      "createdAt": "2023-02-21T11:54:19.264Z",
+                      "updatedAt": "2023-06-29T06:53:37.563Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:32.594Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFjov9uaSfMo=",
+                  "node": {
+                      "id": "1601645354960452810",
+                      "name": "Art Style",
+                      "displayName": "Art Style",
+                      "mediaId": "317973110474707337",
+                      "createdAt": "2023-04-09T03:37:06.735Z",
+                      "updatedAt": "2023-06-29T02:43:01.281Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:51:25.533Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFhOaLwPp4OA=",
+                  "node": {
+                      "id": "1590784620111716576",
+                      "name": "Scenery",
+                      "displayName": "Scenery",
+                      "mediaId": "317971615891716876",
+                      "createdAt": "2023-03-10T04:20:25.013Z",
+                      "updatedAt": "2023-06-29T06:22:20.439Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:04.627Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFZ8Pca1u4DQ=",
+                  "node": {
+                      "id": "1557980977008926772",
+                      "name": "Pokemon",
+                      "displayName": "Pokemon",
+                      "mediaId": "317977937950840643",
+                      "createdAt": "2022-12-09T15:50:27.803Z",
+                      "updatedAt": "2025-08-11T09:41:19.051Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:06.142Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFlLHoVehnaQ=",
+                  "node": {
+                      "id": "1608567512698559908",
+                      "name": "Hololive",
+                      "displayName": "Hololive",
+                      "mediaId": "318267924610176457",
+                      "createdAt": "2023-04-28T06:03:17.750Z",
+                      "updatedAt": "2023-06-29T02:17:13.060Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:50:37.441Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFaYQW/nmjys=",
+                  "node": {
+                      "id": "1559952308151160619",
+                      "name": "Azur Lane",
+                      "displayName": "Azur Lane",
+                      "mediaId": "317974208987706136",
+                      "createdAt": "2022-12-15T02:23:49.770Z",
+                      "updatedAt": "2023-06-29T06:22:29.103Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:36.488Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFdgiqmH9HEU=",
+                  "node": {
+                      "id": "1574046184949750853",
+                      "name": "League of Legends",
+                      "displayName": "League of Legends",
+                      "mediaId": "317974295952404755",
+                      "createdAt": "2023-01-22T23:47:51.371Z",
+                      "updatedAt": "2023-07-06T13:41:34.874Z",
+                      "extra": {
+                          "id": "league_of_legends",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "textModerated": "2024-08-28T07:49:51.835Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAF63W/acfqFg=",
+                  "node": {
+                      "id": "1706256218762225752",
+                      "name": "palworld",
+                      "displayName": "palworld",
+                      "mediaId": null,
+                      "createdAt": "2024-01-22T19:43:20.084Z",
+                      "updatedAt": "2025-09-29T13:40:50.357Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "palworld",
+                          "textModerated": "2024-08-28T08:03:01.951Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              }
+          ],
+          "pageInfo": {
+              "hasNextPage": false,
+              "hasPreviousPage": false,
+              "endCursor": "gaJpZNcAF63W/acfqFg=",
+              "startCursor": "gaJpZNcAFhS1MnEVq+A=",
+              "__typename": "PageInfo"
+          },
+          "totalCount": 18,
+          "__typename": "TagConnection"
+      }
+  }
+}

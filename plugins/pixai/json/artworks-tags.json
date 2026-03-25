@@ -1,0 +1,1006 @@
+{
+  "data": {
+      "tags": {
+          "edges": [
+              {
+                  "cursor": "gaJpZNcAFV06n0GQgDI=",
+                  "node": {
+                      "id": "1539451103304777778",
+                      "name": "genshin impact",
+                      "displayName": "原神",
+                      "mediaId": "329560554382287256",
+                      "createdAt": "2022-10-19T12:39:21.648Z",
+                      "updatedAt": "2025-02-08T04:27:29.398Z",
+                      "extra": {
+                          "id": "genshin_impact",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "textModerated": "2024-08-28T07:49:17.855Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGqxkLZNnuy0=",
+                  "node": {
+                      "id": "1922021287889713965",
+                      "name": "Cyrene(Honkai_Star_Rail)",
+                      "displayName": "Cyrene(Honkai_Star_Rail)",
+                      "mediaId": "631721391803680990",
+                      "createdAt": "2025-09-09T05:16:41.462Z",
+                      "updatedAt": "2025-12-03T11:03:42.563Z",
+                      "extra": {
+                          "textModerated": "2025-09-09T05:16:43.639Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFq/C6L0LDts=",
+                  "node": {
+                      "id": "1634739494618599131",
+                      "name": "honkai:star_rail",
+                      "displayName": "崩壊：スターレイル",
+                      "mediaId": "457775406734619667",
+                      "createdAt": "2023-07-09T11:21:23.680Z",
+                      "updatedAt": "2025-08-06T10:52:29.975Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "honkai:star rail",
+                          "textModerated": "2024-08-28T08:00:24.223Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFe22bGmPESI=",
+                  "node": {
+                      "id": "1580119621020619042",
+                      "name": "Demon Slayer",
+                      "displayName": "Demon Slayer",
+                      "mediaId": "612492463963263265",
+                      "createdAt": "2023-02-08T18:01:30.752Z",
+                      "updatedAt": "2025-07-18T03:47:21.947Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:22.869Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFsVEF7nyHeU=",
+                  "node": {
+                      "id": "1640792507941002725",
+                      "name": "zenless_zone_zero",
+                      "displayName": "ゼンゼロ",
+                      "mediaId": "468996424250154680",
+                      "createdAt": "2023-07-26T04:13:54.074Z",
+                      "updatedAt": "2025-02-08T04:28:02.612Z",
+                      "extra": {
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "inputName": "Zenless zone zero",
+                          "textModerated": "2024-08-28T18:08:27.468Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGEoFr9BKeac=",
+                  "node": {
+                      "id": "1750217657858816423",
+                      "name": "鳴潮",
+                      "displayName": "鳴潮",
+                      "mediaId": "459918073048415081",
+                      "createdAt": "2024-05-23T03:10:24.071Z",
+                      "updatedAt": "2025-02-08T04:29:02.543Z",
+                      "extra": {
+                          "lang": "zh",
+                          "textModerated": "2024-08-28T14:21:41.250Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGXfE8zG6TVs=",
+                  "node": {
+                      "id": "1835151921967156571",
+                      "name": "phainon(honkai:star_rail)",
+                      "displayName": "phainon(honkai:star_rail)",
+                      "mediaId": "546603732665600939",
+                      "createdAt": "2025-01-12T12:08:45.987Z",
+                      "updatedAt": "2025-07-02T10:05:32.837Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "phainon(honkai:star_rail)",
+                          "textModerated": "2025-01-12T12:09:00.772Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "shumei"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGpkwVGhaQ0Q=",
+                  "node": {
+                      "id": "1916616255508988740",
+                      "name": "Yidhari(Zenless_zone_zero)",
+                      "displayName": "Yidhari(Zenless_zone_zero)",
+                      "mediaId": "626316429939231947",
+                      "createdAt": "2025-08-25T07:19:01.322Z",
+                      "updatedAt": "2025-12-03T10:47:30.504Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-08-25T07:19:01.744Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGm6l3PdIv1Y=",
+                  "node": {
+                      "id": "1904642060884426582",
+                      "name": "Lauma（Genshin_impact）",
+                      "displayName": "Lauma（Genshin_impact）",
+                      "mediaId": "614342447461538842",
+                      "createdAt": "2025-07-23T06:17:50.854Z",
+                      "updatedAt": "2025-09-16T06:07:25.519Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-07-23T06:17:51.679Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFWf8If+oTJg=",
+                  "node": {
+                      "id": "1542478620351024280",
+                      "name": "original character",
+                      "displayName": "オリキャラ",
+                      "mediaId": "329560705500102078",
+                      "createdAt": "2022-10-27T21:09:37.955Z",
+                      "updatedAt": "2025-06-03T04:38:54.925Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:16.995Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFvImQkMefL4=",
+                  "node": {
+                      "id": "1653426079234161854",
+                      "name": "goddess_of_victory:nikke",
+                      "displayName": "goddess_of_victory:nikke",
+                      "mediaId": "499526158068457557",
+                      "createdAt": "2023-08-30T00:55:13.016Z",
+                      "updatedAt": "2025-08-11T09:19:20.978Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "goddess of victory:nikke",
+                          "textModerated": "2024-08-28T07:58:17.787Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAF+TMp+ho85g=",
+                  "node": {
+                      "id": "1721725979093169048",
+                      "name": "学園アイドルマスター",
+                      "displayName": "学園アイドルマスター",
+                      "mediaId": "460320155292303154",
+                      "createdAt": "2024-03-05T12:14:38.349Z",
+                      "updatedAt": "2024-06-27T11:04:03.432Z",
+                      "extra": {
+                          "lang": "ja",
+                          "inputName": "学園アイドルマスター",
+                          "textModerated": "2024-08-28T16:39:22.471Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFqL111Ebung=",
+                  "node": {
+                      "id": "1631136320189086328",
+                      "name": "wuthering_waves",
+                      "displayName": "wuthering_waves",
+                      "mediaId": "459917928474389288",
+                      "createdAt": "2023-06-29T12:43:40.140Z",
+                      "updatedAt": "2024-10-31T04:29:15.561Z",
+                      "extra": {
+                          "id": "wuthering_waves",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "inputName": "Wuthering Waves",
+                          "textModerated": "2024-08-28T18:18:15.543Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFXEKwFyy3aA=",
+                  "node": {
+                      "id": "1545027968470015392",
+                      "name": "pokemon",
+                      "displayName": "ポケモン",
+                      "mediaId": "329560693563112818",
+                      "createdAt": "2022-11-03T21:59:49.911Z",
+                      "updatedAt": "2025-08-11T09:41:19.052Z",
+                      "extra": {
+                          "id": "pokemon",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "textModerated": "2024-08-28T07:49:14.410Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFygf6of22Og=",
+                  "node": {
+                      "id": "1668618754104678632",
+                      "name": "reverse:1999",
+                      "displayName": "リバース:1998",
+                      "mediaId": "458854398299009879",
+                      "createdAt": "2023-10-10T23:05:28.656Z",
+                      "updatedAt": "2024-05-21T05:05:12.949Z",
+                      "extra": {
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "inputName": "Reverse:1999",
+                          "textModerated": "2024-08-28T08:01:40.647Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFWrXNmzSt1w=",
+                  "node": {
+                      "id": "1543282451081770844",
+                      "name": "miku",
+                      "displayName": "miku",
+                      "mediaId": "329561086949843853",
+                      "createdAt": "2022-10-30T02:23:46.135Z",
+                      "updatedAt": "2024-05-21T03:39:09.196Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:16.904Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGHWRi1xGQHE=",
+                  "node": {
+                      "id": "1762474856920006769",
+                      "name": "ave_mujica",
+                      "displayName": "ave_mujica",
+                      "mediaId": "541500295042232064",
+                      "createdAt": "2024-06-25T22:56:07.880Z",
+                      "updatedAt": "2025-01-22T10:31:22.966Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "ave mujica",
+                          "textModerated": "2024-08-28T11:49:34.739Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGIqwXKQmBkA=",
+                  "node": {
+                      "id": "1768419715633776192",
+                      "name": "mavuika_(genshin_impact)",
+                      "displayName": "mavuika_(genshin_impact)",
+                      "mediaId": "493376108361554416",
+                      "createdAt": "2024-07-12T08:38:52.802Z",
+                      "updatedAt": "2025-08-08T10:05:57.118Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "mavuika_(genshin_impact)",
+                          "textModerated": "2024-08-28T11:15:23.224Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFxz/gkGPbdQ=",
+                  "node": {
+                      "id": "1665486897130991060",
+                      "name": "furina(genshin_impact)",
+                      "displayName": "furina(genshin_impact)",
+                      "mediaId": "472250175413006320",
+                      "createdAt": "2023-10-02T07:40:35.901Z",
+                      "updatedAt": "2025-08-06T11:22:17.827Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "Furina(genshin impact)",
+                          "textModerated": "2024-08-28T07:58:40.085Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFi/3iQveV7o=",
+                  "node": {
+                      "id": "1598768560721516474",
+                      "name": "Jujutsu kaisen",
+                      "displayName": "Jujutsu kaisen",
+                      "mediaId": "538312244278567996",
+                      "createdAt": "2023-04-01T05:05:45.545Z",
+                      "updatedAt": "2025-09-29T13:40:49.684Z",
+                      "extra": {
+                          "id": "jujutsu_kaisen",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "textModerated": "2024-08-28T07:54:21.410Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGcbw0DlpEGU=",
+                  "node": {
+                      "id": "1857436673443958885",
+                      "name": "pulchra_fellini",
+                      "displayName": "pulchra_fellini",
+                      "mediaId": "568298131652363143",
+                      "createdAt": "2025-03-15T00:00:29.429Z",
+                      "updatedAt": "2025-06-30T03:24:06.800Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "pulchra fellini",
+                          "textModerated": "2025-03-15T00:00:29.727Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGnG9nYpVgZM=",
+                  "node": {
+                      "id": "1905512601682805139",
+                      "name": "Seed(Zenless_Zone_Zero)",
+                      "displayName": "Seed(Zenless_Zone_Zero)",
+                      "mediaId": "615212893981328766",
+                      "createdAt": "2025-07-25T15:57:03.956Z",
+                      "updatedAt": "2025-09-16T06:04:41.048Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-07-25T15:57:04.218Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYznxNcdms=",
+                  "node": {
+                      "id": "1888753852046145131",
+                      "name": "Alice Thymefield(zenless_zone_zero)",
+                      "displayName": "Alice Thymefield(zenless_zone_zero)",
+                      "mediaId": "598454273530280098",
+                      "createdAt": "2025-06-09T10:03:46.678Z",
+                      "updatedAt": "2025-09-16T06:06:59.500Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T10:03:47.079Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGlNvOaT3p2o=",
+                  "node": {
+                      "id": "1896982161424623466",
+                      "name": "Blade(honkai:star_rail)",
+                      "displayName": "Blade(honkai:star_rail)",
+                      "mediaId": "606682601717449121",
+                      "createdAt": "2025-07-02T03:00:08.509Z",
+                      "updatedAt": "2025-09-29T13:40:55.429Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-07-02T03:00:08.714Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGaqPdaKn70U=",
+                  "node": {
+                      "id": "1849448332391870277",
+                      "name": "cantarella(wuthering_waves)",
+                      "displayName": "cantarella(wuthering_waves)",
+                      "mediaId": "573755050172257482",
+                      "createdAt": "2025-02-20T22:57:39.880Z",
+                      "updatedAt": "2025-05-12T10:28:22.390Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "cantarella(wuthering_waves)",
+                          "textModerated": "2025-02-20T22:57:40.906Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGR5/1NFUsNA=",
+                  "node": {
+                      "id": "1810024652271300816",
+                      "name": "yanagi(zenless_zone_zero)",
+                      "displayName": "yanagi(zenless_zone_zero)",
+                      "mediaId": "519725068654403975",
+                      "createdAt": "2024-11-04T04:02:02.735Z",
+                      "updatedAt": "2024-12-05T09:51:29.453Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-11-04T04:02:02.897Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "shumei"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGPvfXmxx4Jo=",
+                  "node": {
+                      "id": "1800278072703967386",
+                      "name": "sunday(honkai:star_rail)",
+                      "displayName": "sunday(honkai:star_rail)",
+                      "mediaId": "509978200508696433",
+                      "createdAt": "2024-10-08T06:32:37.081Z",
+                      "updatedAt": "2024-12-31T03:01:22.000Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-10-08T06:32:37.100Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAF2iMPinNSWM=",
+                  "node": {
+                      "id": "1686752259067431267",
+                      "name": "anby_demara",
+                      "displayName": "anby_demara",
+                      "mediaId": "568296443354142439",
+                      "createdAt": "2023-11-30T00:01:33.668Z",
+                      "updatedAt": "2025-04-23T07:26:28.118Z",
+                      "extra": {
+                          "lang": "en",
+                          "category": "character",
+                          "isSystem": true,
+                          "inputName": "anby demara",
+                          "textModerated": "2024-08-28T17:38:56.848Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGUa6Sd42uJE=",
+                  "node": {
+                      "id": "1821347925741451409",
+                      "name": "anaxa(honkai:star_rail)",
+                      "displayName": "anaxa(honkai:star_rail)",
+                      "mediaId": "531048360383687443",
+                      "createdAt": "2024-12-05T09:56:41.504Z",
+                      "updatedAt": "2025-09-16T06:06:31.456Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-12-05T09:56:41.820Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGYRInM0lvKs=",
+                  "node": {
+                      "id": "1838674386167905451",
+                      "name": "tribbie(honkai:star_rail)",
+                      "displayName": "tribbie(honkai:star_rail)",
+                      "mediaId": "561122508459692328",
+                      "createdAt": "2025-01-22T05:25:49.458Z",
+                      "updatedAt": "2025-07-18T03:49:29.076Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "tribbie(honkai:star_rail)",
+                          "textModerated": "2025-01-22T05:25:51.829Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGl4a6Qix1VI=",
+                  "node": {
+                      "id": "1899985680972502354",
+                      "name": "Ronova(Genshin_impact)",
+                      "displayName": "Ronova(Genshin_impact)",
+                      "mediaId": "609686057684590311",
+                      "createdAt": "2025-07-10T09:55:03.371Z",
+                      "updatedAt": "2025-09-16T06:05:02.834Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-07-10T09:55:03.596Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGip9ZL1ZCUc=",
+                  "node": {
+                      "id": "1885457265634904391",
+                      "name": "chisa(wuthering_waves)",
+                      "displayName": "chisa(wuthering_waves)",
+                      "mediaId": "596197402603784970",
+                      "createdAt": "2025-05-31T07:44:19.231Z",
+                      "updatedAt": "2025-07-18T03:48:43.330Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "Chisa(wuthering_waves)",
+                          "textModerated": "2025-05-31T07:44:19.472Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGkGMtQWDhxE=",
+                  "node": {
+                      "id": "1891948027581794065",
+                      "name": "Cerydra(Honkai star_rail)",
+                      "displayName": "Cerydra(Honkai star_rail)",
+                      "mediaId": "601648469395017241",
+                      "createdAt": "2025-06-18T05:36:17.471Z",
+                      "updatedAt": "2025-07-12T17:28:55.179Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-18T05:36:17.825Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYx4IxsIsE=",
+                  "node": {
+                      "id": "1888751934226834113",
+                      "name": "Iuno(Wuthering_waves)",
+                      "displayName": "Iuno(Wuthering_waves)",
+                      "mediaId": "598452383803886996",
+                      "createdAt": "2025-06-09T09:56:09.434Z",
+                      "updatedAt": "2025-07-18T03:49:42.783Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T09:56:09.724Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYhXaRTNKo=",
+                  "node": {
+                      "id": "1888733779801093290",
+                      "name": "Skirk(Genshin_impact)",
+                      "displayName": "Skirk(Genshin_impact)",
+                      "mediaId": "598434199621736822",
+                      "createdAt": "2025-06-09T08:44:01.082Z",
+                      "updatedAt": "2025-08-11T03:02:34.801Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T08:44:01.284Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAF8wweQZUYoU=",
+                  "node": {
+                      "id": "1714798854476685957",
+                      "name": "wriothesley_(genshin_impact)",
+                      "displayName": "リオセスリ(原神)",
+                      "mediaId": "570922735500695685",
+                      "createdAt": "2024-02-15T09:28:43.168Z",
+                      "updatedAt": "2025-08-08T10:31:06.036Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "wriothesley_(genshin_impact)",
+                          "textModerated": "2024-08-28T17:05:37.909Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGDRTtOtL2XA=",
+                  "node": {
+                      "id": "1744110992206059888",
+                      "name": "ellen(zenless_zone_zero)",
+                      "displayName": "ellen(zenless_zone_zero)",
+                      "mediaId": "453811349168653888",
+                      "createdAt": "2024-05-06T06:44:41.556Z",
+                      "updatedAt": "2025-06-19T09:07:35.290Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T14:47:31.757Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "ner"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGxogC2hUjLU=",
+                  "node": {
+                      "id": "1952908621785631925",
+                      "name": "Dialyn(Zenless_zone_zero)",
+                      "displayName": "Dialyn(Zenless_zone_zero)",
+                      "mediaId": "662608699263661188",
+                      "createdAt": "2025-12-03T10:51:55.722Z",
+                      "updatedAt": "2025-12-03T10:52:51.535Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-12-03T10:51:55.947Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGwlee/FWldc=",
+                  "node": {
+                      "id": "1948192200237422039",
+                      "name": "Ye_shunguang(Zenless_zone_zero)",
+                      "displayName": "Ye_shunguang(Zenless_zone_zero)",
+                      "mediaId": "657892498940680901",
+                      "createdAt": "2025-11-20T10:30:33.198Z",
+                      "updatedAt": "2025-11-20T10:30:33.215Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-11-20T10:30:33.413Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGX3+qHshpCM=",
+                  "node": {
+                      "id": "1836904222610793507",
+                      "name": "castorice(honkai:star_rail)",
+                      "displayName": "castorice(honkai:star_rail)",
+                      "mediaId": "546604669644742723",
+                      "createdAt": "2025-01-17T08:11:51.675Z",
+                      "updatedAt": "2025-06-03T04:37:15.897Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-01-17T08:11:52.626Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGSF2rcV0wP4=",
+                  "node": {
+                      "id": "1810859013893832958",
+                      "name": "miyabi(zenless_zone_zero)",
+                      "displayName": "miyabi(zenless_zone_zero)",
+                      "mediaId": "522622096675376021",
+                      "createdAt": "2024-11-06T11:17:29.803Z",
+                      "updatedAt": "2025-07-10T10:25:53.905Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "Miyabi(Zenless_zone_zero)",
+                          "textModerated": "2024-11-06T11:17:30.314Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGTfdhT6Vuqw=",
+                  "node": {
+                      "id": "1817164539017673388",
+                      "name": "zani(wuthering_waves)",
+                      "displayName": "zani(wuthering_waves)",
+                      "mediaId": "573758759256361218",
+                      "createdAt": "2024-11-23T20:53:24.194Z",
+                      "updatedAt": "2025-06-30T03:14:23.133Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "zani(wuthering_waves)",
+                          "textModerated": "2024-11-23T20:53:24.664Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGT3JC45aTPE=",
+                  "node": {
+                      "id": "1818830875997654257",
+                      "name": "silver_wolf(honkai:star_rail)",
+                      "displayName": "silver_wolf(honkai:star_rail)",
+                      "mediaId": "554517086653522201",
+                      "createdAt": "2024-11-28T11:14:49.305Z",
+                      "updatedAt": "2025-08-08T09:54:23.614Z",
+                      "extra": {
+                          "lang": "en",
+                          "inputName": "Silver_wolf(honkai:star_rail)",
+                          "textModerated": "2024-11-28T11:14:50.426Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFWz20hegs+Y=",
+                  "node": {
+                      "id": "1543880154481210342",
+                      "name": "touhou",
+                      "displayName": "東方Project",
+                      "mediaId": "266507565396344241",
+                      "createdAt": "2022-10-31T17:58:49.731Z",
+                      "updatedAt": "2024-07-29T04:04:35.305Z",
+                      "extra": {
+                          "id": "touhou",
+                          "lang": "en",
+                          "category": "ip",
+                          "isSystem": true,
+                          "textModerated": "2024-08-28T07:49:13.752Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYV3G4T+9I=",
+                  "node": {
+                      "id": "1888721130212293586",
+                      "name": "yixuan(zenless_zone_zero)",
+                      "displayName": "yixuan(zenless_zone_zero)",
+                      "mediaId": "598421106095521606",
+                      "createdAt": "2025-06-09T07:53:45.185Z",
+                      "updatedAt": "2025-09-16T06:06:44.283Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T07:53:45.501Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGd54kZ7WeBY=",
+                  "node": {
+                      "id": "1864059862608410646",
+                      "name": "brant(wuthering_waves)",
+                      "displayName": "brant(wuthering_waves)",
+                      "mediaId": "573760307657115583",
+                      "createdAt": "2025-04-02T06:38:40.792Z",
+                      "updatedAt": "2025-07-10T10:25:44.979Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-04-02T06:38:41.199Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYuIh7nvts=",
+                  "node": {
+                      "id": "1888747817810771675",
+                      "name": "Ciaccona_(Wuthering_waves)",
+                      "displayName": "Ciaccona_(Wuthering_waves)",
+                      "mediaId": "598448257765326233",
+                      "createdAt": "2025-06-09T09:39:48.004Z",
+                      "updatedAt": "2025-06-19T09:08:33.271Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T09:39:48.223Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGjYEXOP1aHo=",
+                  "node": {
+                      "id": "1888701890736515194",
+                      "name": "qiuyuan(wuthering_waves)",
+                      "displayName": "qiuyuan(wuthering_waves)",
+                      "mediaId": "598402183587736645",
+                      "createdAt": "2025-06-09T06:37:18.136Z",
+                      "updatedAt": "2025-06-09T06:37:52.659Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-06-09T06:37:18.712Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAFbbiWwcOwg8=",
+                  "node": {
+                      "id": "1564686801146135055",
+                      "name": "guides",
+                      "displayName": "guides",
+                      "mediaId": "274387246580809463",
+                      "createdAt": "2022-12-28T03:57:00.869Z",
+                      "updatedAt": "2024-11-01T04:22:28.295Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2024-08-28T07:49:43.751Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              },
+              {
+                  "cursor": "gaJpZNcAGtmcrOatEBQ=",
+                  "node": {
+                      "id": "1934749781350748180",
+                      "name": "Rerir(Genshin_impact)",
+                      "displayName": "Rerir(Genshin_impact)",
+                      "mediaId": "644450067938589553",
+                      "createdAt": "2025-10-14T08:15:10.787Z",
+                      "updatedAt": "2025-10-14T08:15:10.793Z",
+                      "extra": {
+                          "lang": "en",
+                          "textModerated": "2025-10-14T08:15:10.971Z",
+                          "textModerationResult": "PASS",
+                          "textModerationProvider": "openai"
+                      },
+                      "__typename": "Tag"
+                  },
+                  "__typename": "TagEdge"
+              }
+          ],
+          "pageInfo": {
+              "hasNextPage": true,
+              "hasPreviousPage": false,
+              "endCursor": "gaJpZNcAGtmcrOatEBQ=",
+              "startCursor": "gaJpZNcAFV06n0GQgDI=",
+              "__typename": "PageInfo"
+          },
+          "totalCount": 1001,
+          "__typename": "TagConnection"
+      }
+  }
+}

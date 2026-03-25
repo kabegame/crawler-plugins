@@ -1,0 +1,27 @@
+{
+  "baseUrl": "https://pixai.art",
+  "var": [
+    {
+      "key": "max_model_pages",
+      "type": "int",
+      "name": "模型分页数",
+      "default": 3,
+      "min": 1,
+      "max": 50
+    },
+    {
+      "key": "max_artwork_pages",
+      "type": "int",
+      "name": "每个模型作品分页数",
+      "default": 1,
+      "min": 1,
+      "max": 50
+    },
+    {
+      "key": "safe_search",
+      "type": "boolean",
+      "name": "安全搜索",
+      "default": true
+    }
+  ]
+}

@@ -1,0 +1,4527 @@
+{
+  "data": {
+    "artworks": {
+      "edges": [
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1991608648078203490",
+            "title": "ZELDA",
+            "authorId": "1940548110091114029",
+            "prompts": "character: princess_zelda, , , , the legend of zelda, 1girl, (close-up:1.2), (from\n  above:1.2), cowboy shot, dutch angle, animal, bare arms, bare shoulders, belt, bird,\n  blonde hair, blue eyes, braid, crown braid, dove, dress, elf, floating hair, flock,\n  green background, green eyes, green theme, holding, long dress, long hair, motion\n  blur, outdoors, ripples, skirt hold, sleeveless, sleeveless dress, solo, standing,\n  strapless, strapless dress, sundress, wading, water, white bird, white dress, wind,\n  emmmerald, riko-m, (nishihara isao:0.6), (konya karasue:0.6), (wushier:0.6), (kkia:0.5),\n  (sheya tin:0.5), (renjian shilian:0.4), (krenz:0.4), (a-shacho:0.4), (redum4:0.4),\n  (tanjiu:0.3), stylefeisekong286, cinematic feeling, Aesthetic, excellent, year 2025,\n  newest, perspective, point of view, shadows, lighting, shading, countershading,\n  dynamic shading, dynamic lighting, warm colors, light colors, beautiful light, best\n  quality, high quality,harukav2 style\n\n  flat color and clean geometric lines. simplified, with little texture or shading.\n  Soft pastel palettes",
+            "createdAt": "2026-03-20T05:52:01.287Z",
+            "updatedAt": "2026-03-20T05:52:02.298Z",
+            "mediaId": "701308069833372536",
+            "media": {
+              "id": "701308069833372536",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/e55ce167-71b4-4f72-a895-824d44bafa81",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/e55ce167-71b4-4f72-a895-824d44bafa81",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/e55ce167-71b4-4f72-a895-824d44bafa81",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UaONjZPUPTn3}mTKXTrEEenSVvj??crrr^XR",
+              "naturalPrompts": "princess zelda, the legend of zelda, 1girl, (close-up:1.2), (from above:1.2), cowboy shot, dutch angle, animal, bare arms, bare shoulders, belt, bird, blonde hair, blue eyes, braid, crown braid, dove, dress, elf, floating hair, flock, green background, green eyes, green theme, holding, long dress, long hair, motion blur, outdoors, ripples, skirt hold, sleeveless, sleeveless dress, solo, standing, strapless, strapless dress, sundress, wading, water, white bird, white dress, wind, emmmerald, riko-m, (nishihara isao:0.6), (konya karasue:0.6), (wushier:0.6), (kkia:0.5), (sheya tin:0.5), (renjian shilian:0.4), (krenz:0.4), (a-shacho:0.4), (redum4:0.4), (tanjiu:0.3), stylefeisekong286, cinematic feeling, Aesthetic, excellent, year 2025, newest, perspective, point of view, shadows, lighting, shading, countershading, dynamic shading, dynamic lighting, warm colors, light colors, beautiful light, best quality, high quality,harukav2 style",
+              "suggestedTacks": [
+                "1941984459577906425",
+                "1941984459791818034",
+                "1941984459686957447",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459598880616",
+                "1941984459569518236",
+                "1941984459565322469",
+                "1941984459561130127",
+                "1941984459808592822",
+                "1941984459628239853",
+                "1941984459561129873",
+                "1941984459783426381",
+                "1941984459598880612",
+                "1941984459603072559",
+                "1941984459598877415",
+                "1941984459565322621",
+                "1941984459561129991",
+                "1941984459569518545",
+                "1941984459632431313",
+                "1941984459535964013",
+                "1941984459607268144",
+                "1941984459565322303",
+                "1941984459657597098",
+                "1941984459636626753",
+                "1941984459615656558",
+                "1941984459632434904",
+                "1941984459569518845",
+                "1941984459741486866",
+                "1941984459607268663",
+                "1941984459657600617"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Fri Mar 20 2026 05:52:02 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "13 year",
+                "ass",
+                "baby",
+                "bondage",
+                "breast",
+                "breasts",
+                "bust",
+                "horror",
+                "late teen",
+                "loli",
+                "milf",
+                "negro",
+                "penis",
+                "seductive",
+                "see through",
+                "spread legs",
+                "teenager",
+                "toddler"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 385,
+            "liked": null,
+            "commentCount": 14,
+            "author": {
+              "id": "1940548110091114029",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "ibuki-douji",
+              "displayName": "Treasure",
+              "createdAt": "2025-10-30T08:15:40.087Z",
+              "updatedAt": null,
+              "avatarMediaId": "686532317316004100",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/821df249-f393-4838-ad0f-5f71829dfa41",
+              "membership": {
+                "membershipId": "membership-start",
+                "tier": 1,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1960157188751039143",
+                  "decorationId": "1957196608856579025",
+                  "decoration": {
+                    "id": "1957196608856579025",
+                    "code": "xmas_2025_artwork_frame_credit_pack_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Mistletoe Gleam"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "槲寄微光"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "聖なる輝き"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "미슬토 글림"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 125,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "f2635d"
+                          },
+                          {
+                            "position": 24,
+                            "colorType": "RRGGBB",
+                            "colorValue": "7ac141"
+                          },
+                          {
+                            "position": 56,
+                            "colorType": "RRGGBB",
+                            "colorValue": "f2635d"
+                          },
+                          {
+                            "position": 80,
+                            "colorType": "RRGGBB",
+                            "colorValue": "7ac141"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "f2635d"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-12-15T06:50:51.506Z",
+                    "updatedAt": "2025-12-15T06:52:24.005Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-23T10:55:08.757Z",
+                  "obtainedFrom": "christmasEvent2025_order_extra-package-5",
+                  "updatedAt": "2025-12-23T11:22:44.696Z",
+                  "createdAt": "2025-12-23T10:55:08.757Z",
+                  "userId": "1940548110091114029",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1976776025300190443",
+                  "decorationId": "1975324234421385350",
+                  "decoration": {
+                    "id": "1975324234421385350",
+                    "code": "valentine_2026_avatar_frame_credit_pack_2",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Rosebound Valentine"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "瑰麗情緣"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ローズ・ロマンス"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "장미의 약속"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/19fc0c81-0913-48a3-be7c-a23ec5b2c2bc",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/19fc0c81-0913-48a3-be7c-a23ec5b2c2bc",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/35bb6d99-08cf-4755-a5fa-650a0e019c38",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/09d61586-83fd-41c0-8797-ab7219990918",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/4b661652-94b4-4204-8cf0-8abcfaa71a34",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-02-03T07:23:34.236Z",
+                    "updatedAt": "2026-02-03T08:04:26.672Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-02-07T07:32:28.155Z",
+                  "obtainedFrom": "valentineEvent2026_order_extra-package-9",
+                  "updatedAt": "2026-02-07T07:34:01.725Z",
+                  "createdAt": "2026-02-07T07:32:28.155Z",
+                  "userId": "1940548110091114029",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1976776025220498661",
+                  "decorationId": "1975327846378041356",
+                  "decoration": {
+                    "id": "1975327846378041356",
+                    "code": "valentine_2026_badge_credit_pack_3",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Heartfelt Keepsake"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "衷心珍藏"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ハートフル・コレクション"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "진심 담은 보물함"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/c1f08205-1852-434b-b1e2-0fbda79eacc9",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/c1f08205-1852-434b-b1e2-0fbda79eacc9",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/f2d9344f-7a45-471e-8a51-2eecde00a589",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/d804158f-d124-471c-bef1-0636877620f0",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/54f49b2d-1453-418e-9944-aa1bf586a0d9",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-02-03T07:37:55.393Z",
+                    "updatedAt": "2026-02-03T08:09:53.436Z",
+                    "allowUserEditRemark": true,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-02-07T07:32:28.136Z",
+                  "obtainedFrom": "valentineEvent2026_order_extra-package-9",
+                  "updatedAt": "2026-03-25T05:31:50.047Z",
+                  "createdAt": "2026-02-07T07:32:28.136Z",
+                  "userId": "1940548110091114029",
+                  "userRemark": "With eternal love.",
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6Odg3BMGmKkc2VlZACkc29ydJLLQHjDAPuogmuzMTk5MTYwODY0ODA3ODIwMzQ5MA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993162559546611190",
+            "title": "Prima Princess",
+            "authorId": "1824874432858909887",
+            "prompts": "5girls, matsuda arisa, emily stewart, tanaka kotoha, kousaka umi, satake minako, idol clothes, plaid clothes, red jacket, red skirt, pleated skirt",
+            "createdAt": "2026-03-24T12:46:42.648Z",
+            "updatedAt": "2026-03-24T12:46:42.707Z",
+            "mediaId": "702686555187858136",
+            "media": {
+              "id": "702686555187858136",
+              "type": "IMAGE",
+              "width": 1280,
+              "height": 768,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/b4c817ff-589f-4fb4-9f91-e25d5a627b37",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/b4c817ff-589f-4fb4-9f91-e25d5a627b37",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/b4c817ff-589f-4fb4-9f91-e25d5a627b37",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.5,
+                "y": 0.377
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UXHKeaRnIoM|~WRoRiRkgOWZRiV@b|j]Rjad",
+              "naturalPrompts": "5girls, matsuda arisa, emily stewart, tanaka kotoha, kousaka umi, satake minako, idol clothes, plaid clothes, red jacket, red skirt, pleated skirt, ",
+              "suggestedTacks": [
+                "1941984459531769387",
+                "1941984459665987713",
+                "1941984459829564275",
+                "1941984459741485718",
+                "1941984459720515187",
+                "1941984459707928847",
+                "1941984459716320258",
+                "1941984459716319709",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459573714238",
+                "1941984459603073733",
+                "1941984459565322446",
+                "1941984459615656564",
+                "1941984459598880616",
+                "1941984459561130122",
+                "1941984459569518236",
+                "1941984459569518260",
+                "1941984459607268902",
+                "1941984459561130570",
+                "1941984459632431118",
+                "1941984459577906396",
+                "1941984459586294001",
+                "1941984459728902767",
+                "1941984459607268130",
+                "1941984459598880641",
+                "1941984459586294153",
+                "1941984459565322912",
+                "1941984459565325973",
+                "1941984459565322252",
+                "1941984459594686184",
+                "1941984459598877217",
+                "1941984459598877833",
+                "1941984459796009421",
+                "1941984459619851847",
+                "1941984459569518366",
+                "1941984459640822542",
+                "1941984459758260731",
+                "1941984459573714756"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 12:46:42 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "12 years",
+                "6 years",
+                "ass",
+                "baby",
+                "bondage",
+                "breast",
+                "breasts",
+                "bust",
+                "camel toe",
+                "child",
+                "children",
+                "convulsing",
+                "cum",
+                "diaper",
+                "dildo",
+                "horror",
+                "kindergarten",
+                "little boy",
+                "loli",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "nipples",
+                "nsfw",
+                "nude",
+                "panties",
+                "panty",
+                "pelvic",
+                "pregnancy",
+                "pussy",
+                "scat",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "sex",
+                "sexual",
+                "sexually",
+                "shit",
+                "spread legs",
+                "strap on",
+                "stripper",
+                "sucks",
+                "tied up",
+                "toddler",
+                "vaginal",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1824874432858909887",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "yamamotoyusuke",
+              "displayName": "山本裕介",
+              "createdAt": "2024-12-15T03:29:46.317Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940458695782526766",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-30T02:20:22.054Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-12-01T16:44:43.700Z",
+                  "createdAt": "2025-10-30T02:20:22.054Z",
+                  "userId": "1824874432858909887",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1967623608778242709",
+                  "decorationId": "1962567829327944749",
+                  "decoration": {
+                    "id": "1962567829327944749",
+                    "code": "newyear_2026_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Blessing Flight"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "祝福之翼"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "鶴の舞い"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "축복의 비행"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/b98bd205-0826-4fde-8c11-018995260bdf"
+                    },
+                    "createdAt": "2025-12-30T02:34:10.259Z",
+                    "updatedAt": "2025-12-30T02:34:55.897Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-01-13T01:24:02.012Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2026-01-13T01:24:04.522Z",
+                  "createdAt": "2026-01-13T01:24:02.012Z",
+                  "userId": "1824874432858909887",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6kiyaViVfakc2VlZACkc29ydJLLQHhvsJ6Y3NuzMTk5MzE2MjU1OTU0NjYxMTE5MA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993470584586160557",
+            "title": "バーチャルYoutuberのリリア・ミラージュ",
+            "authorId": "1993061304681051012",
+            "prompts": ", , , harukav2 style,Masterpiece,best quality,intricate details,professional\n  execution,2D aesthetic,anime style,clean lineart,crisp outlines,cel shading,flat\n  shading,no gradient,limited color palette,dramatic lighting,vibrant colors,high\n  polished finish,aesthetic color palette,illustrative finish,vector art. 2D art only,Defined\n  lower eyelids,(Subtle lower eyelid contour:0.9),(masterpiece:1.2),(style of dark\n  anime),sketch,lineart,fine lines,muted colors,desaturated,grainy texture,high contrast,detailed\n  lower lashes,puffy undereyes,solid color fills,thick outline,risograph,flat shading,cel\n  shaded,chromatic aberration,screen tone,flat color,jagged lines,rim light,(soft\n  blush on aegyo sal:1.2),",
+            "createdAt": "2026-03-25T09:10:41.443Z",
+            "updatedAt": "2026-03-25T09:10:41.539Z",
+            "mediaId": "703170878454139590",
+            "media": {
+              "id": "703170878454139590",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/0a641010-4919-4844-bb0c-1fa94c2e85fe",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/0a641010-4919-4844-bb0c-1fa94c2e85fe",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/0a641010-4919-4844-bb0c-1fa94c2e85fe",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "このキャラクターの魅力に私もすっかり惹かれてしまいました！彼女のミステリアスな雰囲気と鋭い赤目に引き込まれ、何度も見返してしまいます。ぜひいいねやフォローで応援してくださいね！これからも素敵な作品をたくさん投稿しますので、コメントも気軽にどうぞ〜",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UAAu]*KQi^Ee}]9[v}S$WTNbxHo2X8xaj[nh",
+              "naturalPrompts": "harukav2 style,Masterpiece,best quality,intricate details,professional execution,2D aesthetic,anime style,clean lineart,crisp outlines,cel shading,flat shading,no gradient,limited color palette,dramatic lighting,vibrant colors,high polished finish,aesthetic color palette,illustrative finish,vector art. 2D art only,Defined lower eyelids,(Subtle lower eyelid contour:0.9),(masterpiece:1.2),(style of dark anime),sketch,lineart,fine lines,muted colors,desaturated,grainy texture,high contrast,detailed lower lashes,puffy undereyes,solid color fills,thick outline,risograph,flat shading,cel shaded,chromatic aberration,screen tone,flat color,jagged lines,rim light,(soft blush on aegyo sal:1.2),",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459628239862",
+                "1941984459569518236",
+                "1941984459640821699",
+                "1941984459565322469",
+                "1941984459561130205",
+                "1941984459632431118",
+                "1941984459569518309",
+                "1941984459586294153",
+                "1941984459586297312",
+                "1941984459569517872",
+                "1941984459863121300",
+                "1941984459569518545",
+                "1941984460693591090",
+                "1941984459573714931",
+                "1941984459565322604",
+                "1941984459577905307"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Mar 25 2026 09:10:41 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "13years",
+                "ass",
+                "baby",
+                "breast",
+                "breasts",
+                "bukkake",
+                "bust",
+                "child",
+                "futanari",
+                "grope",
+                "hentai",
+                "horror",
+                "kid",
+                "little boy",
+                "loli",
+                "moaning",
+                "naked",
+                "negro",
+                "nsfw",
+                "oral",
+                "orgasm",
+                "panties",
+                "peeing",
+                "penis",
+                "pregnant",
+                "pussy",
+                "seductive",
+                "see through",
+                "sex",
+                "sexual",
+                "shota",
+                "teenager",
+                "tied up"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1993061304681051012",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1993061304681051012",
+              "displayName": "Mfo",
+              "createdAt": "2026-03-24T06:04:21.324Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6o671Byya2kc2VlZACkc29ydJLLQHhhv0h/y5KzMTk5MzQ3MDU4NDU4NjE2MDU1Nw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992215289093036453",
+            "title": "Alina Gray ",
+            "authorId": "1587723221039760275",
+            "prompts": ", , , alina gray, fishnet legwear, green hair, blonde hair, thighhighs, black footwear, green eyes, short sleeves, goggles, puffy short sleeves, garter straps, skirt, very long hair, puffy sleeves, wrist cuffs, bow, hair between eyes, ,((perfect_hands:1.5)),harukav2 style",
+            "createdAt": "2026-03-21T22:02:35.596Z",
+            "updatedAt": "2026-03-21T22:02:36.572Z",
+            "mediaId": "701915225299387902",
+            "media": {
+              "id": "701915225299387902",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/ecd5f14f-43ef-45b6-b87f-91e4ca974b1e",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/ecd5f14f-43ef-45b6-b87f-91e4ca974b1e",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/ecd5f14f-43ef-45b6-b87f-91e4ca974b1e",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.496,
+                "y": 0.202
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UtMaU#t2~qt8%La$jJob=~jIn.tQInobodV]",
+              "naturalPrompts": "alina gray, fishnet legwear, green hair, blonde hair, thighhighs, black footwear, green eyes, short sleeves, goggles, puffy short sleeves, garter straps, skirt, very long hair, puffy sleeves, wrist cuffs, bow, hair between eyes, ,((perfect_hands:1.5)),harukav2 style",
+              "suggestedTacks": [
+                "1941984459615657260",
+                "1941984459837955712",
+                "1941984459888284204",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459531769135",
+                "1941984459615656564",
+                "1941984459565322395",
+                "1941984459632431304",
+                "1941984459561130122",
+                "1941984459569518236",
+                "1941984459808592822",
+                "1941984459565322816",
+                "1941984459561130570",
+                "1941984459527573642",
+                "1941984459728902767",
+                "1941984459598880612",
+                "1941984459569518309",
+                "1941984459632431515",
+                "1941984459632431594",
+                "1941984459619851850",
+                "1941984459569518270",
+                "1941984459573714048",
+                "1941984459682766529",
+                "1941984459531768364",
+                "1941984459561130936",
+                "1941984459573713563",
+                "1941984459607268144",
+                "1941984459531768409",
+                "1941984459594684838",
+                "1941984459603073357",
+                "1941984459594685688",
+                "1941984459569518995",
+                "1941984460710369605"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sat Mar 21 2026 22:02:36 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "1 year",
+                "5 year",
+                "ass",
+                "baby",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "cum",
+                "ecchi",
+                "ejaculation",
+                "erotic",
+                "fellatio",
+                "futanari",
+                "girl on top",
+                "horror",
+                "kid",
+                "little boy",
+                "little girl",
+                "loli",
+                "naked",
+                "negro",
+                "nigga",
+                "nipple",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "panties",
+                "pelvic",
+                "pubic",
+                "seductive",
+                "sex",
+                "shibari",
+                "spread legs",
+                "strap on",
+                "teenager",
+                "testicles",
+                "tied up",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 3,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1587723221039760275",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1587723221039760275",
+              "displayName": "Shadow Knight",
+              "createdAt": "2023-03-01T17:35:31.364Z",
+              "updatedAt": null,
+              "avatarMediaId": "638814091016663554",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/a0a2510e-bc1b-42c7-a240-ec47ecf19117",
+              "membership": {
+                "membershipId": "membership-plus",
+                "tier": 2,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940386966967803605",
+                  "decorationId": "1934782440120757513",
+                  "decoration": {
+                    "id": "1934782440120757513",
+                    "code": "anniversary_3rd_artwork_frame_shop_2",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Member’s Aura"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "會員光環"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "メンバーオーラ"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "멤버 오라"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 320,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "DB2C5D"
+                          },
+                          {
+                            "position": 21,
+                            "colorType": "RRGGBB",
+                            "colorValue": "F0C18A"
+                          },
+                          {
+                            "position": 32,
+                            "colorType": "RRGGBB",
+                            "colorValue": "F090B0"
+                          },
+                          {
+                            "position": 49,
+                            "colorType": "RRGGBB",
+                            "colorValue": "E568A3"
+                          },
+                          {
+                            "position": 64,
+                            "colorType": "RRGGBB",
+                            "colorValue": "9673F7"
+                          },
+                          {
+                            "position": 81,
+                            "colorType": "RRGGBB",
+                            "colorValue": "f3A184"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "194AE8"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:24:57.245Z",
+                    "updatedAt": "2025-10-14T10:24:57.245Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T21:35:20.573Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2025-10-29T21:35:20.993Z",
+                  "createdAt": "2025-10-29T21:35:20.573Z",
+                  "userId": "1587723221039760275",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6XFQA5+GaWkc2VlZACkc29ydJLLQHhQUgB91EGzMTk5MjIxNTI4OTA5MzAzNjQ1Mw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992458983470911843",
+            "title": "Ichinose Asuna (Blue Archive)",
+            "authorId": "1715249240458230961",
+            "prompts": "character: asuna_(blue_archive), harukav2 style, harukav2 style, asuna (blue archive), 1girl, halo, very long hair, ribbon, blue eyes, mole, blue bow, hair ribbon, hair over one eye, asymmetrical bangs, grin, blue bowtie, blue halo, choker, light brown hair, wrist scrunchie, blue ribbon, beach, day, masterpiece, best quality",
+            "createdAt": "2026-03-22T14:10:56.949Z",
+            "updatedAt": "2026-03-22T14:10:58.710Z",
+            "mediaId": "702158585134206373",
+            "media": {
+              "id": "702158585134206373",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/539d0595-5eff-47b7-8983-f673989d8fe4",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/539d0595-5eff-47b7-8983-f673989d8fe4",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/539d0595-5eff-47b7-8983-f673989d8fe4",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.559,
+                "y": 0.349
+              },
+              "description": "Ichinose Asuha from Blue Archive",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "URKe4i4:PC$%t-xuF}%hI=IWERNJcujFnNMx",
+              "naturalPrompts": "harukav2 style, asuna (blue archive), 1girl, halo, very long hair, ribbon, blue eyes, mole, blue bow, hair ribbon, hair over one eye, asymmetrical bangs, grin, blue bowtie, blue halo, choker, light brown hair, wrist scrunchie, blue ribbon, beach, day, masterpiece, best quality",
+              "taskProcessType": "normal",
+              "moderationMachine": "Sun Mar 22 2026 14:10:58 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "14 years",
+                "2 year",
+                "adolescence",
+                "anus",
+                "ass",
+                "baby",
+                "bdsm",
+                "blow job",
+                "booty",
+                "breast",
+                "breasts",
+                "bukkake",
+                "bust",
+                "child",
+                "children",
+                "cock",
+                "dildo",
+                "dominatrix",
+                "early teen",
+                "erotic",
+                "exhibitionism",
+                "fellatio",
+                "futanari",
+                "gangbang",
+                "hardcore",
+                "horror",
+                "jailbait",
+                "loli",
+                "milf",
+                "milking",
+                "minor",
+                "moaning",
+                "naked",
+                "negro",
+                "nipples",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "nudity",
+                "oral",
+                "orgasm",
+                "panties",
+                "panty",
+                "pelvic",
+                "penis",
+                "pregnancy",
+                "pregnant",
+                "preteen",
+                "pussy",
+                "sadism",
+                "schoolboy",
+                "seductive",
+                "see through",
+                "sex",
+                "sexual",
+                "shirt lift",
+                "slingshot",
+                "slut",
+                "small girl",
+                "spread legs",
+                "stripper",
+                "teenager",
+                "tied up",
+                "tits",
+                "topless",
+                "tribadism",
+                "vagina",
+                "vaginal",
+                "whore",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 20,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1715249240458230961",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "qawsedrf78",
+              "displayName": "qawsedrf78",
+              "createdAt": "2024-02-16T15:18:23.710Z",
+              "updatedAt": null,
+              "avatarMediaId": "509218347938443341",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/8c15552c-4ac0-4e09-8163-a977657df0fe",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1960280457937959362",
+                  "decorationId": "1957198761749995683",
+                  "decoration": {
+                    "id": "1957198761749995683",
+                    "code": "xmas_2025_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Jingle Bell"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "叮噹鈴鐺"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ジングルベル"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "징글벨"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/43d2d27a-b2bf-4e70-b103-9aaf7aa7c558"
+                    },
+                    "createdAt": "2025-12-15T06:59:24.796Z",
+                    "updatedAt": "2025-12-15T06:59:56.850Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-23T19:04:58.423Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2025-12-23T19:04:59.128Z",
+                  "createdAt": "2025-12-23T19:04:58.423Z",
+                  "userId": "1715249240458230961",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6ai45NR0WOkc2VlZACkc29ydJLLQHhOn752yLSzMTk5MjQ1ODk4MzQ3MDkxMTg0Mw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992252195457568815",
+            "title": "Cat-eared Operator in Tactical Gear",
+            "authorId": "1977683333550678158",
+            "prompts": ", , , dokaebi character from rainbow six siege, harukav2 style, 8K, watercolor painting,",
+            "createdAt": "2026-03-22T00:29:14.810Z",
+            "updatedAt": "2026-03-22T00:29:16.053Z",
+            "mediaId": "701952292215618953",
+            "media": {
+              "id": "701952292215618953",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/8d02ed1a-19fb-4469-9aee-ebbfb855f527",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/8d02ed1a-19fb-4469-9aee-ebbfb855f527",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/8d02ed1a-19fb-4469-9aee-ebbfb855f527",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.49,
+                "y": 0.302
+              },
+              "description": "I'm captivated by this detailed illustration of a character with adorable cat ears and striking red eyes, dressed in tactical gear and ready for action. The combination of her cute expression and fierce equipment truly appeals to my love for dynamic character designs. If you enjoy this vibe, please like, follow, and share your thoughts in the comments — I can't wait to create more! Stay tuned for my next art drop!",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UnIq.WWB_2xt~qaex[xaxvWBt6j[W=R*enWB",
+              "naturalPrompts": "dokaebi personaje de rainbow sixs,harukav2 style,8K,watercolor painting,",
+              "suggestedTacks": [
+                "1941984459871508767",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459628239862",
+                "1941984459565322446",
+                "1941984459619848768",
+                "1941984459640821699",
+                "1941984459569518260",
+                "1941984459561130205",
+                "1941984459531768674",
+                "1941984459561130570",
+                "1941984459586294001",
+                "1941984459565322345",
+                "1941984459573713573",
+                "1941984459720515129",
+                "1941984459800205481",
+                "1941984459531768766",
+                "1941984459561130936",
+                "1941984459682765800",
+                "1941984459565325897",
+                "1941984459565322839",
+                "1941984459800205492",
+                "1941984459603072973",
+                "1941984459573713612",
+                "1941984459586293866",
+                "1941984459607265503",
+                "1941984459833760028"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sun Mar 22 2026 00:29:15 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "blowjob",
+                "breast",
+                "breasts",
+                "bust",
+                "cameltoe",
+                "goo girl",
+                "hentai",
+                "horror",
+                "kid",
+                "milf",
+                "minor",
+                "negro",
+                "nsfw",
+                "nude",
+                "panties",
+                "seductive",
+                "semen",
+                "slut",
+                "small girl",
+                "tied up",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 3,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1977683333550678158",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "ydil",
+              "displayName": "Ydil",
+              "createdAt": "2026-02-09T19:37:47.297Z",
+              "updatedAt": null,
+              "avatarMediaId": "687408949862865723",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/0e398ccf-f248-48ed-84db-39ef10f517cc",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6Xm0P09kC+kc2VlZACkc29ydJLLQHhOm1x82JmzMTk5MjI1MjE5NTQ1NzU2ODgxNQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993349234741895677",
+            "title": "Chibi Girl in Green Dress!",
+            "authorId": "1992888244346060302",
+            "prompts": "harukav2 style, a female with short wavy blonde hair lime green eyes freckles wearing green sleeveless dress with white belt with green knee high boots, happy, wink, pointing at viewer, heart, simple background, green background",
+            "createdAt": "2026-03-25T01:08:29.388Z",
+            "updatedAt": "2026-03-25T01:08:30.374Z",
+            "mediaId": "702902902882714176",
+            "media": {
+              "id": "702902902882714176",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/20d93091-9a92-45a4-b19d-799d79ef9932",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/20d93091-9a92-45a4-b19d-799d79ef9932",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/20d93091-9a92-45a4-b19d-799d79ef9932",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "這是一幅充滿活力的綠色調少女插畫！我非常喜歡她那明亮的表情和炫酷的服裝風格，讓人感覺充滿正能量。喜歡這樣的畫風嗎？不要忘記點讚、追蹤我，未來還會帶來更多精彩作品！也歡迎留言交流哦～",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UYK2afR#O}tl~SxtNrNH$kE2EL=|Kab;$*Rl",
+              "naturalPrompts": "harukav2 style, a female with short wavy blonde hair lime green eyes freckles wearing green sleeveless dress with white belt with green knee high boots, happy, wink, pointing at viewer, heart, simple background, green background",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459531768781",
+                "1941984459628239862",
+                "1941984459573714238",
+                "1941984459531769135",
+                "1941984459603073733",
+                "1941984459565322446",
+                "1941984459565322395",
+                "1941984459569518236",
+                "1941984459561130127",
+                "1941984459632431118",
+                "1941984459783426381",
+                "1941984459598880612",
+                "1941984459577906605",
+                "1941984459561130531",
+                "1941984459632431511",
+                "1941984459565322252",
+                "1941984459594686184",
+                "1941984459628239427",
+                "1941984459577905246",
+                "1941984459561130691",
+                "1941984459577905386",
+                "1941984459733094811",
+                "1941984459565322839",
+                "1941984459586297558",
+                "1941984459573714936",
+                "1941984459707932426",
+                "1941984459603073191",
+                "1941984459913450293"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Mar 25 2026 01:08:30 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "2 years",
+                "age play",
+                "ass",
+                "baby",
+                "ball gag",
+                "booty",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "cum",
+                "doggystyle",
+                "erotic",
+                "exhibitionism",
+                "futanari",
+                "horny",
+                "horror",
+                "kid",
+                "late teen",
+                "little girl",
+                "loli",
+                "lolicon",
+                "milf",
+                "minor",
+                "moaning",
+                "naked",
+                "negro",
+                "nipples",
+                "nsfw",
+                "nude",
+                "open front",
+                "oral",
+                "panties",
+                "pelvic",
+                "penis",
+                "pregnancy",
+                "pregnant",
+                "pubic",
+                "pussy",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "sex",
+                "shirt lift",
+                "shota",
+                "small girl",
+                "spread legs",
+                "teenager",
+                "tied up",
+                "topless",
+                "upskirt",
+                "vagina",
+                "vaginal",
+                "very young",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1992888244346060302",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "amelianasko09",
+              "displayName": "amelianasko09",
+              "createdAt": "2026-03-23T18:36:40.526Z",
+              "updatedAt": null,
+              "avatarMediaId": "702899658344006972",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/3db8c009-2cb8-4290-9fd6-27cdac4a6146",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6nMkVoWYf2kc2VlZACkc29ydJLLQHhNY9xIatOzMTk5MzM0OTIzNDc0MTg5NTY3Nw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992367832412431983",
+            "title": "Spring Uraraka Ochako 9 🩷",
+            "authorId": "1778748738602810692",
+            "prompts": "character: uraraka_ochaco, harukav2 style, uraraka ochako, brown eyes, sidelocks, bob cut, short\n  hair, blush stickers, red polka dot dress, skirt, cute, smile, spring, cherry blossoms,\n  sunny, day, outdoors, 1girl, solo,harukav2 style",
+            "createdAt": "2026-03-22T08:08:44.850Z",
+            "updatedAt": "2026-03-22T08:08:46.823Z",
+            "mediaId": "702067609384290463",
+            "media": {
+              "id": "702067609384290463",
+              "type": "IMAGE",
+              "width": 992,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/4de9e1bb-8cac-4bcf-ba71-5939a393faba",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/4de9e1bb-8cac-4bcf-ba71-5939a393faba",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/4de9e1bb-8cac-4bcf-ba71-5939a393faba",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.589,
+                "y": 0.311
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UXLWV7ZkCQ-UO_k.$.oyNyrdv$V],@oHtMIU",
+              "naturalPrompts": "uraraka ochako, brown eyes, sidelocks, bob cut, short hair, blush stickers, red polka dot dress, skirt, cute, smile, spring, cherry blossoms, sunny, day, outdoors, 1girl, solo,harukav2 style",
+              "taskProcessType": "normal",
+              "moderationMachine": "Sun Mar 22 2026 08:08:46 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "baby",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "erotic",
+                "futanari",
+                "girl on top",
+                "hardcore",
+                "horror",
+                "jailbait",
+                "kinky",
+                "little boy",
+                "loli",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "nympho",
+                "orgasm",
+                "panties",
+                "panty",
+                "pussy",
+                "seductive",
+                "sex",
+                "slut",
+                "small girl",
+                "teenager",
+                "tied up",
+                "tits",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1778748738602810692",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "yoloswagger69",
+              "displayName": "YoloBaller04",
+              "createdAt": "2024-08-09T20:42:43.833Z",
+              "updatedAt": null,
+              "avatarMediaId": "670882150446870962",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/ed124a36-698f-4940-b126-33b4865cdaa8",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6ZP/NDbpm+kc2VlZACkc29ydJLLQHhLAYP5HmSzMTk5MjM2NzgzMjQxMjQzMTk4Mw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992335456316564944",
+            "title": "Happy 13th Anniversary 2.0",
+            "authorId": "1671423310860654140",
+            "prompts": ", , , 1girl, Relum Rollot, masterpiece, best quality, ultra-detailed,\n  (very aesthetic:1.4), absurdres, aqua blue eyes, silver hair with aqua blue tips,\n  long hair, ahoge, hair between eyes, anime screencap, anime coloring, clear outline anime style coloring, overall whitish silver hair with aqua blue tips, overall white witch hat with blue brim and aqua blue crystal attached to the tip, open blue cropped jacket with wide sleeves rolled up and gold trim, both arms visible up to elbows, under the blue jacket is a closed long jacket in white and blue with gold trim hanging down to the skirt hem, aqua blue necktie, aqua blue skirt with multiple white flower-like marks, gold trim overall, white frills at the hem, thighs and knees visible, rolled-up hem, pointed toe blue boots, heart-shaped accessory, low teen with small but noticeable bust, slim waist, unnoticeable hips body shape, holding a golden staff in right hand with magical glowing aura gathering and aqua blue orb at center glowing, left hand raised beside face in peace sign, left knee bent standing only on right foot, glamorous party venue with white and gold walls, large white banner written \"Happy\n  13th Anniversary\", buffet table with chicken cake and cocktails, artificial light, mouth open wide with upper teeth visible lower teeth not visible smile, round eyes happy expression, one eye wink, 60 degree diagonal from above angle,harukav2\n  style",
+            "createdAt": "2026-03-22T06:00:05.794Z",
+            "updatedAt": "2026-03-22T06:04:22.585Z",
+            "mediaId": "702034398281237452",
+            "media": {
+              "id": "702034398281237452",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/674e2bc3-afa8-4f74-b92e-fd005b98f7d3",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/674e2bc3-afa8-4f74-b92e-fd005b98f7d3",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/674e2bc3-afa8-4f74-b92e-fd005b98f7d3",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.559,
+                "y": 0.294
+              },
+              "description": "An imitated illustration of Relum Rollot, an iconic character of Quiz RPG: The World of Mystic Wiz!",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UJKxC,?tx8%ztkyWt1M{}lM{D+ic-:]isqE1",
+              "naturalPrompts": "1girl, Relum Rollot, masterpiece, best quality, ultra-detailed, (very aesthetic:1.4), absurdres, aqua blue eyes, silver hair with aqua blue tips, long hair, ahoge, hair between eyes, anime screencap, anime coloring, くっきりとした輪郭線のアニメスタイルの色塗り、全体的に白みがかった銀髪で毛先がアクアブルー、全体的に白色でつばの部分がブルーで先端に水色のクリスタルがくっついた魔女の帽子、金で縁取りされワイドな袖で袖がまくられている開いたブルーのクロップドジャケット、両腕の肘までが見えている状態、ブルーのジャケットの下から見えるのは金で縁取りされスカートのすそまで垂れ下がった白色と青色の閉じたロングジャケット、水色のネッカチーフ、全体は金で縁取りされ白い花のようなマークが複数つき裾には白いフリルがついている水色のスカート、太ももから膝までが見えている状態、裾がまくられたようになっており爪先が尖った青色のブーツ、ハート形のアクセサリー、ローティーンでバストは小ぶりだが目立ちウエストは細くヒップは目立たない体形、右手で金色の杖を持ち魔法的な光るオーラが集まり杖の中心の水色の球が光っている、左手を顔の横に挙げたピースサイン、左足の膝を曲げて右足のみを地面につけて立っている状態、白と金色の壁を持つきらびやかなパーティー会場、\"Happy 13th Anniversary\"と書かれた白い大きな垂れ幕、チキンやケーキやカクテルが乗ったバイキングテーブル、人工的な光、大き目に口を開き上側の歯が見え下の歯は見えない笑顔、真ん丸な目で幸せな表情、片目をウインク、斜め60度上からのアングル,harukav2 style",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459573714238",
+                "1941984459603073733",
+                "1941984459598880616",
+                "1941984459619848768",
+                "1941984459640821699",
+                "1941984459561130127",
+                "1941984459561130570",
+                "1941984459586294001",
+                "1941984459561129873",
+                "1941984459569518309",
+                "1941984459569518296",
+                "1941984459531768219",
+                "1941984459615655908",
+                "1941984459535963979",
+                "1941984459561130531",
+                "1941984459586297312",
+                "1941984459569518849",
+                "1941984459565322252",
+                "1941984459682766529",
+                "1941984459619851858",
+                "1941984459565322638",
+                "1941984459603073683",
+                "1941984459577905650",
+                "1941984459577906116",
+                "1941984460030890518"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sun Mar 22 2026 06:00:06 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "7 years",
+                "adolescent",
+                "ass",
+                "babe",
+                "baby",
+                "bondage",
+                "booty",
+                "breast",
+                "breasts",
+                "bust",
+                "cameltoe",
+                "child",
+                "cunnilingus",
+                "diaper",
+                "futanari",
+                "hardcore",
+                "horror",
+                "jailbait",
+                "kid",
+                "little girl",
+                "loli",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "nipples",
+                "nsfw",
+                "nude",
+                "panties",
+                "panty",
+                "pelvic",
+                "penis",
+                "seductive",
+                "see through",
+                "sex",
+                "shirt lift",
+                "teenager",
+                "tied up"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 2,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1671423310860654140",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1671423310860654140",
+              "displayName": "Usoneko / 嘘猫",
+              "createdAt": "2023-10-18T16:49:47.849Z",
+              "updatedAt": null,
+              "avatarMediaId": "566804803376137999",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/6dd7a042-dcfa-4d6b-a3d9-10a5855237b6",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940081212683275405",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T01:20:23.070Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-29T01:22:10.594Z",
+                  "createdAt": "2025-10-29T01:20:23.070Z",
+                  "userId": "1671423310860654140",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1940081412973484238",
+                  "decorationId": "1934782442537681111",
+                  "decoration": {
+                    "id": "1934782442537681111",
+                    "code": "anniversary_3rd_artwork_frame_gacha_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Eclipse Kiss"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "日蝕之吻"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "エクリプスキス"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "이클립스 키스"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 323,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "3E3E3E"
+                          },
+                          {
+                            "position": 16,
+                            "colorType": "RRGGBB",
+                            "colorValue": "534447"
+                          },
+                          {
+                            "position": 30,
+                            "colorType": "RRGGBB",
+                            "colorValue": "EE8997"
+                          },
+                          {
+                            "position": 46,
+                            "colorType": "RRGGBB",
+                            "colorValue": "E06D8D"
+                          },
+                          {
+                            "position": 62,
+                            "colorType": "RRGGBB",
+                            "colorValue": "F898B3"
+                          },
+                          {
+                            "position": 81,
+                            "colorType": "RRGGBB",
+                            "colorValue": "8F5E5E"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "535353"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:24:57.821Z",
+                    "updatedAt": "2025-10-14T10:24:57.821Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T01:21:10.822Z",
+                  "obtainedFrom": "Anniversary2025 progress reward p20",
+                  "updatedAt": "2025-10-29T01:21:33.958Z",
+                  "createdAt": "2025-10-29T01:21:10.822Z",
+                  "userId": "1671423310860654140",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1963121562102897286",
+                  "decorationId": "1962567829327944749",
+                  "decoration": {
+                    "id": "1962567829327944749",
+                    "code": "newyear_2026_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Blessing Flight"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "祝福之翼"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "鶴の舞い"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "축복의 비행"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/b98bd205-0826-4fde-8c11-018995260bdf"
+                    },
+                    "createdAt": "2025-12-30T02:34:10.259Z",
+                    "updatedAt": "2025-12-30T02:34:55.897Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-31T15:14:30.440Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2025-12-31T15:14:31.915Z",
+                  "createdAt": "2025-12-31T15:14:30.440Z",
+                  "userId": "1671423310860654140",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6YyiqsqJdCkc2VlZACkc29ydJLLQHhHKASWZ7azMTk5MjMzNTQ1NjMxNjU2NDk0NA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992874829187527311",
+            "title": "Bleu girl",
+            "authorId": "1778840378887257910",
+            "prompts": "character: otomachi_una, a blue-haired girl with black streaks walking in a lake of stars passing around, with very long dark tunics with a white scepter in hand, harukav2 style, environmental details, slight depth of field, atmospheric perspective, balanced composition,",
+            "createdAt": "2026-03-23T17:43:22.304Z",
+            "updatedAt": "2026-03-23T17:43:23.328Z",
+            "mediaId": "702574342506694262",
+            "media": {
+              "id": "702574342506694262",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/1df5a36f-3cde-4c99-b9b6-2b36639cd92b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/1df5a36f-3cde-4c99-b9b6-2b36639cd92b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/1df5a36f-3cde-4c99-b9b6-2b36639cd92b",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.539,
+                "y": 0.218
+              },
+              "description": "an unexpected result",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "US8=,6kXT#kXqtjYMbt7O;WAR}s;ivWAnmWA",
+              "naturalPrompts": "una chica de cabello azulado con mechones negros caminado en un lago de estrellas pasando alrededor, con tunicas oscuras muy largas con un cetro blanco en la mano,harukav2 style,environmental details,slight depth of field,atmospheric perspective,balanced composition,",
+              "suggestedTacks": [
+                "1941984459565325718",
+                "1941984459787623065",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459598880616",
+                "1941984459640821699",
+                "1941984459561130127",
+                "1941984459565322816",
+                "1941984459561130570",
+                "1941984459565322686",
+                "1941984459640822575",
+                "1941984459527573683",
+                "1941984459569518253",
+                "1941984459569518309",
+                "1941984459531768219",
+                "1941984459598877415",
+                "1941984459561130531",
+                "1941984459569517872",
+                "1941984459561130567",
+                "1941984459594686184",
+                "1941984459632431326",
+                "1941984459586293996",
+                "1941984459535964013",
+                "1941984459632435031",
+                "1941984459611459944",
+                "1941984459590489013",
+                "1941984459615656510",
+                "1941984459720515109",
+                "1941984459577905272",
+                "1941984459645017408",
+                "1941984459661792221",
+                "1941984459993145280",
+                "1941984460030890518"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Mon Mar 23 2026 17:43:23 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "baby",
+                "breast",
+                "breasts",
+                "bust",
+                "cum",
+                "futanari",
+                "handjob",
+                "horror",
+                "little boy",
+                "loli",
+                "negro",
+                "newborn",
+                "nsfw",
+                "nude",
+                "panties",
+                "penis",
+                "schoolboy",
+                "seductive"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1778840378887257910",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1778840378887257910",
+              "displayName": "Kairen Crim",
+              "createdAt": "2024-08-10T02:46:52.580Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6gdGTOKMo+kc2VlZACkc29ydJLLQHhC8b70nPWzMTk5Mjg3NDgyOTE4NzUyNzMxMQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993217234968631001",
+            "title": "Sophie (power battle watch car)",
+            "authorId": "1977531430922182012",
+            "prompts": "1girl,solo,young girl,purple hair,long hair,forehead,parted bangs,twintails,high twintails,skull ornament hair,pink eyes,Princess dress,pink dress,puffy short sleeves,pink skirt,white petticoat,pink wristwatch,purple footwear,pink background,harukav2 style,",
+            "createdAt": "2026-03-24T16:23:58.220Z",
+            "updatedAt": "2026-03-24T16:24:00.847Z",
+            "mediaId": "702917120390483950",
+            "media": {
+              "id": "702917120390483950",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/e49ea5fb-bbe9-4d58-91d6-f52f5627e1bb",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/e49ea5fb-bbe9-4d58-91d6-f52f5627e1bb",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/e49ea5fb-bbe9-4d58-91d6-f52f5627e1bb",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.446,
+                "y": 0.342
+              },
+              "description": "SOPHIE FROM POWER BATTLE WATCH CAR",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UONbQV4.HZR%4@xuNqJ5M1-pv}RP=hf9%MgM",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 16:24:00 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "baby",
+                "breasts",
+                "milf",
+                "nude",
+                "nudity",
+                "seductive"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 10,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1977531430922182012",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-197753143092218",
+              "displayName": "Fourseason ",
+              "createdAt": "2026-02-09T09:34:10.890Z",
+              "updatedAt": null,
+              "avatarMediaId": "687238075566266149",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/d9fd7fb5-363f-484e-a327-af5b11a0f1b4",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6lUg8J91tmkc2VlZACkc29ydJLLQHg/eT3Zf2OzMTk5MzIxNzIzNDk2ODYzMTAwMQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992659071974516070",
+            "title": "Dark Knight",
+            "authorId": "1777117947254822476",
+            "prompts": ", , , masterpiece, 1girl, solo, starry sky, night sky, lush forest, dark\n  forest, dirt path, black dirt, outdoors, standing, front view, straight on, facing\n  viewer, looking at viewer, centered, red eyes, symmetrical face, symmetrical eyes,\n  perfect eyes, symmetrical eyelashes, perfectly aligned eyelashes, balanced eyes,\n  black hair, straight hair, twintails, high twintails, (very long twintails:1.5),\n  knee-length twintails, extremely long twintails, bangs, hair between eyes, closed\n  mouth, hair tie, knight, black bodysuit, latex bodysuit, high neck undershirt, long\n  sleeves, black armor, black cuirass, solid breastplate, shoulder armor, black pauldrons,\n  black gauntlets, symmetrical, symmetrical legs, perfect symmetry, black cuisses,\n  black thigh armor, matching leg armor, balanced armor, tight black latex gloves,\n  skin-tight gloves, gem, solid cape, one-piece cape, simple cape, draped cape, long\n  cape, floor-length cape, ankle-length cape, uncut hem, smooth edges, single piece\n  of fabric, wide cape, heavy cape, red cape, (bastard sword:1.3), red sword, holding\n  (one sword:1.5), single sword, only one blade, unsheathed sword, holding a bare\n  sword, gripping sword handle, firmly holding sword, (holding sword in right hand:1.4),\n  (right hand:1.2), sword in right hand, wielding sword with right hand, holding sword\n  at waist level, sword at side, low guard stance, left arm down, (left arm behind\n  back:1.2), left hand behind back, (clenched fist:1.3), (5 fingers:1.5), (five fingers\n  per hand:1.3), (perfect hands:1.2), artist: patzzi, artist: tianliang_duohe_fangdongye,\n  artist: ratatatat74, artist: nekometaru, artist: konya_karasue, bright eyes, artist:\n  reddizen, artist: channel, vibrant colors, Aegyo sal, ((artist: patzzi)), (artist:\n  tianliang_duohe_fangdongye), ((artist: ratatatat74)), (artist: nekometaru), (artist:\n  konya_karasue), (bright eyes), ((artist: reddizen)), (artist:channel), vibrant colors,\n  (Aegyo sal), masterpiece,((artist: patzzi)),(artist: tianliang_ duohe_fangdongye),((artist:\n  ratatatat74)),(artist: nekometaru),(artist: konya _karasue),(bright eyes),((artist:\n  reddizen)),(artist:channel),vibrant colors,(Aegyo sal),harukav2 style,",
+            "createdAt": "2026-03-23T03:26:01.680Z",
+            "updatedAt": "2026-03-23T03:26:02.848Z",
+            "mediaId": "702359422494083398",
+            "media": {
+              "id": "702359422494083398",
+              "type": "IMAGE",
+              "width": 1024,
+              "height": 1024,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/61276b38-aceb-434b-80d6-e652523ffa60",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/61276b38-aceb-434b-80d6-e652523ffa60",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/61276b38-aceb-434b-80d6-e652523ffa60",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UL9Z{Fn+RhS#PXW=Rgs.OtfkI,WVi~WV#kWA",
+              "naturalPrompts": "masterpiece, 1girl, solo, starry sky, night sky, lush forest, dark forest, dirt path, black dirt, outdoors, standing, front view, straight on, facing viewer, looking at viewer, centered, red eyes, symmetrical face, symmetrical eyes, perfect eyes, symmetrical eyelashes, perfectly aligned eyelashes, balanced eyes, black hair, straight hair, twintails, high twintails, (very long twintails:1.5), knee-length twintails, extremely long twintails, bangs, hair between eyes, closed mouth, hair tie, knight, black bodysuit, latex bodysuit, high neck undershirt, long sleeves, black armor, black cuirass, solid breastplate, shoulder armor, black pauldrons, black gauntlets, symmetrical, symmetrical legs, perfect symmetry, black cuisses, black thigh armor, matching leg armor, balanced armor, tight black latex gloves, skin-tight gloves, gem, solid cape, one-piece cape, simple cape, draped cape, long cape, floor-length cape, ankle-length cape, uncut hem, smooth edges, single piece of fabric, wide cape, heavy cape, red cape, (bastard sword:1.3), red sword, holding (one sword:1.5), single sword, only one blade, unsheathed sword, holding a bare sword, gripping sword handle, firmly holding sword, (holding sword in right hand:1.4), (right hand:1.2), sword in right hand, wielding sword with right hand, holding sword at waist level, sword at side, low guard stance, left arm down, (left arm behind back:1.2), left hand behind back, (clenched fist:1.3), (5 fingers:1.5), (five fingers per hand:1.3), (perfect hands:1.2), artist: patzzi, artist: tianliang_duohe_fangdongye, artist: ratatatat74, artist: nekometaru, artist: konya_karasue, bright eyes, artist: reddizen, artist: channel, vibrant colors, Aegyo sal, ((artist: patzzi)), (artist: tianliang_duohe_fangdongye), ((artist: ratatatat74)), (artist: nekometaru), (artist: konya_karasue), (bright eyes), ((artist: reddizen)), (artist:channel), vibrant colors, (Aegyo sal), masterpiece,((artist: patzzi)),(artist: tianliang_ duohe_fangdongye),((artist: ratatatat74)),(artist: nekometaru),(artist: konya _karasue),(bright eyes),((artist: reddizen)),(artist:channel),vibrant colors,(Aegyo sal),harukav2 style,",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459569518218",
+                "1941984459640821699",
+                "1941984459565322469",
+                "1941984459561130205",
+                "1941984459565322686",
+                "1941984459527573683",
+                "1941984459573713573",
+                "1941984459565322621",
+                "1941984459561130567",
+                "1941984459577905679",
+                "1941984459607269207",
+                "1941984459603072603",
+                "1941984459842147370",
+                "1941984459611459944",
+                "1941984459720515109",
+                "1941984459577906601",
+                "1941984459615656675",
+                "1941984459686957280",
+                "1941984459636627172",
+                "1941984459586294193",
+                "1941984460026699685"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Mon Mar 23 2026 03:26:02 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "bondage",
+                "breast",
+                "breasts",
+                "horror",
+                "late teen",
+                "sex",
+                "topless",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 2,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1777117947254822476",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1777117947254822476",
+              "displayName": "브레이커",
+              "createdAt": "2024-08-05T08:42:32.877Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6dY3k+AJWakc2VlZACkc29ydJLLQHg568QI2O2zMTk5MjY1OTA3MTk3NDUxNjA3MA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992971395444430344",
+            "title": "OC - Iris Jones",
+            "authorId": "1910181457449162213",
+            "prompts": "harukav2 style, 1girl, orange hair, wavy hair, medium hair, closed eyes, open mouth, happy, jumping, full body, white shirt, jeans, sneakers, harukav2 style",
+            "createdAt": "2026-03-24T00:07:06.234Z",
+            "updatedAt": "2026-03-24T00:55:09.797Z",
+            "mediaId": "702671285670935402",
+            "media": {
+              "id": "702671285670935402",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/1b0955eb-a649-452d-90f7-9eb4411fed28",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/1b0955eb-a649-452d-90f7-9eb4411fed28",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/1b0955eb-a649-452d-90f7-9eb4411fed28",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UZOdd~9v@?}T}T-8NcJ.m,oLTKS~rWOEX8s,",
+              "naturalPrompts": "1girl, orange hair, wavy hair, medium hair, closed eyes, open mouth, happy, jumping, full body, white shirt, jeans, sneakers,harukav2 style,",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459573714238",
+                "1941984459531769135",
+                "1941984459603073733",
+                "1941984459615656564",
+                "1941984459728902767",
+                "1941984459640822575",
+                "1941984459607268141",
+                "1941984459632431176",
+                "1941984459858926275",
+                "1941984459569518275",
+                "1941984459561130017",
+                "1941984459531769415",
+                "1941984459603073173",
+                "1941984461264017638",
+                "1941984459921841642",
+                "1941984459573713671",
+                "1941984459582101729",
+                "1941984459812789099"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 00:55:09 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "bondage",
+                "breast",
+                "breasts",
+                "horror",
+                "loli",
+                "naked",
+                "negro",
+                "nude",
+                "penis",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "shirt lift",
+                "shota",
+                "strap on",
+                "teenager",
+                "vagina",
+                "young adult",
+                "youngster"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1910181457449162213",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "cendrillon",
+              "displayName": "Ayla",
+              "createdAt": "2025-08-07T13:09:25.912Z",
+              "updatedAt": null,
+              "avatarMediaId": "692830124537168220",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/f370e2d4-edc8-437a-9ccb-0246f54033f9",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940061454774124465",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T00:01:52.416Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-29T00:02:10.155Z",
+                  "createdAt": "2025-10-29T00:01:52.416Z",
+                  "userId": "1910181457449162213",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1967457941709886721",
+                  "decorationId": "1962567829327944749",
+                  "decoration": {
+                    "id": "1962567829327944749",
+                    "code": "newyear_2026_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Blessing Flight"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "祝福之翼"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "鶴の舞い"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "축복의 비행"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/b98bd205-0826-4fde-8c11-018995260bdf"
+                    },
+                    "createdAt": "2025-12-30T02:34:10.259Z",
+                    "updatedAt": "2025-12-30T02:34:55.897Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-01-12T14:25:43.904Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2026-01-12T14:25:44.213Z",
+                  "createdAt": "2026-01-12T14:25:43.904Z",
+                  "userId": "1910181457449162213",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6h07Mj61gikc2VlZACkc29ydJLLQHg2I2OyVwCzMTk5Mjk3MTM5NTQ0NDQzMDM0NA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993130185152844021",
+            "title": "Expressive Girl in a Red Hoodie",
+            "authorId": "1992888244346060302",
+            "prompts": ", , harukav2 style, Short shoulder length hair, messy black hair, yellow eyes, tsundere, light blush, arms crossing, red hoodie, jeans, standing, upper body, illerstation, red simple background, white outline, female, petite",
+            "createdAt": "2026-03-24T10:38:03.889Z",
+            "updatedAt": "2026-03-24T10:38:04.804Z",
+            "mediaId": "702830061118062611",
+            "media": {
+              "id": "702830061118062611",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/6a3291f3-3842-4f76-b073-b15f6e495093",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/6a3291f3-3842-4f76-b073-b15f6e495093",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/6a3291f3-3842-4f76-b073-b15f6e495093",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.572,
+                "y": 0.279
+              },
+              "description": "I'm really captivated by this character's somewhat edgy yet relatable vibe. Her expressive eyes and subtle blush make me feel like I know her personally, which I absolutely adore. If you feel the same way, please like, follow, and share your thoughts in the comments—I'll be creating more just like this soon!",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "USMqSS]Q|GK5%fSNn5of7MX7+[r?#7ogOraK",
+              "naturalPrompts": "harukav2 style, Short shoulder length hair, messy black hair, yellow eyes, tsundere, light blush, arms crossing, red hoodie, jeans, standing, upper body, illerstation, red simple background, white outline, female, petite",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459628239862",
+                "1941984459531769135",
+                "1941984459565322446",
+                "1941984459565322395",
+                "1941984459569518218",
+                "1941984459808592822",
+                "1941984459598880631",
+                "1941984459632431176",
+                "1941984459800205481",
+                "1941984459569517416",
+                "1941984459573713926",
+                "1941984459720515480",
+                "1941984459531769415",
+                "1941984459577906561",
+                "1941984459741486992",
+                "1941984459573713671",
+                "1941984459603073366"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 10:38:04 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "baby",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "horny",
+                "horror",
+                "loli",
+                "moaning",
+                "naked",
+                "nipple",
+                "nsfw",
+                "panties",
+                "panty",
+                "pelvic",
+                "pubic",
+                "seductive",
+                "see through",
+                "sex",
+                "shit",
+                "shota",
+                "stripper",
+                "suck",
+                "teenager",
+                "topless"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1992888244346060302",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "amelianasko09",
+              "displayName": "amelianasko09",
+              "createdAt": "2026-03-23T18:36:40.526Z",
+              "updatedAt": null,
+              "avatarMediaId": "702899658344006972",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/3db8c009-2cb8-4290-9fd6-27cdac4a6146",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6kFV+Uk0PWkc2VlZACkc29ydJLLQHg1Ol41P32zMTk5MzEzMDE4NTE1Mjg0NDAyMQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993207927503218677",
+            "title": "Pink-haired Girl in a White Dress",
+            "authorId": "1855464333317289073",
+            "prompts": "character: yuzuriha_inori, harukav2 style, yuzuriha inori, 1girl, solo, holding, hair ornament, dress, red eyes, bare shoulders, standing, pink hair, food, indoors, off shoulder, buttons, table, double-breasted, fork, holding fork,harukav2 style,",
+            "createdAt": "2026-03-24T15:46:59.052Z",
+            "updatedAt": "2026-03-24T15:47:00.000Z",
+            "mediaId": "702577356487411179",
+            "media": {
+              "id": "702577356487411179",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/498a4dd1-2884-4298-9c97-61366751808e",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/498a4dd1-2884-4298-9c97-61366751808e",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/498a4dd1-2884-4298-9c97-61366751808e",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.545,
+                "y": 0.27
+              },
+              "description": "I find myself captivated by this beautiful pink-haired girl, whose gentle yet intriguing expression draws me in. Her elegant dress and the subtle details make her so charming, I can’t help but feel a warm connection to her. If you enjoy this kind of art, please like, follow, and share your thoughts in the comments—more adorable characters are coming soon!",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UWKd0$IU0J-pn3R-ELtRE1M|WBNHtl$$rqof",
+              "naturalPrompts": "yuzuriha inori, 1girl, solo, holding, hair ornament, dress, red eyes, bare shoulders, standing, pink hair, food, indoors, off shoulder, buttons, table, double-breasted, fork, holding fork,harukav2 style,",
+              "suggestedTacks": [
+                "1941984459628239500",
+                "1941984459712124537",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459531768781",
+                "1941984459628239862",
+                "1941984459619848768",
+                "1941984459640821699",
+                "1941984459565322469",
+                "1941984459561130127",
+                "1941984459808592822",
+                "1941984459561130205",
+                "1941984459628239853",
+                "1941984459783426381",
+                "1941984459527573683",
+                "1941984459603072559",
+                "1941984459569518281",
+                "1941984459632431594",
+                "1941984459569517872",
+                "1941984459569518849",
+                "1941984459645017201",
+                "1941984459569518545",
+                "1941984459632431313",
+                "1941984459628239840",
+                "1941984459628239891",
+                "1941984459993144779",
+                "1941984459775039428",
+                "1941984459850538882",
+                "1941984459699541408",
+                "1941984459653404826",
+                "1941984459821175805"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 15:46:59 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "loli",
+                "penis"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1855464333317289073",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1855464333317289073",
+              "displayName": "อริสา มณีรัตน์",
+              "createdAt": "2025-03-09T13:23:06.924Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6lMDLJSZ/Wkc2VlZACkc29ydJLLQHgzP+XJHRWzMTk5MzIwNzkyNzUwMzIxODY3Nw==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993084803000646445",
+            "title": "挽歌版くにおっぽいの",
+            "authorId": "1879991643958303471",
+            "prompts": "harukav2 style, amazing quality, 8k, insanely detailed anime style illustration, dramatic and luminous ethereal aesthetic. The film grain, blended with the fluid colors, adds an emotional texture. Adjacent materials do not blend together. \n[character]: a teenage high school boy is slender but muscular.\n[hair style]: light brown hair is aipaa hairstyle, iron-pressed hair. (tight sides:1.2), Triangular pointed bangs that (stick out:1.2), (pressed flat top:1.3), smooth sleek hair, slicked-back hair, (straight and flat back hair:1.5), (no hair flipping at the nape:1.4), hair follows the contour of the neck, gravity-defying flat back.\n[Eyes and Eyebrows]: His thick light brown eyebrows and sharp ligh brown eyes are particularly noticeable.\n\nHe is wearing white long sleeved cropped-length gakuran, showing the belt line with broad padded shoulders, structured. \nHigh-waisted  white wide trousers with deep double pleats, loose and baggy silhouette.\ngray socks, white loafers.\n\n[skin & body]: (Matte skin:0.8), (dynamic anatomical tension:1.3), (extreme kinetic articulation:1.2), precise limb separation, weight distribution, no merged limbs. \n[Hands, Fingers & Nails]:\n(Hands: Perfectly anatomical, exact length of five fingers and articulated:1.2). (strong and thick fingers:0.6). The finger joints are (bony and prominent:0.8), while the finger pads are firm and calloused. Nails: short, neatly trimmed nails. \n\n[Action & Expression]: top-down View.\nSpread legs with squatting pose, arms on knees. Heels are on the ground. looking up at viwer with sharp glaring eyes.\n\n[Background]: In front of the dilapidated school gate, the school building is visible in the background.\n",
+            "createdAt": "2026-03-24T07:37:43.928Z",
+            "updatedAt": "2026-03-24T07:38:21.547Z",
+            "mediaId": "702784484921609055",
+            "media": {
+              "id": "702784484921609055",
+              "type": "IMAGE",
+              "width": 960,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/476f00d3-d126-45bd-998d-76547c7e7b09",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/476f00d3-d126-45bd-998d-76547c7e7b09",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/476f00d3-d126-45bd-998d-76547c7e7b09",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 74,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "でぃすいず、とらでぃしぃおなる、じゃぱにいず、うんこすわり",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UKK-h5tR?^s._NaytRRP-SWCNIMx-pWBWYWV",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 07:37:45 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "Spread legs",
+                "breast",
+                "breasts",
+                "erotic",
+                "hentai",
+                "loli",
+                "milf",
+                "minor",
+                "nipples",
+                "seductive",
+                "sex",
+                "spread legs",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 9,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1879991643958303471",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "ddada",
+              "displayName": "dac dda",
+              "createdAt": "2025-05-16T05:45:53.476Z",
+              "updatedAt": null,
+              "avatarMediaId": "632830595619804964",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/dc66eb7d-0f2f-4e56-8aec-6ce4cea06172",
+              "membership": {
+                "membershipId": "membership-premium-v2",
+                "tier": 3,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6jcEYoVOy2kc2VlZACkc29ydJLLQHgvnA6+36SzMTk5MzA4NDgwMzAwMDY0NjQ0NQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993341869564137842",
+            "title": "体操着レオタード＃339",
+            "authorId": "1975602807695598897",
+            "prompts": "((high_quality)), ((Super_Detailed)),  , harukav2 style, 2girls, round breasts, bouncing breasts, looking at viewer, average build, (Running:1.3), arms up, laughing, masterpiece, low angle, (detailed pupil eyes:1.4), (round eyes:1.4), (masterpiece, top quality:1.2), (smile:1.4), open mouth,random eye color, (dynamic eye color:1.1), (dutch angle1.3), dynamic angle, Japanese gym uniform (leotard style:1.3), short sleeves leotard, highleg, white leotard with blue lines, in school gymnasium,  detailed background, random background, (sports festival:1.3), highly detailed,",
+            "createdAt": "2026-03-25T00:39:13.473Z",
+            "updatedAt": "2026-03-25T00:40:06.177Z",
+            "mediaId": "701422139626517820",
+            "media": {
+              "id": "701422139626517820",
+              "type": "IMAGE",
+              "width": 1536,
+              "height": 864,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/b652af5f-e5b0-4727-9bd0-93d332073c0a",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/b652af5f-e5b0-4727-9bd0-93d332073c0a",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/b652af5f-e5b0-4727-9bd0-93d332073c0a",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.764,
+                "y": 0.234
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UFOV_p;J:|My4.%~DjVXWR.8.SIo%~tRt-kX",
+              "naturalPrompts": "2girls, round breasts, bouncing breasts, looking at viewer, average build, (Running:1.3), arms up, laughing, masterpiece, low angle, (detailed pupil eyes:1.4), (round eyes:1.4), (masterpiece, top quality:1.2), (smile:1.4), open mouth,random eye color, (dynamic eye color:1.1), (dutch angle1.3), dynamic angle, Japanese gym uniform (leotard style:1.3), short sleeves leotard, highleg, white leotard with blue lines, in school gymnasium,  detailed background, random background, (sports festival:1.3), highly detailed,",
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Mar 25 2026 00:39:15 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "14 years",
+                "age play",
+                "ass",
+                "baby",
+                "bdsm",
+                "big breasts",
+                "bondage",
+                "booty",
+                "bouncing breasts",
+                "breast",
+                "breasts",
+                "bust",
+                "cameltoe",
+                "child",
+                "cunt",
+                "doggystyle",
+                "ecchi",
+                "fellatio",
+                "fuck",
+                "horror",
+                "kid",
+                "late teen",
+                "little girl",
+                "loli",
+                "middle school",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "newborn",
+                "nipple",
+                "nipples",
+                "nsfw",
+                "nude",
+                "nudity",
+                "open front",
+                "oral",
+                "orgasm",
+                "panties",
+                "pelvic",
+                "penis",
+                "pregnancy",
+                "pregnant",
+                "pussy",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "sex",
+                "sexual",
+                "slingshot",
+                "small girl",
+                "small male",
+                "spread legs",
+                "teenager",
+                "tied up",
+                "tits",
+                "topless",
+                "vulva"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1975602807695598897",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1975602807695598897",
+              "displayName": "nisepony",
+              "createdAt": "2026-02-04T01:50:31.280Z",
+              "updatedAt": null,
+              "avatarMediaId": "685530084439801017",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/f18610bd-f69f-4509-ae09-6f310d9627d2",
+              "membership": {
+                "membershipId": "membership-premium-v2",
+                "tier": 3,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1991535758445858041",
+                  "decorationId": "1988388766284596331",
+                  "decoration": {
+                    "id": "1988388766284596331",
+                    "code": "aprilfools_2026_badge_culmulative_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "The Joker’s Ace"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "百變王牌"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "トリッキージョーカー"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "조커의 에이스"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/75337a84-7a07-4dda-b0ec-94ec1a10bd69",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/1393789f-7f64-438d-9bc7-ec7dbd0a96ea",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/4a17e0d1-1ce5-4563-a6e5-9243e1bec4df",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-03-11T08:37:21.360Z",
+                    "updatedAt": "2026-03-11T08:37:35.026Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-20T01:02:22.759Z",
+                  "obtainedFrom": "aprilFoolsEvent2026:totalPurchased",
+                  "updatedAt": "2026-03-20T01:02:32.768Z",
+                  "createdAt": "2026-03-20T01:02:22.759Z",
+                  "userId": "1975602807695598897",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6nF3oNIkXKkc2VlZACkc29ydJLLQHguo6Kcd5qzMTk5MzM0MTg2OTU2NDEzNzg0Mg==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992112438737190740",
+            "title": "Paladin",
+            "authorId": "1777117947254822476",
+            "prompts": ", , , best quality, masterpiece, , 1girl, solo, grey sky, wasteland,\n  deserted land, barren earth, rocky terrain, cracked ground, front view, straight\n  on, facing viewer, looking at viewer, centered, cowboy shot, long straight hair,\n  very long hair, crossed bangs, white hair, silvery blue hair, (hair over cape:1.4),\n  (hair visible over cloak:1.3), long hair draped over cape, closed mouth, blue eyes,\n  symmetrical face, symmetrical eyes, perfect eyes, symmetrical eyelashes, perfectly\n  aligned eyelashes, balanced eyes, knight, black high neck undershirt, long sleeves,\n  black underwear, female underwear, cotton underwear, pelvic_curtain, silver armor,\n  silver cuirass, blue cape, shoulder armor, symmetry, matching leg armor, balanced\n  armor, black belt, (black leather gloves:1.2), standing, straight sword handle,\n  solid grip, perfectly straight hilt, rigid sword, (bastard sword:1.3), blue sword,\n  holding (one sword:1.5), single sword, only one blade, unsheathed sword, holding\n  a bare sword, gripping sword handle, firmly holding sword, (holding sword in right\n  hand:1.4), (right hand:1.2), sword in right hand, wielding sword with right hand,\n  holding sword at waist level, sword at side, left arm down, (clenched fist:1.3),\n  (5 fingers:1.5), (five fingers per hand:1.3), (perfect hands:1.2), (separated fingers:1.4),\n  clearly defined digits, anatomically correct hands, nice hands, highly detailed\n  fingers,harukav2 style,",
+            "createdAt": "2026-03-21T15:13:54.256Z",
+            "updatedAt": "2026-03-21T15:13:55.209Z",
+            "mediaId": "701812625184946589",
+            "media": {
+              "id": "701812625184946589",
+              "type": "IMAGE",
+              "width": 1024,
+              "height": 1024,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/c15d63be-4923-4d81-bc25-674fdb2addec",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/c15d63be-4923-4d81-bc25-674fdb2addec",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/c15d63be-4923-4d81-bc25-674fdb2addec",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.514,
+                "y": 0.221
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UzIh]in#xut7_NWEbFa$x]ogRjj=ogjYoMjY",
+              "naturalPrompts": "best quality, masterpiece, , 1girl, solo, grey sky, wasteland, deserted land, barren earth, rocky terrain, cracked ground, front view, straight on, facing viewer, looking at viewer, centered, cowboy shot, long straight hair, very long hair, crossed bangs, white hair, silvery blue hair, (hair over cape:1.4), (hair visible over cloak:1.3), long hair draped over cape, closed mouth, blue eyes, symmetrical face, symmetrical eyes, perfect eyes, symmetrical eyelashes, perfectly aligned eyelashes, balanced eyes, knight, black high neck undershirt, long sleeves, black underwear, female underwear, cotton underwear, pelvic_curtain, silver armor, silver cuirass, blue cape, shoulder armor, symmetry, matching leg armor, balanced armor, black belt, (black leather gloves:1.2), standing, straight sword handle, solid grip, perfectly straight hilt, rigid sword, (bastard sword:1.3), blue sword, holding (one sword:1.5), single sword, only one blade, unsheathed sword, holding a bare sword, gripping sword handle, firmly holding sword, (holding sword in right hand:1.4), (right hand:1.2), sword in right hand, wielding sword with right hand, holding sword at waist level, sword at side, left arm down, (clenched fist:1.3), (5 fingers:1.5), (five fingers per hand:1.3), (perfect hands:1.2), (separated fingers:1.4), clearly defined digits, anatomically correct hands, nice hands, highly detailed fingers,harukav2 style,",
+              "suggestedTacks": [
+                "1941984459959587058",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459598880616",
+                "1941984459640821699",
+                "1941984459808592822",
+                "1941984459527573642",
+                "1941984459565322686",
+                "1941984459561129873",
+                "1941984459569518296",
+                "1941984459573714214",
+                "1941984459573713573",
+                "1941984459632431594",
+                "1941984459565322621",
+                "1941984459720515129",
+                "1941984459561130567",
+                "1941984459728902351",
+                "1941984459577905679",
+                "1941984459607269207",
+                "1941984459603072603",
+                "1941984459737291229",
+                "1941984459842147370",
+                "1941984459733098207",
+                "1941984459720515304",
+                "1941984459653404232",
+                "1941984459586294193"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sat Mar 21 2026 15:13:55 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "13-year-old",
+                "4 years",
+                "ass",
+                "baby",
+                "booty",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "creampie",
+                "cum",
+                "doggy style",
+                "doggystyle",
+                "erotic",
+                "female underwear",
+                "femdom",
+                "fucking",
+                "futanari",
+                "horny",
+                "horror",
+                "late teen",
+                "loli",
+                "masturbation",
+                "middle school",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "nudity",
+                "open front",
+                "panties",
+                "panty",
+                "pelvic",
+                "pelvic_curtain",
+                "penis",
+                "pregnancy",
+                "pubic",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "shota",
+                "spread legs",
+                "teenager",
+                "tied up",
+                "tit",
+                "topless",
+                "unclothed",
+                "underwear",
+                "undress",
+                "young adult",
+                "young age"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1777117947254822476",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1777117947254822476",
+              "displayName": "브레이커",
+              "createdAt": "2024-08-05T08:42:32.877Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6VntVeRP1Skc2VlZACkc29ydJLLQHguAt4A0bezMTk5MjExMjQzODczNzE5MDc0MA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992966435136049978",
+            "title": "image for an AI im making",
+            "authorId": "1992811419881250793",
+            "prompts": "harukav2 style, Styles: (Anime coloring:0.85), thin outline. \nBREAK\n  Solo, (1woman,18 years old, mid size bust, Lavender hair, French braid, green eyes, Academy uniform, Uniform black with gold accents, low neckline, tight fitting skirt, pink glossy lips. dark colored stockings, standing, curvy, slight frown, slight blush,  thick eyebrows, Crossing her arms under her bust. Warmer colors\n BREAK\nAngle: (close-up), Dutch angle,\nBREAK\nScene: Outdoor, Courtyard, academy, \nBREAK\nultra-HD, ((Depth of field)), (Detailed hair: 1.5), (18k resolution), best quality, (Perfect hands), (Ultra Detailed Eyes: 2.0), (Magnificent eyes: 1.5), absurdres, (Sharpness: 1.7),",
+            "createdAt": "2026-03-23T23:47:22.868Z",
+            "updatedAt": "2026-03-24T00:18:38.407Z",
+            "mediaId": "702628376407999998",
+            "media": {
+              "id": "702628376407999998",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/ecbdac7a-6cdb-4b21-aa67-797082119824",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/ecbdac7a-6cdb-4b21-aa67-797082119824",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/ecbdac7a-6cdb-4b21-aa67-797082119824",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.647,
+                "y": 0.32
+              },
+              "description": "Still learning how to use this properly, Not the worst ive done but something i can improve on. TIps  on how to improve would be greatly appreciated",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UVKm^RITo@?a-@V;k89Ho#ITRPxatOV?RiD,",
+              "naturalPrompts": "Styles: (Anime coloring:0.85), thin outline. \nBREAK \nSolo, (1woman,18 years old, mid size bust, Lavender hair, French braid, green eyes, Academy uniform, Uniform black with gold accents, low neckline, tight fitting skirt, pink glossy lips. dark colored stockings, standing, curvy, slight frown, slight blush,  thick eyebrows, Crossing her arms under her bust. Warmer colors\nBREAK\nAngle: (close-up), Dutch angle,\nBREAK\nScene: Outdoor, Courtyard, academy, \nBREAK\nultra-HD, ((Depth of field)), (Detailed hair: 1.5), (18k resolution), best quality, (Perfect hands), (Ultra Detailed Eyes: 2.0), (Magnificent eyes: 1.5), absurdres, (Sharpness: 1.7),",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Mar 24 2026 00:18:38 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "anal",
+                "anus",
+                "ass",
+                "babe",
+                "baby",
+                "breast",
+                "breasts",
+                "bust",
+                "camel toe",
+                "child",
+                "children",
+                "dick",
+                "elementary school",
+                "erection",
+                "erotic",
+                "fuck",
+                "gangbang",
+                "hentai",
+                "horror",
+                "jizz",
+                "little girl",
+                "loli",
+                "masturbation",
+                "middle school",
+                "milf",
+                "milking",
+                "moaning",
+                "naked",
+                "negro",
+                "newborn",
+                "nsfw",
+                "nude",
+                "open front",
+                "oral",
+                "orgasm",
+                "panties",
+                "peeing",
+                "pregnancy",
+                "pregnant",
+                "pubic",
+                "pussy",
+                "rape",
+                "sadism",
+                "schoolboy",
+                "schoolgirl",
+                "seductive",
+                "sex",
+                "sexuality",
+                "shota",
+                "slingshot",
+                "spread legs",
+                "teenager",
+                "testicles",
+                "tied up",
+                "tits",
+                "topless",
+                "vagina",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1992811419881250793",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "pinclerinus",
+              "displayName": "DarcsRequiem",
+              "createdAt": "2026-03-23T13:31:24.145Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6hwad+Pkzqkc2VlZACkc29ydJLLQHgtqODJ2dOzMTk5Mjk2NjQzNTEzNjA0OTk3OA==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992115463147502962",
+            "title": "Festival (R)",
+            "authorId": "1981285478571968212",
+            "prompts": "clean semi-rendered anime painting style with soft volumetric shading,\n  harukav2 style, 1girl, solo,\n\n  masterpiece, sharp focus,\n\n  anime style, clean smooth lines (clean smooth lines:1.4)\n\n  skin: natural bright skin tone\n\n  face: baby face proportions, small nose, small mouth, subtle glossy eyes, delicate\n  eyelashes, (beautiful enigmatic face:1.4)\n\n  expression: indifferent expression\n\n  eyes: symmetrical eye colors, crystal-like eyes, (beautiful enigmatic face:1.4),\n  (very large eyes:1.2)\n\n  hair: loose half-up hair\n\n  body: tall girl, curvy figure, slender figure, slim waist, long legs,\n\n  medium bust, medium breasts,\n\n  outfit: modest coverage, clean clothes, dry clothes, not wet,\n\n  personal color theme charcoal with off-white accents and gold highlights,\n\n  soft-shouldered double-breasted jacket with double lining, metal buttons,\n\n  high-neck top,\n\n  straight slacks with center press,\n\n  single coat-of-arms brooch, thin chain choker\n\n  POSE (do not simplify): sitting on a chair, slumped forward with elbows on the table,\n  resting her upper body on her arms, the other hand holding a straw in a glass of\n  clear transparent drink\n\n  background: strong saturated colors, cold room interior, large window behind, fireworks\n  festival visible outside the window, cold white table/desk surface, on the table\n  a clear transparent drink in a glass with a straw, blue on top and red on bottom,\n  plus one empty glass, a white pigeon drinking from the same drink with her,outlines\n  caused by lighting",
+            "createdAt": "2026-03-21T15:25:55.300Z",
+            "updatedAt": "2026-03-21T15:31:18.588Z",
+            "mediaId": "701815199518715918",
+            "media": {
+              "id": "701815199518715918",
+              "type": "IMAGE",
+              "width": 912,
+              "height": 1536,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/e4eabba2-c046-4553-8309-bf5d378fb670",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/e4eabba2-c046-4553-8309-bf5d378fb670",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/e4eabba2-c046-4553-8309-bf5d378fb670",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "That’s right. I think I can fully share the prompt now.",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UaI=Dm%1EU$*jNM{IwjF0NS%sTogIqn~-4oz",
+              "naturalPrompts": "1girl, solo,\nmasterpiece, sharp focus,\nanime style, clean smooth lines (clean smooth lines:1.4)\nskin: natural bright skin tone\nface: baby face proportions, small nose, small mouth, subtle glossy eyes, delicate eyelashes, (beautiful enigmatic face:1.4)\nexpression: indifferent expression\neyes: symmetrical eye colors, crystal-like eyes, (beautiful enigmatic face:1.4), (very large eyes:1.2)\nhair: loose half-up hair\nbody: tall girl, curvy figure, slender figure, slim waist, long legs,\nmedium bust, medium breasts,\noutfit: modest coverage, clean clothes, dry clothes, not wet,\npersonal color theme charcoal with off-white accents and gold highlights,\nsoft-shouldered double-breasted jacket with double lining, metal buttons,\nhigh-neck top,\nstraight slacks with center press,\nsingle coat-of-arms brooch, thin chain choker\nPOSE (do not simplify): sitting on a chair, slumped forward with elbows on the table, resting her upper body on her arms, the other hand holding a straw in a glass of clear transparent drink\nbackground: strong saturated colors, cold room interior, large window behind, fireworks festival visible outside the window, cold white table/desk surface, on the table a clear transparent drink in a glass with a straw, blue on top and red on bottom, plus one empty glass, a white pigeon drinking from the same drink with her,outlines caused by lighting",
+              "suggestedTacks": [
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459531768781",
+                "1941984459628239862",
+                "1941984459615656564",
+                "1941984459598880616",
+                "1941984459619848768",
+                "1941984459569518236",
+                "1941984459808592822",
+                "1941984459586294001",
+                "1941984459561129868",
+                "1941984459783426381",
+                "1941984459632431176",
+                "1941984459590490084",
+                "1941984459636626753",
+                "1941984459775039428",
+                "1941984459657600095",
+                "1941984459678569556",
+                "1941984459636626078",
+                "1941984459636626048"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sat Mar 21 2026 15:25:56 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "4-year-old",
+                "ass",
+                "baby",
+                "bdsm",
+                "bondage",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "children",
+                "cum",
+                "dick",
+                "erotic",
+                "exhibitionism",
+                "feces",
+                "fellatio",
+                "footjob",
+                "horny",
+                "horror",
+                "kid",
+                "loli",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "nsfw",
+                "nude",
+                "nudity",
+                "open front",
+                "oral",
+                "panties",
+                "peeing",
+                "penis",
+                "pussy",
+                "schoolgirl",
+                "scissoring",
+                "seductive",
+                "see through",
+                "sex",
+                "shirt lift",
+                "shota",
+                "strap on",
+                "tied up",
+                "tit",
+                "titty",
+                "topless",
+                "underage",
+                "upskirt",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 2,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1981285478571968212",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "demilami",
+              "displayName": "Demilami",
+              "createdAt": "2026-02-19T18:11:25.595Z",
+              "updatedAt": null,
+              "avatarMediaId": "695999218229858642",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/00ce48e5-051b-4d81-87ad-a0ced6a3f0fa",
+              "membership": {
+                "membershipId": "membership-start",
+                "tier": 1,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6VqdYR4PXKkc2VlZACkc29ydJLLQHgs47zTWoazMTk5MjExNTQ2MzE0NzUwMjk2Mg==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1992367421225250249",
+            "title": "愛宕は",
+            "authorId": "1969928132120090517",
+            "prompts": "character: takao_(kancolle), atago_(kancolle), 1girl, harukav2 style, takao (kancolle), 1girl, red eyes, ascot, blush, short hair, military uniform, black thighhighs, hat, beret, blue headwear, uniform, military, thighhighs, gloves, atago (kancolle), pantyhose, green eyes, long hair, smile, open mouth, blonde hair, dynamic pose, looking at viewer, front view angle, full body, on the sea, clouds, horizon",
+            "createdAt": "2026-03-22T08:07:06.800Z",
+            "updatedAt": "2026-03-22T08:07:07.993Z",
+            "mediaId": "702064220510387132",
+            "media": {
+              "id": "702064220510387132",
+              "type": "IMAGE",
+              "width": 960,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/f92094b7-836e-4191-8f8a-5368de67efc6",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/f92094b7-836e-4191-8f8a-5368de67efc6",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/f92094b7-836e-4191-8f8a-5368de67efc6",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.482,
+                "y": 0.294
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UUGcP}R6KlSj~Wa~SjNfO]NeRoM}5tRPWrM|",
+              "naturalPrompts": "takao (kancolle), 1girl, red eyes, ascot, blush, short hair, military uniform, black thighhighs, hat, beret, blue headwear, uniform, military, thighhighs, gloves, atago (kancolle), pantyhose, green eyes, long hair, smile, open mouth, blonde hair, \nダイナミックなポーズ、カメラ目線、正面からのアングル、全身、海上、雲、水平線 ",
+              "suggestedTacks": [
+                "1941984459670183839",
+                "1941984459674375143",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459531768781",
+                "1941984459628239862",
+                "1941984459573714238",
+                "1941984459531769135",
+                "1941984459603073733",
+                "1941984459619848768",
+                "1941984459565326144",
+                "1941984459561130122",
+                "1941984459569518236",
+                "1941984459561130570",
+                "1941984459527573642",
+                "1941984459598880612",
+                "1941984459565322621",
+                "1941984459720515129",
+                "1941984459561130567",
+                "1941984459586294199",
+                "1941984459535964013",
+                "1941984459737291229",
+                "1941984459582102305",
+                "1941984459569518051",
+                "1941984459607268924",
+                "1941984459582102021",
+                "1941984459636627178",
+                "1941984459670183258"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sun Mar 22 2026 08:07:07 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "1 year",
+                "14 years",
+                "14-year-old",
+                "2 years",
+                "5 years",
+                "anal",
+                "ass",
+                "asshole",
+                "baby",
+                "ball gag",
+                "bdsm",
+                "bondage",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "children",
+                "clitoris",
+                "cock",
+                "cum",
+                "deepthroat",
+                "diaper",
+                "dick",
+                "dildo",
+                "dog style",
+                "dominatrix",
+                "ejaculation",
+                "erotic",
+                "exhibitionism",
+                "feces",
+                "fingering",
+                "futanari",
+                "gangbang",
+                "girl on top",
+                "guro",
+                "hardcore",
+                "hentai",
+                "horny",
+                "horror",
+                "incest",
+                "kid",
+                "little girl",
+                "loli",
+                "lolicon",
+                "milf",
+                "milking",
+                "minor",
+                "missionary position",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "oral",
+                "orgasm",
+                "panties",
+                "panty",
+                "peeing",
+                "pelvic",
+                "penis",
+                "pregnant",
+                "pubic",
+                "pussy",
+                "rape",
+                "scat",
+                "seductive",
+                "see through",
+                "semen",
+                "sex",
+                "shibari",
+                "shota",
+                "slingshot",
+                "slut",
+                "small girl",
+                "strap on",
+                "strip club",
+                "teenager",
+                "threesome",
+                "tied up",
+                "tits",
+                "toddler",
+                "topless",
+                "underage",
+                "undress",
+                "undressing",
+                "upskirt",
+                "vagina",
+                "vaginal",
+                "very young",
+                "whore",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 5,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1969928132120090517",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1969928132120090517",
+              "displayName": "石動剛士",
+              "createdAt": "2026-01-19T10:01:23.192Z",
+              "updatedAt": null,
+              "avatarMediaId": "699406355908690886",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/3079246a-e70f-4a79-bb7e-67d424661695",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6ZPnRQxLcmkc2VlZACkc29ydJLLQHgsqs2eg+SzMTk5MjM2NzQyMTIyNTI1MDI0OQ==",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1993341906557902732",
+            "title": "体操着レオタード＃340",
+            "authorId": "1975602807695598897",
+            "prompts": "((high_quality)), ((Super_Detailed)),  , harukav2 style, 2girls, round breasts, bouncing breasts, looking at viewer, average build, (Running:1.3), arms up, laughing, masterpiece, low angle, (detailed pupil eyes:1.4), (round eyes:1.4), (masterpiece, top quality:1.2), (smile:1.4), open mouth,random eye color, (dynamic eye color:1.1), (dutch angle1.3), dynamic angle, Japanese gym uniform (leotard style:1.3), short sleeves leotard, highleg, white leotard with blue lines, in school gymnasium,  detailed background, random background, (sports festival:1.3), highly detailed,",
+            "createdAt": "2026-03-25T00:39:22.118Z",
+            "updatedAt": "2026-03-25T00:39:24.161Z",
+            "mediaId": "701422139590870165",
+            "media": {
+              "id": "701422139590870165",
+              "type": "IMAGE",
+              "width": 1536,
+              "height": 864,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/51fa5bca-3c50-450b-8d59-1d731c2edb77",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/51fa5bca-3c50-450b-8d59-1d731c2edb77",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/51fa5bca-3c50-450b-8d59-1d731c2edb77",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UMN,D2r]vcxuAeM{t7jX^HXTxuoKyXWXgNtR",
+              "naturalPrompts": "2girls, round breasts, bouncing breasts, looking at viewer, average build, (Running:1.3), arms up, laughing, masterpiece, low angle, (detailed pupil eyes:1.4), (round eyes:1.4), (masterpiece, top quality:1.2), (smile:1.4), open mouth,random eye color, (dynamic eye color:1.1), (dutch angle1.3), dynamic angle, Japanese gym uniform (leotard style:1.3), short sleeves leotard, highleg, white leotard with blue lines, in school gymnasium,  detailed background, random background, (sports festival:1.3), highly detailed,",
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Mar 25 2026 00:39:24 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "babe",
+                "baby",
+                "bitch",
+                "bouncing breasts",
+                "breast",
+                "breasts",
+                "bust",
+                "children",
+                "cunt",
+                "diaper",
+                "futanari",
+                "horror",
+                "loli",
+                "milf",
+                "moaning",
+                "negro",
+                "nipple",
+                "nipples",
+                "nsfw",
+                "panties",
+                "pelvic",
+                "penis",
+                "seductive",
+                "sexo",
+                "vagina"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 0,
+            "liked": null,
+            "commentCount": 0,
+            "author": {
+              "id": "1975602807695598897",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-1975602807695598897",
+              "displayName": "nisepony",
+              "createdAt": "2026-02-04T01:50:31.280Z",
+              "updatedAt": null,
+              "avatarMediaId": "685530084439801017",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/f18610bd-f69f-4509-ae09-6f310d9627d2",
+              "membership": {
+                "membershipId": "membership-premium-v2",
+                "tier": 3,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1991535758445858041",
+                  "decorationId": "1988388766284596331",
+                  "decoration": {
+                    "id": "1988388766284596331",
+                    "code": "aprilfools_2026_badge_culmulative_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "The Joker’s Ace"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "百變王牌"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "トリッキージョーカー"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "조커의 에이스"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/75337a84-7a07-4dda-b0ec-94ec1a10bd69",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/1393789f-7f64-438d-9bc7-ec7dbd0a96ea",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/4a17e0d1-1ce5-4563-a6e5-9243e1bec4df",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-03-11T08:37:21.360Z",
+                    "updatedAt": "2026-03-11T08:37:35.026Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-20T01:02:22.759Z",
+                  "obtainedFrom": "aprilFoolsEvent2026:totalPurchased",
+                  "updatedAt": "2026-03-20T01:02:32.768Z",
+                  "createdAt": "2026-03-20T01:02:22.759Z",
+                  "userId": "1975602807695598897",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "g6JpZNcAG6nF5yBIn4ykc2VlZACkc29ydJLLQHgqFKTSssCzMTk5MzM0MTkwNjU1NzkwMjczMg==",
+          "__typename": "ArtworkEdge"
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": true,
+        "hasPreviousPage": false,
+        "endCursor": "g6JpZNcAG6nF5yBIn4ykc2VlZACkc29ydJLLQHgqFKTSssCzMTk5MzM0MTkwNjU1NzkwMjczMg==",
+        "startCursor": "g6JpZNcAG6Odg3BMGmKkc2VlZACkc29ydJLLQHjDAPuogmuzMTk5MTYwODY0ODA3ODIwMzQ5MA==",
+        "__typename": "PageInfo"
+      },
+      "totalCount": 2166,
+      "feedUuid": null,
+      "__typename": "ArtworkConnection"
+    }
+  }
+}
