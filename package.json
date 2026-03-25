@@ -1,13 +1,13 @@
 {
   "name": "crawler-plugins",
-  "version": "3.1.11",
+  "version": "3.1.12",
   "description": "Kabegame 爬虫插件仓库",
   "type": "module",
   "scripts": {
     "package": "bun package-plugin.ts",
     "package:single": "bun package-plugin.ts",
     "generate-index": "bun generate-index.ts",
-    "release": "bun nx package && bun run generate-index",
+    "release": "bun package && bun generate-index",
     "prepare": "husky"
   },
   "devDependencies": {
