@@ -72,10 +72,96 @@ Open the user’s profile on Pixiv. The numeric part in the URL (middle or end) 
 
 Fields depend on the selected mode:
 
-- **Rankings**: Ranking type, content type, start date (YYYYMMDD), date range, max count.
-- **Bookmarks**: User UID, max count.
-- **Artist**: User UID, artist UID, max count.
-- **Keyword**: Search keyword, search mode (safe / R18 / all), sort (by date / by popularity), max count. **Keyword + sort lets you target exactly what you want.**
+- **Rankings**: Ranking type, content type, start date, end date (inclusive; calendar UI, stored as `YYYYMMDD`).
+- **Bookmarks**: User UID.
+- **Artist**: User UID, artist UID.
+- **Keyword**: Search keyword, search mode (safe / R18 / all), sort (by date / by popularity). **Keyword + sort lets you target exactly what you want.**
+
+## Max artworks (`num_artworks`)
+
+Integer **1–1000**, used in **all four modes**. The cap counts **artworks** (one illustration entry), not final image files; **multi-page works** still download each page, so **file count can exceed** `num_artworks`.
+
+The script is **streaming**: it requests list APIs **page by page**, and for each `illust_id` it immediately calls `ajax/illust/{id}/pages` and downloads originals. When `num_artworks` is reached it **stops**—it does **not** precompute a fixed page count from the cap, avoiding empty-page **404**s.
+
+### Behaviour summary
+
+1. **Rankings**  
+   Days from start to end; each day starts at `p=1` for `ranking.php?...&format=json`. Each `illust_id` in `contents` is **downloaded before** counting toward the cap. If a page request fails (e.g. **404**, no next page), that day’s paging stops and the next day continues if still under the cap. Fewer than **50** `contents` entries means last page for that day.
+
+2. **Bookmarks**  
+   `limit=48` per page; after each response, **download** works on that page until the cap or no more bookmarks.
+
+3. **Artist**  
+   Still one **`profile/all`** call (no list pagination); then iterate `body.illusts` keys **in order**, download until `num_artworks`.
+
+4. **Keyword**  
+   Like rankings: search pages `p=1,2,…`, download as you go until the cap or a short page.
+
+## Example runs (what the script actually does)
+
+Cookie and mode-specific query values come from your form; dates are **`YYYYMMDD`** (no dashes).
+
+### Example A: Rankings (streaming, by day)
+
+| Field | Example |
+|-------|---------|
+| Source | Rankings |
+| Ranking mode | Daily (`daily`) |
+| Content | All (`all`) |
+| Start / end date | e.g. `20240101`–`20240102` |
+| Max artworks | `120` |
+
+**Flow**  
+For each calendar day, request  
+`https://www.pixiv.net/ranking.php?mode=daily&content=all&date=YYYYMMDD&p={p}&format=json`.  
+For each `illust_id` in `contents`: **finish that artwork’s** `pages` → `urls.original`, then increment the counter; at **120** the **whole task** ends. If `p=k` errors (including 404), no more pages that day; if still under 120, move to the next day.  
+This **replaces** the old “precompute `num_pages` from `num_artworks`” batch list phase.
+
+---
+
+### Example B: Bookmarks (paged, download as you go)
+
+| Field | Example |
+|-------|---------|
+| Source | Bookmarks |
+| User UID | e.g. `12345678` |
+| Max artworks | `50` |
+
+**Flow**  
+From `offset=0`, `limit=48` per request; for each `body.works[].id` run the `pages` download until **50** artworks processed or the page has fewer than 48 items.
+
+---
+
+### Example C: Artist (one list request, streaming cap on download)
+
+| Field | Example |
+|-------|---------|
+| Source | Artist works |
+| Logged-in user UID (`x-user-id`) | Your account UID |
+| Artist UID | e.g. `87654321` |
+| Max artworks | `5` |
+
+**Flow**  
+One request to `https://www.pixiv.net/ajax/user/87654321/profile/all?lang=zh`, then download **at most 5** artworks in key order (each may be multi-image).
+
+---
+
+### Example D: Keyword search (streaming by search page)
+
+| Field | Example |
+|-------|---------|
+| Source | Keyword |
+| Keyword | e.g. `初音ミク` |
+| Search mode | Safe (`safe`) |
+| Sort | By date (`date_d`) |
+| Max artworks | `25` |
+
+**Flow**  
+`p=1,2,…` on `ajax/search/artworks/...`; for each page, download `illustManga.data[].id` until **25** or fewer than **60** results (usually no next page).
+
+---
+
+These four examples map to the four `source` values. R18 / weekly / monthly only change URL semantics. **Common rule:** cap is `num_artworks`; modes with paged lists are **streaming** (the next list page is only fetched when more artworks are still needed).
 
 ## Notes
 
@@ -83,4 +169,4 @@ Fields depend on the selected mode:
 - Refresh cookie when it expires.
 - Keywords support advanced syntax, e.g. `(Lucy OR 边缘行者) AND 5000users`.
 - **Sort by popularity** requires a Pixiv Premium account; use "Sort by date" otherwise.
-- Set a reasonable max count to avoid overloading Pixiv.
+- Set a reasonable max artwork count to avoid overloading Pixiv.

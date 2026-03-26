@@ -117,10 +117,10 @@ This repository contains crawler plugins for the Kabegame image collection syste
 - `user_id`：用户 UID（收藏、画师等模式）
 - `ranking_mode`：排行榜类型（日榜、周榜、月榜、男性向、女性向、AI 日榜及 R18 等）
 - `content_mode`：内容类型（全部 / 插画 / 漫画 / 动图，仅部分排行榜）
-- `start_date` / `date_range`：起始日期（YYYYMMDD）、日期范围（天）
+- Pixiv 排行榜：`start_date` / `end_date`（均为 `date` + `format: YYYYMMDD`），闭区间逐日抓取
 - `artist_id`：画师 UID（画师作品模式）
 - `keyword` / `search_mode` / `keyword_order`：关键词、搜索模式（安全/R18/全部）、排序方式
-- `num_images`：最大下载数（1～1000）
+- `num_artworks`：最大作品数（1～1000），流式下载说明见插件用户文档 `plugins/pixiv/doc_root/`
 
 ![image](./images/pixiv.png)
 ---

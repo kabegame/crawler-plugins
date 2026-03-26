@@ -34,6 +34,7 @@
         { "$ref": "#/$defs/VarInt" },
         { "$ref": "#/$defs/VarFloat" },
         { "$ref": "#/$defs/VarString" },
+        { "$ref": "#/$defs/VarDate" },
         { "$ref": "#/$defs/VarBoolean" },
         { "$ref": "#/$defs/VarOptions" },
         { "$ref": "#/$defs/VarList" },
@@ -80,6 +81,31 @@
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
         "default": { "type": "string", "description": "默认值" },
+        "when": { "$ref": "#/$defs/WhenCondition" }
+      }
+    },
+    "VarDate": {
+      "type": "object",
+      "required": ["key", "type", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string", "description": "变量名；存入任务的日期字符串格式由 format 决定（默认 YYYY-MM-DD）" },
+        "type": { "const": "date" },
+        "name": { "type": "string", "description": "展示名称" },
+        "descripts": { "type": "string", "description": "说明" },
+        "default": { "type": "string", "description": "默认值，与 format 一致；常用空字符串" },
+        "format": {
+          "type": "string",
+          "description": "dayjs 格式：提交给脚本/后端的日期字符串，如 YYYYMMDD；省略则 YYYY-MM-DD"
+        },
+        "dateMin": {
+          "type": "string",
+          "description": "可选：最早可选日：YYYY-MM-DD，或关键字 today / yesterday（不区分大小写）"
+        },
+        "dateMax": {
+          "type": "string",
+          "description": "可选：最晚可选日：YYYY-MM-DD，或 today / yesterday"
+        },
         "when": { "$ref": "#/$defs/WhenCondition" }
       }
     },
