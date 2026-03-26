@@ -3,6 +3,67 @@
   "selector": null,
   "var": [
     {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "取得モード",
+      "name.ko": "수집 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "排行榜：按周期排行页抓取。作品索引：从作品タイトル一覧按假名行勾选后抓取",
+      "descripts.en": "Ranking pages, or anime/game title index by row (あ行〜わ行)",
+      "descripts.ja": "ランキングページ、または作品タイトル一覧（あ行〜わ行）",
+      "descripts.ko": "랭킹 페이지 또는 작품 제목 목록(あ〜わ 행)",
+      "descripts.zhtw": "排行榜：依週期排行頁。作品索引：依假名行勾選",
+      "default": "ranking",
+      "options": [
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "ranking"
+        },
+        {
+          "name": "作品索引（アニメ・ゲーム一覧）",
+          "name.en": "Title index (anime/game)",
+          "name.ja": "作品タイトル一覧",
+          "name.ko": "작품 제목 목록",
+          "name.zhtw": "作品索引（動漫・遊戲一覽）",
+          "variable": "anime_game"
+        }
+      ]
+    },
+    {
+      "key": "anime_game_rows",
+      "type": "checkbox",
+      "name": "假名行（仅作品索引模式）",
+      "name.en": "Kana rows (index mode only)",
+      "name.ja": "かな行（一覧モードのみ）",
+      "name.ko": "가나 행(목록 모드만)",
+      "name.zhtw": "假名行（僅作品索引）",
+      "descripts": "在作品一覧页按 h3 id 分段：あ・か・さ・た・な / は・ま・や・ら・わ",
+      "descripts.en": "Sections by row: a, ka, sa… / ha, ma, ya, ra, wa",
+      "descripts.ja": "あ行〜わ行ブロック（id=a,ka,…,wa）",
+      "descripts.ko": "あ〜わ 블록",
+      "descripts.zhtw": "對應頁面 h3 id：a, ka, …, wa",
+      "default": ["a", "ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"],
+      "options": [
+        { "name": "-あ行-", "name.en": "A row", "variable": "a" },
+        { "name": "-か行-", "name.en": "Ka row", "variable": "ka" },
+        { "name": "-さ行-", "name.en": "Sa row", "variable": "sa" },
+        { "name": "-た行-", "name.en": "Ta row", "variable": "ta" },
+        { "name": "-な行-", "name.en": "Na row", "variable": "na" },
+        { "name": "-は行-", "name.en": "Ha row", "variable": "ha" },
+        { "name": "-ま行-", "name.en": "Ma row", "variable": "ma" },
+        { "name": "-や行-", "name.en": "Ya row", "variable": "ya" },
+        { "name": "-ら行-", "name.en": "Ra row", "variable": "ra" },
+        { "name": "-わ行-", "name.en": "Wa row", "variable": "wa" }
+      ],
+      "when": { "crawl_mode": ["anime_game"] }
+    },
+    {
       "key": "start_page",
       "type": "int",
       "name": "起始页面",
@@ -18,7 +79,8 @@
       "default": 1,
       "options": null,
       "min": 1,
-      "max": 5
+      "max": 5,
+      "when": { "crawl_mode": ["ranking"] }
     },
     {
       "key": "end_page",
@@ -36,7 +98,8 @@
       "default": 5,
       "options": null,
       "min": 1,
-      "max": 5
+      "max": 5,
+      "when": { "crawl_mode": ["ranking"] }
     },
     {
       "key": "wallpaper_type",
@@ -120,7 +183,8 @@
         }
       ],
       "min": null,
-      "max": null
+      "max": null,
+      "when": { "crawl_mode": ["ranking"] }
     }
   ]
 }

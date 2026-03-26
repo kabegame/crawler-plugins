@@ -67,13 +67,14 @@ async function handleInitial(ctx) {
   // 获取当前页面
   const page = state.page;
 
-  // 获得结束页面，第一次来到initial可能没有设置
+  // 获得结束页面，第一次来到 initial 可能尚未由 posts 页写入（undefined）
+  // 注意：endPage 合法值为 0 时必须仍参与判断，不能用 if (endPage)（0 为假值会跳过退出）
   const endPage = state.endPage;
 
-  if (endPage) {
+  if (typeof endPage === "number" && Number.isFinite(endPage)) {
     if (page > endPage) {
       await ctx.exit();
-      return;  
+      return;
     }
   }
 
@@ -93,14 +94,19 @@ async function handlePosts(ctx) {
   await ctx.waitForDom();
   const state = ctx.state;
 
-  // 不知道最后一页是多少
+  // 不知道最后一页是多少（从分页 DOM 解析；解析失败则退回用户配置的 endPage）
   if (state.endPage === undefined) {
     const endPageConfig = ctx.vars?.endPage ?? state.startPage;
-    const totalPages = Math.max(...ctx.$$('.numeric_pages > *').map(e => parseInt(e.textContent)).filter(v => !isNaN(v)));
+    const pageNums = ctx
+      .$$(".numeric_pages > *")
+      .map((e) => parseInt(String(e.textContent).trim(), 10))
+      .filter((v) => Number.isFinite(v));
+    const parsedMax = pageNums.length > 0 ? Math.max(...pageNums) : NaN;
+    const totalPages = Number.isFinite(parsedMax) ? parsedMax : endPageConfig;
     const endPage = Math.min(endPageConfig, totalPages);
-    const totalPage = (endPage - state.startPage + 1);
-    await ctx.updateState({ endPage, percentPerPage: 100 / totalPage })
-    ctx.log(`最大页数: ${endPage}，总页数: ${totalPage}`)
+    const totalPage = endPage - state.startPage + 1;
+    await ctx.updateState({ endPage, percentPerPage: totalPage > 0 ? 100 / totalPage : 100 });
+    ctx.log(`最大页数: ${endPage}，总页数: ${totalPage}`);
   }
 
   const pageState = ctx.pageState;
