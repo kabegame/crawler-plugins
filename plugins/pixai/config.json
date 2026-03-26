@@ -2,12 +2,150 @@
   "baseUrl": "https://pixai.art",
   "var": [
     {
+      "key": "crawl_type",
+      "type": "options",
+      "name": "爬取种类",
+      "name.en": "Crawl Type",
+      "name.ja": "取得種類",
+      "name.ko": "크롤링 유형",
+      "default": "model",
+      "options": [
+        {
+          "name": "按模型",
+          "name.en": "By Model",
+          "name.ja": "モデル別",
+          "name.ko": "모델별",
+          "variable": "model"
+        },
+        {
+          "name": "按标签",
+          "name.en": "By Tag",
+          "name.ja": "タグ別",
+          "name.ko": "태그별",
+          "variable": "tag"
+        },
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "variable": "ranking"
+        }
+      ]
+    },
+    {
+      "key": "rank_type",
+      "type": "options",
+      "name": "榜单类型",
+      "name.en": "Rank Type",
+      "name.ja": "ランキング種類",
+      "name.ko": "랭킹 유형",
+      "default": "artwork",
+      "options": [
+        {
+          "name": "作品",
+          "name.en": "Artwork",
+          "name.ja": "作品",
+          "name.ko": "작품",
+          "variable": "artwork"
+        },
+        {
+          "name": "うごイラ (动图)",
+          "name.en": "Animated",
+          "name.ja": "うごイラ",
+          "name.ko": "움직이는 일러스트",
+          "variable": "animated"
+        },
+        {
+          "name": "SD 模型",
+          "name.en": "SD Model",
+          "name.ja": "SDモデル",
+          "name.ko": "SD 모델",
+          "variable": "model"
+        },
+        {
+          "name": "LoRA",
+          "name.en": "LoRA",
+          "name.ja": "LoRA",
+          "name.ko": "LoRA",
+          "variable": "lora"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "rank_period",
+      "type": "options",
+      "name": "榜单范围",
+      "name.en": "Rank Period",
+      "name.ja": "ランキング期間",
+      "name.ko": "랭킹 기간",
+      "default": "today",
+      "options": [
+        {
+          "name": "今日",
+          "name.en": "Today",
+          "name.ja": "今日",
+          "name.ko": "오늘",
+          "variable": "today"
+        },
+        {
+          "name": "本周",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "variable": "weekly"
+        },
+        {
+          "name": "本月",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "variable": "monthly"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "max_artwork_pages_ranking",
+      "type": "int",
+      "name": "每个上榜模型作品分页数",
+      "name.en": "Artwork Pages per Ranked Model",
+      "name.ja": "ランクインモデルごとの作品ページ数",
+      "name.ko": "랭킹 모델당 작품 페이지 수",
+      "default": 1,
+      "min": 1,
+      "max": 50,
+      "when": {
+        "crawl_type": [
+          "ranking"
+        ],
+        "rank_type": [
+          "model",
+          "lora"
+        ]
+      }
+    },
+    {
       "key": "max_model_pages",
       "type": "int",
       "name": "模型分页数",
       "default": 3,
       "min": 1,
-      "max": 50
+      "max": 50,
+      "when": {
+        "crawl_type": [
+          "model"
+        ]
+      }
     },
     {
       "key": "max_artwork_pages",
@@ -15,13 +153,402 @@
       "name": "每个模型作品分页数",
       "default": 1,
       "min": 1,
-      "max": 50
+      "max": 50,
+      "when": {
+        "crawl_type": [
+          "model"
+        ]
+      }
     },
     {
-      "key": "safe_search",
-      "type": "boolean",
-      "name": "安全搜索",
-      "default": true
+      "key": "artwork_tags",
+      "type": "checkbox",
+      "name": "作品标签",
+      "name.en": "Artwork Tags",
+      "name.ja": "作品タグ",
+      "name.ko": "작품 태그",
+      "default": [
+        "1539451103304777778",
+        "1922021287889713965",
+        "1634739494618599131",
+        "1580119621020619042",
+        "1640792507941002725",
+        "1750217657858816423",
+        "1835151921967156571",
+        "1916616255508988740",
+        "1904642060884426582",
+        "1542478620351024280",
+        "1653426079234161854",
+        "1721725979093169048",
+        "1631136320189086328",
+        "1545027968470015392",
+        "1668618754104678632",
+        "1543282451081770844",
+        "1762474856920006769",
+        "1768419715633776192",
+        "1665486897130991060",
+        "1598768560721516474",
+        "1857436673443958885",
+        "1905512601682805139",
+        "1888753852046145131",
+        "1896982161424623466",
+        "1849448332391870277",
+        "1810024652271300816",
+        "1800278072703967386",
+        "1686752259067431267",
+        "1821347925741451409",
+        "1838674386167905451",
+        "1899985680972502354",
+        "1885457265634904391",
+        "1891948027581794065",
+        "1888751934226834113",
+        "1888733779801093290",
+        "1714798854476685957",
+        "1744110992206059888",
+        "1952908621785631925",
+        "1948192200237422039",
+        "1836904222610793507",
+        "1810859013893832958",
+        "1817164539017673388",
+        "1818830875997654257",
+        "1543880154481210342",
+        "1888721130212293586",
+        "1864059862608410646",
+        "1888747817810771675",
+        "1888701890736515194",
+        "1564686801146135055",
+        "1934749781350748180"
+      ],
+      "options": [
+        {
+          "name": "原神 (genshin impact)",
+          "variable": "1539451103304777778"
+        },
+        {
+          "name": "Cyrene(Honkai_Star_Rail)",
+          "variable": "1922021287889713965"
+        },
+        {
+          "name": "崩壊：スターレイル (honkai:star_rail)",
+          "variable": "1634739494618599131"
+        },
+        {
+          "name": "Demon Slayer",
+          "variable": "1580119621020619042"
+        },
+        {
+          "name": "ゼンゼロ (zenless_zone_zero)",
+          "variable": "1640792507941002725"
+        },
+        {
+          "name": "鳴潮",
+          "variable": "1750217657858816423"
+        },
+        {
+          "name": "phainon(honkai:star_rail)",
+          "variable": "1835151921967156571"
+        },
+        {
+          "name": "Yidhari(Zenless_zone_zero)",
+          "variable": "1916616255508988740"
+        },
+        {
+          "name": "Lauma（Genshin_impact）",
+          "variable": "1904642060884426582"
+        },
+        {
+          "name": "オリキャラ (original character)",
+          "variable": "1542478620351024280"
+        },
+        {
+          "name": "goddess_of_victory:nikke",
+          "variable": "1653426079234161854"
+        },
+        {
+          "name": "学園アイドルマスター",
+          "variable": "1721725979093169048"
+        },
+        {
+          "name": "wuthering_waves",
+          "variable": "1631136320189086328"
+        },
+        {
+          "name": "ポケモン (pokemon)",
+          "variable": "1545027968470015392"
+        },
+        {
+          "name": "リバース:1998 (reverse:1999)",
+          "variable": "1668618754104678632"
+        },
+        {
+          "name": "miku",
+          "variable": "1543282451081770844"
+        },
+        {
+          "name": "ave_mujica",
+          "variable": "1762474856920006769"
+        },
+        {
+          "name": "mavuika_(genshin_impact)",
+          "variable": "1768419715633776192"
+        },
+        {
+          "name": "furina(genshin_impact)",
+          "variable": "1665486897130991060"
+        },
+        {
+          "name": "Jujutsu kaisen",
+          "variable": "1598768560721516474"
+        },
+        {
+          "name": "pulchra_fellini",
+          "variable": "1857436673443958885"
+        },
+        {
+          "name": "Seed(Zenless_Zone_Zero)",
+          "variable": "1905512601682805139"
+        },
+        {
+          "name": "Alice Thymefield(zenless_zone_zero)",
+          "variable": "1888753852046145131"
+        },
+        {
+          "name": "Blade(honkai:star_rail)",
+          "variable": "1896982161424623466"
+        },
+        {
+          "name": "cantarella(wuthering_waves)",
+          "variable": "1849448332391870277"
+        },
+        {
+          "name": "yanagi(zenless_zone_zero)",
+          "variable": "1810024652271300816"
+        },
+        {
+          "name": "sunday(honkai:star_rail)",
+          "variable": "1800278072703967386"
+        },
+        {
+          "name": "anby_demara",
+          "variable": "1686752259067431267"
+        },
+        {
+          "name": "anaxa(honkai:star_rail)",
+          "variable": "1821347925741451409"
+        },
+        {
+          "name": "tribbie(honkai:star_rail)",
+          "variable": "1838674386167905451"
+        },
+        {
+          "name": "Ronova(Genshin_impact)",
+          "variable": "1899985680972502354"
+        },
+        {
+          "name": "chisa(wuthering_waves)",
+          "variable": "1885457265634904391"
+        },
+        {
+          "name": "Cerydra(Honkai star_rail)",
+          "variable": "1891948027581794065"
+        },
+        {
+          "name": "Iuno(Wuthering_waves)",
+          "variable": "1888751934226834113"
+        },
+        {
+          "name": "Skirk(Genshin_impact)",
+          "variable": "1888733779801093290"
+        },
+        {
+          "name": "リオセスリ(原神) (wriothesley_(genshin_impact))",
+          "variable": "1714798854476685957"
+        },
+        {
+          "name": "ellen(zenless_zone_zero)",
+          "variable": "1744110992206059888"
+        },
+        {
+          "name": "Dialyn(Zenless_zone_zero)",
+          "variable": "1952908621785631925"
+        },
+        {
+          "name": "Ye_shunguang(Zenless_zone_zero)",
+          "variable": "1948192200237422039"
+        },
+        {
+          "name": "castorice(honkai:star_rail)",
+          "variable": "1836904222610793507"
+        },
+        {
+          "name": "miyabi(zenless_zone_zero)",
+          "variable": "1810859013893832958"
+        },
+        {
+          "name": "zani(wuthering_waves)",
+          "variable": "1817164539017673388"
+        },
+        {
+          "name": "silver_wolf(honkai:star_rail)",
+          "variable": "1818830875997654257"
+        },
+        {
+          "name": "東方Project (touhou)",
+          "variable": "1543880154481210342"
+        },
+        {
+          "name": "yixuan(zenless_zone_zero)",
+          "variable": "1888721130212293586"
+        },
+        {
+          "name": "brant(wuthering_waves)",
+          "variable": "1864059862608410646"
+        },
+        {
+          "name": "Ciaccona_(Wuthering_waves)",
+          "variable": "1888747817810771675"
+        },
+        {
+          "name": "qiuyuan(wuthering_waves)",
+          "variable": "1888701890736515194"
+        },
+        {
+          "name": "guides",
+          "variable": "1564686801146135055"
+        },
+        {
+          "name": "Rerir(Genshin_impact)",
+          "variable": "1934749781350748180"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "model_tags",
+      "type": "checkbox",
+      "name": "模型标签",
+      "name.en": "Model Tags",
+      "name.ja": "モデルタグ",
+      "name.ko": "모델 태그",
+      "default": [
+        "1591095796618865632",
+        "1707089382801558374",
+        "1563247480019240531",
+        "1585637247938118134",
+        "1602513520778957426",
+        "1608126583068580780",
+        "1590659231625048280",
+        "1608567307759474969",
+        "1601467468303624392",
+        "1575311124989111452",
+        "1584738254857918036",
+        "1601645354960452810",
+        "1590784620111716576",
+        "1557980977008926772",
+        "1608567512698559908",
+        "1559952308151160619",
+        "1574046184949750853",
+        "1706256218762225752"
+      ],
+      "options": [
+        {
+          "name": "Realistic Style",
+          "variable": "1591095796618865632"
+        },
+        {
+          "name": "Palworld",
+          "variable": "1707089382801558374"
+        },
+        {
+          "name": "Anime Style",
+          "variable": "1563247480019240531"
+        },
+        {
+          "name": "Game",
+          "variable": "1585637247938118134"
+        },
+        {
+          "name": "Genshin Impact",
+          "variable": "1602513520778957426"
+        },
+        {
+          "name": "Anime Character",
+          "variable": "1608126583068580780"
+        },
+        {
+          "name": "Pose",
+          "variable": "1590659231625048280"
+        },
+        {
+          "name": "Blue Archive",
+          "variable": "1608567307759474969"
+        },
+        {
+          "name": "Fate Series",
+          "variable": "1601467468303624392"
+        },
+        {
+          "name": "NIKKE",
+          "variable": "1575311124989111452"
+        },
+        {
+          "name": "Arknights",
+          "variable": "1584738254857918036"
+        },
+        {
+          "name": "Art Style",
+          "variable": "1601645354960452810"
+        },
+        {
+          "name": "Scenery",
+          "variable": "1590784620111716576"
+        },
+        {
+          "name": "Pokemon",
+          "variable": "1557980977008926772"
+        },
+        {
+          "name": "Hololive",
+          "variable": "1608567512698559908"
+        },
+        {
+          "name": "Azur Lane",
+          "variable": "1559952308151160619"
+        },
+        {
+          "name": "League of Legends",
+          "variable": "1574046184949750853"
+        },
+        {
+          "name": "palworld",
+          "variable": "1706256218762225752"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "max_tag_artwork_pages",
+      "type": "int",
+      "name": "每个标签作品分页数",
+      "name.en": "Pages per Tag",
+      "name.ja": "タグごとのページ数",
+      "name.ko": "태그당 페이지 수",
+      "default": 3,
+      "min": 1,
+      "max": 50,
+      "when": {
+        "crawl_type": [
+          "tag"
+        ]
+      }
     }
   ]
 }

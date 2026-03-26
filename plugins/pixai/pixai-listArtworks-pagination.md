@@ -1,6 +1,6 @@
 # PixAI `listArtworks` 接口爬取说明
 
-本文说明如何通过 HTTP 稳定调用 PixAI 站点使用的 GraphQL 接口 **`listArtworks`**（作品列表，Relay 游标分页：`first` + `after`）。实现爬虫、插件或离线脚本时按下列顺序组请求即可。
+本文说明如何通过 HTTP 稳定调用 PixAI 站点使用的 GraphQL 接口 **`listArtworks`**（作品列表，Relay 游标分页：`first` + `after`）。实现爬虫、插件或离线脚本时按下列顺序组请求即可。**按标签（Tag）爬取**时变量用 **`tackId`**，要点见 **§5.1**。
 
 ---
 
@@ -81,13 +81,32 @@ https://api.pixai.art/graphql
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `loraId` | 字符串 | LoRA / 模型相关 id，与页面上下文一致。 |
+| `loraId` | 字符串 | LoRA / 模型相关 id；**模型作品流** 与页面上下文一致时使用（与 `tackId` 一般不同时出现，**以抓包为准**）。 |
+| `tackId` | 字符串 | **标签（Tag/Tack）** id；**标签作品流** 与页面上下文一致时使用。分页规则与 `loraId` 流完全相同。 |
 | `isSafeSearch` | 布尔 | 是否安全搜索过滤。 |
 | `first` | 整数 | 本页条数（每页最多多少条由服务端限制，常用 24）。 |
 | `feed` | 字符串 | 流类型，如 `trending1`；不同入口可能不同，**以抓包为准**。 |
 | `after` | 字符串，可选 | **第二页及以后**：上一页返回的 **`data.artworks.pageInfo.endCursor`**。第一页 **不要** 传。 |
 
 翻页时 **除新增/更新 `after` 外，其余过滤条件必须与本流一致**，否则游标无效或结果错位。
+
+### 5.1 按 Tag（标签）爬取要点
+
+- **与模型流的唯一区别在 `variables` 主键**：标签页、按标签浏览作品时，抓包中为 **`tackId`**（字符串），而不是 **`loraId`**。`isSafeSearch`、`first`、`feed` 等与入口一致即可；**Relay 分页**仍是首屏不传 `after`，之后每页 **`after` = 上一响应的 `data.artworks.pageInfo.endCursor`**（见 §7、§8），不要手写游标（§9）。
+- **示例 `variables`（首屏，紧凑 JSON 后再做 URL 编码）**：
+
+```json
+{
+  "isSafeSearch": true,
+  "tackId": "1941984460689399023",
+  "first": 24,
+  "feed": "trending1"
+}
+```
+
+- **`tackId` 的来源**：须与当前标签页 URL / 接口一致；仓库内 [`json/artworks-tags.json`](./json/artworks-tags.json) 为 **标签列表元数据**（`tags` 查询样例），可用于对照 `id` / `name`，**拉取该标签下的作品列表仍用本接口 `listArtworks` + `tackId`**，二者不要混淆。
+- **与本仓库插件脚本**：[`crawl.rhai`](./crawl.rhai) 当前按 **模型** 组装 `loraId`；若实现「按标签爬作品」，将变量改为 **`tackId`**（并保留相同翻页与 `extensions` 逻辑）即可。
+- **`trending` 类 feed** 仍可能出现时间漂移或相邻页 id 交集，需要唯一集合时对 `node.id` 去重（§8 末段）。
 
 ---
 
@@ -160,8 +179,8 @@ HEADERS = {
   body = 解析 JSON(response)
   返回 body
 
-// 全量翻页
-baseVariables = { loraId, isSafeSearch, first, feed }   // 不含 after
+// 全量翻页（标签流将 loraId 换为 tackId，其余相同）
+baseVariables = { loraId 或 tackId, isSafeSearch, first, feed }   // 不含 after
 cursor = 空
 
 循环:
@@ -243,8 +262,9 @@ curl -sS "$URL" \
 
 | 文件（相对仓库根） | 说明 |
 |--------------------|------|
-| `./json/pixai-listArtworks-page1-response.json` | `variables` 无 `after`（首屏） |
+| `./json/pixai-listArtworks-page1-response.json` | `variables` 无 `after`（首屏；样例为 **`loraId`** 流） |
 | `./json/pixai-listArtworks-page2-response.json` | `variables.after` = 上一文件 `data.artworks.pageInfo.endCursor` |
+| `./json/artworks-tags.json` | 标签元数据对照；**作品分页**仍用 `listArtworks` + **`tackId`**（§5.1） |
 
 ---
 

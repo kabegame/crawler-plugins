@@ -12,6 +12,10 @@
       "description": "插件名称（默认值，无点后缀）。多语言用 name.zh、name.ja 等键"
     },
     "version": { "type": "string", "description": "语义化版本，如 1.0.0" },
+    "minAppVersion": {
+      "type": "string",
+      "description": "运行本插件所需的最低 Kabegame 应用版本（major.minor.patch，如 3.3.1）"
+    },
     "description": {
       "type": "string",
       "description": "插件描述（默认值）。多语言用 description.zh、description.ja 等键"

@@ -1,0 +1,3179 @@
+{
+  "data": {
+    "artworks": {
+      "edges": [
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1977883032743373915",
+            "title": "Columbina in the Snow",
+            "authorId": "1950111781080368188",
+            "prompts": "",
+            "createdAt": "2026-02-10T08:51:19.533Z",
+            "updatedAt": "2026-02-10T08:51:20.456Z",
+            "mediaId": "687330188211654543",
+            "media": {
+              "id": "687330188211654543",
+              "type": "IMAGE",
+              "width": 896,
+              "height": 1152,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/1dff3769-695b-49a1-8b4f-f5995ec3b78f",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/1dff3769-695b-49a1-8b4f-f5995ec3b78f",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/1dff3769-695b-49a1-8b4f-f5995ec3b78f",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UJCa3=4moft8M_VsWXtRIA%Mf+WAIoV@s.Rj",
+              "suggestedTags": [
+                "genshin_impact",
+                "columbina_(genshin_impact)",
+                "anime_style",
+                "1girl",
+                "solo",
+                "long_hair",
+                "smile",
+                "black_hair",
+                "hair_ornament",
+                "closed_mouth",
+                "ribbon",
+                "very_long_hair",
+                "upper_body",
+                "multicolored_hair",
+                "closed_eyes",
+                "pink_hair",
+                "sidelocks",
+                "wings",
+                "blunt_bangs",
+                "streaked_hair",
+                "two-tone_hair",
+                "coat",
+                "from_side",
+                "fur_trim",
+                "feathered_wings",
+                "head_wings",
+                "white_coat",
+                "white_wings",
+                "snow",
+                "hair_spread_out",
+                "snowing",
+                "fur-trimmed_coat",
+                "eye_mask",
+                "white_mask",
+                "fatui_coat"
+              ],
+              "naturalPrompts": "HIDDEN_BY_AUTHOR",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Feb 10 2026 08:51:20 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "breast",
+                "breasts",
+                "bust",
+                "girl on top",
+                "horny",
+                "horror",
+                "negro",
+                "nipples",
+                "panties",
+                "penis",
+                "pregnant",
+                "seductive",
+                "sexual",
+                "teenager"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 3960,
+            "liked": null,
+            "commentCount": 76,
+            "author": {
+              "id": "1950111781080368188",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "pekka25",
+              "displayName": "P.E.K.K.A",
+              "createdAt": "2025-11-25T17:38:16.934Z",
+              "updatedAt": null,
+              "avatarMediaId": "692897794436567616",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/544ccadd-f2fb-4960-8f89-819655730fad",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1962471737415335355",
+                  "decorationId": "1957198761749995683",
+                  "decoration": {
+                    "id": "1957198761749995683",
+                    "code": "xmas_2025_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Jingle Bell"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "叮噹鈴鐺"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ジングルベル"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "징글벨"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/43d2d27a-b2bf-4e70-b103-9aaf7aa7c558"
+                    },
+                    "createdAt": "2025-12-15T06:59:24.796Z",
+                    "updatedAt": "2025-12-15T06:59:56.850Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-29T20:12:20.162Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2025-12-29T20:12:43.792Z",
+                  "createdAt": "2025-12-29T20:12:20.162Z",
+                  "userId": "1950111781080368188",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3LaI5Xw7Fs=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1976447153619934158",
+            "title": "❤︎⋆˙⊹ ෆ ",
+            "authorId": "1855931778144844929",
+            "prompts": "",
+            "createdAt": "2026-02-06T09:45:39.311Z",
+            "updatedAt": "2026-02-06T12:31:58.499Z",
+            "mediaId": "686142090826518458",
+            "media": {
+              "id": "686142090826518458",
+              "type": "IMAGE",
+              "width": 1024,
+              "height": 1024,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/5b4135f1-50a3-429b-9a5a-a9363611e0e5",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/5b4135f1-50a3-429b-9a5a-a9363611e0e5",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/5b4135f1-50a3-429b-9a5a-a9363611e0e5",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.316,
+                "y": 0.671
+              },
+              "description": "Valentine’s Day is coming up soon ❤️\n\nI’ve been a little off lately after starting to feel unwell (╥﹏╥) just hoping I’m not getting sick haha ",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UNLpdO0xV;X.?rxB${#q};-nSuJUs6xaobIV",
+              "suggestedTags": [
+                "anime_style",
+                "long_hair",
+                "looking_at_viewer",
+                "blush",
+                "short_hair",
+                "black_hair",
+                "holding",
+                "multiple_girls",
+                "hair_ornament",
+                "closed_mouth",
+                "hair_between_eyes",
+                "animal_ears",
+                "bow",
+                "2girls",
+                "twintails",
+                "purple_eyes",
+                "upper_body",
+                "white_hair",
+                "ahoge",
+                "heart",
+                "hair_bow",
+                "frills",
+                "choker",
+                "fang",
+                "hood",
+                "maid_headdress",
+                "hoodie",
+                "head_tilt",
+                "frown",
+                "white_bow",
+                "portrait",
+                "yellow_background",
+                "skin_fang",
+                "polka_dot",
+                "hood_up",
+                "orange_background",
+                "animal_hood",
+                "polka_dot_background",
+                "heads_together",
+                "heart_ahoge",
+                "leaning_on_person",
+                "clover",
+                "pink_hoodie",
+                "four-leaf_clover",
+                "clover_hair_ornament",
+                "green_flower"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Fri Feb 06 2026 09:45:39 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "breasts",
+                "diaper",
+                "negro"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 2545,
+            "liked": null,
+            "commentCount": 9,
+            "author": {
+              "id": "1855931778144844929",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "bbiimaii",
+              "displayName": "(mai)",
+              "createdAt": "2025-03-10T20:20:34.454Z",
+              "updatedAt": null,
+              "avatarMediaId": "652228163774965093",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/13873938-72ec-4899-844b-0d188f279d15",
+              "membership": {
+                "membershipId": "membership-start",
+                "tier": 1,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940076648979348038",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T01:02:14.998Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-29T01:21:52.354Z",
+                  "createdAt": "2025-10-29T01:02:14.998Z",
+                  "userId": "1855931778144844929",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1991996789642584964",
+                  "decorationId": "1988388766284596331",
+                  "decoration": {
+                    "id": "1988388766284596331",
+                    "code": "aprilfools_2026_badge_culmulative_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "The Joker’s Ace"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "百變王牌"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "トリッキージョーカー"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "조커의 에이스"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/6202686e-7a09-4eb8-bc46-dc24148ecae4",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/75337a84-7a07-4dda-b0ec-94ec1a10bd69",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/1393789f-7f64-438d-9bc7-ec7dbd0a96ea",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/4a17e0d1-1ce5-4563-a6e5-9243e1bec4df",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-03-11T08:37:21.360Z",
+                    "updatedAt": "2026-03-11T08:37:35.026Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-21T07:34:21.162Z",
+                  "obtainedFrom": "aprilFoolsEvent2026:totalPurchased",
+                  "updatedAt": "2026-03-21T07:34:28.736Z",
+                  "createdAt": "2026-03-21T07:34:21.162Z",
+                  "userId": "1855931778144844929",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG23ANuzZG84=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1975650570511273173",
+            "title": "しなみく",
+            "authorId": "1816068320923418128",
+            "prompts": "\ncinnamiku, cinnamoroll, fuwa fuwa cinnamoroll, sanrio, vocaloid, hatsune miku, hatsune miku (cosplay), miku day, 1girl, solo, 39,\naqua hair, long hair, twintails, updo, hair between eyes, hair bow, bow, aqua bow, blue bow, hair ornament, ear bow, tied ears,\naqua eyes, heart, heart hair ornament, hairclip, headphones, headset,\n:o, > <, ?, spoken question mark, open mouth, parted lips, looking at viewer,\ngrey shirt, collared shirt, sleeveless, sleeveless shirt, lace-trimmed shirt, shirt, black sleeves, detached sleeves, long sleeves,\naqua necktie, blue necktie, necktie, tie clip,\nblack skirt, pleated skirt, miniskirt,\nblack thighhighs, thighhighs, zettai ryouiki,\narm tattoo, number tattoo, tattoo,\ncharacter doll, stuffed toy, holding, holding doll, hugging object,\nlying, knees up,\n\n\n\n(anime art style:1.4),hyper-detailed, (best quality:1.2), beautiful eyes, detailed eyes, 8k, (anime coloring:2.0), (anime screencap:2.0), (high-quality game cg:1.5), (official art:1.2),detailed body, smooth skin, sharp focus,(detailed background)",
+            "createdAt": "2026-02-04T05:00:18.914Z",
+            "updatedAt": "2026-02-04T05:00:20.856Z",
+            "mediaId": "685350933846589555",
+            "media": {
+              "id": "685350933846589555",
+              "type": "IMAGE",
+              "width": 744,
+              "height": 1496,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/90adb400-3fba-48da-a825-c179be48a50b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/90adb400-3fba-48da-a825-c179be48a50b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/90adb400-3fba-48da-a825-c179be48a50b",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.719,
+                "y": 0.41
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UXIFYznkspkC~p-pM{Rjtl$*ozXSr[R*t7kC",
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Feb 04 2026 05:00:20 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "bondage",
+                "breasts",
+                "erotic",
+                "fellatio",
+                "horror",
+                "little girl",
+                "loli",
+                "nude",
+                "panties",
+                "pelvic",
+                "penis",
+                "seductive",
+                "sexual",
+                "shota",
+                "small girl",
+                "tied up"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 2011,
+            "liked": null,
+            "commentCount": 10,
+            "author": {
+              "id": "1816068320923418128",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "user-ichinino",
+              "displayName": "いちにの/ichinino",
+              "createdAt": "2024-11-20T20:17:25.622Z",
+              "updatedAt": null,
+              "avatarMediaId": "570852984267423737",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/be0b7159-b79b-42f8-9438-2561f6608e13",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1936439029117759032",
+                  "decorationId": "1934779891502012261",
+                  "decoration": {
+                    "id": "1934779891502012261",
+                    "code": "anniversary_3rd_badge_gacha_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Game Master"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "遊戲大師"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ゲームマスター"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "게임 마스터"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/4e90e43e-2540-4824-9459-c8f9cbda857e"
+                    },
+                    "createdAt": "2025-10-14T10:14:49.607Z",
+                    "updatedAt": "2025-10-14T10:14:49.607Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-19T00:07:38.840Z",
+                  "obtainedFrom": "Anniversary2025 progress reward p10",
+                  "updatedAt": "2025-10-19T00:07:51.654Z",
+                  "createdAt": "2025-10-19T00:07:38.840Z",
+                  "userId": "1816068320923418128",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1940071894892157618",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-29T00:43:21.536Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-29T02:48:30.855Z",
+                  "createdAt": "2025-10-29T00:43:21.536Z",
+                  "userId": "1816068320923418128",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG2rrufefTNU=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1976815574268905938",
+            "title": "princess zelda",
+            "authorId": "1867705720518714607",
+            "prompts": "princess zelda, the legend of zelda, 1girl, (close-up:1.2), (from above:1.2), cowboy shot, dutch angle, animal, bare arms, bare shoulders, belt, bird, blonde hair, blue eyes, braid, crown braid, dove, dress, elf, floating hair, flock, green background, green eyes, green theme, holding, long dress, long hair, motion blur, outdoors, ripples, skirt hold, sleeveless, sleeveless dress, solo, standing, strapless, strapless dress, sundress, wading, water, white bird, white dress, wind, emmmerald, riko-m, (nishihara isao:0.6), (konya karasue:0.6), (wushier:0.6), (kkia:0.5), (sheya tin:0.5), (renjian shilian:0.4), (krenz:0.4), (a-shacho:0.4), (redum4:0.4), (tanjiu:0.3), stylefeisekong286, cinematic feeling, Aesthetic, excellent, year 2025, newest, perspective, point of view, shadows, lighting, shading, countershading, dynamic shading, dynamic lighting, warm colors, light colors, beautiful light, best quality, high quality",
+            "createdAt": "2026-02-07T10:09:37.541Z",
+            "updatedAt": "2026-02-07T10:09:37.649Z",
+            "mediaId": "686434445746516845",
+            "media": {
+              "id": "686434445746516845",
+              "type": "IMAGE",
+              "width": 848,
+              "height": 1112,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/04010f19-ab77-41af-b11c-914d691b3dc8",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/04010f19-ab77-41af-b11c-914d691b3dc8",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/04010f19-ab77-41af-b11c-914d691b3dc8",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "428",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UBEMm#%cGa5pqcw4I[JA01oyxG-VyWX7xZWB",
+              "suggestedTags": [
+                "the_legend_of_zelda",
+                "the_legend_of_zelda:_breath_of_the_wild",
+                "princess_zelda",
+                "anime_style",
+                "1girl",
+                "solo",
+                "long_hair",
+                "blonde_hair",
+                "dress",
+                "closed_mouth",
+                "jewelry",
+                "bare_shoulders",
+                "standing",
+                "green_eyes",
+                "sidelocks",
+                "braid",
+                "outdoors",
+                "artist_name",
+                "pointy_ears",
+                "day",
+                "necklace",
+                "water",
+                "parted_bangs",
+                "bracelet",
+                "strapless",
+                "bare_arms",
+                "floating_hair",
+                "expressionless",
+                "bird",
+                "strapless_dress",
+                "wind",
+                "wading",
+                "crown_braid",
+                "skirt_hold",
+                "bangle",
+                "ripples",
+                "gold_bracelet",
+                "white_bird",
+                "dove"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Sat Feb 07 2026 10:09:37 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "breast",
+                "breasts",
+                "fisting",
+                "hentai",
+                "horror",
+                "little girl",
+                "nipples",
+                "nsfw",
+                "nude",
+                "seductive",
+                "spread legs",
+                "vaginal",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1687,
+            "liked": null,
+            "commentCount": 3,
+            "author": {
+              "id": "1867705720518714607",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "starrystarxo",
+              "displayName": "★ 𝕮𝖔𝖈𝖔𝕶𝖔𝖐𝖔\n",
+              "createdAt": "2025-04-12T08:06:01.066Z",
+              "updatedAt": null,
+              "avatarMediaId": "696339787996082269",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/72f54063-aedd-4911-84ec-334788ae7293",
+              "membership": {
+                "membershipId": "membership-plus-v2",
+                "tier": 2,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1993463021940920326",
+                  "decorationId": "1985095093653713060",
+                  "decoration": {
+                    "id": "1985095093653713060",
+                    "code": "eap_2026_avatar_frame_grant_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "EAP Member"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "EAP 成員"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "EAPメンバー"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "EAP 멤버"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/ba46d17d-b78d-4a40-a5b4-5f5ce6d9809d",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/ba46d17d-b78d-4a40-a5b4-5f5ce6d9809d",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/0f0bcbce-579b-4727-be17-06afd7ae071c",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/56818f68-931b-46f0-a89e-0075d9f6dd1f",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/ed740bfa-062b-4d3a-ba23-49cc810dd591",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-03-02T06:29:28.611Z",
+                    "updatedAt": "2026-03-02T06:43:15.431Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-25T08:40:38.183Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2026-03-25T08:43:17.327Z",
+                  "createdAt": "2026-03-25T08:40:38.183Z",
+                  "userId": "1867705720518714607",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1993463231010885710",
+                  "decorationId": "1985096127412445672",
+                  "decoration": {
+                    "id": "1985096127412445672",
+                    "code": "eap_2026_badge_grant_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "EAP Elite"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "EAP 精英"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "EAPエリート"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "EAP 엘리트"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/e7957f64-97fa-42eb-8a00-abbfcddadeaa",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/e7957f64-97fa-42eb-8a00-abbfcddadeaa",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/0f0bcbce-579b-4727-be17-06afd7ae071c",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/ac3ab27e-2f87-476e-81c2-d83d988377dc",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/ed740bfa-062b-4d3a-ba23-49cc810dd591",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2026-03-02T06:33:35.078Z",
+                    "updatedAt": "2026-03-02T06:41:18.811Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-25T08:41:28.029Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2026-03-25T08:43:19.429Z",
+                  "createdAt": "2026-03-25T08:41:28.029Z",
+                  "userId": "1867705720518714607",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1993463292580356191",
+                  "decorationId": "1985096236275606069",
+                  "decoration": {
+                    "id": "1985096236275606069",
+                    "code": "eap_2026_artwork_frame_grant_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "EAP Creator"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "EAP 創作者"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "EAPクリエイター"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "EAP 크리에이터"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 315,
+                        "colorStops": [
+                          {
+                            "position": 30,
+                            "colorType": "RRGGBB",
+                            "colorValue": "c6da93"
+                          },
+                          {
+                            "position": 70,
+                            "colorType": "RRGGBB",
+                            "colorValue": "F5BDD5"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2026-03-02T06:34:01.032Z",
+                    "updatedAt": "2026-03-02T06:36:13.741Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-03-25T08:41:42.709Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2026-03-25T08:43:14.475Z",
+                  "createdAt": "2026-03-25T08:41:42.709Z",
+                  "userId": "1867705720518714607",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG28PSorCCdI=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1976522490132918433",
+            "title": "西連寺春菜",
+            "authorId": "1891463946287775012",
+            "prompts": "1girl, sairenji haruna (to love-ru), masterpiece, maid apron, frilled apron, purple hair, purple eyes, short hair, medium breasts, cleavage, holding bowl, chocolate making, heart-shaped box, valentine gift, polka dot bow, puffy sleeves, wrist cuffs, looking at viewer, open mouth, seductive smile",
+            "createdAt": "2026-02-06T14:45:00.973Z",
+            "updatedAt": "2026-02-06T14:45:02.908Z",
+            "mediaId": "686222311437142715",
+            "media": {
+              "id": "686222311437142715",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/248fa6be-a409-470f-90c6-006aed9cd89f",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/248fa6be-a409-470f-90c6-006aed9cd89f",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/248fa6be-a409-470f-90c6-006aed9cd89f",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.489,
+                "y": 0.28
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UJJQ~A4mEbww?wIA%GXO8_IrtjV@SibceSog",
+              "naturalPrompts": "sairenji haruna, to love-ru, 1girl, apron, bow, bowl, bowtie, box, breasts, chocolate, chocolate making, cleavage, food, frilled apron, gift, gift box, hair bow, hairband, heart, heart-shaped box, heart-shaped food, holding, maid, maid apron, maid headdress, medium breasts, mixing bowl, open mouth, polka dot, polka dot bow, puffy short sleeves, puffy sleeves, purple eyes, purple hair, short hair, short sleeves, solo, star (symbol), trading card, valentine, waist apron, white apron, wrist cuffs",
+              "taskProcessType": "normal",
+              "moderationMachine": "Fri Feb 06 2026 14:45:02 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "1girl, solo, long hair, breasts, looking at viewer, simple background, black hair, dress, hat, cleavage, sidelocks, small breasts, sleeveless, choker, grey background, black dress, black eyes, black choker, sleeveless dress, black hat, arms behind back,1girl,ahegao,nsfw,vulgarity,pussy,pregnant,birth,(child birth:1.5),(baby emerging out of vagina:1.5),(vaginal birth:1.5),lying,",
+                "booty",
+                "breasts",
+                "bust",
+                "child",
+                "grope",
+                "horror",
+                "little boy",
+                "loli",
+                "milking",
+                "negro",
+                "nsfw",
+                "nude",
+                "panties",
+                "penis",
+                "pussy",
+                "scat",
+                "seductive",
+                "sex",
+                "small boy",
+                "small girl",
+                "tit",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 830,
+            "liked": null,
+            "commentCount": 4,
+            "author": {
+              "id": "1891463946287775012",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "ggxxvenom",
+              "displayName": "西連寺撞",
+              "createdAt": "2025-06-16T21:32:43.496Z",
+              "updatedAt": null,
+              "avatarMediaId": "609277660705645035",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/2003ed24-cc9e-4307-a0e7-00f425d97a9a",
+              "membership": {
+                "membershipId": "membership-premium",
+                "tier": 3,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1909385676239607825",
+                  "decorationId": "1909385491920916488",
+                  "decoration": {
+                    "id": "1909385491920916488",
+                    "code": "sodaFloat2025",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Tropical Breeze"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "トロピカルフルーツ"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "쥬시 트로피컬"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "熱帶果香"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/aa5d6146-9ad7-4383-9b20-64a0f2dc3da6",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/aa5d6146-9ad7-4383-9b20-64a0f2dc3da6",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/0a52325a-50ca-4bea-ae58-eacd4e00f322",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/bcbda57a-a0d3-4121-b21f-a7f71d8faca3",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/b7da939d-2dc0-4ae0-8a3c-93853f402a3c",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-08-05T08:26:32.941Z",
+                    "updatedAt": "2025-12-03T13:30:43.849Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-07-18T13:15:15.857Z",
+                  "obtainedFrom": "summerEvent2025",
+                  "updatedAt": "2025-08-05T08:27:16.886Z",
+                  "createdAt": "2025-08-05T08:27:16.886Z",
+                  "userId": "1891463946287775012",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1936163008757273785",
+                  "decorationId": "1934779891502012261",
+                  "decoration": {
+                    "id": "1934779891502012261",
+                    "code": "anniversary_3rd_badge_gacha_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Game Master"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "遊戲大師"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ゲームマスター"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "게임 마스터"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/4e90e43e-2540-4824-9459-c8f9cbda857e"
+                    },
+                    "createdAt": "2025-10-14T10:14:49.607Z",
+                    "updatedAt": "2025-10-14T10:14:49.607Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-18T05:50:50.456Z",
+                  "obtainedFrom": "Anniversary2025 progress reward p10",
+                  "updatedAt": "2025-10-21T13:11:38.327Z",
+                  "createdAt": "2025-10-18T05:50:50.456Z",
+                  "userId": "1891463946287775012",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1939733856558570528",
+                  "decorationId": "1934782442537681111",
+                  "decoration": {
+                    "id": "1934782442537681111",
+                    "code": "anniversary_3rd_artwork_frame_gacha_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Eclipse Kiss"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "日蝕之吻"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "エクリプスキス"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "이클립스 키스"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 323,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "3E3E3E"
+                          },
+                          {
+                            "position": 16,
+                            "colorType": "RRGGBB",
+                            "colorValue": "534447"
+                          },
+                          {
+                            "position": 30,
+                            "colorType": "RRGGBB",
+                            "colorValue": "EE8997"
+                          },
+                          {
+                            "position": 46,
+                            "colorType": "RRGGBB",
+                            "colorValue": "E06D8D"
+                          },
+                          {
+                            "position": 62,
+                            "colorType": "RRGGBB",
+                            "colorValue": "F898B3"
+                          },
+                          {
+                            "position": 81,
+                            "colorType": "RRGGBB",
+                            "colorValue": "8F5E5E"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "535353"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:24:57.821Z",
+                    "updatedAt": "2025-10-14T10:24:57.821Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-28T02:20:06.916Z",
+                  "obtainedFrom": "Anniversary2025 progress reward p20",
+                  "updatedAt": "2025-10-28T15:04:46.399Z",
+                  "createdAt": "2025-10-28T02:20:06.916Z",
+                  "userId": "1891463946287775012",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG24Eu5LxcKE=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1976500242709700739",
+            "title": "My Valentine (haha)",
+            "authorId": "1813583560831402225",
+            "prompts": "1girl, masterpiece, intricate details, ultra detailed, ai-generated, best quality, amazing quality, absurdres, very aesthetic, best composition, best angle, cinematic angle, newest, beautiful eyes, detailed eyes, HDeyes, very blurry background, blurry blue and pink neon light background, vibrant colors, dynamic lighting, mai valentine (yu-gi-oh!), blonde hair, long hair, purple eyes, hair between eyes, jewelry, lipstick, makeup, hoop earrings, holding letter, heart shaped sticker on letter, (blushing), shy, hiding, looking at viewer, red blush, soft, cute, kawaii",
+            "createdAt": "2026-02-06T13:16:36.683Z",
+            "updatedAt": "2026-02-06T13:16:37.543Z",
+            "mediaId": "686067044713630420",
+            "media": {
+              "id": "686067044713630420",
+              "type": "IMAGE",
+              "width": 1920,
+              "height": 1152,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/9bace82f-581b-4590-912a-2bc11a636db6",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/9bace82f-581b-4590-912a-2bc11a636db6",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/9bace82f-581b-4590-912a-2bc11a636db6",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UPJ7XV0g4;-oR%f,xwxstSR*V]oeWVS3NGj?",
+              "naturalPrompts": "1girl, masterpiece, intricate details, ultra detailed, ai-generated, best quality, amazing quality, absurdres, very aesthetic, best composition, best angle, cinematic angle, newest, beautiful eyes, detailed eyes, HDeyes, very blurry background, blurry blue and pink neon light background,  vibrant colors, dynamic lighting, mai valentine, blonde hair, long hair, purple eyes, hair between eyes, jewelry, lipstick, makeup, hoop earrings, holding letter, heart shaped sticker on letter, (blushing), shy, hiding, looking at viewer, , red blush, soft, cute, kawaii, ",
+              "suggestedTacks": [
+                "1941984459598877490",
+                "1941984459632434772",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459531769135",
+                "1941984459569518236",
+                "1941984459640821699",
+                "1941984459808592822",
+                "1941984459632431118",
+                "1941984459607268130",
+                "1941984459586294153",
+                "1941984459577906605",
+                "1941984459565322621",
+                "1941984459607268133",
+                "1941984459691153591",
+                "1941984459611459944",
+                "1941984459565322334",
+                "1941984459619848494",
+                "1941984459624043373",
+                "1941984459686958115"
+              ],
+              "taskProcessType": "hires",
+              "moderationMachine": "Fri Feb 06 2026 13:16:37 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "ass",
+                "booty",
+                "breasts",
+                "bust",
+                "erotic",
+                "horror",
+                "loli",
+                "milf",
+                "milking",
+                "no clothes",
+                "nudity",
+                "panties",
+                "penis",
+                "pregnant",
+                "pubic",
+                "seductive",
+                "see through",
+                "sex"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 633,
+            "liked": null,
+            "commentCount": 24,
+            "author": {
+              "id": "1813583560831402225",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "soragami",
+              "displayName": "sora",
+              "createdAt": "2024-11-13T23:43:52.652Z",
+              "updatedAt": null,
+              "avatarMediaId": "695085369374690933",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/33c6b41c-5197-43d6-8e45-6f040088c4fb",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG23wf7EvYIM=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1977926335675274345",
+            "title": "fox girl",
+            "authorId": "1624475692347965592",
+            "prompts": "1 fox girl, amber eyes, (fox tail:0.9), fox ears, low ponytail, orange hair, (surprised:1.1), open mouth, (fang:0.9), cute, (sweatdrop:1.1), \nshort robe, (witch hat:0.9), apron, ribbon, (pink witch:0.9), \npouring pink onto chocolate, (holding test tube:1.1), (leaning forward:0.7), \nbrown chocolate, heart-shaped chocolate, stone table, indoors, \nsharp focus, looking at viewer, looking back, from behind, from above, \n(intricate:1.1), (pink tone:1.1), (brown tone:0.9), (pink theme:1.1), \nmasterpiece, best quality, very aesthetic, absurdres, detailed background, newest, ai-generated, intricate details, ",
+            "createdAt": "2026-02-10T11:43:23.658Z",
+            "updatedAt": "2026-02-10T11:43:23.898Z",
+            "mediaId": "687323151736538404",
+            "media": {
+              "id": "687323151736538404",
+              "type": "IMAGE",
+              "width": 984,
+              "height": 1264,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/f3e064e5-9d99-40c3-a481-d39545996e7b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/f3e064e5-9d99-40c3-a481-d39545996e7b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/f3e064e5-9d99-40c3-a481-d39545996e7b",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "USLxiR?b1a$+=|=0spX9Mxaer?$*D*rYIUWA",
+              "suggestedTacks": [
+                "1941984459972169826",
+                "1941984459632434772",
+                "1941984459565326088",
+                "1941984459628239862",
+                "1941984459531769135",
+                "1941984459603073733",
+                "1941984459640821699",
+                "1941984459561130127",
+                "1941984459531768674",
+                "1941984459561130570",
+                "1941984459531768954",
+                "1941984459561130702",
+                "1941984459577906605",
+                "1941984459569518849",
+                "1941984459569517587",
+                "1941984459569518275",
+                "1941984459531769186",
+                "1941984459598880637",
+                "1941984459632434953",
+                "1941984459598876818",
+                "1941984459565322638",
+                "1941984459804401572",
+                "1941984459619848553",
+                "1941984459573713728",
+                "1941984459577906116",
+                "1941984459670183060",
+                "1941984460869752901"
+              ],
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Feb 10 2026 11:43:23 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "booty",
+                "breasts",
+                "dick",
+                "doggystyle",
+                "handjob",
+                "loli",
+                "moaning",
+                "nsfw",
+                "nude",
+                "panties",
+                "pelvic",
+                "seductive",
+                "strap on"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 592,
+            "liked": null,
+            "commentCount": 30,
+            "author": {
+              "id": "1624475692347965592",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "yukishigure",
+              "displayName": "Yukishigure",
+              "createdAt": "2023-06-11T03:36:43.444Z",
+              "updatedAt": null,
+              "avatarMediaId": "339062963350234857",
+              "avatarSmallThumbnailMediaUrl": "https://imagedelivery.net/5ejkUOtsMH5sf63fw6q33Q/acf954c5-c7a9-4da2-3ea9-febf126e9100/thumbnail",
+              "membership": {
+                "membershipId": "membership-start",
+                "tier": 1,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940475541491510116",
+                  "decorationId": "1934779892882244204",
+                  "decoration": {
+                    "id": "1934779892882244204",
+                    "code": "anniversary_3rd_badge_checkin_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Starlit Hat"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "星光魔帽"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "星影の帽子"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "스타라이트 햇"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/1b05ba7f-80c4-4071-ae38-3993f9bd48c0"
+                    },
+                    "createdAt": "2025-10-14T10:14:49.935Z",
+                    "updatedAt": "2025-10-14T10:14:49.935Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-30T03:27:18.384Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-30T03:28:44.613Z",
+                  "createdAt": "2025-10-30T03:27:18.384Z",
+                  "userId": "1624475692347965592",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1940475541642505065",
+                  "decorationId": "1934781811770393328",
+                  "decoration": {
+                    "id": "1934781811770393328",
+                    "code": "anniversary_3rd_avatar_frame_checkin_2",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Misty Boo"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "迷霧小鬼"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ミストゴースト"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "미스티 부"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/0981cd80-f72f-4461-afd1-339704b9210b",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/0981cd80-f72f-4461-afd1-339704b9210b",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/d8e5d7d1-e5b4-4dbf-9178-681a8bda7d0e",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/41e49313-1997-4dae-801f-cba49fee6f05",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/11f61e2a-8b8a-48c5-83dd-7763f59f773a",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.434Z",
+                    "updatedAt": "2025-12-03T13:03:35.399Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-30T03:27:18.419Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-10-30T03:28:54.021Z",
+                  "createdAt": "2025-10-30T03:27:18.419Z",
+                  "userId": "1624475692347965592",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3MBhdXQlGk=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1978403691514799954",
+            "title": "7",
+            "authorId": "1918724032712494360",
+            "prompts": "",
+            "createdAt": "2026-02-11T19:20:14.058Z",
+            "updatedAt": "2026-02-11T19:20:15.786Z",
+            "mediaId": "688103875735993988",
+            "media": {
+              "id": "688103875735993988",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1280,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/0771f22c-d0b3-4d81-9d23-551a08148215",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/0771f22c-d0b3-4d81-9d23-551a08148215",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/0771f22c-d0b3-4d81-9d23-551a08148215",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UPM84^z;yXTe~Wx]baxZTKOEZ~Mx%fRkkCXT",
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Feb 11 2026 19:20:15 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "12 years",
+                "14 years",
+                "baby",
+                "bondage",
+                "breast",
+                "breasts",
+                "bust",
+                "child",
+                "clitoris",
+                "cum",
+                "fingering",
+                "horror",
+                "late teen",
+                "little boy",
+                "moaning",
+                "naked",
+                "negro",
+                "nipples",
+                "nsfw",
+                "nude",
+                "panties",
+                "panty",
+                "peeing",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "sex",
+                "sexo",
+                "small girl",
+                "spread legs",
+                "suck",
+                "tied up",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1222,
+            "liked": null,
+            "commentCount": 28,
+            "author": {
+              "id": "1918724032712494360",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "kioraaaa",
+              "displayName": "keyna kiora💕",
+              "createdAt": "2025-08-31T02:54:34.568Z",
+              "updatedAt": null,
+              "avatarMediaId": "674971820856258835",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/bd7a84a8-8598-43f1-af94-0057550c11c5",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1943325741372112576",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-11-07T00:12:58.989Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-12-17T07:48:32.450Z",
+                  "createdAt": "2025-11-07T00:12:58.989Z",
+                  "userId": "1918724032712494360",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1957347223539819031",
+                  "decorationId": "1934782441321286991",
+                  "decoration": {
+                    "id": "1934782441321286991",
+                    "code": "anniversary_3rd_artwork_frame_shop_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Hydrangea"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "紫陽花"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "アジサイ"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "수국"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 273,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "6D5FEE"
+                          },
+                          {
+                            "position": 21,
+                            "colorType": "RRGGBB",
+                            "colorValue": "8B7FFB"
+                          },
+                          {
+                            "position": 36,
+                            "colorType": "RRGGBB",
+                            "colorValue": "9D9FFF"
+                          },
+                          {
+                            "position": 55,
+                            "colorType": "RRGGBB",
+                            "colorValue": "FF7DE2"
+                          },
+                          {
+                            "position": 75,
+                            "colorType": "RRGGBB",
+                            "colorValue": "EF6D92"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "CF64A1"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:24:57.530Z",
+                    "updatedAt": "2025-10-14T10:24:57.530Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-15T16:49:20.844Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2025-12-15T16:49:32.971Z",
+                  "createdAt": "2025-12-15T16:49:20.844Z",
+                  "userId": "1918724032712494360",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1938975332674047081",
+                  "decorationId": "1934779891502012261",
+                  "decoration": {
+                    "id": "1934779891502012261",
+                    "code": "anniversary_3rd_badge_gacha_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Game Master"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "遊戲大師"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ゲームマスター"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "게임 마스터"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/4e90e43e-2540-4824-9459-c8f9cbda857e"
+                    },
+                    "createdAt": "2025-10-14T10:14:49.607Z",
+                    "updatedAt": "2025-10-14T10:14:49.607Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-26T00:06:00.730Z",
+                  "obtainedFrom": "Anniversary2025 progress reward p10",
+                  "updatedAt": "2025-12-17T07:48:36.506Z",
+                  "createdAt": "2025-10-26T00:06:00.730Z",
+                  "userId": "1918724032712494360",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3SzrOcPp1I=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1977816392480666104",
+            "title": "OC🍓",
+            "authorId": "1917760407412047660",
+            "prompts": "",
+            "createdAt": "2026-02-10T04:26:31.164Z",
+            "updatedAt": "2026-03-01T05:34:20.517Z",
+            "mediaId": "680777859855592292",
+            "media": {
+              "id": "680777859855592292",
+              "type": "IMAGE",
+              "width": 768,
+              "height": 1024,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/images/orig/2297d535-175f-4932-9fe2-c64488db7836",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/images/thumb/2297d535-175f-4932-9fe2-c64488db7836",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/images/stillThumb/2297d535-175f-4932-9fe2-c64488db7836",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "cpKeywords": [],
+              "faceCenter": {
+                "x": 0.561,
+                "y": 0.51
+              },
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UMNT8,xEQn%g%%^Q=|s:UuIqsTEz=etRniNF",
+              "naturalPrompts": "HIDDEN_BY_AUTHOR",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Feb 10 2026 04:26:31 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "14 years",
+                "ass",
+                "baby",
+                "breast",
+                "breasts",
+                "children",
+                "fellatio",
+                "futanari",
+                "horror",
+                "loli",
+                "milf",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "nsfw",
+                "nude",
+                "panties",
+                "seductive",
+                "sexual",
+                "shirt lift",
+                "teenager",
+                "tit",
+                "tits"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 1112,
+            "liked": null,
+            "commentCount": 31,
+            "author": {
+              "id": "1917760407412047660",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "hahary",
+              "displayName": "fff",
+              "createdAt": "2025-08-28T11:05:28.481Z",
+              "updatedAt": null,
+              "avatarMediaId": "",
+              "avatarSmallThumbnailMediaUrl": null,
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3Kdh7DBMfg=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1975472341314421650",
+            "title": " ",
+            "authorId": "1914318305634427381",
+            "prompts": "",
+            "createdAt": "2026-02-03T17:12:05.956Z",
+            "updatedAt": "2026-02-03T17:12:06.816Z",
+            "mediaId": "684398237032342821",
+            "media": {
+              "id": "684398237032342821",
+              "type": "IMAGE",
+              "width": 1472,
+              "height": 832,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/4be7b742-dc8b-4470-904b-391a2a1f050b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/4be7b742-dc8b-4470-904b-391a2a1f050b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/4be7b742-dc8b-4470-904b-391a2a1f050b",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UNF?0G-oxqM_0eNds;xto~aK#QMyw[R,cGg3",
+              "suggestedTags": [
+                "anime_style",
+                "1girl",
+                "solo",
+                "looking_at_viewer",
+                "short_hair",
+                "shirt",
+                "blue_eyes",
+                "long_sleeves",
+                "holding",
+                "1boy",
+                "hair_between_eyes",
+                "hat",
+                "white_shirt",
+                "blue_hair",
+                "upper_body",
+                "male_focus",
+                "flower",
+                "food",
+                "virtual_youtuber",
+                "scarf",
+                "fruit",
+                "beret",
+                "holding_food",
+                "cat",
+                "fire",
+                "suspenders",
+                "bug",
+                "butterfly",
+                "blue_flower",
+                "cake",
+                "red_scarf",
+                "strawberry",
+                "covered_mouth",
+                "candle",
+                "black_cat",
+                "picture_frame",
+                "blue_butterfly",
+                "painting_(object)",
+                "candlestand",
+                "cat_on_shoulder"
+              ],
+              "naturalPrompts": "HIDDEN_BY_AUTHOR",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Feb 03 2026 17:12:06 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "adolescent",
+                "ass",
+                "baby",
+                "blowjob",
+                "breast",
+                "breasts",
+                "bust",
+                "cock",
+                "dildo",
+                "doggystyle",
+                "erotic",
+                "fucking",
+                "genitals",
+                "horror",
+                "kid",
+                "loli",
+                "middle school",
+                "moaning",
+                "negro",
+                "nipples",
+                "nsfw",
+                "nude",
+                "pubic",
+                "seductive",
+                "sex",
+                "topless",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 814,
+            "liked": null,
+            "commentCount": 4,
+            "author": {
+              "id": "1914318305634427381",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "shika14106",
+              "displayName": "鹿先森",
+              "createdAt": "2025-08-18T23:07:47.378Z",
+              "updatedAt": null,
+              "avatarMediaId": "678893905970260018",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/e28ef171-4835-4fb6-9e9f-31a44154ccb7",
+              "membership": {
+                "membershipId": "membership-start",
+                "tier": 1,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1940506557561789000",
+                  "decorationId": "1934781812940739939",
+                  "decoration": {
+                    "id": "1934781812940739939",
+                    "code": "anniversary_3rd_avatar_frame_checkin_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Fox Whisper"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "狐狸低語"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "狐のささやき"
+                        },
+                        {
+                          "lang": "kr",
+                          "text": "여우의 속삭임"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/fe3be9f0-70d7-4af9-9d24-3641c9051e62",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/11eeabee-4064-4e5f-917d-0a9f144f5f39",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/0195ba9c-5b71-41bc-b058-558a022acb26",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/2d79a054-83e8-417f-9017-15a1c4e5e0a2",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-10-14T10:22:27.712Z",
+                    "updatedAt": "2025-12-03T13:11:59.174Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-10-30T05:30:33.192Z",
+                  "obtainedFrom": "",
+                  "updatedAt": "2025-11-01T03:09:05.180Z",
+                  "createdAt": "2025-10-30T05:30:33.192Z",
+                  "userId": "1914318305634427381",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1964809655195378907",
+                  "decorationId": "1962567047905629882",
+                  "decoration": {
+                    "id": "1962567047905629882",
+                    "code": "newyear_2026_badge_credit_pack_1",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Plum Shrine"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "梅花神龕"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "梅花の社"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "매화 신사"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/89c38e1d-0377-4c2f-a624-e3457acb635b"
+                    },
+                    "createdAt": "2025-12-30T02:31:03.954Z",
+                    "updatedAt": "2025-12-30T02:31:51.153Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-01-05T07:02:23.197Z",
+                  "obtainedFrom": "newYearEvent2026_order_extra-package-2",
+                  "updatedAt": "2026-03-17T20:34:52.026Z",
+                  "createdAt": "2026-01-05T07:02:23.197Z",
+                  "userId": "1914318305634427381",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG2pJoL+nw5I=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1980490844641774567",
+            "title": "蛇喰夢子",
+            "authorId": "1878650179896731788",
+            "prompts": "solo, Jabami Yumeko (Kakegurui), ((black and red patterned background:1.5)), hyakkaou academy school uniform, school uniform, red blazer, gray houndstooth patterned mini pleated skirt, black pantyhose, suit jacket, collared shirt, holding cards, red nail polish, thumb ring, pantyhose,  \nfocus, full body, crossed legs, sitting, contrapposto, puffy thighs, thick thighs, abstract background, from below,  \nblunt bangs, black hair, hime cut, long hair, red eyes, long lashes, shiny lips, soft lips, glossy lips, red lips, blush, blush body, glistening skin, crazy laugh, open mouth,  \nsoft color, pale colors, light colors, soft focus, shiny skin, glossy lips, aegyo sal, long eyelashes, sketch lines, Aes_stylemix",
+            "createdAt": "2026-02-17T13:33:50.296Z",
+            "updatedAt": "2026-03-02T07:52:00.813Z",
+            "mediaId": "684338330588246908",
+            "media": {
+              "id": "684338330588246908",
+              "type": "IMAGE",
+              "width": 1536,
+              "height": 1536,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/gi/orig/ae7799e6-640d-4297-911b-0679cf9ef34b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/thumb/ae7799e6-640d-4297-911b-0679cf9ef34b",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/gi/stillThumb/ae7799e6-640d-4297-911b-0679cf9ef34b",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": false,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "isSexyPic": true,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "isSexyText": false,
+              "description": "",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UaI2:Aof[;#S}ZX8aKr?soR*bHS2J7nif+xa",
+              "naturalPrompts": "solo, Jabami Yumeko_\\(Kakegurui\\), ((black and red patterned background:1.5)),  jabami yumeko, hyakkaou academy school uniform, school uniform, red blazer, gray houndstooth patterned mini pleated skirt, black pantyhose, suit jacket, collared shirt, holding cards, red nail polish, thumb ring, pantyhose, \nfocus, full body, crossed legs, sitting, contrapposto, puffy thighs, thick thighs, abstract background, from below, \nblunt bangs, black hair, hime cut, long hair, red eyes, long lashes, shiny lips, soft lips, glossy lips, red lips, blush, blush body, glistening skin, crazy laugh, open mouth, \n\nsoft color, pale colors, light colors, soft focus, shiny skin, glossy lips, aegyo sal,  long eyelashes, sketch lines, Aes_stylemix",
+              "suggestedTacks": [
+                "1941984459716319281",
+                "1941984459762457412",
+                "1941984459632434772",
+                "1941984459565326112",
+                "1941984459565326088",
+                "1941984459531768781",
+                "1941984459628239862",
+                "1941984459573714238",
+                "1941984459603073733",
+                "1941984459615656564",
+                "1941984459619848768",
+                "1941984459561130122",
+                "1941984459569518218",
+                "1941984459640821699",
+                "1941984459561130205",
+                "1941984459632431118",
+                "1941984459586294001",
+                "1941984459565322686",
+                "1941984459728902767",
+                "1941984459561129868",
+                "1941984459582101359",
+                "1941984459577906345",
+                "1941984459531769433",
+                "1941984459619851850",
+                "1941984459598877217",
+                "1941984459573714931",
+                "1941984459607268721",
+                "1941984459825371487",
+                "1941984459565325902",
+                "1941984459577905307",
+                "1941984459586294378",
+                "1941984459531768304",
+                "1941984459569517414",
+                "1941984459573713385",
+                "1941984459938616474"
+              ],
+              "moderationHuman": "1772437920810",
+              "taskProcessType": "normal",
+              "moderationMachine": "Tue Feb 17 2026 13:33:51 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "10 years",
+                "11years",
+                "12-year-old",
+                "13-year-old",
+                "6-year-old",
+                "8 year",
+                "8 years",
+                "adolescent",
+                "anal",
+                "ass",
+                "baby",
+                "bdsm",
+                "big knockers",
+                "bitch",
+                "blowjob",
+                "bondage",
+                "booty",
+                "breast",
+                "breasts",
+                "bust",
+                "butthole",
+                "cameltoe",
+                "child",
+                "children",
+                "cock",
+                "convulsing",
+                "cum",
+                "diaper",
+                "dick",
+                "dog style",
+                "doggy style",
+                "doggystyle",
+                "dominatrix",
+                "erotic",
+                "fellatio",
+                "femdom",
+                "footjob",
+                "fucking",
+                "futanari",
+                "gangbang",
+                "girl on top",
+                "guro",
+                "hardcore",
+                "hentai",
+                "horror",
+                "kid",
+                "kindergarten",
+                "leather restraint",
+                "little boy",
+                "little girl",
+                "loli",
+                "lolicon",
+                "masturbating",
+                "milf",
+                "minor",
+                "missionary position",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "nudity",
+                "nursery",
+                "open front",
+                "oral",
+                "orgasm",
+                "panties",
+                "panty",
+                "pees",
+                "pelvic",
+                "penis",
+                "porno",
+                "pregnancy",
+                "pregnant",
+                "preteen",
+                "pubic",
+                "pussy",
+                "school age",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "semen",
+                "sex",
+                "sexo",
+                "sexual",
+                "shirt lift",
+                "shota",
+                "slingshot",
+                "slut",
+                "small boy",
+                "small girl",
+                "spread legs",
+                "strap on",
+                "strip club",
+                "stripper",
+                "teenager",
+                "testicles",
+                "tied up",
+                "tits",
+                "topless",
+                "undress",
+                "undressing",
+                "upskirt",
+                "urethra",
+                "vagina",
+                "vaginal",
+                "very young",
+                "vulva",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 541,
+            "liked": null,
+            "commentCount": 4,
+            "author": {
+              "id": "1878650179896731788",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "gorira33",
+              "displayName": "末端ゴリラ",
+              "createdAt": "2025-05-12T12:55:23.694Z",
+              "updatedAt": null,
+              "avatarMediaId": "599611815284556481",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/0daf7a60-4d23-4cee-a80e-848f60847379",
+              "membership": null,
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3wd7hvJS+c=",
+          "__typename": "ArtworkEdge"
+        },
+        {
+          "node": {
+            "__typename": "Artwork",
+            "id": "1978126857196659304",
+            "title": "Failed work ",
+            "authorId": "1857493201894573963",
+            "prompts": "",
+            "createdAt": "2026-02-11T01:00:11.738Z",
+            "updatedAt": "2026-02-17T18:19:44.391Z",
+            "mediaId": "674592083816732747",
+            "media": {
+              "id": "674592083816732747",
+              "type": "IMAGE",
+              "width": 1392,
+              "height": 1392,
+              "urls": [
+                {
+                  "variant": "PUBLIC",
+                  "url": "https://images-ng.pixai.art/images/orig/253a3648-6da5-4fe2-b759-fb208052dc88",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/images/thumb/253a3648-6da5-4fe2-b759-fb208052dc88",
+                  "__typename": "ImageUrl"
+                },
+                {
+                  "variant": "STILL_THUMBNAIL",
+                  "url": "https://images-ng.pixai.art/images/stillThumb/253a3648-6da5-4fe2-b759-fb208052dc88",
+                  "__typename": "ImageUrl"
+                }
+              ],
+              "imageType": "webp",
+              "fileUrl": null,
+              "duration": null,
+              "thumbnailUrl": null,
+              "hlsUrl": null,
+              "size": null,
+              "flag": {
+                "shouldBlur": false,
+                "__typename": "ModerationFlag"
+              },
+              "__typename": "Media"
+            },
+            "videoMediaId": null,
+            "hidePrompts": true,
+            "visibility": "PUBLIC",
+            "isNsfw": false,
+            "isSensitive": false,
+            "extra": {
+              "isMinors": false,
+              "isWarned": false,
+              "challenge": 73,
+              "isSexyPic": false,
+              "cpKeywords": [],
+              "faceCenter": null,
+              "isSexyText": false,
+              "description": "I donhave time to make a new work that I have to upload my failed work instead 😅✨💕",
+              "isRealistic": false,
+              "isSensitive": false,
+              "imageBlurHash": "UqD][VRjIUs.jCjrflog4ms:xtR*bcbIjbRj",
+              "naturalPrompts": "HIDDEN_BY_AUTHOR",
+              "taskProcessType": "normal",
+              "moderationMachine": "Wed Feb 11 2026 01:00:12 GMT+0000 (Coordinated Universal Time)",
+              "sensitiveKeywords": [
+                "10 years",
+                "11-year-old",
+                "11years",
+                "12-year-old",
+                "3 years",
+                "4 year",
+                "8 years-old",
+                "adolescent",
+                "ass",
+                "baby",
+                "ball gag",
+                "bdsm",
+                "black cock",
+                "bondage",
+                "booty",
+                "breast",
+                "breasts",
+                "bust",
+                "cameltoe",
+                "child",
+                "clitoris",
+                "cum",
+                "cunnilingus",
+                "deepthroat",
+                "diaper",
+                "doggy style",
+                "dominatrix",
+                "elementary school",
+                "erotic",
+                "fellatio",
+                "fingering",
+                "futanari",
+                "handjob",
+                "hentai",
+                "horny",
+                "horror",
+                "kindergarten",
+                "little boy",
+                "little girl",
+                "loli",
+                "masturbation",
+                "middle school",
+                "milf",
+                "minor",
+                "moaning",
+                "naked",
+                "negro",
+                "nipple",
+                "nipples",
+                "no clothes",
+                "nsfw",
+                "nude",
+                "open front",
+                "oral",
+                "orgasm",
+                "panties",
+                "panty",
+                "pelvic",
+                "penis",
+                "piss",
+                "pregnant",
+                "pubic",
+                "pussy",
+                "rape",
+                "school age",
+                "schoolgirl",
+                "seductive",
+                "see through",
+                "semen",
+                "sex",
+                "sexually",
+                "shota",
+                "slingshot",
+                "small boy",
+                "small girl",
+                "spread legs",
+                "suck",
+                "teenager",
+                "tied up",
+                "tits",
+                "topless",
+                "vagina",
+                "young adult"
+              ],
+              "censorSensitiveFlag": "PASS"
+            },
+            "type": "DEFAULT",
+            "paidCredit": null,
+            "aesScore": null,
+            "feedMetadata": null,
+            "flag": {
+              "status": "END",
+              "isSensitive": false,
+              "isMinors": false,
+              "isRealistic": false,
+              "isFlagged": false,
+              "shouldBlur": false,
+              "isWarned": false,
+              "isAppealable": false,
+              "__typename": "ModerationFlag"
+            },
+            "likedCount": 524,
+            "liked": null,
+            "commentCount": 29,
+            "author": {
+              "id": "1857493201894573963",
+              "email": null,
+              "emailVerified": null,
+              "verificationStatus": null,
+              "username": "nodsl",
+              "displayName": "EPW",
+              "createdAt": "2025-03-15T03:45:06.887Z",
+              "updatedAt": null,
+              "avatarMediaId": "700585338334081284",
+              "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/9b9c8e16-5095-413e-9a7c-8009f2f8f9a9",
+              "membership": {
+                "membershipId": "membership-premium",
+                "tier": 3,
+                "__typename": "Membership"
+              },
+              "deleteAfter": null,
+              "isAdmin": null,
+              "platformRoles": null,
+              "accountType": "default",
+              "activeDecorations": [
+                {
+                  "id": "1959973668837491328",
+                  "decorationId": "1957201936285832170",
+                  "decoration": {
+                    "id": "1957201936285832170",
+                    "code": "xmas_2025_avatar_frame_credit_pack_1",
+                    "type": "AVATAR_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Gingerbread Charm"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "薑餅祝福"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "魔法ジンジャー"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "진저브레드 참"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/f81ab861-2ef5-41c4-a103-386c9d204cc5",
+                      "mediaAsset": {
+                        "original": "https://images-ng.pixai.art/images/orig/f81ab861-2ef5-41c4-a103-386c9d204cc5",
+                        "variants": {
+                          "large": {
+                            "url": "https://images-ng.pixai.art/images/orig/101a3e37-3624-4535-a18c-cdf605c3293c",
+                            "width": 256,
+                            "height": 256
+                          },
+                          "small": {
+                            "url": "https://images-ng.pixai.art/images/orig/1d246083-4d92-458f-a281-ad4284bd2a40",
+                            "width": 64,
+                            "height": 64
+                          },
+                          "medium": {
+                            "url": "https://images-ng.pixai.art/images/orig/49c4cb13-10ab-4512-bbf0-4ded1482c3ec",
+                            "width": 128,
+                            "height": 128
+                          }
+                        }
+                      }
+                    },
+                    "createdAt": "2025-12-15T07:12:01.665Z",
+                    "updatedAt": "2025-12-15T07:18:12.626Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-22T22:45:54.201Z",
+                  "obtainedFrom": "christmasEvent2025_order_extra-package-3",
+                  "updatedAt": "2025-12-22T23:46:54.113Z",
+                  "createdAt": "2025-12-22T22:45:54.201Z",
+                  "userId": "1857493201894573963",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1958602117444822836",
+                  "decorationId": "1957198761749995683",
+                  "decoration": {
+                    "id": "1957198761749995683",
+                    "code": "xmas_2025_badge_shop_2",
+                    "type": "BADGE",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Jingle Bell"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "叮噹鈴鐺"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "ジングルベル"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "징글벨"
+                        }
+                      ],
+                      "assetUrl": "https://images-ng.pixai.art/images/orig/43d2d27a-b2bf-4e70-b103-9aaf7aa7c558"
+                    },
+                    "createdAt": "2025-12-15T06:59:24.796Z",
+                    "updatedAt": "2025-12-15T06:59:56.850Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2025-12-19T03:55:50.867Z",
+                  "obtainedFrom": "shop_purchase",
+                  "updatedAt": "2026-01-31T03:33:56.988Z",
+                  "createdAt": "2025-12-19T03:55:50.867Z",
+                  "userId": "1857493201894573963",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                },
+                {
+                  "id": "1968421529884494625",
+                  "decorationId": "1962568202917840053",
+                  "decoration": {
+                    "id": "1962568202917840053",
+                    "code": "newyear_2026_artwork_frame_credit_pack_1",
+                    "type": "ARTWORK_FRAME",
+                    "data": {
+                      "name": [
+                        {
+                          "lang": "en",
+                          "text": "Pastel Gradient"
+                        },
+                        {
+                          "lang": "zh",
+                          "text": "柔和漸變"
+                        },
+                        {
+                          "lang": "ja",
+                          "text": "淡彩"
+                        },
+                        {
+                          "lang": "ko",
+                          "text": "파스텔 그라데이션"
+                        }
+                      ],
+                      "linearGradient": {
+                        "degree": 140,
+                        "colorStops": [
+                          {
+                            "position": 0,
+                            "colorType": "RRGGBB",
+                            "colorValue": "ffdcde"
+                          },
+                          {
+                            "position": 36,
+                            "colorType": "RRGGBB",
+                            "colorValue": "72dad1"
+                          },
+                          {
+                            "position": 100,
+                            "colorType": "RRGGBB",
+                            "colorValue": "ffdcde"
+                          }
+                        ]
+                      }
+                    },
+                    "createdAt": "2025-12-30T02:35:39.329Z",
+                    "updatedAt": "2025-12-30T02:35:47.210Z",
+                    "allowUserEditRemark": false,
+                    "__typename": "Decoration"
+                  },
+                  "isEnabled": true,
+                  "obtainedAt": "2026-01-15T06:14:41.228Z",
+                  "obtainedFrom": "newYearEvent2026_order_extra-package-5",
+                  "updatedAt": "2026-01-31T03:34:03.974Z",
+                  "createdAt": "2026-01-15T06:14:41.228Z",
+                  "userId": "1857493201894573963",
+                  "userRemark": null,
+                  "__typename": "UserDecorationRelation"
+                }
+              ],
+              "__typename": "User"
+            },
+            "manga": null
+          },
+          "cursor": "gaJpZNcAG3O35WPd4mg=",
+          "__typename": "ArtworkEdge"
+        }
+      ],
+      "pageInfo": {
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "endCursor": "gaJpZNcAG3O35WPd4mg=",
+        "startCursor": "gaJpZNcAG3LaI5Xw7Fs=",
+        "__typename": "PageInfo"
+      },
+      "totalCount": null,
+      "feedUuid": null,
+      "__typename": "ArtworkConnection"
+    }
+  }
+}
