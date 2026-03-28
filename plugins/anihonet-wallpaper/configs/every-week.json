@@ -1,0 +1,25 @@
+{
+  "name": "每周 PC 榜",
+  "name.en": "Weekly PC Ranking",
+  "name.ja": "毎週 PC ランキング",
+  "name.ko": "매주 PC 랭킹",
+  "name.zhtw": "每周 PC 榜",
+  "description": "每周爬取榜单前5页",
+  "description.en": "Crawl the first 5 ranking pages weekly",
+  "description.ja": "毎週ランキングをクロール",
+  "description.ko": "매주 랭킹을 크롤링",
+  "description.zhtw": "每週爬取榜單前5頁",
+  "userConfig": {
+    "crawl_mode": "ranking",
+    "start_page": 1,
+    "end_page": 5,
+    "ranking_period": "weekly",
+    "wallpaper_type": "imgpc"
+  },
+  "scheduleSpec": {
+    "mode": "weekly",
+    "weekday": 1,
+    "hour": 20,
+    "minute": 0
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "小鸟游星野比基尼",
+  "name.en": "Takanashi Hoshino Bikini",
+  "name.ja": "タカナシ ホシノ ビキニ",
+  "name.ko": "타카나시 호시노 비키니",
+  "name.zhtw": "小鳥遊星野比基尼",
+  "description": "爬取小鸟游星野比基尼图片，可以调整排序方式",
+  "description.en": "Crawl Takanashi Hoshino Bikini images, you can adjust the sorting method",
+  "description.ja": "小鳥遊星野のビキニ画像をクロールし、並べ替え方を調整できます",
+  "description.ko": "타카나시 호시노 비키니 이미지를 크롤링하고、정렬 방법을 조정할 수 있습니다",
+  "description.zhtw": "爬取小鳥遊星野比基尼圖片，可以調整排序方式",
+  "userConfig": {
+    "crawl_mode": "tags",
+    "mode_tag_value": ["takanashi_hoshino", "bikini"],
+    "start_page": 1,
+    "end_page": 5
+  }
+}

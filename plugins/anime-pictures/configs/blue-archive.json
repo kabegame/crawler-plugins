@@ -1,0 +1,17 @@
+{
+  "name": "蔚蓝档案",
+  "name.en": "Blue Archive",
+  "name.ja": "ブルーアーカイブ",
+  "name.ko": "블루아카이브",
+  "name.zhtw": "蔚藍檔案",
+  "description": "蔚蓝档案图片，页数可配置(共约100页左右)",
+  "description.en": "Blue Archive images with page range configurable (about 100 pages)",
+  "description.ja": "ブルーアーカイブの画像をページ範囲を設定してクロール(約100ページぐらいある)",
+  "description.ko": "블루아카이브의 이미지를 페이지 범위를 설정하여 크롤링(약 100페이지 정도)",
+  "description.zhtw": "蔚藍檔案圖片，頁數可配置(約100頁左右)",
+  "userConfig": {
+    "startPage": 0,
+    "endPage": 10,
+    "tag": "ブルーアーカイブ"
+  }
+}

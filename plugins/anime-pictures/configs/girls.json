@@ -1,0 +1,17 @@
+{
+  "name": "女生",
+  "name.en": "Girls",
+  "name.ja": "女の子",
+  "name.ko": "여자",
+  "name.zhtw": "女生",
+  "description": "女生图片，页数可配置(共约7000页左右)",
+  "description.en": "Girls images with page range configurable (about 7000 pages)",
+  "description.ja": "女の子の画像をページ範囲を設定してクロール(約7000ページぐらいある)",
+  "description.ko": "여자의 이미지를 페이지 범위를 설정하여 크롤링(약 7000페이지 정도)",
+  "description.zhtw": "女生圖片，頁數可配置(約7000頁左右)",
+  "userConfig": {
+    "startPage": 0,
+    "endPage": 10,
+    "tag": "女の子"
+  }
+}

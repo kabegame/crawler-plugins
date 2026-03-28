@@ -1,0 +1,17 @@
+{
+  "name": "oli o o 作品",
+  "name.en": "oli o o artworks",
+  "name.ja": "oli o o 作品",
+  "name.ko": "oli o o 작품",
+  "name.zhtw": "oli o o 作品",
+  "description": "oli o o 作品图片，页数可配置(共约30多张)",
+  "description.en": "oli o o works images with page range configurable (about 30+ images)",
+  "description.ja": "oli o o 作品の画像をページ範囲を設定してクロール(約30+枚程度)",
+  "description.ko": "oli o o 작품의 이미지를 페이지 범위를 설정하여 크롤링(약 30+장 정도)",
+  "description.zhtw": "oli o o 作品圖片，頁數可配置(約30+張左右)",
+  "userConfig": {
+    "startPage": 0,
+    "endPage": 0,
+    "tag": "oli+o+o"
+  }
+}

@@ -4,7 +4,10 @@
 /** 判断当前是否为挑战页（如 Cloudflare "Just a moment..."） */
 function isChallengePage(ctx) {
   const title = (document.title || "").trim();
-  const bodyText = (document.body && document.body.innerText) ? document.body.innerText.slice(0, 2000) : "";
+  const bodyText =
+    document.body && document.body.innerText
+      ? document.body.innerText.slice(0, 2000)
+      : "";
   const isChallenge =
     /just a moment|cloudflare|challenge|checking your browser/i.test(title) ||
     /just a moment|cloudflare|checking your browser/i.test(bodyText);
@@ -14,7 +17,9 @@ function isChallengePage(ctx) {
 /** 若为挑战页：请求打开 webview、等待 20 秒后再继续，并 log 相关信息 */
 async function ensurePastChallenge(ctx) {
   if (!isChallengePage(ctx)) return;
-  ctx.log("[anime-pictures] 检测到挑战页（如 Cloudflare 验证），请求打开 WebView 窗口并等待 20 秒");
+  ctx.log(
+    "[anime-pictures] 检测到挑战页（如 Cloudflare 验证），请求打开 WebView 窗口并等待 20 秒",
+  );
   await ctx.requestShowWebview();
   await ctx.sleep(20000);
   ctx.log("[anime-pictures] 等待结束，重新查询页面元素");
@@ -39,7 +44,6 @@ async function run() {
       break;
     case "exit":
     default:
-      // 脚本结束退出。
       await ctx.exit();
   }
 }
@@ -85,8 +89,9 @@ async function handleInitial(ctx) {
   const tagParam = tag ? encodeURIComponent(tag) : "";
   await ctx.sleep(2000);
   ctx.log(`当前页面: ${page}, 标签: ${tag}`);
-  await ctx.to(`/posts?page=${page}${tagParam ? `&search_tag=${tagParam}` : ""}`, 
-    { pageLabel: "posts", pageState: { nth: 1 } }
+  await ctx.to(
+    `/posts?page=${page}${tagParam ? `&search_tag=${tagParam}` : ""}`,
+    { pageLabel: "posts", pageState: { nth: 1 } },
   );
 }
 
@@ -105,14 +110,17 @@ async function handlePosts(ctx) {
     const totalPages = Number.isFinite(parsedMax) ? parsedMax : endPageConfig;
     const endPage = Math.min(endPageConfig, totalPages);
     const totalPage = endPage - state.startPage + 1;
-    await ctx.updateState({ endPage, percentPerPage: totalPage > 0 ? 100 / totalPage : 100 });
+    await ctx.updateState({
+      endPage,
+      percentPerPage: totalPage > 0 ? 100 / totalPage : 100,
+    });
     ctx.log(`最大页数: ${endPage}，总页数: ${totalPage}`);
   }
 
   const pageState = ctx.pageState;
   const nth = pageState.nth ?? 1;
 
-  const items = ctx.$$('.img-block > a');
+  const items = ctx.$$(".img-block > a");
 
   if (nth === 1) {
     ctx.log(`本页图片数量: ${items.length}`);
@@ -126,9 +134,8 @@ async function handlePosts(ctx) {
   }
 
   const percentPerPage = state.percentPerPage;
-  const percentPerImage = (percentPerPage > 0 && items.length > 0)
-    ? percentPerPage / items.length
-    : 0;
+  const percentPerImage =
+    percentPerPage > 0 && items.length > 0 ? percentPerPage / items.length : 0;
   if (percentPerImage > 0) {
     await ctx.addProgress(percentPerImage);
   }

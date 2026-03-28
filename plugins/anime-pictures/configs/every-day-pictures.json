@@ -1,0 +1,21 @@
+{
+  "name": "每天最新",
+  "name.en": "daily updates",
+  "name.ja": "毎日最新",
+  "name.ko": "매일 최신",
+  "name.zhtw": "每天最新",
+  "description": "每天自动爬取最新的图片（约一页80张）",
+  "description.en": "Automatically crawl the latest images every day (about 80 images total)",
+  "description.ja": "毎日最新をクロール(約80枚程度)",
+  "description.ko": "매일 최신을 크롤링(약 80장 정도)",
+  "description.zhtw": "每天自動爬取最新的圖片(約80張左右)",
+  "userConfig": {
+    "endPage": 0,
+    "startPage": 0
+  },
+  "scheduleSpec": {
+    "mode": "daily",
+    "hour": 19,
+    "minute": 0
+  }
+}

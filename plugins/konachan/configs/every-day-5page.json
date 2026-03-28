@@ -1,0 +1,23 @@
+{
+  "name": "每日前5页爬取",
+  "name.en": "Daily Crawl 5 Pages",
+  "name.ja": "毎日 5 ページ クロール",
+  "name.ko": "매일 5 페이지 크롤링",
+  "name.zhtw": "每日前5頁爬取",
+  "description": "每日爬取前5页图片，保持最新",
+  "description.en": "Daily crawl the first 5 pages of images, keep the latest",
+  "description.ja": "毎日最初の5ページの画像をクロールし、最新のものを保持します",
+  "description.ko": "매일 첫 번째 5 페이지의 이미지를 크롤링하고、최신의 것을 유지합니다",
+  "description.zhtw": "每日爬取前5頁圖片，保持最新",
+  "userConfig": {
+    "crawl_mode": "all",
+    "quality": "high",
+    "start_page": 1,
+    "end_page": 5
+  },
+  "scheduleEnabled": {
+    "mode": "daily",
+    "hour": 16,
+    "minute": 0
+  }
+}

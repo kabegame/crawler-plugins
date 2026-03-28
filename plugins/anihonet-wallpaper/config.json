@@ -10,11 +10,11 @@
       "name.ja": "取得モード",
       "name.ko": "수집 모드",
       "name.zhtw": "爬取模式",
-      "descripts": "排行榜：按周期排行页抓取。作品索引：从作品タイトル一覧按假名行勾选后抓取",
-      "descripts.en": "Ranking pages, or anime/game title index by row (あ行〜わ行)",
-      "descripts.ja": "ランキングページ、または作品タイトル一覧（あ行〜わ行）",
-      "descripts.ko": "랭킹 페이지 또는 작품 제목 목록(あ〜わ 행)",
-      "descripts.zhtw": "排行榜：依週期排行頁。作品索引：依假名行勾選",
+      "descripts": "排行榜：按周期排行页抓取。作品索引：从作品タイトル一覧按假名行勾选后抓取。主题模式：在一覧页按标题关键字匹配进入该主题，再抓列表指定页范围",
+      "descripts.en": "Ranking, title index by kana row, or find one theme by keyword on the index page",
+      "descripts.ja": "ランキング、あ〜わ行一覧、または一覧ページでキーワード一致の作品へ",
+      "descripts.ko": "랭킹, 가나 행 목록, 또는 목록 페이지에서 키워드로 작품 진입",
+      "descripts.zhtw": "排行榜、假名行索引、或於一覽頁以關鍵字進入主題",
       "default": "ranking",
       "options": [
         {
@@ -32,8 +32,68 @@
           "name.ko": "작품 제목 목록",
           "name.zhtw": "作品索引（動漫・遊戲一覽）",
           "variable": "anime_game"
+        },
+        {
+          "name": "主题模式（一覧检索）",
+          "name.en": "By theme (index search)",
+          "name.ja": "テーマ指定（一覧から検索）",
+          "name.ko": "테마 지정(목록 검색)",
+          "name.zhtw": "主題模式（一覽搜尋）",
+          "variable": "by_theme"
         }
       ]
+    },
+    {
+      "key": "ranking_period",
+      "type": "options",
+      "name": "排行榜周期",
+      "name.en": "Ranking period",
+      "name.ja": "ランキング期間",
+      "name.ko": "랭킹 기간",
+      "name.zhtw": "排行榜週期",
+      "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
+      "descripts.en": "Daily, weekly, monthly or annual ranking",
+      "descripts.ja": "日間・週間・月間・年間ランキング",
+      "descripts.ko": "일간·주간·월간·연간 랭킹",
+      "descripts.zhtw": "選擇要爬取的排行榜週期：日榜、週榜、月榜或年榜",
+      "default": "daily",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "daily"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "weekly"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "monthly"
+        },
+        {
+          "name": "年榜",
+          "name.en": "Annual",
+          "name.ja": "年間",
+          "name.ko": "연간",
+          "name.zhtw": "年榜",
+          "variable": "annual"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "when": { "crawl_mode": ["ranking"] }
     },
     {
       "key": "anime_game_rows",
@@ -62,6 +122,63 @@
         { "name": "-わ行-", "name.en": "Wa row", "variable": "wa" }
       ],
       "when": { "crawl_mode": ["anime_game"] }
+    },
+    {
+      "key": "theme_search",
+      "type": "string",
+      "name": "主题关键字",
+      "name.en": "Theme keyword",
+      "name.ja": "作品名キーワード",
+      "name.ko": "작품 키워드",
+      "name.zhtw": "主題關鍵字",
+      "descripts": "在作品タイトル一覧页中，匹配链接文案「包含」此字符串的第一个主题（区分大小写与日语原文一致更易命中）",
+      "descripts.en": "First index link whose text contains this substring (case-sensitive)",
+      "descripts.ja": "一覧のリンク文言にこの文字列が含まれる最初の作品へ",
+      "descripts.ko": "목록 링크 텍스트에 부분 문자열이 포함된 첫 작품",
+      "descripts.zhtw": "一覽頁連結文案「包含」此字串的第一個主題",
+      "default": "",
+      "options": null,
+      "min": null,
+      "max": null,
+      "when": { "crawl_mode": ["by_theme"] }
+    },
+    {
+      "key": "theme_start_page",
+      "type": "int",
+      "name": "主题列表起始页",
+      "name.en": "Theme list start page",
+      "name.ja": "テーマ一覧の開始ページ",
+      "name.ko": "테마 목록 시작 페이지",
+      "name.zhtw": "主題列表起始頁",
+      "descripts": "进入主题后，作品列表从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
+      "descripts.en": "1-based list page to start downloading (earlier pages are skipped)",
+      "descripts.ja": "テーマ内リストの取得開始ページ（1 始まり）",
+      "descripts.ko": "테마 목록에서 수집을 시작할 페이지(1부터)",
+      "descripts.zhtw": "進入主題後從第幾頁開始抓（1 為第一頁）",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "when": { "crawl_mode": ["by_theme"] }
+    },
+    {
+      "key": "theme_end_page",
+      "type": "int",
+      "name": "主题列表结束页",
+      "name.en": "Theme list end page",
+      "name.ja": "テーマ一覧の終了ページ",
+      "name.ko": "테마 목록 끝 페이지",
+      "name.zhtw": "主題列表結束頁",
+      "descripts": "作品列表抓到第几页为止（含该页）；若站点无下一页则提前结束，进度会补足",
+      "descripts.en": "Last list page to crawl (inclusive); stops early if no next link",
+      "descripts.ja": "テーマ内リストの終了ページ（このページを含む）",
+      "descripts.ko": "테마 목록에서 수집을 끝낼 페이지(포함)",
+      "descripts.zhtw": "列表抓到第幾頁為止（含該頁）",
+      "default": 10,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "when": { "crawl_mode": ["by_theme"] }
     },
     {
       "key": "start_page",
@@ -133,58 +250,6 @@
           "variable": "sp"
         }
       ]
-    },
-    {
-      "key": "ranking_period",
-      "type": "options",
-      "name": "排行榜周期",
-      "name.en": "Ranking period",
-      "name.ja": "ランキング期間",
-      "name.ko": "랭킹 기간",
-      "name.zhtw": "排行榜週期",
-      "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
-      "descripts.en": "Daily, weekly, monthly or annual ranking",
-      "descripts.ja": "日間・週間・月間・年間ランキング",
-      "descripts.ko": "일간·주간·월간·연간 랭킹",
-      "descripts.zhtw": "選擇要爬取的排行榜週期：日榜、週榜、月榜或年榜",
-      "default": "daily",
-      "options": [
-        {
-          "name": "日榜",
-          "name.en": "Daily",
-          "name.ja": "日間",
-          "name.ko": "일간",
-          "name.zhtw": "日榜",
-          "variable": "daily"
-        },
-        {
-          "name": "周榜",
-          "name.en": "Weekly",
-          "name.ja": "週間",
-          "name.ko": "주간",
-          "name.zhtw": "週榜",
-          "variable": "weekly"
-        },
-        {
-          "name": "月榜",
-          "name.en": "Monthly",
-          "name.ja": "月間",
-          "name.ko": "월간",
-          "name.zhtw": "月榜",
-          "variable": "monthly"
-        },
-        {
-          "name": "年榜",
-          "name.en": "Annual",
-          "name.ja": "年間",
-          "name.ko": "연간",
-          "name.zhtw": "年榜",
-          "variable": "annual"
-        }
-      ],
-      "min": null,
-      "max": null,
-      "when": { "crawl_mode": ["ranking"] }
     }
   ]
 }

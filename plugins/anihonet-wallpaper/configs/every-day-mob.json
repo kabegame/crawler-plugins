@@ -1,0 +1,24 @@
+{
+  "name": "每日手机榜",
+  "name.en": "Daily Mobile Ranking",
+  "name.ja": "毎日 モバイル ランキング",
+  "name.ko": "매일 모바일 랭킹",
+  "name.zhtw": "每日手機榜",
+  "description": "每日爬取榜单前5页",
+  "description.en": "Crawl the first 5 ranking pages daily",
+  "description.ja": "毎日ランキングの第一列をクロール",
+  "description.ko": "매일 랭킹의 첫 번째 열을 크롤링",
+  "description.zhtw": "每日爬取榜單前5頁",
+  "userConfig": {
+    "crawl_mode": "ranking",
+    "start_page": 1,
+    "end_page": 5,
+    "ranking_period": "daily",
+    "wallpaper_type": "sp"
+  },
+  "scheduleSpec": {
+    "mode": "daily",
+    "hour": 20,
+    "minute": 0
+  }
+}
