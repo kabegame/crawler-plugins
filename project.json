@@ -21,16 +21,6 @@
       "inputs": ["normalInputs"],
       "outputs": ["{projectRoot}/packed/**/*"]
     },
-    "package-to-resources": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "bun package-plugin.ts --out-dir ../src-tauri/app-main/resources/plugins",
-        "cwd": "{projectRoot}"
-      },
-      "cache": true,
-      "inputs": ["normalInputs"],
-      "outputs": ["{workspaceRoot}/src-tauri/app-main/resources/plugins/**/*"]
-    },
     "package-to-dev-data": {
       "executor": "nx:run-commands",
       "options": {
