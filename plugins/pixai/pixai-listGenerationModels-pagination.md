@@ -1,6 +1,6 @@
 # PixAI `listGenerationModels` 接口爬取说明（父页面 / 模型列表）
 
-本文说明如何通过 HTTP 稳定调用 PixAI 站点使用的 GraphQL 接口 **`listGenerationModels`**（**趋势/推荐等模型列表**，Relay 游标分页：**`last` + `before`**，向 **更旧** 方向继续拉取）。实现爬虫、插件或离线脚本时按下列顺序组请求即可。
+本文说明如何通过 HTTP 稳定调用 PixAI 站点使用的 GraphQL 接口 **`listGenerationModels`**（模型列表：**人气 / 趋势 / 生成人气 / 最新** 等 Tab，见 [§5.1](#51-四种列表与排序)）。分页为 Relay 游标：**`last` + `before`**（向 **更旧**）或 **`first` + `after`**（向 **更新**），依 Tab 与抓包为准。实现爬虫、插件或离线脚本时按下列顺序组请求即可。
 
 **子页面（某模型下的作品列表）** 使用 **`listArtworks`**（`first` + `after`），见同目录 [pixai-listArtworks-pagination.md](./pixai-listArtworks-pagination.md)。仓库 [docs/pixai-listGenerationModels-pagination.md](../../../docs/pixai-listGenerationModels-pagination.md) 为同文副本（可选对照）。
 
@@ -92,18 +92,65 @@ https://api.pixai.art/graphql
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `feed` | 字符串 | 列表类型，如 **`trending`**；其他入口以抓包为准。 |
-| `last` | 整数 | 本页条数（常用 **24**）。 |
-| `before` | 字符串，可选 | **第二页及以后（更旧的一批）**：值为 **上一页响应** 的 **`data.generationModels.pageInfo.startCursor`**。第一页 **不要** 传。 |
+| `feed` | 字符串 | 列表类型（如 **`trending`**、**`latest`**、**`meilisearch`**）。与站点 Tab 的对应关系见 [§5.1](#51-四种列表与排序)。 |
+| `authorId` | 字符串，可选 | 限定为某位用户的 **模型**列表（个人主页「模型」Tab 抓包）。与全站 **`feed`** 流 **不要混在同一请求里**（以抓包为准：常见 **无 `feed`**，仅有 **`first`**、**`authorId`**、**`orderBy`**）。分页为 **`first` + `after`**，下一页 **`after`** = 上一页 **`pageInfo.endCursor`**，结束看 **`hasNextPage`**。详见 [§5.2](#52-作者页的模型列表-authorid)。 |
+| `orderBy` | 字符串，可选 | 显式排序字段。**前缀 `-` = 降序**；**去掉 `-`（或等价无负号字段名）= 升序 / 与站点默认相反的「倒序」**，如 **`markInfo.likedCount`**、**`markInfo.refCount`**、**`createdAt`**。详见 [§5.1](#51-四种列表与排序)。**趋势** 等 Tab 可不传，由服务端决定顺序。 |
+| `last` | 整数，可选 | 与 **`before`** 配套：用于 **趋势 / 最新** 等；本页条数常用 **24**。与 **`first`** 以抓包为准二选一，勿混用。 |
+| `first` | 整数，可选 | 与 **`after`** 配套：用于 **人气 / 生成人气**（`feed: "meilisearch"`）等；本页条数常用 **24**。 |
+| `before` | 字符串，可选 | **`last`** 分页：**第二页及以后（更旧的一批）** = 上一页响应的 **`data.generationModels.pageInfo.startCursor`**。第一页 **不要** 传。 |
+| `after` | 字符串，可选 | **`first`** 分页：下一页（更「新」一侧）= 上一页 **`pageInfo.endCursor`**。第一页 **不要** 传。语义与 **`listArtworks`** 的 `after` 一致，以抓包为准。 |
 
-继续向 **更旧** 翻页时，**除设置 `before` 外，`feed` 与 `last` 须与本流一致**，否则游标无效或结果错位。
+继续翻页时，**除游标字段外**，`feed`（若有）、**`authorId`**（若有）、`orderBy`、`last`/`first` 等须与本流 **完全一致**，否则游标无效或结果错位。
+
+- 使用 **`last` + `before`** 时：向 **更旧** 翻页；下一页游标来源 **`pageInfo.startCursor`**；结束条件常看 **`hasPreviousPage`**（见 §7、§9）。
+- 使用 **`first` + `after`** 时：向 **更新** 翻页；下一页游标来源 **`pageInfo.endCursor`**；结束条件常看 **`hasNextPage`**。
 
 与 **`listArtworks`** 的对照（方向相反）：
 
 | 接口 | 分页方向 | 参数 | 下一页游标来源 | 常见结束条件 |
 |------|----------|------|----------------|--------------|
 | `listArtworks` | 向前 | `first` + `after` | **`pageInfo.endCursor`** | `hasNextPage == false` |
-| `listGenerationModels` | 向后（更旧） | `last` + `before` | **`pageInfo.startCursor`** | `hasPreviousPage == false` |
+| `listGenerationModels`（`last` 流） | 向后（更旧） | `last` + `before` | **`pageInfo.startCursor`** | `hasPreviousPage == false` |
+| `listGenerationModels`（`first` 流） | 向前（更新） | `first` + `after` | **`pageInfo.endCursor`** | `hasNextPage == false`（以实际响应为准） |
+
+### 5.1 四种列表与排序
+
+站点模型列表常见四个 Tab 与抓包变量对应如下。**约定：`orderBy` 带前缀 `-` 为降序（站点常见默认）；去掉 `-` 为升序，即与上述默认相反的「倒序」请求。**
+
+| 站点 Tab | `feed` | `orderBy`（降序 · 默认） | `orderBy`（升序 · 倒序） | 每页条数 | 排序含义（降序） |
+|----------|--------|-------------------------|-------------------------|----------|------------------|
+| **人气** | `meilisearch` | `-markInfo.likedCount` | `markInfo.likedCount` | `first`: 24 | 点赞相关计数从高到低 |
+| **趋势** | `trending` | （不传） | — | `last`: 24 | 服务端内置「趋势」规则，无显式 `orderBy` |
+| **生成人气** | `meilisearch` | `-markInfo.refCount` | `markInfo.refCount` | `first`: 24 | 引用/关联热度从高到低（字段语义以服务端为准） |
+| **最新** | `latest` | `-createdAt` | `createdAt` | `last`: 24 | 创建时间从新到旧 |
+
+**倒序 / 升序实测说明（无 Cookie GET，与 §6 persisted query 新哈希一致）：**
+
+- **`meilisearch` + `markInfo.likedCount` / `markInfo.refCount`**：接口返回 **200** 且首条 **`node.id`** 与对应降序 **不同**，可视为升序参数被接受且顺序与降序区分明显。
+- **`latest` + `createdAt`**：接口 **200**，但曾观测 **首条 `node.id` 与 `-createdAt` 相同**；是否严格按创建时间升序（最旧在前）需结合响应内时间字段或翻页再核对。
+- 可用本插件目录下脚本批量对比：**`scripts/verify-listGenerationModels-orderBy.mjs`**（`node ./scripts/verify-listGenerationModels-orderBy.mjs`）。
+
+**说明：**
+
+- **人气** 与 **生成人气** 共用 **`feed: "meilisearch"`**，靠 **`orderBy`** 区分；分页均为 **`first` + `after`**（下一页：`after` = 上一页 **`pageInfo.endCursor`**）。升序、降序流各自保持 **`orderBy` 与分页参数一致**。
+- **趋势**、**最新** 使用 **`last` + `before`**（下一页：`before` = 上一页 **`pageInfo.startCursor`**），与全文 §7–§9 示例一致。
+- 登录态、**`u3t`**、以及 **`extensions.persistedQuery.sha256Hash`** 以当前站点抓包为准；不同前端版本可能与 §6 示例哈希不同，但上述 **`variables` 结构**仍可用于对照 Tab。
+
+### 5.2 作者页的模型列表（`authorId`）
+
+用户个人页的 **模型** 列表与全站四个 Tab（§5.1）不同：抓包常见 **`listGenerationModels`** 的 `variables` 含 **`authorId`**（作者用户 id 字符串），并配合 **`first`** 与可选 **`orderBy`**（如 **`-createdAt`**），**不传 `feed`**。
+
+| 项目 | 说明 |
+|------|------|
+| **首屏** | `{"first":<n>,"authorId":"<id>","orderBy":"-createdAt"}`（`orderBy` 以该 Tab 抓包为准，可省略则勿传） |
+| **下一页（更「旧」一侧 / 沿列表向下）** | 在首屏变量基础上增加 **`"after": "<上一响应的 pageInfo.endCursor>"`** |
+| **结束** | **`hasNextPage == false`** 或 **`endCursor` 为空**（以响应为准） |
+| **Persisted query** | 前端可能为「带 `authorId` 的同一 operation」注册 **另一哈希**；若 §6 示例哈希报未知查询，请在 Network 中复制当前请求的 **`extensions`** |
+| **登录** | 公网 **无 `Authorization` / Cookie** 时，该流常返回 **`totalCount: 0`、空 `edges`**；与浏览器一致带 **`Bearer`**（及站点要求的 **`u3t`** 等）后再测 |
+
+与 **`listArtworks`** 作者页（`authorId` + **`types`**，见 [pixai-listArtworks-pagination.md §5.3](./pixai-listArtworks-pagination.md)）并列：本接口拉 **模型**，彼接口拉 **作品**。
+
+**校验脚本：** `node ./scripts/verify-listGenerationModels-author-pagination.mjs`（支持 `PIXAI_AUTHORIZATION`、`PIXAI_AUTHOR_ID`、`PIXAI_PQ_HASH`、`PIXAI_AUTHOR_ORDER_BY`、`PIXAI_FIRST`）。
 
 ---
 
@@ -125,6 +172,7 @@ https://api.pixai.art/graphql
 ```
 
 - **`sha256Hash`** 对应操作 **`listGenerationModels`** 的注册查询；**站点升级前端后哈希可能变更**，若出现 GraphQL 层「未知 persisted query」类错误，需在 DevTools → Network 里 **重新复制** `extensions`。
+- **作者 `authorId` 流** 抓包中曾出现与上表 **不同** 的哈希（示例：`1658f8e716184e95d3177d20fad189d8f7b250fb30e8401496ed0aaf34e4ad83`）；以你当前页面请求为准。
 - `clientLibrary.version` 宜与抓包一致（或与当前站点的 Apollo 版本一致）。
 
 ---
@@ -137,7 +185,7 @@ https://api.pixai.art/graphql
   - **`hasPreviousPage`**：是否还有 **更旧** 的一批（继续翻页主要看它）。
   - **`hasNextPage`**：另一侧是否还有数据（父列表场景下常与「向下滚」语义不同，以实际 UI 为准）。
   - **`startCursor`**：本页 **第一条（通常更新 / 更靠前）** 的游标 → **下一页（更旧）请求里 `variables.before`**。
-  - **`endCursor`**：本页最后一条游标；**不要**用于 `before` 翻更旧页（与 `listArtworks` 的 `after` 用法不对称）。
+  - **`endCursor`**：本页最后一条游标；在 **`last` + `before`** 流中 **不要**用于 `before` 翻更旧页。在 **`first` + `after`** 流中，下一页 **`variables.after`** 取上一页 **`endCursor`**（与 `listArtworks` 一致）。
 
 若存在 **`errors`**，可能仍有部分 `data`；需根据业务决定重试或记录。
 
@@ -279,5 +327,5 @@ curl -sS "$URL" \
 
 ## 14. 相关文档
 
-- 子页面作品列表：**[pixai-listArtworks-pagination.md](./pixai-listArtworks-pagination.md)**
+- 子页面作品列表：**[pixai-listArtworks-pagination.md](./pixai-listArtworks-pagination.md)**（作者 **作品** 流见该文 §5.3）
 - 仓库 `docs/` 副本（可选）：**[docs/pixai-listGenerationModels-pagination.md](../../../docs/pixai-listGenerationModels-pagination.md)**

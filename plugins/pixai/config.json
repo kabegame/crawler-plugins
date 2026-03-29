@@ -8,8 +8,15 @@
       "name.en": "Crawl Type",
       "name.ja": "取得種類",
       "name.ko": "크롤링 유형",
-      "default": "model",
+      "default": "global",
       "options": [
+        {
+          "name": "全站",
+          "name.en": "Global",
+          "name.ja": "全サイト",
+          "name.ko": "전체",
+          "variable": "global"
+        },
         {
           "name": "按模型",
           "name.en": "By Model",
@@ -30,6 +37,13 @@
           "name.ja": "ランキング",
           "name.ko": "랭킹",
           "variable": "ranking"
+        },
+        {
+          "name": "按作者",
+          "name.en": "By Author",
+          "name.ja": "作者別",
+          "name.ko": "작가별",
+          "variable": "author"
         }
       ]
     },
@@ -135,6 +149,71 @@
       }
     },
     {
+      "key": "model_sort",
+      "type": "options",
+      "name": "模型排序",
+      "name.en": "Model Sort",
+      "name.ja": "モデル並び順",
+      "name.ko": "모델 정렬",
+      "default": "trending",
+      "options": [
+        {
+          "name": "趋势",
+          "name.en": "Trending",
+          "name.ja": "トレンド",
+          "name.ko": "트렌딩",
+          "variable": "trending"
+        },
+        {
+          "name": "人气（高到低）",
+          "name.en": "Popular (Desc)",
+          "name.ja": "人気（高→低）",
+          "name.ko": "인기순(내림차순)",
+          "variable": "popular_desc"
+        },
+        {
+          "name": "人气（低到高）",
+          "name.en": "Popular (Asc)",
+          "name.ja": "人気（低→高）",
+          "name.ko": "인기순(오름차순)",
+          "variable": "popular_asc"
+        },
+        {
+          "name": "生成人气（高到低）",
+          "name.en": "Generated Popular (Desc)",
+          "name.ja": "生成人気（高→低）",
+          "name.ko": "생성 인기순(내림차순)",
+          "variable": "gen_popular_desc"
+        },
+        {
+          "name": "生成人气（低到高）",
+          "name.en": "Generated Popular (Asc)",
+          "name.ja": "生成人気（低→高）",
+          "name.ko": "생성 인기순(오름차순)",
+          "variable": "gen_popular_asc"
+        },
+        {
+          "name": "最新（新到旧）",
+          "name.en": "Latest (Desc)",
+          "name.ja": "最新（新→旧）",
+          "name.ko": "최신순(내림차순)",
+          "variable": "latest_desc"
+        },
+        {
+          "name": "最新（旧到新）",
+          "name.en": "Latest (Asc)",
+          "name.ja": "最新（旧→新）",
+          "name.ko": "최신순(오름차순)",
+          "variable": "latest_asc"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "model"
+        ]
+      }
+    },
+    {
       "key": "max_model_pages",
       "type": "int",
       "name": "模型分页数",
@@ -144,6 +223,181 @@
       "when": {
         "crawl_type": [
           "model"
+        ]
+      }
+    },
+    {
+      "key": "skip_model_pages",
+      "type": "int",
+      "name": "跳过模型页数",
+      "name.en": "Skip Model Pages",
+      "name.ja": "スキップするモデルページ数",
+      "name.ko": "건너뛸 모델 페이지 수",
+      "descripts": "从第 N+1 页开始处理模型（前 N 页仅翻页不下载）",
+      "descripts.en": "Start processing models from page N+1 (first N pages only advance cursor, no downloads)",
+      "descripts.ja": "N+1 ページ目からモデルを処理します（最初の N ページはカーソル進行のみ、ダウンロードなし）",
+      "descripts.ko": "N+1 페이지부터 모델 처리(앞 N 페이지는 커서 이동만, 다운로드 없음)",
+      "default": 0,
+      "min": 0,
+      "max": 49,
+      "when": {
+        "crawl_type": [
+          "model"
+        ]
+      }
+    },
+    {
+      "key": "artwork_sort",
+      "type": "options",
+      "name": "作品排序",
+      "name.en": "Artwork Sort",
+      "name.ja": "作品並び順",
+      "name.ko": "작품 정렬",
+      "default": "trending",
+      "options": [
+        {
+          "name": "趋势",
+          "name.en": "Trending",
+          "name.ja": "トレンド",
+          "name.ko": "트렌딩",
+          "variable": "trending"
+        },
+        {
+          "name": "日榜",
+          "name.en": "Daily Ranking",
+          "name.ja": "日間ランキング",
+          "name.ko": "일간 랭킹",
+          "variable": "daily_ranking"
+        },
+        {
+          "name": "人气（高到低）",
+          "name.en": "Popular (Desc)",
+          "name.ja": "人気（高→低）",
+          "name.ko": "인기순(내림차순)",
+          "variable": "popular_desc"
+        },
+        {
+          "name": "最新",
+          "name.en": "Latest",
+          "name.ja": "最新",
+          "name.ko": "최신",
+          "variable": "latest"
+        },
+        {
+          "name": "人气（低到高）",
+          "name.en": "Popular (Asc)",
+          "name.ja": "人気（低→高）",
+          "name.ko": "인기순(오름차순)",
+          "variable": "popular_asc"
+        },
+        {
+          "name": "创建时间（旧到新）",
+          "name.en": "Created Time (Asc)",
+          "name.ja": "作成時間（旧→新）",
+          "name.ko": "생성 시간(오름차순)",
+          "variable": "created_asc"
+        },
+        {
+          "name": "创建时间（新到旧）",
+          "name.en": "Created Time (Desc)",
+          "name.ja": "作成時間（新→旧）",
+          "name.ko": "생성 시간(내림차순)",
+          "variable": "created_desc"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "global",
+          "model",
+          "tag",
+          "author"
+        ]
+      }
+    },
+    {
+      "key": "author_id",
+      "type": "string",
+      "name": "作者 ID",
+      "name.en": "Author ID",
+      "name.ja": "作者 ID",
+      "name.ko": "작가 ID",
+      "descripts": "输入 PixAI 用户 ID（纯数字字符串，可在用户主页 URL 中找到）",
+      "descripts.en": "Enter PixAI user ID (numeric string, can be found in user profile URL)",
+      "descripts.ja": "PixAI ユーザー ID（数字文字列）を入力。ユーザーページ URL で確認できます",
+      "descripts.ko": "PixAI 사용자 ID(숫자 문자열)를 입력하세요. 사용자 페이지 URL에서 확인할 수 있습니다",
+      "default": "",
+      "when": {
+        "crawl_type": [
+          "author"
+        ]
+      }
+    },
+    {
+      "key": "author_artwork_type",
+      "type": "options",
+      "name": "爬取类型",
+      "name.en": "Artwork Type",
+      "name.ja": "取得タイプ",
+      "name.ko": "작품 유형",
+      "default": "image",
+      "options": [
+        {
+          "name": "图片",
+          "name.en": "Image",
+          "name.ja": "画像",
+          "name.ko": "이미지",
+          "variable": "image"
+        },
+        {
+          "name": "动图",
+          "name.en": "Animated",
+          "name.ja": "うごイラ",
+          "name.ko": "움직이는 일러스트",
+          "variable": "animated"
+        }
+      ],
+      "when": {
+        "crawl_type": [
+          "author"
+        ]
+      }
+    },
+    {
+      "key": "skip_artwork_pages",
+      "type": "int",
+      "name": "跳过作品页数",
+      "name.en": "Skip Artwork Pages",
+      "name.ja": "スキップする作品ページ数",
+      "name.ko": "건너뛸 작품 페이지 수",
+      "descripts": "每个模型/标签/全站从第 N+1 页开始下载（前 N 页仅翻页不下载）",
+      "descripts.en": "For each model/tag/global stream, download from page N+1 (first N pages only advance cursor)",
+      "descripts.ja": "各モデル/タグ/全サイトで N+1 ページ目からダウンロード（最初の N ページはカーソル進行のみ）",
+      "descripts.ko": "모델/태그/전체 스트림 각각 N+1 페이지부터 다운로드(앞 N 페이지는 커서 이동만)",
+      "default": 0,
+      "min": 0,
+      "max": 199,
+      "when": {
+        "crawl_type": [
+          "global",
+          "model",
+          "tag",
+          "author"
+        ]
+      }
+    },
+    {
+      "key": "max_global_pages",
+      "type": "int",
+      "name": "全站作品分页数",
+      "name.en": "Global Artwork Pages",
+      "name.ja": "全サイト作品ページ数",
+      "name.ko": "전체 작품 페이지 수",
+      "default": 5,
+      "min": 1,
+      "max": 200,
+      "when": {
+        "crawl_type": [
+          "global"
         ]
       }
     },
@@ -161,373 +415,22 @@
       }
     },
     {
-      "key": "artwork_tags",
-      "type": "checkbox",
-      "name": "作品标签",
-      "name.en": "Artwork Tags",
-      "name.ja": "作品タグ",
-      "name.ko": "작품 태그",
+      "key": "tag_code_names",
+      "type": "list",
+      "name": "标签 codeName",
+      "name.en": "Tag codeNames",
+      "name.ja": "タグ codeName",
+      "name.ko": "태그 codeName",
+      "descripts": "输入 PixAI 标签的 codeName（如 spy_x_family、genshin_impact），可在 pixai.art 标签页 URL 中找到",
+      "descripts.en": "Enter PixAI tag codeNames (e.g. spy_x_family, genshin_impact), found in pixai.art tag page URLs",
+      "descripts.ja": "PixAI タグの codeName を入力（例: spy_x_family、genshin_impact）。pixai.art のタグページ URL で確認できます",
+      "descripts.ko": "PixAI 태그 codeName 입력 (예: spy_x_family, genshin_impact). pixai.art 태그 페이지 URL에서 확인 가능",
       "default": [
-        "1539451103304777778",
-        "1922021287889713965",
-        "1634739494618599131",
-        "1580119621020619042",
-        "1640792507941002725",
-        "1750217657858816423",
-        "1835151921967156571",
-        "1916616255508988740",
-        "1904642060884426582",
-        "1542478620351024280",
-        "1653426079234161854",
-        "1721725979093169048",
-        "1631136320189086328",
-        "1545027968470015392",
-        "1668618754104678632",
-        "1543282451081770844",
-        "1762474856920006769",
-        "1768419715633776192",
-        "1665486897130991060",
-        "1598768560721516474",
-        "1857436673443958885",
-        "1905512601682805139",
-        "1888753852046145131",
-        "1896982161424623466",
-        "1849448332391870277",
-        "1810024652271300816",
-        "1800278072703967386",
-        "1686752259067431267",
-        "1821347925741451409",
-        "1838674386167905451",
-        "1899985680972502354",
-        "1885457265634904391",
-        "1891948027581794065",
-        "1888751934226834113",
-        "1888733779801093290",
-        "1714798854476685957",
-        "1744110992206059888",
-        "1952908621785631925",
-        "1948192200237422039",
-        "1836904222610793507",
-        "1810859013893832958",
-        "1817164539017673388",
-        "1818830875997654257",
-        "1543880154481210342",
-        "1888721130212293586",
-        "1864059862608410646",
-        "1888747817810771675",
-        "1888701890736515194",
-        "1564686801146135055",
-        "1934749781350748180"
+        "genshin_impact",
+        "honkai_star_rail",
+        "zenless_zone_zero"
       ],
-      "options": [
-        {
-          "name": "原神 (genshin impact)",
-          "variable": "1539451103304777778"
-        },
-        {
-          "name": "Cyrene(Honkai_Star_Rail)",
-          "variable": "1922021287889713965"
-        },
-        {
-          "name": "崩壊：スターレイル (honkai:star_rail)",
-          "variable": "1634739494618599131"
-        },
-        {
-          "name": "Demon Slayer",
-          "variable": "1580119621020619042"
-        },
-        {
-          "name": "ゼンゼロ (zenless_zone_zero)",
-          "variable": "1640792507941002725"
-        },
-        {
-          "name": "鳴潮",
-          "variable": "1750217657858816423"
-        },
-        {
-          "name": "phainon(honkai:star_rail)",
-          "variable": "1835151921967156571"
-        },
-        {
-          "name": "Yidhari(Zenless_zone_zero)",
-          "variable": "1916616255508988740"
-        },
-        {
-          "name": "Lauma（Genshin_impact）",
-          "variable": "1904642060884426582"
-        },
-        {
-          "name": "オリキャラ (original character)",
-          "variable": "1542478620351024280"
-        },
-        {
-          "name": "goddess_of_victory:nikke",
-          "variable": "1653426079234161854"
-        },
-        {
-          "name": "学園アイドルマスター",
-          "variable": "1721725979093169048"
-        },
-        {
-          "name": "wuthering_waves",
-          "variable": "1631136320189086328"
-        },
-        {
-          "name": "ポケモン (pokemon)",
-          "variable": "1545027968470015392"
-        },
-        {
-          "name": "リバース:1998 (reverse:1999)",
-          "variable": "1668618754104678632"
-        },
-        {
-          "name": "miku",
-          "variable": "1543282451081770844"
-        },
-        {
-          "name": "ave_mujica",
-          "variable": "1762474856920006769"
-        },
-        {
-          "name": "mavuika_(genshin_impact)",
-          "variable": "1768419715633776192"
-        },
-        {
-          "name": "furina(genshin_impact)",
-          "variable": "1665486897130991060"
-        },
-        {
-          "name": "Jujutsu kaisen",
-          "variable": "1598768560721516474"
-        },
-        {
-          "name": "pulchra_fellini",
-          "variable": "1857436673443958885"
-        },
-        {
-          "name": "Seed(Zenless_Zone_Zero)",
-          "variable": "1905512601682805139"
-        },
-        {
-          "name": "Alice Thymefield(zenless_zone_zero)",
-          "variable": "1888753852046145131"
-        },
-        {
-          "name": "Blade(honkai:star_rail)",
-          "variable": "1896982161424623466"
-        },
-        {
-          "name": "cantarella(wuthering_waves)",
-          "variable": "1849448332391870277"
-        },
-        {
-          "name": "yanagi(zenless_zone_zero)",
-          "variable": "1810024652271300816"
-        },
-        {
-          "name": "sunday(honkai:star_rail)",
-          "variable": "1800278072703967386"
-        },
-        {
-          "name": "anby_demara",
-          "variable": "1686752259067431267"
-        },
-        {
-          "name": "anaxa(honkai:star_rail)",
-          "variable": "1821347925741451409"
-        },
-        {
-          "name": "tribbie(honkai:star_rail)",
-          "variable": "1838674386167905451"
-        },
-        {
-          "name": "Ronova(Genshin_impact)",
-          "variable": "1899985680972502354"
-        },
-        {
-          "name": "chisa(wuthering_waves)",
-          "variable": "1885457265634904391"
-        },
-        {
-          "name": "Cerydra(Honkai star_rail)",
-          "variable": "1891948027581794065"
-        },
-        {
-          "name": "Iuno(Wuthering_waves)",
-          "variable": "1888751934226834113"
-        },
-        {
-          "name": "Skirk(Genshin_impact)",
-          "variable": "1888733779801093290"
-        },
-        {
-          "name": "リオセスリ(原神) (wriothesley_(genshin_impact))",
-          "variable": "1714798854476685957"
-        },
-        {
-          "name": "ellen(zenless_zone_zero)",
-          "variable": "1744110992206059888"
-        },
-        {
-          "name": "Dialyn(Zenless_zone_zero)",
-          "variable": "1952908621785631925"
-        },
-        {
-          "name": "Ye_shunguang(Zenless_zone_zero)",
-          "variable": "1948192200237422039"
-        },
-        {
-          "name": "castorice(honkai:star_rail)",
-          "variable": "1836904222610793507"
-        },
-        {
-          "name": "miyabi(zenless_zone_zero)",
-          "variable": "1810859013893832958"
-        },
-        {
-          "name": "zani(wuthering_waves)",
-          "variable": "1817164539017673388"
-        },
-        {
-          "name": "silver_wolf(honkai:star_rail)",
-          "variable": "1818830875997654257"
-        },
-        {
-          "name": "東方Project (touhou)",
-          "variable": "1543880154481210342"
-        },
-        {
-          "name": "yixuan(zenless_zone_zero)",
-          "variable": "1888721130212293586"
-        },
-        {
-          "name": "brant(wuthering_waves)",
-          "variable": "1864059862608410646"
-        },
-        {
-          "name": "Ciaccona_(Wuthering_waves)",
-          "variable": "1888747817810771675"
-        },
-        {
-          "name": "qiuyuan(wuthering_waves)",
-          "variable": "1888701890736515194"
-        },
-        {
-          "name": "guides",
-          "variable": "1564686801146135055"
-        },
-        {
-          "name": "Rerir(Genshin_impact)",
-          "variable": "1934749781350748180"
-        }
-      ],
-      "when": {
-        "crawl_type": [
-          "tag"
-        ]
-      }
-    },
-    {
-      "key": "model_tags",
-      "type": "checkbox",
-      "name": "模型标签",
-      "name.en": "Model Tags",
-      "name.ja": "モデルタグ",
-      "name.ko": "모델 태그",
-      "default": [
-        "1591095796618865632",
-        "1707089382801558374",
-        "1563247480019240531",
-        "1585637247938118134",
-        "1602513520778957426",
-        "1608126583068580780",
-        "1590659231625048280",
-        "1608567307759474969",
-        "1601467468303624392",
-        "1575311124989111452",
-        "1584738254857918036",
-        "1601645354960452810",
-        "1590784620111716576",
-        "1557980977008926772",
-        "1608567512698559908",
-        "1559952308151160619",
-        "1574046184949750853",
-        "1706256218762225752"
-      ],
-      "options": [
-        {
-          "name": "Realistic Style",
-          "variable": "1591095796618865632"
-        },
-        {
-          "name": "Palworld",
-          "variable": "1707089382801558374"
-        },
-        {
-          "name": "Anime Style",
-          "variable": "1563247480019240531"
-        },
-        {
-          "name": "Game",
-          "variable": "1585637247938118134"
-        },
-        {
-          "name": "Genshin Impact",
-          "variable": "1602513520778957426"
-        },
-        {
-          "name": "Anime Character",
-          "variable": "1608126583068580780"
-        },
-        {
-          "name": "Pose",
-          "variable": "1590659231625048280"
-        },
-        {
-          "name": "Blue Archive",
-          "variable": "1608567307759474969"
-        },
-        {
-          "name": "Fate Series",
-          "variable": "1601467468303624392"
-        },
-        {
-          "name": "NIKKE",
-          "variable": "1575311124989111452"
-        },
-        {
-          "name": "Arknights",
-          "variable": "1584738254857918036"
-        },
-        {
-          "name": "Art Style",
-          "variable": "1601645354960452810"
-        },
-        {
-          "name": "Scenery",
-          "variable": "1590784620111716576"
-        },
-        {
-          "name": "Pokemon",
-          "variable": "1557980977008926772"
-        },
-        {
-          "name": "Hololive",
-          "variable": "1608567512698559908"
-        },
-        {
-          "name": "Azur Lane",
-          "variable": "1559952308151160619"
-        },
-        {
-          "name": "League of Legends",
-          "variable": "1574046184949750853"
-        },
-        {
-          "name": "palworld",
-          "variable": "1706256218762225752"
-        }
-      ],
+      "options": null,
       "when": {
         "crawl_type": [
           "tag"
@@ -547,6 +450,22 @@
       "when": {
         "crawl_type": [
           "tag"
+        ]
+      }
+    },
+    {
+      "key": "max_author_artwork_pages",
+      "type": "int",
+      "name": "作者作品分页数",
+      "name.en": "Pages per Author",
+      "name.ja": "作者ごとのページ数",
+      "name.ko": "작가당 페이지 수",
+      "default": 5,
+      "min": 1,
+      "max": 200,
+      "when": {
+        "crawl_type": [
+          "author"
         ]
       }
     }
