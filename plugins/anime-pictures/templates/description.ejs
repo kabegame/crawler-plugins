@@ -1,0 +1,135 @@
+<% const m = metadata || {}; const a = m.author; %>
+<style>
+  .ap-ap-desc { font-size: 0.875rem; line-height: 1.55; color: inherit; }
+  .ap-ap-desc .post_content.head-info { margin-bottom: 0; }
+  .ap-ap-desc .post_content.head-info h1 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem;
+    line-height: 1.35;
+  }
+  .ap-ap-desc .post_content.head-info h1 a { text-decoration: underline; text-underline-offset: 2px; color: inherit; }
+  .ap-ap-desc .info-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1rem;
+    align-items: start;
+  }
+  @media (max-width: 480px) {
+    .ap-ap-desc .info-grid { grid-template-columns: 1fr; }
+  }
+  .ap-ap-desc .author-section { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .ap-ap-desc .author-section img {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .ap-ap-desc .user_link { font-weight: 600; text-decoration: none; color: inherit; }
+  .ap-ap-desc .user_link:hover { text-decoration: underline; }
+  .ap-ap-desc .details-section { min-width: 0; }
+  .ap-ap-desc .info-line { display: flex; flex-wrap: wrap; gap: 0.35rem 1rem; margin-bottom: 0.35rem; }
+  .ap-ap-desc .info-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+  }
+  .ap-ap-desc .info-item svg { flex-shrink: 0; opacity: 0.85; vertical-align: middle; }
+  .ap-ap-desc .light { opacity: 0.7; }
+  .ap-ap-desc .desktop_only,
+  .ap-ap-desc .desktop-only { display: revert; }
+  .ap-ap-desc .color-sample {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border-radius: 2px;
+    vertical-align: middle;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+  }
+  .ap-ap-desc .wrapper.page-tags {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.22);
+  }
+  .ap-ap-desc ul.tags {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.5rem;
+    align-items: center;
+  }
+  .ap-ap-desc ul.tags > span {
+    flex: 0 0 100%;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    opacity: 0.75;
+    font-weight: 500;
+  }
+  .ap-ap-desc ul.tags > span:first-child { margin-top: 0; }
+  .ap-ap-desc ul.tags li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    list-style: none;
+  }
+  .ap-ap-desc ul.tags li.green .big_tag,
+  .ap-ap-desc a.big_tag.copyright { background: rgba(22, 163, 74, 0.18); }
+  .ap-ap-desc ul.tags li.blue .big_tag,
+  .ap-ap-desc a.big_tag.character { background: rgba(37, 99, 235, 0.18); }
+  .ap-ap-desc ul.tags li.orange .big_tag,
+  .ap-ap-desc a.big_tag.artist { background: rgba(234, 88, 12, 0.18); }
+  .ap-ap-desc a.big_tag.reference { background: rgba(107, 114, 128, 0.16); }
+  .ap-ap-desc a.big_tag.object { background: rgba(147, 51, 234, 0.16); }
+  .ap-ap-desc a.big_tag {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.8125rem;
+    display: inline-block;
+  }
+  .ap-ap-desc a.big_tag:hover { filter: brightness(0.92); }
+  .ap-ap-desc .edit_tag { font-size: 0.7rem; opacity: 0.6; white-space: nowrap; }
+  .ap-ap-desc .ap-rating-row { margin-top: 0.75rem; font-size: 0.8125rem; }
+</style>
+<div class="ap-ap-desc">
+  <% if (m.headInfoHtml) { %>
+    <%- m.headInfoHtml %>
+  <% } else { %>
+    <% if (a && (a.name || a.avatarUrl)) { %>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <% if (a.avatarUrl) { %>
+          <img src="<%= a.avatarUrl %>" alt="" style="width:2.75rem;height:2.75rem;border-radius:50%;object-fit:cover;flex-shrink:0;" />
+        <% } %>
+        <div style="min-width:0;">
+          <% if (a.profileUrl && a.name) { %>
+            <a href="<%= a.profileUrl %>" target="_blank" rel="noopener noreferrer" style="font-weight:600;"><%= a.name %></a>
+          <% } else if (a.name) { %>
+            <span style="font-weight:600;"><%= a.name %></span>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+    <% if (m.lines && m.lines.length) { %>
+      <ul style="margin:0 0 8px 0;padding-left:1.1em;">
+        <% m.lines.forEach(function (line) { %>
+          <li style="margin-bottom:4px;"><%= line %></li>
+        <% }); %>
+      </ul>
+    <% } %>
+  <% } %>
+  <% if (m.tagsHtml) { %>
+    <div class="wrapper page-tags svelte-1ok3vri">
+      <%- m.tagsHtml %>
+    </div>
+  <% } %>
+  <% if (m.rating && m.rating.label) { %>
+    <div class="ap-rating-row"><strong style="color:#9ca3af;"><%= m.rating.label %></strong> <%= m.rating.count || "" %></div>
+  <% } %>
+</div>

@@ -91,6 +91,132 @@ fn make_full_url(thumb_url, res) {
     return re_replace_all("_\\d+x\\d+", `_${res}`, thumb_url);
 }
 
+// 详情页标题常以 "Wallpaper " 开头，图库展示名去掉此前缀
+fn display_name_from_wallpaper_title(title_raw) {
+    let t = title_raw;
+    t.trim();
+    if t == "" {
+        return "";
+    }
+    if t.len() > 10 && t.sub_string(0, 10) == "Wallpaper " {
+        let rest = t.sub_string(10, t.len() - 10);
+        rest.trim();
+        return rest;
+    }
+    return t;
+}
+
+// 栈顶须为 wallpaperscraft 壁纸详情页（已由调用方 to()）
+fn wc_fetch_detail_metadata() {
+    let detail_url = current_url();
+
+    let title = "";
+    let titles = query(".content-main h1.gui-heading");
+    if titles.len() > 0 {
+        title = titles[0];
+        title.trim();
+    }
+    let author = "";
+    let license = "";
+    let auth_rows = query(".author .author__row");
+    for row in auth_rows {
+        let r = row;
+        r.trim();
+        if r.len() >= 7 && r.sub_string(0, 7) == "Author:" {
+            let a = r.sub_string(7, r.len() - 7);
+            a.trim();
+            author = a;
+        }
+        if r.len() >= 8 && r.sub_string(0, 8) == "License:" {
+            let l = r.sub_string(8, r.len() - 8);
+            l.trim();
+            l.replace("\n", " ");
+            license = l;
+        }
+    }
+
+    let source_url = "";
+    let src_h = get_attr(".author__block_source a.author__link", "href");
+    if src_h.len() > 0 {
+        source_url = resolve_url(src_h[0]);
+    }
+
+    let rating = "";
+    let rate_arr = query(".wallpaper-votes__rate");
+    if rate_arr.len() > 0 {
+        rating = rate_arr[0];
+        rating.trim();
+    }
+
+    let votes_total = "";
+    let vt = query(".JS-Vote-Total");
+    if vt.len() > 0 {
+        votes_total = vt[0];
+        votes_total.trim();
+    }
+
+    let orig_res = "";
+    let views = "";
+    let uploaded = "";
+    let cells = query(".wallpaper-table .wallpaper-table__cell");
+    let ci = 0;
+    while ci + 1 < cells.len() {
+        let k = cells[ci];
+        k.trim();
+        let v = cells[ci + 1];
+        v.trim();
+        if k.contains("Original Resolution") {
+            orig_res = v;
+        } else if k.contains("Views") {
+            views = v;
+        } else if k.contains("Uploaded") {
+            uploaded = v;
+        }
+        ci += 2;
+    }
+
+    let orig_dl = "";
+    let dl_h = get_attr(".wallpaper-table a[href*='/download/']", "href");
+    if dl_h.len() > 0 {
+        orig_dl = resolve_url(dl_h[0]);
+    }
+
+    return #{
+        site_base: base_url,
+        detail_url: detail_url,
+        wallpaper_title: title,
+        author: author,
+        license: license,
+        source_url: source_url,
+        rating: rating,
+        votes_total: votes_total,
+        original_resolution: orig_res,
+        original_download_url: orig_dl,
+        views: views,
+        uploaded: uploaded
+    };
+}
+
+fn download_with_wc_detail(full_url, detail_rel) {
+    let rel = detail_rel;
+    rel.trim();
+    if rel == "" {
+        download_image(full_url);
+        return;
+    }
+
+    let detail_abs = resolve_url(rel);
+    to(detail_abs);
+    let meta = wc_fetch_detail_metadata();
+    let dn = display_name_from_wallpaper_title(meta.wallpaper_title);
+    if dn != "" {
+        download_image(full_url, #{ name: dn, metadata: meta });
+    } else {
+        download_image(full_url, #{ metadata: meta });
+    }
+    back();
+}
+
 fn run() {
     if end_page < start_page {
         throw "结束页数需要大于或等于起始页数";
@@ -136,6 +262,7 @@ fn run() {
         }
 
         let thumbnail_srcs = get_attr(".wallpapers__link img", "src");
+        let detail_hrefs = get_attr(".wallpapers__link", "href");
         let info_texts = query(".wallpapers__link .wallpapers__info");
 
         let page_progress = if total_pages > 0 { 100.0 / total_pages } else { 0.0 };
@@ -155,7 +282,11 @@ fn run() {
 
             if final_res != "" {
                 let full_url = make_full_url(thumb, final_res);
-                download_image(full_url);
+                let detail_rel = "";
+                if idx < detail_hrefs.len() {
+                    detail_rel = detail_hrefs[idx];
+                }
+                download_with_wc_detail(full_url, detail_rel);
             }
 
             add_progress(per_image_progress);

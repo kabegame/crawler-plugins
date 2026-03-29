@@ -18,7 +18,7 @@ for item in list {
         let category_images = item.zids;
         let base_url = item.baseUrl;
         for zid in category_images {
-            download_image(base_url + zid);
+            download_image(base_url + zid, #{ metadata: #{ category: item.category } });
             if total > 0 {
                 add_progress(percent_per_image);
             }

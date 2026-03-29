@@ -10,8 +10,89 @@
 // 处理单个详情页
 fn process_detail_page(href) {
     to(href);
-    let image = get_attr(".bip-download-btn", "href")[0];
-    download_image(image);
+    let image_links = get_attr(".bip-download-btn", "href");
+    if image_links.len() == 0 {
+        print("[twodwallpapers] 详情页未找到下载链接，跳过");
+        back();
+        return;
+    }
+
+    let image = image_links[0];
+    let detail_url = current_url();
+
+    let title_raw = "";
+    let title_arr = query(".post-title");
+    if title_arr.len() > 0 {
+        title_raw = title_arr[0];
+        title_raw.trim();
+    }
+
+    let name = re_replace_all("\\s*Wallpaper\\s+ID\\d+\\s*$", "", title_raw);
+    name.trim();
+    if name == "" {
+        name = title_raw;
+    }
+
+    let wallpaper_id = "";
+    if re_is_match("Wallpaper\\s+ID(\\d+)\\s*$", title_raw) {
+        wallpaper_id = re_replace_all("^.*Wallpaper\\s+ID(\\d+)\\s*$", "$1", title_raw);
+        wallpaper_id.trim();
+    }
+
+    let page_num = "";
+    if re_is_match("^.*/([^/]+)\\.html(?:\\?.*)?$", detail_url) {
+        page_num = re_replace_all("^.*/([^/]+)\\.html(?:\\?.*)?$", "$1", detail_url);
+        page_num.trim();
+    }
+
+    let category = "";
+    let categories = query(".meta-cat-dot a");
+    if categories.len() > 0 {
+        category = categories[0];
+        category.trim();
+    }
+
+    let sidebar_text = "";
+    let sidebar_arr = query("#block-9");
+    if sidebar_arr.len() > 0 {
+        sidebar_text = sidebar_arr[0];
+    }
+
+    let resolution = "";
+    if re_is_match("(?i)Resolution:\\s*[^\\n\\r]+", sidebar_text) {
+        resolution = re_replace_all("(?is)^.*?Resolution:\\s*([^\\n\\r]+).*$", "$1", sidebar_text);
+        resolution.trim();
+    }
+
+    let size = "";
+    if re_is_match("(?i)Size:\\s*[^\\n\\r]+", sidebar_text) {
+        size = re_replace_all("(?is)^.*?Size:\\s*([^\\n\\r]+).*$", "$1", sidebar_text);
+        size.trim();
+    }
+
+    let file_format = "";
+    if re_is_match("(?i)Format:\\s*[^\\n\\r]+", sidebar_text) {
+        file_format = re_replace_all("(?is)^.*?Format:\\s*([^\\n\\r]+).*$", "$1", sidebar_text);
+        file_format.trim();
+    }
+
+    let meta = #{
+        name: name,
+        wallpaper_id: wallpaper_id,
+        page_num: page_num,
+        detail_url: detail_url,
+        resolution: resolution,
+        size: size,
+        format: file_format,
+        category: category,
+        download_url: image
+    };
+
+    if name != "" {
+        download_image(image, #{ name: name, metadata: meta });
+    } else {
+        download_image(image, #{ metadata: meta });
+    }
     back();
 }
 

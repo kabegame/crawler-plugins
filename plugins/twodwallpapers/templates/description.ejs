@@ -1,0 +1,214 @@
+<% const m = metadata || {}; %>
+<%
+  const title = m.name != null ? String(m.name).trim() : '';
+  const detailUrl = m.detail_url != null ? String(m.detail_url).trim() : '';
+  const category = m.category != null ? String(m.category).trim() : '';
+  const resolution = m.resolution != null ? String(m.resolution).trim() : '';
+  const size = m.size != null ? String(m.size).trim() : '';
+  const format = m.format != null ? String(m.format).trim() : '';
+  const wallpaperId = m.wallpaper_id != null ? String(m.wallpaper_id).trim() : '';
+  const pageNum = m.page_num != null ? String(m.page_num).trim() : '';
+  const hasAny = !!(title || detailUrl || category || resolution || size || format || wallpaperId || pageNum);
+%>
+<% if (!hasAny) { %>
+<p id="twod-desc-empty" class="twod-desc-empty" style="font-size:0.875rem;opacity:0.75;"></p>
+<% } else { %>
+<style>
+.twod-desc-wrap {
+  unicode-bidi: isolate;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: inherit;
+  box-sizing: border-box;
+}
+.twod-desc-wrap * { box-sizing: border-box; }
+.twod-desc-wrap .twod-title {
+  margin: 0 0 0.65rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--anime-text-primary, inherit);
+}
+.twod-desc-wrap .twod-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.twod-desc-wrap .twod-title a:hover {
+  color: var(--anime-primary, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.twod-desc-wrap .twod-panel {
+  margin: 0 0 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--anime-text-primary, currentColor) 12%, transparent);
+}
+.twod-desc-wrap .twod-panel:last-of-type { margin-bottom: 0; }
+.twod-desc-wrap .twod-kv {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 45%, transparent);
+}
+.twod-desc-wrap .twod-kv:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.twod-desc-wrap .twod-kv-key {
+  flex: 0 0 auto;
+  min-width: 6.5rem;
+  font-weight: 600;
+  color: var(--anime-text-secondary, inherit);
+}
+.twod-desc-wrap .twod-kv-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+  color: var(--anime-text-primary, inherit);
+}
+.twod-desc-wrap a.twod-link {
+  color: var(--anime-primary, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.twod-desc-wrap a.twod-link:hover { opacity: 0.9; }
+</style>
+<div class="twod-desc-wrap" id="twod-desc-root">
+  <% if (title) { %>
+  <h1 class="twod-title">
+    <% if (detailUrl) { %>
+    <a href="<%= detailUrl %>" target="_blank" rel="noopener noreferrer"><%= title %></a>
+    <% } else { %>
+    <%= title %>
+    <% } %>
+  </h1>
+  <% } %>
+
+  <div class="twod-panel" data-twod-panel="1" aria-label="">
+    <% if (category) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="category"></span><span class="twod-kv-val"><%= category %></span></div>
+    <% } %>
+    <% if (resolution) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="resolution"></span><span class="twod-kv-val"><%= resolution %></span></div>
+    <% } %>
+    <% if (size) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="size"></span><span class="twod-kv-val"><%= size %></span></div>
+    <% } %>
+    <% if (format) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="format"></span><span class="twod-kv-val"><%= format %></span></div>
+    <% } %>
+    <% if (wallpaperId) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="wallpaperId"></span><span class="twod-kv-val"><%= wallpaperId %></span></div>
+    <% } %>
+    <% if (pageNum) { %>
+    <div class="twod-kv"><span class="twod-kv-key" data-twod-lbl="pageNum"></span><span class="twod-kv-val"><%= pageNum %></span></div>
+    <% } %>
+  </div>
+</div>
+<% } %>
+<script>
+(function () {
+  function twodLabels(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') {
+      return {
+        category: '分類',
+        resolution: '解析度',
+        size: '檔案大小',
+        format: '格式',
+        wallpaperId: '壁紙 ID',
+        pageNum: '頁面編號',
+        download: '下載',
+        originalImage: '原圖',
+        panelAria: '2dwallpapers 詳情元資料',
+        empty: '尚無 2dwallpapers 詳情元資料（請以最新版外掛重新抓取）。'
+      };
+    }
+    if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
+      return {
+        category: '分类',
+        resolution: '分辨率',
+        size: '文件大小',
+        format: '格式',
+        wallpaperId: '壁纸 ID',
+        pageNum: '页面编号',
+        download: '下载',
+        originalImage: '原图',
+        panelAria: '2dwallpapers 详情元数据',
+        empty: '暂无 2dwallpapers 详情元数据（请使用最新版插件重新抓取）。'
+      };
+    }
+    if (s === 'ja') {
+      return {
+        category: 'カテゴリ',
+        resolution: '解像度',
+        size: 'ファイルサイズ',
+        format: '形式',
+        wallpaperId: '壁紙 ID',
+        pageNum: 'ページ番号',
+        download: 'ダウンロード',
+        originalImage: 'オリジナル画像',
+        panelAria: '2dwallpapers の詳細メタデータ',
+        empty: '2dwallpapers の詳細メタデータがありません（最新版プラグインで再取得してください）。'
+      };
+    }
+    if (s === 'ko') {
+      return {
+        category: '카테고리',
+        resolution: '해상도',
+        size: '파일 크기',
+        format: '형식',
+        wallpaperId: '배경화면 ID',
+        pageNum: '페이지 번호',
+        download: '다운로드',
+        originalImage: '원본 이미지',
+        panelAria: '2dwallpapers 상세 메타데이터',
+        empty: '2dwallpapers 상세 메타데이터가 없습니다(최신 플러그인으로 다시 수집하세요).'
+      };
+    }
+    return {
+      category: 'Category',
+      resolution: 'Resolution',
+      size: 'Size',
+      format: 'Format',
+      wallpaperId: 'Wallpaper ID',
+      pageNum: 'Page number',
+      download: 'Download',
+      originalImage: 'Original image',
+      panelAria: '2dwallpapers detail metadata',
+      empty: 'No 2dwallpapers detail metadata (re-crawl with the latest plugin).'
+    };
+  }
+  function apply(loc) {
+    var L = twodLabels(loc);
+    var nodes = document.querySelectorAll('[data-twod-lbl]');
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      var k = el.getAttribute('data-twod-lbl');
+      if (k && L[k] != null) el.textContent = L[k];
+    }
+    var panel = document.querySelector('[data-twod-panel="1"]');
+    if (panel && L.panelAria) panel.setAttribute('aria-label', L.panelAria);
+    var emptyEl = document.getElementById('twod-desc-empty');
+    if (emptyEl && L.empty) emptyEl.textContent = L.empty;
+  }
+  function onReady() {
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(apply).catch(function () {
+        apply('en');
+      });
+    } else {
+      apply((navigator.language || 'en').split('-')[0]);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
+})();
+</script>

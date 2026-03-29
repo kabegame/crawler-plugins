@@ -41,10 +41,203 @@ fn build_tags_value_from_list(tag_list) {
     return joined;
 }
 
+// 解析 Related Posts 下第一个 <ul> 内的 <a>（不保存原始 HTML，仅 href + 文案）
+fn parse_related_posts(html) {
+    let related = [];
+    let parts = html.split("Related Posts</h5>");
+    if parts.len() < 2 {
+        return related;
+    }
+    let tail = parts[1];
+    let ul_parts = tail.split("<ul>");
+    if ul_parts.len() < 2 {
+        return related;
+    }
+    let after_ul = ul_parts[1];
+    let ul_close = after_ul.split("</ul>");
+    if ul_close.len() < 1 {
+        return related;
+    }
+    let inner = ul_close[0];
+    let li_chunks = inner.split("<li>");
+    let ci = 0;
+    while ci < li_chunks.len() {
+        let chunk = li_chunks[ci];
+        if re_is_match("href=\"([^\"]+)\"", chunk) {
+            let href = trim_text(re_replace_all("(?s)^.*?href=\"([^\"]+)\"[^>]*>([^<]*)</a>.*$", "$1", chunk));
+            let lab = trim_text(re_replace_all("(?s)^.*?href=\"([^\"]+)\"[^>]*>([^<]*)</a>.*$", "$2", chunk));
+            if href != "" {
+                related.push(#{ href: resolve_url(href), label: lab });
+            }
+        }
+        ci += 1;
+    }
+    return related;
+}
+
+// 从详情页侧边栏解析结构化 metadata（仅 current_html / query / get_attr，无额外请求）
+fn build_konachan_metadata() {
+    let html = current_html();
+    let posted_by_name = "";
+    let posted_by_href = "";
+    let source_href = "";
+    let score_str = "";
+    let user_hrefs = get_attr("#stats ul li:nth-of-type(2) a[href*='/user/show/']", "href");
+    let user_names = query("#stats ul li:nth-of-type(2) a[href*='/user/show/']");
+    if user_hrefs.len() > 0 && user_names.len() > 0 {
+        let uh = resolve_url(trim_text(user_hrefs[0]));
+        let un = trim_text(user_names[0]);
+        if un != "" {
+            posted_by_name = un;
+            posted_by_href = uh;
+        }
+    }
+    let src_hrefs = get_attr("#stats ul li a[href^='http']", "href");
+    if src_hrefs.len() > 0 {
+        let sh = trim_text(src_hrefs[0]);
+        if sh != "" {
+            source_href = sh;
+        }
+    }
+    if re_is_match("id=\\\"post-score-\\d+\\\">\\s*(-?\\d+)\\s*</span>", html) {
+        let s = trim_text(re_replace_all("(?s)^.*?id=\\\"post-score-\\d+\\\">\\s*(-?\\d+)\\s*</span>.*$", "$1", html));
+        if re_is_match("^-?\\d+$", s) {
+            score_str = s;
+        }
+    }
+
+    let post_id_str = "";
+    let size_str = "";
+    let rating_str = "";
+    let stat_lines = query("#stats ul > li");
+    let si = 0;
+    while si < stat_lines.len() {
+        let line = trim_text(`${stat_lines[si]}`);
+        if re_is_match("^Id:\\s*\\d+", line) {
+            post_id_str = trim_text(re_replace_all("^Id:\\s*(\\d+).*$", "$1", line));
+        } else if re_is_match("^Size:", line) {
+            size_str = trim_text(re_replace_all("^Size:\\s*(.+)$", "$1", line));
+        } else if re_is_match("^Rating:", line) {
+            rating_str = trim_text(re_replace_all("^Rating:\\s*(\\S+).*$", "$1", line));
+        }
+        si += 1;
+    }
+
+    let date_href = "";
+    let date_text = "";
+    let date_title = "";
+    let date_hrefs = get_attr("#stats ul > li:nth-of-type(2) a[href*='/post?tags=date']", "href");
+    let date_texts = query("#stats ul > li:nth-of-type(2) a[href*='/post?tags=date']");
+    let date_titles = get_attr("#stats ul > li:nth-of-type(2) a[href*='/post?tags=date']", "title");
+    if date_hrefs.len() > 0 {
+        date_href = resolve_url(trim_text(`${date_hrefs[0]}`));
+    }
+    if date_texts.len() > 0 {
+        date_text = trim_text(`${date_texts[0]}`);
+    }
+    if date_titles.len() > 0 {
+        date_title = trim_text(`${date_titles[0]}`);
+    }
+
+    let avatar_href = "";
+    let avatar_src = "";
+    let avatar_hrefs = get_attr("#stats .comment-avatar-container a", "href");
+    let avatar_srcs = get_attr("#stats .comment-avatar-container img", "src");
+    if avatar_hrefs.len() > 0 {
+        avatar_href = resolve_url(trim_text(`${avatar_hrefs[0]}`));
+    }
+    if avatar_srcs.len() > 0 {
+        avatar_src = resolve_url(trim_text(`${avatar_srcs[0]}`));
+    }
+
+    let fav_list = [];
+    let fh = get_attr("#favorited-by a", "href");
+    let fnames = query("#favorited-by a");
+    let fi = 0;
+    while fi < fh.len() && fi < fnames.len() {
+        let h = resolve_url(trim_text(`${fh[fi]}`));
+        let n = trim_text(`${fnames[fi]}`);
+        if n != "" {
+            fav_list.push(#{ href: h, name: n });
+        }
+        fi += 1;
+    }
+
+    let tags = [];
+    let names = get_attr("#tag-sidebar li.tag-link", "data-name");
+    let types = get_attr("#tag-sidebar li.tag-link", "data-type");
+    let wiki_hs = get_attr("#tag-sidebar li.tag-link > a:nth-of-type(1)", "href");
+    let post_hs = get_attr("#tag-sidebar li.tag-link > a:nth-of-type(2)", "href");
+    let labels = query("#tag-sidebar li.tag-link > a:nth-of-type(2)");
+    let counts = query("#tag-sidebar li.tag-link span.post-count");
+    let n = names.len();
+    let ti = 0;
+    while ti < n {
+        let dname = "";
+        if ti < labels.len() {
+            dname = trim_text(`${labels[ti]}`);
+        }
+        let cnt = "";
+        if ti < counts.len() {
+            cnt = trim_text(`${counts[ti]}`);
+        }
+        let w = "";
+        if ti < wiki_hs.len() {
+            w = resolve_url(trim_text(`${wiki_hs[ti]}`));
+        }
+        let p = "";
+        if ti < post_hs.len() {
+            p = resolve_url(trim_text(`${post_hs[ti]}`));
+        }
+        let ty = "";
+        if ti < types.len() {
+            ty = trim_text(`${types[ti]}`);
+        }
+        let na = "";
+        if ti < names.len() {
+            na = trim_text(`${names[ti]}`);
+        }
+        if na != "" || dname != "" {
+            tags.push(#{
+                name: na,
+                type: ty,
+                wiki_href: w,
+                post_href: p,
+                display: dname,
+                count: cnt
+            });
+        }
+        ti += 1;
+    }
+
+    let related = parse_related_posts(html);
+
+    return #{
+        posted_by_name: posted_by_name,
+        posted_by_href: posted_by_href,
+        source_href: source_href,
+        score: score_str,
+        sidebar_tags: tags,
+        stats: #{
+            post_id: post_id_str,
+            size: size_str,
+            rating: rating_str,
+            posted_date_href: date_href,
+            posted_date_text: date_text,
+            posted_date_title: date_title,
+            avatar_href: avatar_href,
+            avatar_src: avatar_src,
+            favorited: fav_list
+        },
+        related: related
+    };
+}
+
 // 处理单个详情页
 fn process_detail_page(href) {
     let full_url = resolve_url(href);
     to(full_url);
+    let meta = build_konachan_metadata();
     let images = [];
     let q = quality;
     if q == "high" {
@@ -59,7 +252,29 @@ fn process_detail_page(href) {
         images = get_attr("#image", "src");
     }
     if images.len() > 0 {
-        download_image(images[0]);
+        let st_ne = if meta.stats != () {
+            let st = meta.stats;
+            trim_text(`${st.post_id}`) != ""
+                || trim_text(`${st.size}`) != ""
+                || trim_text(`${st.rating}`) != ""
+                || trim_text(`${st.posted_date_href}`) != ""
+                || trim_text(`${st.avatar_src}`) != ""
+                || (st.favorited != () && st.favorited.len() > 0)
+        } else {
+            false
+        };
+        let nonempty = trim_text(meta.posted_by_name) != ""
+            || trim_text(meta.posted_by_href) != ""
+            || trim_text(meta.source_href) != ""
+            || trim_text(meta.score) != ""
+            || (meta.sidebar_tags != () && meta.sidebar_tags.len() > 0)
+            || (meta.related != () && meta.related.len() > 0)
+            || st_ne;
+        if nonempty {
+            download_image(images[0], #{ metadata: meta });
+        } else {
+            download_image(images[0]);
+        }
     }
     back();
 }

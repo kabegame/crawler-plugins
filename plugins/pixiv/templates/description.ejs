@@ -1,0 +1,1027 @@
+<%#
+  ================================================================================
+  注入数据结构（本模板 EJS locals）
+  ================================================================================
+  来源：crawl.rhai 中 download_image(..., #{ metadata: #{ body: illust_body } }) 或仅 #{ illustId }。
+
+  - metadata.body：Pixiv 作品详情 ajax（如 GET /ajax/illust/{id}）响应里的 body 对象，与官网作品页同源。
+  - 无 body 时：metadata 可能只有 illustId（字符串），模板可解析作品链接，评论区等依赖字段会降级。
+
+  模板内映射：m = metadata || {}；b =（m.body 为普通对象且非数组）? m.body : null。
+
+  本模板主要读取的字段：illustId / id、title / illustTitle、description / illustComment、tags.tags[]（展示优先 translation.en，链接仍用 tag）、
+  tags.authorId（与 userId 均可；作者栏请求 GET /ajax/user/{id}?full=0&lang=… 取 name / image）、
+  userId、userName、uploadDate / createDate、likeCount、bookmarkCount、viewCount；内联脚本另用 illustId 拉评论。
+
+  ---------------------------------------------------------------------------
+  body 典型形状示例（字段以线上 API 为准；userIllusts、zoneConfig 等同型大块仅示意）
+  ---------------------------------------------------------------------------
+  {
+    "illustId": "141555883",
+    "illustTitle": "深海微光",
+    "illustComment": "",
+    "id": "141555883",
+    "title": "深海微光",
+    "description": "",
+    "illustType": 0,
+    "createDate": "2026-02-23T15:01:00+00:00",
+    "uploadDate": "2026-02-23T15:01:00+00:00",
+    "restrict": 0,
+    "xRestrict": 0,
+    "sl": 2,
+    "urls": {
+      "mini": "https://i.pximg.net/c/48x48/custom-thumb/img/.../141555883_p0_custom1200.jpg",
+      "thumb": "https://i.pximg.net/c/250x250_80_a2/custom-thumb/img/.../141555883_p0_custom1200.jpg",
+      "small": "https://i.pximg.net/c/540x540_70/img-master/img/.../141555883_p0_master1200.jpg",
+      "regular": "https://i.pximg.net/img-master/img/.../141555883_p0_master1200.jpg",
+      "original": "https://i.pximg.net/img-original/img/.../141555883_p0.jpg"
+    },
+    "tags": {
+      "authorId": "3728269",
+      "isLocked": false,
+      "tags": [
+        {
+          "tag": "女の子",
+          "locked": true,
+          "deletable": false,
+          "userId": "3728269",
+          "userName": "Fre"
+        },
+        { "tag": "原神", "locked": true, "deletable": false, "userId": "3728269", "userName": "Fre" }
+      ],
+      "writable": true
+    },
+    "alt": "#女の子 深海微光 - Freのイラスト",
+    "userId": "3728269",
+    "userName": "Fre",
+    "userAccount": "zxhc306",
+    "userIllusts": {
+      "37670731": null,
+      "141555883": {
+        "id": "141555883",
+        "title": "深海微光",
+        "illustType": 0,
+        "xRestrict": 0,
+        "restrict": 0,
+        "sl": 2,
+        "url": "https://i.pximg.net/c/250x250_80_a2/custom-thumb/img/.../141555883_p0_custom1200.jpg",
+        "description": "",
+        "tags": ["女の子", "原神"],
+        "userId": "3728269",
+        "userName": "Fre",
+        "width": 1500,
+        "height": 2312,
+        "pageCount": 1,
+        "isBookmarkable": true,
+        "bookmarkData": null,
+        "alt": "#女の子 深海微光 - Freのイラスト",
+        "titleCaptionTranslation": { "workTitle": null, "workCaption": null },
+        "createDate": "2026-02-24T00:01:45+09:00",
+        "updateDate": "2026-02-24T00:01:00+09:00",
+        "isUnlisted": false,
+        "isMasked": false,
+        "aiType": 1
+      }
+    },
+    "likeData": false,
+    "width": 1500,
+    "height": 2312,
+    "pageCount": 1,
+    "bookmarkCount": 3927,
+    "likeCount": 2681,
+    "commentCount": 11,
+    "responseCount": 0,
+    "viewCount": 21187,
+    "bookStyle": 0,
+    "isHowto": false,
+    "isOriginal": false,
+    "imageResponseOutData": [],
+    "imageResponseData": [],
+    "imageResponseCount": 0,
+    "pollData": null,
+    "seriesNavData": null,
+    "descriptionBoothId": null,
+    "descriptionYoutubeId": null,
+    "comicPromotion": null,
+    "fanboxPromotion": null,
+    "contestBanners": [],
+    "isBookmarkable": true,
+    "bookmarkData": null,
+    "contestData": null,
+    "zoneConfig": {
+      "responsive": { "url": "https://pixon.ads-pixiv.net/show?zone_id=illust_responsive_side&..." },
+      "rectangle": { "url": "https://pixon.ads-pixiv.net/show?zone_id=illust_rectangle&..." }
+    },
+    "extraData": {
+      "meta": {
+        "title": "#女の子 深海微光 - Freのイラスト - pixiv",
+        "description": "…",
+        "canonical": "https://www.pixiv.net/artworks/141555883",
+        "alternateLanguages": { "ja": "https://www.pixiv.net/artworks/141555883", "en": "https://www.pixiv.net/en/artworks/141555883" },
+        "descriptionHeader": "…",
+        "ogp": { "description": "", "image": "https://embed.pixiv.net/artwork.php?illust_id=141555883&...", "title": "…", "type": "article" },
+        "twitter": { "description": "深海微光 by Fre", "image": "…", "title": "深海微光", "card": "summary_large_image" }
+      }
+    },
+    "titleCaptionTranslation": { "workTitle": null, "workCaption": null },
+    "isUnlisted": false,
+    "request": null,
+    "commentOff": 0,
+    "aiType": 1,
+    "reuploadDate": null,
+    "locationMask": false,
+    "commissionLinkHidden": false,
+    "isLoginOnly": false
+  }
+%>
+<% const m = metadata || {}; %>
+<% const b = (m.body != null && typeof m.body === 'object' && !Array.isArray(m.body)) ? m.body : null; %>
+<% const illustId = b ? String(b.illustId || b.id || '') : (m.illustId != null ? String(m.illustId) : ''); %>
+<% const artworkHref = illustId ? ('https://www.pixiv.net/artworks/' + encodeURIComponent(illustId)) : ''; %>
+<% const pxTitle = b ? String(b.title || b.illustTitle || '') : ''; %>
+<% const pxCaption = b ? String(b.description || b.illustComment || '') : ''; %>
+<% const pxTags = (b && b.tags && Array.isArray(b.tags.tags)) ? b.tags.tags : []; %>
+<% const pxUid = b && b.userId != null ? String(b.userId) : ''; %>
+<% const pxUname = b && b.userName != null ? String(b.userName) : ''; %>
+<% const pxAuthorId = (b && b.tags && b.tags.authorId != null) ? String(b.tags.authorId) : pxUid; %>
+<% const pxUserHref = pxUid ? ('https://www.pixiv.net/users/' + encodeURIComponent(pxUid)) : ''; %>
+<% const pxAuthorHref = pxAuthorId ? ('https://www.pixiv.net/users/' + encodeURIComponent(pxAuthorId)) : pxUserHref; %>
+<% const pxDateIso = b && (b.uploadDate != null || b.createDate != null) ? String(b.uploadDate != null ? b.uploadDate : b.createDate) : ''; %>
+<style>
+@keyframes px-spin{to{transform:rotate(360deg)}}
+.px-illust-desc{font-size:0.8rem;color:var(--anime-text-secondary,#4b5563);word-break:break-word;line-height:1.45;margin-bottom:0;}
+.px-illust-desc a{color:var(--anime-primary,#6366f1);text-decoration:none;}
+.px-illust-desc a:hover{text-decoration:underline;}
+.px-illust-desc-expand{display:flex;flex-direction:column;gap:2px;margin-bottom:10px;position:relative;}
+.px-illust-desc-expand__clip{overflow:visible;max-height:none;}
+.px-illust-desc-expand__clip.is-collapsed{max-height:180px;overflow:hidden;}
+.px-illust-desc-expand__foot{display:flex;justify-content:flex-end;align-items:center;width:100%;margin:0;padding:8px 0 0;box-sizing:border-box;}
+.px-illust-desc-expand__foot[hidden]{display:none !important;}
+.px-illust-desc-expand__btn{display:inline-flex;align-items:center;justify-content:center;margin:0;border:1px solid color-mix(in srgb,var(--anime-border,#d1d5db) 90%,transparent);border-radius:9999px;padding:5px 14px;cursor:pointer;font-family:inherit;font-size:0.72rem;line-height:1.2;font-weight:600;letter-spacing:0.02em;color:var(--anime-text-secondary,#6b7280);background:color-mix(in srgb,var(--anime-text-primary,#111827) 5%,transparent);-webkit-tap-highlight-color:transparent;white-space:nowrap;}
+.px-illust-desc-expand__btn:hover{color:var(--anime-text-primary,#1f2937);background:color-mix(in srgb,var(--anime-text-primary,#111827) 9%,transparent);border-color:color-mix(in srgb,var(--anime-border,#d1d5db) 100%,transparent);}
+.px-illust-desc-expand__btn:focus-visible{outline:2px solid color-mix(in srgb,var(--anime-primary,#6366f1) 40%,transparent);outline-offset:2px;}
+.px-illust-dyn[hidden]{display:none !important;}
+.px-stats{display:flex;flex-wrap:wrap;gap:14px 18px;align-items:center;font-size:0.78rem;color:var(--anime-text-secondary,#6b7280);margin-bottom:4px;}
+.px-stat{display:inline-flex;align-items:center;gap:5px;line-height:1;}
+.px-stat svg{flex-shrink:0;display:block;color:var(--anime-text-secondary,#858585);}
+.px-author-bar{display:flex;align-items:center;gap:10px;margin:0 0 10px;min-width:0;}
+.px-author-bar[hidden]{display:none !important;}
+.px-author-bar .px-open{display:inline-flex;align-items:center;gap:10px;min-width:0;max-width:100%;text-decoration:none;color:inherit;cursor:pointer;}
+.px-author-bar .px-open:hover .px-author-name{text-decoration:underline;}
+.px-author-avatar{flex-shrink:0;width:40px;height:40px;border-radius:50%;object-fit:cover;background:color-mix(in srgb,var(--anime-text-secondary,#9ca3af) 14%,transparent);display:block;}
+.px-author-name{font-size:0.875rem;font-weight:600;line-height:1.35;color:var(--anime-text-primary,#1f2937);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.px-title-link{display:block;margin:0 0 8px;font-size:1rem;font-weight:600;line-height:1.35;color:var(--anime-text-primary,#1f2937);text-decoration:none;cursor:pointer;}
+.px-title-link:hover{opacity:0.88;text-decoration:underline;}
+#px-comments-container{display:flex;flex-direction:column;gap:0;}
+.px-comment-row{display:flex;align-items:flex-start;gap:12px;margin:0;padding:12px 0;border-bottom:1px solid color-mix(in srgb,var(--anime-border,#e5e7eb) 50%,transparent);}
+.px-comment-row:last-child{border-bottom:none;}
+.px-comment-avatar{flex-shrink:0;width:40px;height:40px;border-radius:50%;overflow:hidden;background:color-mix(in srgb,var(--anime-text-secondary,#9ca3af) 12%,transparent);}
+.px-comment-avatar img{display:block;width:100%;height:100%;object-fit:cover;}
+.px-comment-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;}
+.px-comment-name{font-size:0.8125rem;font-weight:600;line-height:1.35;color:var(--anime-text-primary,#1f2937);}
+.px-comment-body{font-size:0.875rem;color:var(--anime-text-primary,#1f2937);word-break:break-word;line-height:1.5;}
+.px-comment-body img.px-comment-emoji{vertical-align:middle;object-fit:contain;}
+.px-comment-body--solo img.px-comment-emoji{width:80px;height:80px;}
+.px-comment-meta{font-size:0.75rem;line-height:1.35;color:var(--anime-text-secondary,#6b7280);font-variant-numeric:tabular-nums;}
+</style>
+<div style="font-size:0.875rem;color:var(--anime-text-primary,#1f2937);line-height:1.45;">
+  <% if (b) { %>
+  <div style="margin-bottom:12px;">
+    <div id="px-author-bar" class="px-author-bar px-illust-dyn"<% if (!pxAuthorId && !pxUname) { %> hidden<% } %>>
+      <% if (pxAuthorHref) { %>
+      <a href="#" id="px-author-link" class="px-open" data-url="<%= pxAuthorHref %>" rel="noopener noreferrer">
+        <img id="px-author-avatar" class="px-author-avatar" alt="" width="40" height="40" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" referrerpolicy="no-referrer" />
+        <span id="px-author-name" class="px-author-name"><%= pxUname || pxAuthorId %></span>
+      </a>
+      <% } else { %>
+      <span class="px-open" style="cursor:default;pointer-events:none;">
+        <img id="px-author-avatar" class="px-author-avatar" alt="" width="40" height="40" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" referrerpolicy="no-referrer" />
+        <span id="px-author-name" class="px-author-name"><%= pxUname || pxAuthorId %></span>
+      </span>
+      <% } %>
+    </div>
+    <% if (pxTitle) { %>
+      <% if (artworkHref) { %>
+    <a href="#" id="px-title-link" class="px-open px-title-link" data-url="<%= artworkHref %>" rel="noopener noreferrer"><%= pxTitle %></a>
+      <% } else { %>
+    <h1 id="px-title-text" style="margin:0 0 8px;font-size:1rem;font-weight:600;line-height:1.35;color:var(--anime-text-primary,#1f2937);"><%= pxTitle %></h1>
+      <% } %>
+    <% } %>
+    <div class="px-illust-desc-expand px-illust-dyn" id="px-illust-desc-wrap"<% if (!pxCaption) { %> hidden<% } %>>
+      <div class="px-illust-desc-expand__clip" id="px-illust-desc-clip">
+        <div id="px-illust-desc" class="px-illust-desc"><%- pxCaption %></div>
+      </div>
+      <div class="px-illust-desc-expand__foot" id="px-illust-desc-foot" hidden>
+        <button type="button" class="px-illust-desc-expand__btn" id="px-illust-desc-toggle" aria-expanded="false" aria-controls="px-illust-desc-clip"></button>
+      </div>
+    </div>
+    <ul id="px-illust-tags" class="px-illust-dyn" style="list-style:none;margin:0 0 10px;padding:0;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;"<% if (!pxTags.length) { %> hidden<% } %>>
+      <% for (let ti = 0; ti < pxTags.length; ti++) { const row = pxTags[ti]; const tslug = row && row.tag != null ? String(row.tag) : ''; if (!tslug) continue; const ten = row && row.translation && row.translation.en != null ? String(row.translation.en).trim() : ''; const tlabel = ten ? ten : tslug; const tHref = 'https://www.pixiv.net/tags/' + encodeURIComponent(tslug) + '/artworks'; %>
+      <li style="margin:0;"><a href="#" class="px-open" data-url="<%= tHref %>" style="font-size:0.78rem;color:var(--anime-primary,#6366f1);">#<%= tlabel %></a></li>
+      <% } %>
+    </ul>
+    <div class="px-stats" aria-label="stats">
+      <% if (b.bookmarkCount != null) { %>
+      <span id="px-stat-bookmark" class="px-stat px-illust-dyn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M2,6 C0.8954305,6 0,5.1045695 0,4 C0,2.8954305 0.8954305,2 2,2 C3.1045695,2 4,2.8954305 4,4 C4,5.1045695 3.1045695,6 2,6 Z M10,6 C8.8954305,6 8,5.1045695 8,4 C8,2.8954305 8.8954305,2 10,2 C11.1045695,2 12,2.8954305 12,4 C12,5.1045695 11.1045695,6 10,6 Z M2.1109127,8.8890873 C1.72038841,8.498563 1.72038841,7.86539803 2.1109127,7.47487373 C2.501437,7.08434944 3.13460197,7.08434944 3.52512627,7.47487373 C4.89196129,8.84170876 7.10803871,8.84170876 8.47487373,7.47487373 C8.86539803,7.08434944 9.498563,7.08434944 9.8890873,7.47487373 C10.2796116,7.86539803 10.2796116,8.498563 9.8890873,8.8890873 C7.74120369,11.0369709 4.25879631,11.0369709 2.1109127,8.8890873 Z"></path></svg><span><%= b.bookmarkCount %></span></span>
+      <% } %>
+      <% if (b.likeCount != null) { %>
+        <span id="px-stat-like" class="px-stat px-illust-dyn"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M9,0.75 C10.6568542,0.75 12,2.09314575 12,3.75 C12,6.68851315 10.0811423,9.22726429 6.24342696,11.3662534 L6.24342863,11.3662564 C6.09210392,11.4505987 5.90790324,11.4505988 5.75657851,11.3662565 C1.9188595,9.22726671 0,6.68851455 0,3.75 C1.1324993e-16,2.09314575 1.34314575,0.75 3,0.75 C4.12649824,0.75 5.33911281,1.60202454 6,2.66822994 C6.66088719,1.60202454 7.87350176,0.75 9,0.75 Z"></path></svg><span><%= b.likeCount %></span></span>
+      <% } %>
+      <% if (b.viewCount != null) { %>
+      <span id="px-stat-view" class="px-stat px-illust-dyn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path fill="currentColor" d="M-5.26245714e-14,6 C2,2.66666667 4.33333333,1 7,1 C9.66666667,1 12,2.66666667 14,6 C12,9.33333333 9.66666667,11 7,11 C4.33333333,11 2,9.33333333 -5.26245714e-14,6 Z"></path><path fill="var(--anime-bg-card,#ffffff)" d="M7,8.5 C5.61928813,8.5 4.5,7.38071187 4.5,6 C4.5,4.61928813 5.61928813,3.5 7,3.5 C8.38071187,3.5 9.5,4.61928813 9.5,6 C9.5,7.38071187 8.38071187,8.5 7,8.5 Z M7,7.5 C7.82842712,7.5 8.5,6.82842712 8.5,6 C8.5,5.17157288 7.82842712,4.5 7,4.5 C6.17157288,4.5 5.5,5.17157288 5.5,6 C5.5,6.82842712 6.17157288,7.5 7,7.5 Z"></path></svg><span><%= b.viewCount %></span></span>
+      <% } %>
+      <% if (pxDateIso) { %><time id="px-illust-datetime" class="px-stat px-illust-dyn" datetime="<%= pxDateIso %>" style="font-variant-numeric:tabular-nums;"></time><% } %>
+    </div>
+  </div>
+  <% } %>
+  <% if (illustId) { %>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+    <span style="font-weight:600;font-size:0.8125rem;color:var(--anime-text-secondary,#6b7280);" id="px-comments-heading">…</span>
+    <% if (artworkHref) { %>
+    <a href="#" class="px-open" data-url="<%= artworkHref %>" rel="noopener noreferrer" style="font-size:0.8rem;color:var(--anime-primary,#6366f1);cursor:pointer;text-decoration:underline;white-space:nowrap;">Pixiv</a>
+    <% } %>
+  </div>
+  <div id="px-comments-container" style="margin-bottom:8px;" role="list"></div>
+  <button type="button" id="px-load-more-comments" style="display:none;box-sizing:border-box;width:100%;align-items:center;justify-content:center;gap:6px;padding:8px 10px;margin-top:4px;background:transparent;border:1px solid var(--anime-border,#d1d5db);border-radius:8px;color:var(--anime-text-primary,#1f2937);cursor:pointer;font-size:0.8125rem;line-height:1.2;transition:background 0.075s ease;">
+    <span class="px-lm-chev" style="display:inline-flex;align-items:center;flex-shrink:0;"><svg viewBox="0 0 20 20" width="1.2em" height="1.2em" aria-hidden="true"><path fill="currentColor" d="M15.794 7.733a.75.75 0 0 1-.026 1.06l-5.25 5.001a.75.75 0 0 1-1.035 0l-5.25-5a.75.75 0 0 1 1.034-1.087l4.734 4.509l4.733-4.51a.75.75 0 0 1 1.06.027"></path></svg></span>
+    <span class="px-lm-label" style="white-space:nowrap;">…</span>
+    <svg class="px-lm-spin" viewBox="0 0 20 20" width="1.2em" height="1.2em" style="display:none;flex-shrink:0;animation:px-spin 0.75s linear infinite;" aria-hidden="true"><path fill="currentColor" d="M10 3.5A6.5 6.5 0 0 0 3.5 10A.75.75 0 0 1 2 10a8 8 0 1 1 8 8a.75.75 0 0 1 0-1.5a6.5 6.5 0 1 0 0-13"></path></svg>
+  </button>
+  <% } else { %>
+  <p id="px-no-illust-hint" style="font-size:0.8rem;color:var(--anime-text-secondary,#6b7280);margin:0;"></p>
+  <% } %>
+</div>
+<script>
+(function () {
+  var ILLUST_ID = <%- JSON.stringify(illustId) %>;
+  var PX_SEEDED_AUTHOR_ID = <%- JSON.stringify(pxAuthorId || '') %>;
+  /** 与 Pixiv 前端 emoji.js 一致：括号内 (heaven) 等 → emoji/{id}.png；API 的 stampId → generated-stamps/{id}_s.jpg */
+  var STAMP_NAME_TO_ID = {"normal":101,"surprise":102,"serious":103,"heaven":104,"happy":105,"excited":106,"sing":107,"cry":108,"normal2":201,"shame2":202,"love2":203,"interesting2":204,"blush2":205,"fire2":206,"angry2":207,"shine2":208,"panic2":209,"normal3":301,"satisfaction3":302,"surprise3":303,"smile3":304,"shock3":305,"gaze3":306,"wink3":307,"happy3":308,"excited3":309,"love3":310,"normal4":401,"surprise4":402,"serious4":403,"love4":404,"shine4":405,"sweat4":406,"shame4":407,"sleep4":408,"heart":501,"teardrop":502,"star":503};
+  var PXIMG_COMMON = 'https://s.pximg.net/common/images/';
+  var PXIMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  var PXIMG_PROXY_HEADERS = {
+    Referer: 'https://www.pixiv.net/',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
+  };
+
+  function pxCssVar(name, fallback) {
+    var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  }
+
+  function pixivLang(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'ja') return 'ja';
+    if (s.indexOf('zh') === 0) return 'zh';
+    if (s === 'ko') return 'ko';
+    return 'en';
+  }
+
+  function commentsHeading(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return '留言';
+    if (s.indexOf('zh') === 0) return '评论';
+    if (s === 'ja') return 'コメント';
+    if (s === 'ko') return '댓글';
+    return 'Comments';
+  }
+
+  function noIllustHint(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return '請重新爬取以顯示留言（需帶作品 ID）。';
+    if (s.indexOf('zh') === 0) return '请重新爬取以显示评论（需包含作品 ID）。';
+    if (s === 'ja') return 'コメントを表示するには、イラスト ID 付きで再取得してください。';
+    if (s === 'ko') return '댓글을 보려면 일러스트 ID가 포함되도록 다시 받아오세요.';
+    return 'Re-crawl with illust metadata to load comments.';
+  }
+
+  function loadMoreLabel(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return '載入更多';
+    if (s.indexOf('zh') === 0) return '加载更多';
+    if (s === 'ja') return 'もっと見る';
+    if (s === 'ko') return '더 보기';
+    return 'Load more';
+  }
+
+  /** 作品说明折叠：与 Pixiv 作品页 expandable 段落类似（约 180px 高 + 続きを読む）；无溢出时不显示按钮 */
+  var CAPTION_CLIP_MAX_PX = 180;
+  /** 子像素/行高误差，避免「刚好贴边」仍出现按钮 */
+  var CAPTION_OVERFLOW_EPS_PX = 2;
+
+  var pxCaptionExpand = { ro: null, loc: 'en', expanded: false, btnBound: false };
+
+  function captionReadMoreLabel(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'ja') return '続きを読む';
+    if (s === 'zhtw') return '顯示更多';
+    if (s.indexOf('zh') === 0) return '查看更多';
+    if (s === 'ko') return '더 보기';
+    return 'Read more';
+  }
+
+  function captionShowLessLabel(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'ja') return '折りたたむ';
+    if (s === 'zhtw') return '收合';
+    if (s.indexOf('zh') === 0) return '收起';
+    if (s === 'ko') return '접기';
+    return 'Show less';
+  }
+
+  function pxCaptionExpandEls() {
+    return {
+      clip: document.getElementById('px-illust-desc-clip'),
+      foot: document.getElementById('px-illust-desc-foot'),
+      btn: document.getElementById('px-illust-desc-toggle'),
+      inner: document.getElementById('px-illust-desc')
+    };
+  }
+
+  /** clip 折叠不影响 inner.scrollHeight，可直接与上限比较 */
+  function pxCaptionContentOverflows(inner) {
+    if (!inner) return false;
+    return inner.scrollHeight > CAPTION_CLIP_MAX_PX + CAPTION_OVERFLOW_EPS_PX;
+  }
+
+  function applyPxCaptionExpandLayout() {
+    var els = pxCaptionExpandEls();
+    var clip = els.clip;
+    var foot = els.foot;
+    var btn = els.btn;
+    var inner = els.inner;
+    if (!clip || !foot || !btn || !inner) return;
+
+    var loc = pxCaptionExpand.loc || 'en';
+    var overflows = pxCaptionContentOverflows(inner);
+
+    if (!overflows) {
+      pxCaptionExpand.expanded = false;
+      foot.hidden = true;
+      clip.classList.remove('is-collapsed');
+      btn.textContent = '';
+      btn.setAttribute('aria-expanded', 'true');
+      return;
+    }
+
+    foot.hidden = false;
+    if (pxCaptionExpand.expanded) {
+      clip.classList.remove('is-collapsed');
+      btn.textContent = captionShowLessLabel(loc);
+      btn.setAttribute('aria-expanded', 'true');
+    } else {
+      clip.classList.add('is-collapsed');
+      btn.textContent = captionReadMoreLabel(loc);
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function onPxCaptionExpandBtnClick() {
+    var els = pxCaptionExpandEls();
+    if (!els.inner || !els.foot || els.foot.hidden) return;
+    if (!pxCaptionContentOverflows(els.inner)) {
+      applyPxCaptionExpandLayout();
+      return;
+    }
+    pxCaptionExpand.expanded = !pxCaptionExpand.expanded;
+    applyPxCaptionExpandLayout();
+  }
+
+  function initPxCaptionExpand(loc) {
+    pxCaptionExpand.loc = loc || 'en';
+    var els = pxCaptionExpandEls();
+    if (!els.clip || !els.foot || !els.btn || !els.inner) return;
+
+    if (!pxCaptionExpand.btnBound) {
+      pxCaptionExpand.btnBound = true;
+      els.btn.addEventListener('click', onPxCaptionExpandBtnClick);
+    }
+
+    if (pxCaptionExpand.ro) {
+      try {
+        pxCaptionExpand.ro.disconnect();
+      } catch (e) {}
+      pxCaptionExpand.ro = null;
+    }
+
+    pxCaptionExpand.expanded = false;
+    applyPxCaptionExpandLayout();
+    requestAnimationFrame(applyPxCaptionExpandLayout);
+
+    if (typeof ResizeObserver !== 'undefined') {
+      pxCaptionExpand.ro = new ResizeObserver(function () {
+        if (!pxCaptionContentOverflows(els.inner)) {
+          pxCaptionExpand.expanded = false;
+        }
+        applyPxCaptionExpandLayout();
+      });
+      pxCaptionExpand.ro.observe(els.inner);
+    }
+  }
+
+  /** 评论正文里 (token) 解析出的 id：emoji/104.png 等 */
+  function pixivEmojiPngUrl(numericId) {
+    return PXIMG_COMMON + 'emoji/' + String(numericId) + '.png';
+  }
+
+  /** API stampId 字段：generated-stamps（与官网 backgroundImage 一致） */
+  function pixivGeneratedStampUrl(numericId) {
+    return PXIMG_COMMON + 'stamp/generated-stamps/' + encodeURIComponent(String(numericId)) + '_s.jpg?20180605';
+  }
+
+  function setPxHidden(el, hidden) {
+    if (!el) return;
+    if (hidden) el.setAttribute('hidden', '');
+    else el.removeAttribute('hidden');
+  }
+
+  /**
+   * Pixiv ajax/illust 与评论等接口的 lang 需与作品页一致：用宿主 getLocale() 得到 loc，再经 pixivLang(loc) → ja|zh|ko|en。
+   */
+  function fetchIllustBody(pixivLangCode) {
+    var lang = pixivLangCode != null && pixivLangCode !== '' ? String(pixivLangCode) : 'en';
+    var url = 'https://www.pixiv.net/ajax/illust/' + encodeURIComponent(ILLUST_ID) + '?lang=' + encodeURIComponent(lang);
+    var h = {
+      'Accept': 'application/json',
+      'Referer': 'https://www.pixiv.net/artworks/' + ILLUST_ID,
+      'Origin': 'https://www.pixiv.net',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
+    };
+    return window.__bridge.fetch(url, { headers: h, json: true });
+  }
+
+  /** tags.authorId 优先，否则 userId；与 /ajax/user 一致 */
+  function extractAuthorIdFromIllustBody(body) {
+    if (!body || typeof body !== 'object') return '';
+    if (body.tags && body.tags.authorId != null && String(body.tags.authorId).trim() !== '') return String(body.tags.authorId);
+    if (body.userId != null && String(body.userId).trim() !== '') return String(body.userId);
+    return '';
+  }
+
+  var pxLastAuthorAjaxSuccessId = '';
+
+  /** GET /ajax/user/{id}?full=0&lang=… 取昵称与 image；头像走 __bridge 拉 i.pximg */
+  function hydrateAuthorAjax(body, appLoc) {
+    if (!window.__bridge || !window.__bridge.fetch) return;
+    var bar = document.getElementById('px-author-bar');
+    if (!bar) return;
+    var aid = extractAuthorIdFromIllustBody(body);
+    if (!aid) aid = String(PX_SEEDED_AUTHOR_ID || '');
+    if (!aid) return;
+    if (pxLastAuthorAjaxSuccessId === aid) return;
+
+    var lang = pixivLang(appLoc || 'en');
+    var url = 'https://www.pixiv.net/ajax/user/' + encodeURIComponent(aid) + '?full=0&lang=' + encodeURIComponent(lang);
+    var ref = ILLUST_ID
+      ? ('https://www.pixiv.net/artworks/' + encodeURIComponent(ILLUST_ID) + '?lang=' + encodeURIComponent(lang))
+      : 'https://www.pixiv.net/';
+    var h = {
+      'Accept': 'application/json',
+      'Referer': ref,
+      'Origin': 'https://www.pixiv.net',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
+    };
+    window.__bridge.fetch(url, { headers: h, json: true }).then(function (json) {
+      if (!json || json.error) return;
+      var u = json.body != null && typeof json.body === 'object' ? json.body : json;
+      if (!u || typeof u !== 'object') return;
+      pxLastAuthorAjaxSuccessId = aid;
+
+      var link = document.getElementById('px-author-link');
+      var nameEl = document.getElementById('px-author-name');
+      var img = document.getElementById('px-author-avatar');
+      var uid = u.userId != null ? String(u.userId) : aid;
+      if (nameEl && u.name != null) nameEl.textContent = String(u.name);
+      if (link && uid) link.setAttribute('data-url', 'https://www.pixiv.net/users/' + encodeURIComponent(uid));
+      if (!img) return;
+      var disp = u.name != null ? String(u.name) : (nameEl ? nameEl.textContent : '');
+      img.alt = disp || '';
+      var iu = u.image != null ? String(u.image) : '';
+      if (!iu) {
+        img.src = PXIMG_PLACEHOLDER;
+        img.removeAttribute('data-px-profile-src');
+        return;
+      }
+      if (iu.indexOf('i.pximg.net/user-profile') >= 0) {
+        img.src = PXIMG_PLACEHOLDER;
+        img.setAttribute('data-px-profile-src', iu);
+      } else {
+        img.removeAttribute('data-px-profile-src');
+        img.src = iu;
+      }
+      hydratePxProfileImages(bar);
+    }).catch(function () {});
+  }
+
+  function fetchCommentsPage(offset, limit, lang) {
+    var q = 'illust_id=' + encodeURIComponent(ILLUST_ID) + '&offset=' + offset + '&limit=' + limit + '&lang=' + encodeURIComponent(lang);
+    var url = 'https://www.pixiv.net/ajax/illusts/comments/roots?' + q;
+    var h = {
+      'Accept': 'application/json',
+      'Referer': 'https://www.pixiv.net/artworks/' + ILLUST_ID,
+      'Origin': 'https://www.pixiv.net',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
+    };
+    return window.__bridge.fetch(url, { headers: h, json: true });
+  }
+
+  function localeTagForIntl(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return 'zh-TW';
+    if (s.indexOf('zh') === 0) return 'zh-CN';
+    if (s === 'ja') return 'ja-JP';
+    if (s === 'ko') return 'ko-KR';
+    return 'en-US';
+  }
+
+  function formatPxIllustDate(iso, loc) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return String(iso);
+    var tag = localeTagForIntl(loc);
+    try {
+      return new Intl.DateTimeFormat(tag, { dateStyle: 'long', timeStyle: 'short' }).format(d);
+    } catch (e1) {
+      try {
+        return d.toLocaleString(tag);
+      } catch (e2) {
+        return d.toLocaleString();
+      }
+    }
+  }
+
+  function hydratePxIllustDate(loc) {
+    var el = document.getElementById('px-illust-datetime');
+    if (!el) return;
+    var iso = el.getAttribute('datetime');
+    if (!iso) return;
+    function apply(loc) {
+      el.textContent = formatPxIllustDate(iso, loc);
+      el.setAttribute('title', iso);
+    }
+    if (loc != null) {
+      apply(loc);
+      return;
+    }
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(apply).catch(function () {
+        apply('en');
+      });
+    } else {
+      apply((navigator.language || 'en').split('-')[0]);
+    }
+  }
+
+  /** 作品说明里 Pixiv 返回的相对链接、jump.php 外链，统一归一化后交给全局 a 点击桥接 */
+  function normalizePixivDescLinks(scope) {
+    if (!scope) return;
+    var anchors = scope.querySelectorAll('a[href]');
+    for (var i = 0; i < anchors.length; i++) {
+      var a = anchors[i];
+      if (!a || a.classList.contains('px-open')) continue;
+      var h = a.getAttribute('href');
+      if (!h || h === '#') continue;
+      var out = null;
+      if (h.indexOf('jump.php') >= 0) {
+        var qi = h.indexOf('?');
+        var q = qi >= 0 ? h.slice(qi + 1) : '';
+        try {
+          out = decodeURIComponent(q);
+        } catch (err) {
+          out = null;
+        }
+        if (!out || !/^https?:\/\//i.test(out)) out = null;
+      } else if (h.charAt(0) === '/') {
+        out = 'https://www.pixiv.net' + h;
+      } else if (/^https?:\/\//i.test(h)) {
+        out = h;
+      } else if (/^\/\//.test(h)) {
+        out = 'https:' + h;
+      }
+      if (!out) continue;
+      a.setAttribute('href', out);
+    }
+  }
+
+  function updatePxTitle(body) {
+    var title = body && (body.title || body.illustTitle) != null ? String(body.title || body.illustTitle) : '';
+    var link = document.getElementById('px-title-link');
+    var text = document.getElementById('px-title-text');
+    if (link) {
+      link.textContent = title;
+      setPxHidden(link, !title);
+      if (ILLUST_ID) link.setAttribute('data-url', 'https://www.pixiv.net/artworks/' + encodeURIComponent(ILLUST_ID));
+    }
+    if (text) {
+      text.textContent = title;
+      setPxHidden(text, !title);
+    }
+  }
+
+  function updatePxAuthorFromIllust(body) {
+    var bar = document.getElementById('px-author-bar');
+    if (!bar) return;
+    var aid = extractAuthorIdFromIllustBody(body);
+    if (!aid) aid = String(PX_SEEDED_AUTHOR_ID || '');
+    var uname = body && body.userName != null ? String(body.userName) : '';
+    if (!aid && !uname) {
+      setPxHidden(bar, true);
+      return;
+    }
+    setPxHidden(bar, false);
+    pxLastAuthorAjaxSuccessId = '';
+    var link = document.getElementById('px-author-link');
+    var nameEl = document.getElementById('px-author-name');
+    var img = document.getElementById('px-author-avatar');
+    var disp = uname || aid;
+    if (nameEl) nameEl.textContent = disp;
+    if (link && aid) link.setAttribute('data-url', 'https://www.pixiv.net/users/' + encodeURIComponent(aid));
+    if (img) {
+      img.src = PXIMG_PLACEHOLDER;
+      img.removeAttribute('data-px-profile-src');
+      img.alt = disp || '';
+    }
+  }
+
+  function updatePxCaption(body, loc) {
+    var wrap = document.getElementById('px-illust-desc-wrap');
+    var inner = document.getElementById('px-illust-desc');
+    if (!wrap || !inner) return;
+    var html = body && (body.description || body.illustComment) != null ? String(body.description || body.illustComment) : '';
+    inner.innerHTML = html;
+    normalizePixivDescLinks(inner);
+    setPxHidden(wrap, !html);
+    if (html) initPxCaptionExpand(loc);
+  }
+
+  /** 展示：有 translation.en 用其文案；跳转仍用原始 tag（Pixiv 标签页 slug） */
+  function pxTagSlugAndLabel(row) {
+    var slug = row && row.tag != null ? String(row.tag) : '';
+    if (!slug) return null;
+    var tr = row.translation;
+    var en = tr && tr.en != null ? String(tr.en).trim() : '';
+    return { slug: slug, label: en || slug };
+  }
+
+  function updatePxTags(body) {
+    var list = document.getElementById('px-illust-tags');
+    if (!list) return;
+    while (list.firstChild) list.removeChild(list.firstChild);
+    var rows = body && body.tags && Array.isArray(body.tags.tags) ? body.tags.tags : [];
+    for (var i = 0; i < rows.length; i++) {
+      var pair = pxTagSlugAndLabel(rows[i]);
+      if (!pair) continue;
+      var li = document.createElement('li');
+      li.style.margin = '0';
+      var a = document.createElement('a');
+      a.href = '#';
+      a.className = 'px-open';
+      a.setAttribute('data-url', 'https://www.pixiv.net/tags/' + encodeURIComponent(pair.slug) + '/artworks');
+      a.style.cssText = 'font-size:0.78rem;color:' + pxCssVar('--anime-primary', '#6366f1') + ';';
+      a.textContent = '#' + pair.label;
+      li.appendChild(a);
+      list.appendChild(li);
+    }
+    setPxHidden(list, list.children.length === 0);
+  }
+
+  function updatePxStatValue(id, value) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    setPxHidden(el, value == null || value === '');
+    if (value == null || value === '') return;
+    var spans = el.getElementsByTagName('span');
+    if (spans && spans.length) spans[spans.length - 1].textContent = String(value);
+  }
+
+  function updatePxDate(body, loc) {
+    var el = document.getElementById('px-illust-datetime');
+    if (!el) return;
+    var iso = body && (body.uploadDate != null || body.createDate != null) ? String(body.uploadDate != null ? body.uploadDate : body.createDate) : '';
+    setPxHidden(el, !iso);
+    if (!iso) {
+      el.removeAttribute('datetime');
+      el.textContent = '';
+      return;
+    }
+    el.setAttribute('datetime', iso);
+    hydratePxIllustDate(loc);
+  }
+
+  function applyLatestIllustBody(body, loc) {
+    if (!body || typeof body !== 'object') return;
+    updatePxTitle(body);
+    updatePxAuthorFromIllust(body);
+    updatePxCaption(body, loc);
+    updatePxTags(body);
+    updatePxStatValue('px-stat-bookmark', body.bookmarkCount);
+    updatePxStatValue('px-stat-like', body.likeCount);
+    updatePxStatValue('px-stat-view', body.viewCount);
+    updatePxDate(body, loc);
+    hydrateAuthorAjax(body, loc || 'en');
+  }
+
+  function refreshIllustPresentation(loc) {
+    var appLoc = loc || 'en';
+    if (!ILLUST_ID || !window.__bridge || !window.__bridge.fetch) {
+      hydrateAuthorAjax(null, appLoc);
+      return;
+    }
+    fetchIllustBody(pixivLang(appLoc)).then(function (json) {
+      if (!json || json.error || !json.body) {
+        hydrateAuthorAjax(null, appLoc);
+        return;
+      }
+      applyLatestIllustBody(json.body, appLoc);
+    }).catch(function () {
+      hydrateAuthorAjax(null, appLoc);
+    });
+  }
+
+  /** i.pximg.net/user-profile 需 Referer；iframe 无 Pixiv Referer，经 __bridge.fetch 拉取后转 blob */
+  function hydratePxProfileImages(root) {
+    if (!window.__bridge || !window.__bridge.fetch) return;
+    var scope = root || document;
+    var imgs = scope.querySelectorAll('img[data-px-profile-src]');
+    for (var i = 0; i < imgs.length; i++) {
+      (function (im) {
+        var u = im.getAttribute('data-px-profile-src');
+        if (!u) return;
+        im.removeAttribute('data-px-profile-src');
+        window.__bridge.fetch(u, { headers: PXIMG_PROXY_HEADERS }).then(function (res) {
+          if (!res || !res.base64) return;
+          var bin = atob(res.base64);
+          var arr = new Uint8Array(bin.length);
+          for (var j = 0; j < bin.length; j++) arr[j] = bin.charCodeAt(j);
+          var blob = new Blob([arr], { type: res.contentType || 'image/jpeg' });
+          im.src = URL.createObjectURL(blob);
+        }).catch(function () {
+          im.src = u;
+        });
+      })(imgs[i]);
+    }
+  }
+
+  function appendStampImages(container, stampIds, kind, sizePx) {
+    var px = sizePx == null ? 24 : sizePx;
+    var urlFn = kind === 'emoji' ? pixivEmojiPngUrl : pixivGeneratedStampUrl;
+    for (var i = 0; i < stampIds.length; i++) {
+      var sid = stampIds[i];
+      if (sid == null || sid === '') continue;
+      var img = document.createElement('img');
+      img.src = urlFn(sid);
+      img.width = px;
+      img.height = px;
+      img.alt = '';
+      img.className = 'px-comment-emoji';
+      img.style.cssText = 'width:' + px + 'px;height:' + px + 'px;vertical-align:middle;display:inline-block;object-fit:contain;';
+      img.referrerPolicy = 'no-referrer';
+      container.appendChild(img);
+    }
+  }
+
+  /** 解析 comment 中的 (token) 为 emoji 图；仅 API stamp、或整段仅一个已知 token 时用大尺寸（对齐官网评论） */
+  function fillCommentBody(el, comment, stampId) {
+    el.className = 'px-comment-body';
+    var c = String(comment || '');
+    var sidRaw = stampId != null && stampId !== '' ? String(stampId).trim() : '';
+    if (sidRaw && !c.trim()) {
+      el.classList.add('px-comment-body--solo');
+      appendStampImages(el, [sidRaw], 'stamp', 80);
+      return;
+    }
+    var re = /\(([a-zA-Z0-9_]+)\)/g;
+    var parts = [];
+    var last = 0;
+    var m;
+    var knownEmojiCount = 0;
+    while ((m = re.exec(c)) !== null) {
+      if (m.index > last) {
+        var t0 = c.slice(last, m.index);
+        if (t0) parts.push({ type: 'text', v: t0 });
+      }
+      var name = m[1];
+      var nid = STAMP_NAME_TO_ID[name];
+      if (nid != null) {
+        parts.push({ type: 'emoji', id: String(nid) });
+        knownEmojiCount++;
+      } else {
+        parts.push({ type: 'text', v: m[0] });
+      }
+      last = m.index + m[0].length;
+    }
+    if (last < c.length) {
+      var t1 = c.slice(last);
+      if (t1) parts.push({ type: 'text', v: t1 });
+    }
+    var soloBracketEmoji = knownEmojiCount === 1 && parts.length === 1 && parts[0].type === 'emoji';
+    var emojiPx = soloBracketEmoji ? 80 : 24;
+    if (soloBracketEmoji) el.classList.add('px-comment-body--solo');
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      if (p.type === 'text') {
+        el.appendChild(document.createTextNode(p.v));
+      } else {
+        appendStampImages(el, [p.id], 'emoji', emojiPx);
+      }
+    }
+  }
+
+  function runCommentsUi() {
+    var loadMoreBtn = document.getElementById('px-load-more-comments');
+    var commentsEl = document.getElementById('px-comments-container');
+    var headingEl = document.getElementById('px-comments-heading');
+    var seenIds = {};
+    var offset = 0;
+    var firstPage = true;
+    var appLocale = 'en';
+
+    function setLoadMoreLoading(on) {
+      if (!loadMoreBtn) return;
+      var chev = loadMoreBtn.querySelector('.px-lm-chev');
+      var spin = loadMoreBtn.querySelector('.px-lm-spin');
+      var lab = loadMoreBtn.querySelector('.px-lm-label');
+      loadMoreBtn.disabled = !!on;
+      loadMoreBtn.style.opacity = on ? '0.85' : '1';
+      if (chev) chev.style.display = on ? 'none' : 'inline-flex';
+      if (spin) spin.style.display = on ? 'inline-block' : 'none';
+      if (lab) lab.style.opacity = on ? '0.65' : '1';
+    }
+
+    function appendRow(item) {
+      if (!item || !commentsEl) return;
+      var cid = item.id != null ? String(item.id) : '';
+      if (cid && seenIds[cid]) return;
+      if (cid) seenIds[cid] = true;
+      var row = document.createElement('div');
+      row.className = 'px-comment-row';
+      row.setAttribute('role', 'listitem');
+
+      var avatarCol = document.createElement('div');
+      avatarCol.className = 'px-comment-avatar';
+      if (item.img) {
+        var avi = document.createElement('img');
+        avi.alt = '';
+        avi.referrerPolicy = 'no-referrer';
+        var iu = String(item.img);
+        if (iu.indexOf('i.pximg.net/user-profile') >= 0 && window.__bridge && window.__bridge.fetch) {
+          avi.src = PXIMG_PLACEHOLDER;
+          avi.setAttribute('data-px-profile-src', iu);
+        } else {
+          avi.src = iu;
+        }
+        avatarCol.appendChild(avi);
+      }
+
+      var main = document.createElement('div');
+      main.className = 'px-comment-main';
+
+      var nameEl = document.createElement('div');
+      nameEl.className = 'px-comment-name';
+      var uname = item.userName != null ? String(item.userName) : '';
+      var uid = item.userId != null ? String(item.userId) : '';
+      if (uid) {
+        var na = document.createElement('a');
+        na.href = '#';
+        na.className = 'px-open';
+        na.setAttribute('data-url', 'https://www.pixiv.net/users/' + encodeURIComponent(uid));
+        na.style.cssText = 'color:inherit;text-decoration:none;cursor:pointer;';
+        na.textContent = uname || uid;
+        nameEl.appendChild(na);
+      } else {
+        nameEl.textContent = uname || '?';
+      }
+
+      var body = document.createElement('div');
+      fillCommentBody(body, item.comment, item.stampId);
+
+      var meta = document.createElement('div');
+      meta.className = 'px-comment-meta';
+      meta.textContent = item.commentDate != null ? String(item.commentDate) : '';
+
+      main.appendChild(nameEl);
+      main.appendChild(body);
+      main.appendChild(meta);
+
+      row.appendChild(avatarCol);
+      row.appendChild(main);
+      commentsEl.appendChild(row);
+    }
+
+    function loadPage(opts) {
+      var fromClick = opts && opts.fromClick;
+      if (fromClick) setLoadMoreLoading(true);
+      if (!ILLUST_ID || !commentsEl) {
+        if (fromClick) setLoadMoreLoading(false);
+        return;
+      }
+      var limit = firstPage ? 3 : 50;
+      var lang = pixivLang(appLocale);
+      fetchCommentsPage(offset, limit, lang).then(function (json) {
+        if (!json || json.error) {
+          var msg = (json && json.message) ? String(json.message) : 'error';
+          throw new Error(msg);
+        }
+        var body = json.body || {};
+        var list = body.comments || [];
+        for (var i = 0; i < list.length; i++) {
+          appendRow(list[i]);
+        }
+        hydratePxProfileImages(commentsEl);
+        offset += list.length;
+        var hasNext = body.hasNext === true;
+        if (loadMoreBtn) {
+          if (hasNext) {
+            loadMoreBtn.style.display = 'flex';
+            loadMoreBtn.style.flexDirection = 'row';
+            loadMoreBtn.style.alignItems = 'center';
+            loadMoreBtn.style.justifyContent = 'center';
+          } else {
+            loadMoreBtn.style.display = 'none';
+          }
+        }
+        firstPage = false;
+      }).catch(function (err) {
+        if (commentsEl && commentsEl.children.length === 0) {
+          var p = document.createElement('p');
+          p.style.color = '#fca5a5';
+          p.style.fontSize = '0.8rem';
+          p.textContent = String(err && err.message ? err.message : err);
+          commentsEl.appendChild(p);
+        }
+      }).then(function () {
+        if (fromClick) setLoadMoreLoading(false);
+      });
+    }
+
+    function startWithLocale(loc) {
+      appLocale = loc || 'en';
+      if (headingEl) headingEl.textContent = commentsHeading(appLocale);
+      if (loadMoreBtn) {
+        var lab = loadMoreBtn.querySelector('.px-lm-label');
+        if (lab) lab.textContent = loadMoreLabel(appLocale);
+        loadMoreBtn.addEventListener('mouseenter', function () {
+          if (loadMoreBtn.disabled) return;
+          loadMoreBtn.style.background = 'color-mix(in srgb, ' + pxCssVar('--anime-text-primary', '#1f2937') + ' 10%, transparent)';
+        });
+        loadMoreBtn.addEventListener('mouseleave', function () {
+          loadMoreBtn.style.background = 'transparent';
+        });
+        loadMoreBtn.addEventListener('click', function () {
+          if (loadMoreBtn.disabled) return;
+          loadPage({ fromClick: true });
+        });
+      }
+      loadPage();
+    }
+
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(startWithLocale).catch(function () {
+        startWithLocale('en');
+      });
+    } else {
+      startWithLocale((navigator.language || 'en').split('-')[0]);
+    }
+  }
+
+  function onReady() {
+    hydratePxIllustDate();
+
+    function startCaptionExpand(l) {
+      var loc = l || 'en';
+      initPxCaptionExpand(loc);
+      hydratePxIllustDate(loc);
+      refreshIllustPresentation(loc);
+    }
+    if (document.getElementById('px-illust-desc-clip')) {
+      if (window.__bridge && window.__bridge.getLocale) {
+        window.__bridge.getLocale().then(startCaptionExpand).catch(function () {
+          startCaptionExpand('en');
+        });
+      } else {
+        startCaptionExpand((navigator.language || 'en').split('-')[0]);
+      }
+    }
+
+    if (!ILLUST_ID) {
+      var hintEl = document.getElementById('px-no-illust-hint');
+      function setHint(loc) {
+        if (hintEl) hintEl.textContent = noIllustHint(loc);
+      }
+      if (window.__bridge && window.__bridge.getLocale) {
+        window.__bridge.getLocale().then(setHint).catch(function () {
+          setHint((navigator.language || 'en').split('-')[0]);
+        });
+      } else {
+        setHint((navigator.language || 'en').split('-')[0]);
+      }
+      return;
+    }
+    if (!window.__bridge || !window.__bridge.fetch) return;
+    runCommentsUi();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
+})();
+</script>

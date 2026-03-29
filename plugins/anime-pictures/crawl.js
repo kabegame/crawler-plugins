@@ -148,14 +148,209 @@ async function handlePosts(ctx) {
   await ctx.to(href, { pageLabel: "detail" });
 }
 
+/**
+ * 展示名：与 PixAI 等一致，用「 / 」分割。
+ * title = 作品(copyright) / 角色(character)（缺段则跳过）；author = 作家(artist)；
+ * 最终为 title / author（任一段为空则省略该段及多余斜线）。
+ * 对应页内 ul.tags：作品名（他の）/ キャラクターの名前 / アーティスト名 三块下的 big_tag 链接。
+ */
+function pickAnimePicturesDisplayName(ctx) {
+  const log = (msg) => {
+    if (ctx && typeof ctx.log === "function") ctx.log(msg);
+  };
+
+  const textOf = (el) => (el?.textContent || "").replace(/\s+/g, " ").trim();
+
+  const tagsUl = document.querySelector("ul.tags, .page-tags ul.tags, .wrapper.page-tags ul.tags");
+  if (tagsUl) {
+    const workEl = tagsUl.querySelector("a.copyright");
+    const charEl = tagsUl.querySelector("a.character");
+    const artistEl = tagsUl.querySelector("a.artist");
+    const work = textOf(workEl);
+    const character = textOf(charEl);
+    const artist = textOf(artistEl);
+    const titleSeg = [work, character].filter(Boolean).join(" / ");
+    const name = [titleSeg, artist].filter(Boolean).join(" / ");
+    if (name) {
+      log(
+        `[anime-pictures] pickName: title/author 作品=${JSON.stringify(work || null)} 角色=${JSON.stringify(character || null)} 作家=${JSON.stringify(artist || null)} => ${JSON.stringify(name)}`,
+      );
+      return name;
+    }
+    log("[anime-pictures] pickName: ul.tags 内未找到 copyright/character/artist 链接");
+  } else {
+    log("[anime-pictures] pickName: 未找到 ul.tags，走回退");
+  }
+
+  const illustRe = /^(イラスト|illustration|illustrations|арт|插画|圖片|图片)/i;
+  const h1A = document.querySelector(
+    ".post_content.head-info h1 a.copyright, .post-block h1 a.copyright",
+  );
+  const h1One = textOf(h1A);
+  if (h1One) {
+    log(`[anime-pictures] pickName: 回退 h1.copyright -> ${JSON.stringify(h1One)}`);
+    return h1One;
+  }
+
+  const titleRaw = (document.title || "").trim();
+  const lines = titleRaw
+    .split(/\n/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (lines.length >= 2 && illustRe.test(lines[0])) {
+    log(
+      `[anime-pictures] pickName: 回退 title 换行第2段 -> ${JSON.stringify(lines[1])}`,
+    );
+    return lines[1];
+  }
+  const oneLine = titleRaw.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
+  const tokens = oneLine.split(" ").filter(Boolean);
+  if (tokens.length >= 2 && illustRe.test(tokens[0])) {
+    log(
+      `[anime-pictures] pickName: 回退 title 分词第2词 -> ${JSON.stringify(tokens[1])}`,
+    );
+    return tokens[1];
+  }
+
+  log(
+    `[anime-pictures] pickName: 仍为空 title=${JSON.stringify(oneLine.slice(0, 200))}`,
+  );
+  return "";
+}
+
+function resolveAbsHref(href) {
+  if (!href) return "";
+  try {
+    return new URL(href, location.href).href;
+  } catch {
+    return href;
+  }
+}
+
+/** 克隆 DOM 子树供详情 iframe 使用：绝对化链接与图片、外链新标签打开 */
+function cloneNodeForDescriptionHtml(node) {
+  const c = node.cloneNode(true);
+  c.querySelectorAll("a[href]").forEach((a) => {
+    const h = a.getAttribute("href");
+    if (h) a.setAttribute("href", resolveAbsHref(h));
+    a.setAttribute("target", "_blank");
+    a.setAttribute("rel", "noopener noreferrer");
+  });
+  c.querySelectorAll("img[src]").forEach((img) => {
+    const s = img.getAttribute("src");
+    if (s) img.setAttribute("src", resolveAbsHref(s));
+  });
+  return c;
+}
+
+function infoItemPlainText(item) {
+  const clone = item.cloneNode(true);
+  clone.querySelectorAll("svg").forEach((s) => s.remove());
+  clone.querySelectorAll("a[href]").forEach((a) => {
+    const text = (a.textContent || "").replace(/\s+/g, " ").trim();
+    const href = resolveAbsHref(a.getAttribute("href"));
+    const rep = href ? `${text || href} (${href})` : text;
+    a.replaceWith(document.createTextNode(rep));
+  });
+  clone.querySelectorAll("span.color-sample").forEach((sp) => {
+    const st = sp.getAttribute("style") || "";
+    const m = st.match(/background-color:\s*([^;]+)/i);
+    sp.replaceWith(document.createTextNode(m ? ` ${m[1].trim()}` : ""));
+  });
+  const raw = (clone.textContent || "").replace(/\s+/g, " ").trim();
+  if (!raw) return "";
+  return raw;
+}
+
+/** 详情 metadata（由前端 `templates/description.ejs` 渲染） */
+function buildAnimePicturesMetadata() {
+  const head = document.querySelector(".post_content.head-info");
+  if (!head) return null;
+
+  let author = null;
+  const authorSec = head.querySelector(".author-section");
+  if (authorSec) {
+    const avatarWrap = authorSec.querySelector("a[href*='profile']");
+    const img = authorSec.querySelector("img");
+    const userA = authorSec.querySelector("a.user_link");
+    const name = (userA?.textContent || "").replace(/\s+/g, " ").trim();
+    const profileHref = userA ? resolveAbsHref(userA.getAttribute("href")) : "";
+    const hasImg = !!(img && avatarWrap);
+    const avSrc = hasImg ? resolveAbsHref(img.getAttribute("src")) : "";
+    if (name || avSrc || profileHref) {
+      author = {
+        name: name || "",
+        profileUrl: profileHref || "",
+        avatarUrl: avSrc || "",
+      };
+    }
+  }
+
+  const lines = [];
+  const details = head.querySelector(".details-section");
+  if (details) {
+    for (const line of details.querySelectorAll(":scope > .info-line")) {
+      if (line.querySelector("button.metrics-toggle")) continue;
+      for (const item of line.querySelectorAll(":scope > .info-item")) {
+        const ln = infoItemPlainText(item);
+        if (ln) lines.push(ln);
+      }
+    }
+  }
+
+  let rating = null;
+  const ratingEl = document.querySelector(".vote_block span.rating");
+  if (ratingEl) {
+    const b = ratingEl.querySelector("b");
+    const countEl = [...ratingEl.querySelectorAll("span")].find((s) =>
+      /^\d+$/.test((s.textContent || "").trim()),
+    );
+    if (b && countEl) {
+      rating = {
+        label: (b.textContent || "").trim(),
+        count: (countEl.textContent || "").trim(),
+      };
+    }
+  }
+
+  const headClone = cloneNodeForDescriptionHtml(head);
+  headClone.querySelectorAll("button.metrics-toggle").forEach((b) => {
+    const line = b.closest(".info-line");
+    if (line) line.remove();
+  });
+  const headInfoHtml = headClone.outerHTML;
+
+  const tagsUl =
+    document.querySelector("ul.tags[itemprop='keywords']") ||
+    document.querySelector(".wrapper.page-tags ul.tags");
+  const tagsHtml = tagsUl ? cloneNodeForDescriptionHtml(tagsUl).outerHTML : "";
+
+  return { author, lines, rating, headInfoHtml, tagsHtml };
+}
+
 async function handleDetail(ctx) {
   await ctx.waitForDom();
+  await ensurePastChallenge(ctx);
+
+  const displayName = pickAnimePicturesDisplayName(ctx);
+  const metadata = buildAnimePicturesMetadata();
+
+  ctx.log(
+    `[anime-pictures] downloadImage 展示名 name: ${displayName ? JSON.stringify(displayName) : "(空)"}`,
+  );
+  ctx.log(
+    `[anime-pictures] metadata: ${metadata ? JSON.stringify(metadata).slice(0, 500) : "(空)"}`,
+  );
+
   const downloadIcon = ctx.$(".icon-download");
   await ctx.sleep(3000);
   if (downloadIcon) {
     const href = downloadIcon.getAttribute("href");
     ctx.log(`下载图片: ${href}`);
-    await ctx.downloadImage(href, { cookie: true });
+    const opts = { cookie: true };
+    if (displayName) opts.name = displayName;
+    if (metadata) opts.metadata = metadata;
+    await ctx.downloadImage(href, opts);
   }
   await ctx.back();
 }

@@ -106,7 +106,7 @@ fn process_artworks_edges_for_download(
                 }
                 let download_url = `${media_api_base}${media_id_str}/image`;
                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
-                download_image(download_url);
+                download_image(download_url, #{ name: title, metadata: node });
                 downloaded += 1;
                 if progress_per > 0.0 {
                     add_progress(progress_per);
@@ -149,8 +149,13 @@ fn process_artworks_edges_for_download(
                             let variant = u["variant"];
                             let image_url = u["url"];
                             if variant == "PUBLIC" && image_url != () {
-                                print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）`);
-                                download_image(image_url.to_string());
+                                let title = "";
+                                let t = node["title"];
+                                if t != () {
+                                    title = t.to_string();
+                                }
+                                print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
+                                download_image(image_url.to_string(), #{ name: title, metadata: node });
                                 downloaded += 1;
                                 if progress_per_download > 0.0 {
                                     add_progress(progress_per_download);

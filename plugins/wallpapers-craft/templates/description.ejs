@@ -1,0 +1,267 @@
+<% const m = metadata || {}; %>
+<%
+  const base = (m.site_base != null && String(m.site_base).trim() !== '') ? String(m.site_base).replace(/\/$/, '') : 'https://wallpaperscraft.com';
+  function absUrl(href) {
+    if (href == null || String(href).trim() === '') return '';
+    const h = String(href).trim();
+    if (/^https?:\/\//i.test(h)) return h;
+    return base + (h.startsWith('/') ? h : '/' + h);
+  }
+  const title = m.wallpaper_title != null ? String(m.wallpaper_title).trim() : '';
+  const author = m.author != null ? String(m.author).trim() : '';
+  const license = m.license != null ? String(m.license).trim() : '';
+  const sourceUrl = m.source_url != null ? String(m.source_url).trim() : '';
+  const detailUrl = m.detail_url != null ? String(m.detail_url).trim() : '';
+  const rating = m.rating != null ? String(m.rating).trim() : '';
+  const votesTotal = m.votes_total != null ? String(m.votes_total).trim() : '';
+  const origRes = m.original_resolution != null ? String(m.original_resolution).trim() : '';
+  const origDl = m.original_download_url != null ? String(m.original_download_url).trim() : '';
+  const views = m.views != null ? String(m.views).trim() : '';
+  const uploaded = m.uploaded != null ? String(m.uploaded).trim() : '';
+  const origDlAbs = absUrl(origDl);
+  const hasAuthorBlock = !!(author || license || sourceUrl);
+  const hasInfoBlock = !!(rating || votesTotal || origRes || origDlAbs || views || uploaded);
+  const hasTitle = !!title;
+  const hasAny = hasTitle || hasAuthorBlock || hasInfoBlock;
+%>
+<% if (!hasAny) { %>
+<p class="wc-desc-empty" style="font-size:0.875rem;opacity:0.75;">暂无 wallpaperscraft 详情元数据（请用新版爬虫重新抓取以写入元数据）。</p>
+<% } else { %>
+<style>
+/* 与 twodwallpapers / konachan 一致：跟随宿主注入的 --anime-*（见 ImageDetailContent buildDescriptionIframeThemeStyles） */
+.wc-desc-wrap {
+  unicode-bidi: isolate;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: inherit;
+  box-sizing: border-box;
+}
+.wc-desc-wrap * { box-sizing: border-box; }
+.wc-desc-wrap .wc-title {
+  margin: 0 0 0.65rem;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--anime-text-primary, inherit);
+}
+.wc-desc-wrap .wc-title .wc-title-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.wc-desc-wrap .wc-title .wc-title-link:hover {
+  color: var(--anime-primary, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wc-desc-wrap .wc-panel {
+  margin: 0 0 0.65rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--anime-text-primary, currentColor) 12%, transparent);
+}
+.wc-desc-wrap .wc-panel:last-of-type { margin-bottom: 0; }
+.wc-desc-wrap .author.author_margin {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+}
+.wc-desc-wrap .author .author__block { min-width: 0; }
+.wc-desc-wrap .author .author__row {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--anime-text-primary, inherit);
+}
+.wc-desc-wrap .author .author__row + .author__row { margin-top: 0.35em; }
+.wc-desc-wrap .author .author__block_source {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.35em;
+  margin: 0;
+  padding-top: 0.55rem;
+  border-top: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 50%, transparent);
+}
+.wc-desc-wrap .author .author__link {
+  color: var(--anime-primary, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wc-desc-wrap .author .author__link:hover { opacity: 0.9; }
+.wc-desc-wrap .gui-icon.gui-icon_source {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.85;
+  background: var(--anime-text-secondary, currentColor);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cline x1='10' y1='14' x2='21' y2='3'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.wc-desc-wrap .wallpaper-info {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+}
+.wc-desc-wrap .wallpaper-info .gui-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.65rem;
+}
+.wc-desc-wrap .wallpaper-info__item,
+.wc-desc-wrap .wallpaper-info .gui-col,
+.wc-desc-wrap .wallpaper-info .gui-col-6 {
+  width: 100%;
+  flex: none !important;
+  min-width: 0;
+}
+.wc-desc-wrap .wallpaper-votes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  color: var(--anime-text-secondary, inherit);
+}
+.wc-desc-wrap .wallpaper-votes__rate {
+  font-weight: 600;
+  color: var(--anime-text-primary, inherit);
+}
+.wc-desc-wrap .wallpaper-votes__count { opacity: 0.95; }
+.wc-desc-wrap .wallpaper-votes__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.45;
+  pointer-events: none;
+}
+.wc-desc-wrap .gui-icon_like,
+.wc-desc-wrap .gui-icon_dislike {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  border-radius: 2px;
+  opacity: 0.55;
+}
+.wc-desc-wrap .wallpaper-table { width: 100%; }
+/* 字段间纵向（多行依次堆叠）；字段内横向（每行内 标签 | 值） */
+.wc-desc-wrap .wallpaper-table__row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  gap: 0.35rem 0.75rem;
+  margin: 0.35rem 0;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 45%, transparent);
+}
+.wc-desc-wrap .wallpaper-table__row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.wc-desc-wrap .wallpaper-table__cell:first-child {
+  flex: 0 0 auto;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--anime-text-secondary, inherit);
+  min-width: 4.5rem;
+  max-width: 100%;
+}
+.wc-desc-wrap .wallpaper-table__cell:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  word-break: break-word;
+  color: var(--anime-text-primary, inherit);
+}
+.wc-desc-wrap .wallpaper-table a {
+  color: var(--anime-primary, inherit);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.wc-desc-wrap .wallpaper-table a:hover { opacity: 0.9; }
+</style>
+<div class="wc-desc-wrap">
+  <% if (hasTitle) { %>
+  <h1 class="gui-h2 gui-heading wc-title">
+    <% if (detailUrl) { %>
+    <a class="wc-title-link" href="<%= detailUrl %>" target="_blank" rel="noopener noreferrer"><%= title %></a>
+    <% } else { %>
+    <%= title %>
+    <% } %>
+  </h1>
+  <% } %>
+  <% if (hasAuthorBlock) { %>
+  <div class="wc-panel" aria-label="author">
+    <div class="author author_margin">
+      <div class="author__block">
+        <% if (author) { %><div class="author__row">Author: <%= author %></div><% } %>
+        <% if (license) { %><div class="author__row">License: <span><%= license %></span></div><% } %>
+      </div>
+      <% if (sourceUrl) { %>
+      <div class="author__block author__block_source">
+        <span class="gui-icon gui-icon_source" aria-hidden="true"></span>
+        <a target="_blank" class="author__link" href="<%= sourceUrl %>" rel="noopener noreferrer">Source</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <% } %>
+  <% if (hasInfoBlock) { %>
+  <div class="wc-panel wallpaper-info" aria-label="wallpaper info">
+    <div class="gui-row">
+      <div class="wallpaper-info__item gui-col gui-col-6">
+        <% if (rating || votesTotal) { %>
+        <div class="wallpaper-votes" aria-label="votes">
+          <span class="wallpaper-votes__button" title="Like" aria-hidden="true"><span class="gui-icon gui-icon_like"></span></span>
+          <% if (rating) { %><span class="wallpaper-votes__rate"><%= rating %></span><% } %>
+          <span class="wallpaper-votes__button" title="Dislike" aria-hidden="true"><span class="gui-icon gui-icon_dislike"></span></span>
+          <% if (votesTotal) { %><span class="wallpaper-votes__count"><span class="JS-Vote-Total"><%= votesTotal %></span> Votes</span><% } %>
+        </div>
+        <% } %>
+      </div>
+      <div class="wallpaper-info__item gui-col gui-col-6">
+        <div class="wallpaper-table">
+          <% if (origRes || origDlAbs) { %>
+          <div class="wallpaper-table__row">
+            <span class="wallpaper-table__cell">Original Resolution</span>
+            <span class="wallpaper-table__cell">
+              <% if (origDlAbs) { %><a href="<%= origDlAbs %>" target="_blank" rel="noopener noreferrer"><%= origRes || 'Download' %></a><% } else { %><%= origRes %><% } %>
+            </span>
+          </div>
+          <% } %>
+          <% if (views) { %>
+          <div class="wallpaper-table__row">
+            <span class="wallpaper-table__cell">Views</span>
+            <span class="wallpaper-table__cell"><%= views %></span>
+          </div>
+          <% } %>
+          <% if (uploaded) { %>
+          <div class="wallpaper-table__row">
+            <span class="wallpaper-table__cell">Uploaded</span>
+            <span class="wallpaper-table__cell"><%= uploaded %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+<% } %>

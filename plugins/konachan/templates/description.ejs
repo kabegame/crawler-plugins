@@ -1,0 +1,175 @@
+<% const m = metadata || {}; %>
+<% const st = m.stats && typeof m.stats === 'object' ? m.stats : {}; %>
+<% const tags = Array.isArray(m.sidebar_tags) ? m.sidebar_tags : []; %>
+<% const rel = Array.isArray(m.related) ? m.related : []; %>
+<% const fav = Array.isArray(st.favorited) ? st.favorited : []; %>
+<% const hasStats = !!(st.post_id || st.size || st.rating || st.posted_date_href || st.posted_date_text || st.avatar_src || fav.length || m.source_href || (m.score != null && String(m.score) !== '') || m.posted_by_name); %>
+<style>
+.kc-sidebar{font-size:0.875rem;line-height:1.45;color:var(--anime-text-primary,#e5e7eb);}
+.kc-block{margin-bottom:1em;}
+.kc-h5{margin:0 0 0.35em;font-size:0.82rem;font-weight:600;color:var(--anime-text-secondary,#9ca3af);text-transform:none;letter-spacing:0;}
+.kc-tag-list{list-style:none;margin:0;padding:0;font-size:0.85em;}
+.kc-tag-list .tag-link{margin:0.12em 0;line-height:1.35;}
+.kc-tag-list .tag-link a{color:inherit;text-decoration:none;}
+.kc-tag-list .tag-link a:hover{text-decoration:underline;}
+.kc-tag-list .post-count{color:var(--anime-text-secondary,#6b7280);margin-left:0.25em;}
+.kc-tag-list .tag-type-artist a:nth-of-type(2){color:#c026d3;}
+.kc-tag-list .tag-type-copyright a:nth-of-type(2){color:#db2777;}
+.kc-tag-list .tag-type-character a:nth-of-type(2){color:#16a34a;}
+.kc-tag-list .tag-type-circle a:nth-of-type(2){color:#dc2626;}
+.kc-tag-list .tag-type-style a:nth-of-type(2){color:#ea580c;}
+.kc-tag-list .tag-type-general a:nth-of-type(2){color:var(--anime-text-primary,#e5e7eb);}
+.kc-stats ul{list-style:none;margin:0;padding:0;}
+.kc-stats ul > li{margin:0.2em 0;}
+.kc-stats a{color:var(--anime-primary,#a78bfa);text-decoration:none;}
+.kc-stats a:hover{text-decoration:underline;}
+.kc-avatar-wrap{margin:0 0 0.5em !important;}
+.kc-avatar-wrap img.avatar{display:block;max-width:124px;height:auto;border-radius:4px;}
+.kc-src-short{display:inline-block;max-width:12rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;}
+.kc-related ul{list-style:none;margin:0;padding:0;}
+.kc-related li{margin:0.2em 0;}
+.kc-crawl-hint{display:none;margin:0.75em 0 0;padding-top:0.5em;border-top:1px solid color-mix(in srgb,var(--anime-border,#374151) 55%,transparent);font-size:0.72rem;line-height:1.4;color:var(--anime-text-secondary,#9ca3af);}
+</style>
+<div class="kc-sidebar">
+  <% if (tags.length) { %>
+  <div class="kc-block">
+    <h5 class="kc-h5">Tags</h5>
+    <ul id="tag-sidebar" class="kc-tag-list">
+      <% tags.forEach(function (t) {
+           const ty = (t && t.type && /^[a-z0-9_]+$/i.test(String(t.type))) ? String(t.type) : 'general';
+           const disp = (t && t.display) ? String(t.display) : (t && t.name) ? String(t.name) : '';
+           if (!disp && !(t && t.wiki_href)) return;
+      %>
+      <li class="tag-link tag-type-<%= ty %>"<% if (t && t.name) { %> data-name="<%= String(t.name).replace(/"/g, '&quot;') %>"<% } %> data-type="<%= ty %>">
+        <% if (t && t.wiki_href) { %>
+          <a href="<%= t.wiki_href %>" target="_blank" rel="noopener noreferrer">?</a>
+        <% } %>
+        <% if (t && t.post_href) { %>
+          <a href="<%= t.post_href %>" target="_blank" rel="noopener noreferrer"><%= disp %></a>
+        <% } else if (disp) { %>
+          <%= disp %>
+        <% } %>
+        <% if (t && t.count != null && String(t.count) !== '') { %>
+          <span class="post-count"><%= t.count %></span>
+        <% } %>
+      </li>
+      <% }); %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (hasStats) { %>
+  <div class="kc-block kc-stats vote-container" id="stats">
+    <h5 class="kc-h5">Statistics</h5>
+    <ul>
+      <% if (st.avatar_src) { %>
+      <li class="comment-avatar-container kc-avatar-wrap" style="list-style:none;margin-left:0;padding-left:0;">
+        <% if (st.avatar_href) { %>
+          <a href="<%= st.avatar_href %>" target="_blank" rel="noopener noreferrer">
+            <img class="avatar" src="<%= st.avatar_src %>" alt="" width="124" height="125" loading="lazy" />
+          </a>
+        <% } else { %>
+          <img class="avatar" src="<%= st.avatar_src %>" alt="" width="124" height="125" loading="lazy" />
+        <% } %>
+      </li>
+      <% } %>
+      <% if (st.post_id) { %>
+      <li>Id: <%= st.post_id %></li>
+      <% } %>
+      <li>
+        Posted:
+        <% if (st.posted_date_href) { %>
+          <a href="<%= st.posted_date_href %>" target="_blank" rel="noopener noreferrer"<% if (st.posted_date_title) { %> title="<%= String(st.posted_date_title).replace(/"/g, '&quot;') %>"<% } %>><%= st.posted_date_text || '—' %></a>
+        <% } else if (st.posted_date_text) { %>
+          <%= st.posted_date_text %>
+        <% } %>
+        <% if (m.posted_by_name) { %>
+          <% if (st.posted_date_href || st.posted_date_text) { %> by <% } %>
+          <% if (m.posted_by_href) { %>
+            <a href="<%= m.posted_by_href %>" target="_blank" rel="noopener noreferrer"><%= m.posted_by_name %></a>
+          <% } else { %>
+            <%= m.posted_by_name %>
+          <% } %>
+        <% } %>
+      </li>
+      <% if (st.size) { %>
+      <li>Size: <%= st.size %></li>
+      <% } %>
+      <% if (m.source_href) { %>
+      <li>Source: <a href="<%= m.source_href %>" target="_blank" rel="noopener noreferrer" class="kc-src-short"><%= m.source_href %></a></li>
+      <% } %>
+      <% if (st.rating) { %>
+      <li>Rating: <%= st.rating %></li>
+      <% } %>
+      <% if (m.score != null && String(m.score) !== '') { %>
+      <li>Score: <%= m.score %></li>
+      <% } %>
+      <% if (fav.length) { %>
+      <li>
+        Favorited by:
+        <% fav.forEach(function (u, i) { %>
+          <% if (i > 0) { %>, <% } %>
+          <% if (u && u.href) { %>
+            <a href="<%= u.href %>" target="_blank" rel="noopener noreferrer"><%= u.name || '' %></a>
+          <% } else { %>
+            <%= u && u.name ? u.name : '' %>
+          <% } %>
+        <% }); %>
+      </li>
+      <% } %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (rel.length) { %>
+  <div class="kc-block kc-related">
+    <h5 class="kc-h5">Related Posts</h5>
+    <ul>
+      <% rel.forEach(function (r) { if (!r || !r.href) return; %>
+      <li><a href="<%= r.href %>" target="_blank" rel="noopener noreferrer"><%= r.label || r.href %></a></li>
+      <% }); %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (tags.length || hasStats || rel.length) { %>
+  <p class="kc-crawl-hint" id="kc-crawl-snapshot-hint" role="note"></p>
+  <% } %>
+</div>
+<script>
+(function () {
+  function kcSnapshotHint(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') {
+      return '此側欄（含發帖時間等文案）為抓取當下頁面快照，與目前瀏覽時刻或站台現狀可能不一致。';
+    }
+    if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
+      return '此侧栏（含发帖时间等文案）为抓取当时页面快照，与当前浏览时刻或站点现状可能不一致。';
+    }
+    if (s === 'ja') {
+      return 'このサイドバー（投稿時刻の表記を含む）は取得時点のページのスナップショットです。現在の時刻やサイトの状態とは一致しない場合があります。';
+    }
+    if (s === 'ko') {
+      return '이 사이드바(게시 시각 문구 포함)는 수집 시점의 페이지 스냅샷입니다. 현재 시각이나 사이트 상태와 다를 수 있습니다.';
+    }
+    return 'This sidebar (including posted time wording) is a snapshot from when the image was downloaded; it may not match the current moment or live site.';
+  }
+  function onReady() {
+    var el = document.getElementById('kc-crawl-snapshot-hint');
+    if (!el) return;
+    function apply(loc) {
+      el.textContent = kcSnapshotHint(loc);
+      el.style.display = 'block';
+    }
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(apply).catch(function () {
+        apply('en');
+      });
+    } else {
+      apply((navigator.language || 'en').split('-')[0]);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
+})();
+</script>

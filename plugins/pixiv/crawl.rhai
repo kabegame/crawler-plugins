@@ -37,7 +37,19 @@ fn add_artwork_progress() {
 
 fn download_illust(illust_id) {
     set_header("Referer", "https://www.pixiv.net/artworks/" + illust_id);
-    let url = "https://www.pixiv.net/ajax/illust/" + illust_id + "/pages?lang=zh";
+    // ① 详情：body 为作品对象 → 写入 metadata（与官网「作品页」同源）
+    let illust_body = ();
+    try {
+        let detail = fetch_json("https://www.pixiv.net/ajax/illust/" + illust_id);
+        let ib = detail["body"];
+        if ib != () {
+            illust_body = ib;
+        }
+    } catch {
+    }
+
+    // ② 分页原图：只有 /pages 的 body 才是「每页一张图」的数组，不可再请求 ① 的同 URL
+    let url = "https://www.pixiv.net/ajax/illust/" + illust_id + "/pages";
     try {
         let json = fetch_json(url);
         let body = json["body"];
@@ -51,7 +63,11 @@ fn download_illust(illust_id) {
             if urls != () {
                 let orig = urls["original"];
                 if orig != () {
-                    download_image(orig);
+                    if illust_body != () {
+                        download_image(orig, #{ name: illust_body["title"], metadata: #{ body: illust_body } });
+                    } else {
+                        download_image(orig, #{ name: illust_body["title"], metadata: #{ illustId: illust_id } });
+                    }
                 }
             }
             i += 1;
