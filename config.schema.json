@@ -141,8 +141,12 @@
               "items": {
                 "type": "object",
                 "required": ["name", "variable"],
-                "additionalProperties": false,
-                "properties": { "name": { "type": "string" }, "variable": { "type": "string" } }
+                "additionalProperties": true,
+                "properties": {
+                  "name": { "type": "string" },
+                  "variable": { "type": "string" },
+                  "when": { "$ref": "#/$defs/WhenCondition" }
+                }
               }
             }
           ]
@@ -197,8 +201,12 @@
               "items": {
                 "type": "object",
                 "required": ["name", "variable"],
-                "additionalProperties": false,
-                "properties": { "name": { "type": "string" }, "variable": { "type": "string" } }
+                "additionalProperties": true,
+                "properties": {
+                  "name": { "type": "string" },
+                  "variable": { "type": "string" },
+                  "when": { "$ref": "#/$defs/WhenCondition" }
+                }
               }
             }
           ]

@@ -1,0 +1,20 @@
+{
+  "name": "排行榜 · 日榜插画（示例日期）",
+  "name.en": "Ranking · daily illust (sample date)",
+  "name.ja": "ランキング・日間イラスト（日付例）",
+  "name.ko": "랭킹 · 일간 일러스트(날짜 예시)",
+  "name.zhtw": "排行榜 · 日榜插畫（示例日期）",
+  "description": "日榜、插画类型，单日期 ranking_date（留空为 Pixiv 最新一期）；列表分页由接口返回的 next 字段推进，最多约 60 个作品。非 R18 排行榜一般无需 Cookie。",
+  "description.en": "Daily illust ranking; single ranking_date (empty = latest). Pagination follows API `next`, up to ~60. Non-R18 usually needs no Cookie.",
+  "description.ja": "日間・イラスト、単一日付（空欄は最新）。ページ送りは API の next。最大約60。R18 以外は通常 Cookie 不要。",
+  "description.ko": "일간·일러스트, 단일 날짜(비우면 최신). next로 페이지. 최대 약 60. R18 아님은 보통 Cookie 불필요.",
+  "description.zhtw": "日榜、插畫，單一 ranking_date（留空為最新）；分頁依 API 的 next，最多約 60。非 R18 一般無需 Cookie。",
+  "userConfig": {
+    "source": "ranking",
+    "ranking_mode": "daily",
+    "content_mode": "illust",
+    "age_mode": "safe",
+    "ranking_date": "",
+    "num_artworks": 60
+  }
+}

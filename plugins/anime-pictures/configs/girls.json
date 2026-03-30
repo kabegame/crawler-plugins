@@ -1,17 +1,17 @@
 {
-  "name": "女生",
-  "name.en": "Girls",
-  "name.ja": "女の子",
-  "name.ko": "여자",
-  "name.zhtw": "女生",
-  "description": "女生图片，页数可配置(共约7000页左右)",
-  "description.en": "Girls images with page range configurable (about 7000 pages)",
-  "description.ja": "女の子の画像をページ範囲を設定してクロール(約7000ページぐらいある)",
-  "description.ko": "여자의 이미지를 페이지 범위를 설정하여 크롤링(약 7000페이지 정도)",
-  "description.zhtw": "女生圖片，頁數可配置(約7000頁左右)",
+  "name": "主题标签(例：女生)",
+  "name.en": "Theme Tag (example: Girls)",
+  "name.ja": "テーマタグ（例：女の子）",
+  "name.ko": "주제 태그 (예: 여자)",
+  "name.zhtw": "主題標籤（例：女生）",
+  "description": "标签女生(女の子)图片前10页，共约800张，页数可配置(共约7000页左右)",
+  "description.en": "Crawl the first 10 pages of images with the tag \"Girls\" (女の子), about 800 images in total. The page range can be configured (about 7000 pages in total).",
+  "description.ja": "タグ「女の子」の画像をクロールします。デフォルトでは最初の10ページ（約800枚、ページ範囲は設定可能、全体で約7000ページ）です。",
+  "description.ko": "'여자(女の子)' 태그의 이미지를 처음 10페이지(약 800장) 크롤링합니다. 페이지 범위는 설정 가능하며 전체 약 7000페이지가 있습니다.",
+  "description.zhtw": "爬取標籤為女生（女の子）的圖片，預設前10頁（約800張），可自訂頁數範圍（總約7000頁）。",
   "userConfig": {
     "startPage": 0,
-    "endPage": 10,
+    "endPage": 9,
     "tag": "女の子"
   }
 }

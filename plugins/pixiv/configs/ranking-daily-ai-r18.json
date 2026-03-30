@@ -1,0 +1,20 @@
+{
+  "name": "排行榜 · AI 日榜 R18",
+  "name.en": "Ranking · AI daily R18",
+  "name.ja": "ランキング・AI 日間 R18",
+  "name.ko": "랭킹 · AI 일간 R18",
+  "name.zhtw": "排行榜 · AI 日榜 R18",
+  "description": "Pixiv AI R18 日榜。须年龄认证、有效 Cookie（高级设置 → HTTP 头）及登录用户 UID。ranking_date 留空为最新一期。遵守当地法律法规。",
+  "description.en": "Pixiv AI daily R18. Age verification, Cookie, and account UID required. Empty ranking_date = latest. Comply with laws.",
+  "description.ja": "Pixiv AI 日間 R18。認証・Cookie・UID 必須。日付空欄は最新。法令遵守。",
+  "description.ko": "Pixiv AI 일간 R18. 인증·Cookie·UID 필수. 날짜 비우면 최신. 법규 준수.",
+  "description.zhtw": "Pixiv AI R18 日榜。須認證、Cookie 與登入 UID。留空日期為最新。遵守法規。",
+  "userConfig": {
+    "source": "ranking",
+    "ranking_mode": "daily_ai",
+    "age_mode": "r18",
+    "user_id": "",
+    "ranking_date": "",
+    "num_artworks": 40
+  }
+}

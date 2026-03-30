@@ -1,0 +1,18 @@
+{
+  "name": "全站趋势（前 5 页）",
+  "name.en": "Global trending (5 pages)",
+  "name.ja": "全サイトトレンド（5ページ）",
+  "name.ko": "전체 트렌드(5페이지)",
+  "name.zhtw": "全站趨勢（前 5 頁）",
+  "description": "按全站作品流、趋势排序，抓取约前 5 页公开图，适合快速浏览热门 AI 图",
+  "description.en": "Global artwork stream, trending sort, about 5 pages of public images—good for skimming hot AI art.",
+  "description.ja": "全サイトの作品ストリーム、トレンド順で公開画像を約5ページ分。人気のAIイラストをさっと見るのに向いています。",
+  "description.ko": "전체 작품 스트림, 트렌드 정렬로 공개 이미지 약 5페이지. 인기 AI 일러스트를 빠르게 보기에 적합합니다.",
+  "description.zhtw": "依全站作品流、趨勢排序，約前 5 頁公開圖，適合快速瀏覽熱門 AI 圖。",
+  "userConfig": {
+    "crawl_type": "global",
+    "artwork_sort": "trending",
+    "max_global_pages": 5,
+    "skip_artwork_pages": 0
+  }
+}

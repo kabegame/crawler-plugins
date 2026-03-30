@@ -1,0 +1,19 @@
+{
+  "name": "关键词搜索 · 风景（安全模式）",
+  "name.en": "Keyword search · landscape (safe)",
+  "name.ja": "キーワード検索・風景（全年齢）",
+  "name.ko": "키워드 검색 · 풍경(안전)",
+  "name.zhtw": "關鍵字搜尋 · 風景（安全模式）",
+  "description": "全标签匹配搜索「風景」，安全模式、按日期从新到旧，最多约 40 个作品。可在运行配置里改关键词、排序（人气需 Premium）或模式。需 Cookie。",
+  "description.en": "Full tag search for「風景」, safe mode, sort by date (newest first), ~40 artworks. Edit keyword, sort (popular needs Premium), or mode in run config. Cookie required.",
+  "description.ja": "タグ完全一致で「風景」、安全モード・日付順（新しい順）、最大約40作品。キーワード・並び（人気は Premium）・モードは実行設定で変更可。Cookie 必須。",
+  "description.ko": "태그 완전 일치 키워드「風景」, 안전 모드·날짜순(최신), 최대 약 40작품. 키워드·정렬(인기는 Premium)·모드는 실행 설정에서 변경. Cookie 필요.",
+  "description.zhtw": "標籤完全匹配「風景」，安全、依日期由新到舊，最多約 40 個作品。可改關鍵字、排序（人氣需 Premium）。需 Cookie。",
+  "userConfig": {
+    "source": "keyword",
+    "keyword": "風景",
+    "search_mode": "safe",
+    "keyword_order": "date",
+    "num_artworks": 40
+  }
+}

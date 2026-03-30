@@ -1,0 +1,19 @@
+{
+  "name": "排行榜 · AI 日榜",
+  "name.en": "Ranking · AI daily",
+  "name.ja": "ランキング・AI 日間",
+  "name.ko": "랭킹 · AI 일간",
+  "name.zhtw": "排行榜 · AI 日榜",
+  "description": "Pixiv AI 生成作品日榜（内容类型由站点固定为综合）；ranking_date 留空为最新一期；分页由接口 next 推进，最多约 50 个作品。非 R18 一般无需 Cookie。",
+  "description.en": "Pixiv AI daily (content=all on site). Empty ranking_date = latest; pagination via `next`, up to ~50. Non-R18 usually needs no Cookie.",
+  "description.ja": "Pixiv AI 日間。日付空欄は最新。next でページ。最大約50。R18 以外は通常 Cookie 不要。",
+  "description.ko": "Pixiv AI 일간. 날짜 비우면 최신. next로 페이지. 최대 약 50. R18 아님은 보통 Cookie 불필요.",
+  "description.zhtw": "Pixiv AI 日榜；留空日期為最新；依 next 分頁，最多約 50。非 R18 一般無需 Cookie。",
+  "userConfig": {
+    "source": "ranking",
+    "ranking_mode": "daily_ai",
+    "age_mode": "safe",
+    "ranking_date": "",
+    "num_artworks": 50
+  }
+}

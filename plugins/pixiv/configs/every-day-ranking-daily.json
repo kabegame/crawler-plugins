@@ -1,0 +1,25 @@
+{
+  "name": "每日日榜插画（请更新日期）",
+  "name.en": "Daily illust ranking (update dates)",
+  "name.ja": "毎日・日間イラスト（日付要更新）",
+  "name.ko": "매일 일간 일러스트(날짜 갱신 필요)",
+  "name.zhtw": "每日日榜插畫（請更新日期）",
+  "description": "与「日榜插画」相同逻辑，并带默认定时：每天 18:00。ranking_date 留空则每次运行使用 Pixiv 最新一期，无需手改日期。非 R18 排行榜一般无需 Cookie。",
+  "description.en": "Same as daily illust ranking plus default schedule 18:00 daily. Leave ranking_date empty to use Pixiv’s latest period each run. Non-R18 usually needs no Cookie.",
+  "description.ja": "日間イラストと同じ＋既定 18:00 毎日。日付を空にすると実行ごとに最新期を自動。R18 以外は通常 Cookie 不要。",
+  "description.ko": "일간 일러스트와 동일 + 매일 18:00. 날짜 비우면 실행마다 최신 기간. R18 아님은 보통 Cookie 불필요.",
+  "description.zhtw": "與日榜插畫相同，預設每天 18:00。ranking_date 留空則每次執行使用最新一期。非 R18 一般無需 Cookie。",
+  "userConfig": {
+    "source": "ranking",
+    "ranking_mode": "daily",
+    "content_mode": "illust",
+    "age_mode": "safe",
+    "ranking_date": "",
+    "num_artworks": 50
+  },
+  "scheduleSpec": {
+    "mode": "daily",
+    "hour": 18,
+    "minute": 0
+  }
+}

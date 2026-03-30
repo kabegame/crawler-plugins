@@ -1,6 +1,7 @@
 // Pixiv 爬虫：排行榜 / 收藏 / 画师 / 关键词
-// Cookie 需在「高级设置 → HTTP 头」中填写
-// 流式：按列表分页拉取，每拿到一个作品 ID 立即下载，达到 num_artworks 即停；不再预先扫完所有列表页
+// 非 R18 排行榜一般无需 Cookie；R18 榜、收藏、画师、关键词等需在「高级设置 → HTTP 头」填写有效 Cookie（含年龄认证）。
+// 流式：按列表分页拉取，每拿到一个作品 ID 立即下载，达到 num_artworks 即停。
+// 排行榜：榜序 + 内容类型 + 年龄向（config）；单日期 ranking_date，留空不传 date（Pixiv 返回最新）；分页由响应的 next 字段驱动。
 
 set_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
 set_header("Referer", "https://www.pixiv.net/");
@@ -8,30 +9,48 @@ set_header("Origin", "https://www.pixiv.net");
 set_header("x-requested-with", "XMLHttpRequest");
 set_header("Accept", "application/json");
 
-// 排行榜 start_date / end_date：由 config 的 date.format 提交为 YYYYMMDD；闭区间 [start, end]
-
-fn next_date(d) {
-    let y = parse_int(d.sub_string(0, 4));
-    let m = parse_int(d.sub_string(4, 2));
-    let day = parse_int(d.sub_string(6, 2));
-    let dim = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    if (y % 4 == 0 && y % 100 != 0) || y % 400 == 0 {
-        dim[1] = 29;
-    }
-    day += 1;
-    if day > dim[m - 1] {
-        day = 1;
-        m += 1;
-        if m > 12 { m = 1; y += 1; }
-    }
-    let ms = if m < 10 { "0" + m.to_string() } else { m.to_string() };
-    let ds = if day < 10 { "0" + day.to_string() } else { day.to_string() };
-    y.to_string() + ms + ds
-}
-
 fn add_artwork_progress() {
     if num_artworks > 0 {
         add_progress(99.0 / num_artworks);
+    }
+}
+
+/// 日/周/月/新生榜可选 content；其余榜序站点固定为 all
+fn effective_content_for_ranking(rm, cm) {
+    if rm == "daily" || rm == "weekly" || rm == "monthly" || rm == "rookie" {
+        return cm;
+    }
+    "all"
+}
+
+/// age_mode=r18 时拼接 Pixiv mode 参数（daily_ai → daily_r18_ai）
+fn ranking_pixiv_mode(rm, am) {
+    if am != "r18" {
+        return rm;
+    }
+    if rm == "daily_ai" {
+        return "daily_r18_ai";
+    }
+    rm + "_r18"
+}
+
+/// 仅保留 description.ejs 展示所需字段，避免整份 ajax/illust body（userIllusts、zoneConfig 等）入库。
+fn pixiv_trim_illust_body(ib) {
+    #{
+        illustId: ib["illustId"],
+        id: ib["id"],
+        title: ib["title"],
+        illustTitle: ib["illustTitle"],
+        description: ib["description"],
+        illustComment: ib["illustComment"],
+        userId: ib["userId"],
+        userName: ib["userName"],
+        uploadDate: ib["uploadDate"],
+        createDate: ib["createDate"],
+        bookmarkCount: ib["bookmarkCount"],
+        likeCount: ib["likeCount"],
+        viewCount: ib["viewCount"],
+        tags: ib["tags"],
     }
 }
 
@@ -49,6 +68,7 @@ fn download_illust(illust_id) {
     }
 
     // ② 分页原图：只有 /pages 的 body 才是「每页一张图」的数组，不可再请求 ① 的同 URL
+    // 多页作品：下载名 title(1)、title(2)…；仅一页时只用 title（无后缀）
     let url = "https://www.pixiv.net/ajax/illust/" + illust_id + "/pages";
     try {
         let json = fetch_json(url);
@@ -56,17 +76,41 @@ fn download_illust(illust_id) {
         if body == () {
             return;
         }
+        let page_count = 0;
+        let pc = 0;
+        while pc < body.len() {
+            let pg = body[pc];
+            let u = pg["urls"];
+            if u != () && u["original"] != () {
+                page_count += 1;
+            }
+            pc += 1;
+        }
+        let base = if illust_body != () {
+            let t = illust_body["title"];
+            if t != () { t.to_string() } else { illust_id.to_string() }
+        } else {
+            illust_id.to_string()
+        };
         let i = 0;
+        let page_idx = 0;
         while i < body.len() {
             let page = body[i];
             let urls = page["urls"];
             if urls != () {
                 let orig = urls["original"];
                 if orig != () {
-                    if illust_body != () {
-                        download_image(orig, #{ name: illust_body["title"], metadata: #{ body: illust_body } });
+                    page_idx += 1;
+                    let disp = if page_count > 1 {
+                        base + "(" + page_idx.to_string() + ")"
                     } else {
-                        download_image(orig, #{ name: illust_body["title"], metadata: #{ illustId: illust_id } });
+                        base
+                    };
+                    if illust_body != () {
+                        let trimmed = pixiv_trim_illust_body(illust_body);
+                        download_image(orig, #{ name: disp, metadata: #{ body: trimmed } });
+                    } else {
+                        download_image(orig, #{ name: disp, metadata: #{ illustId: illust_id } });
                     }
                 }
             }
@@ -78,61 +122,60 @@ fn download_illust(illust_id) {
 }
 
 if source == "ranking" {
-    if start_date == "" {
-        throw "排行榜模式请选择起始日期";
+    let effective_content = effective_content_for_ranking(ranking_mode, content_mode);
+    if (ranking_mode == "monthly" || ranking_mode == "rookie") && effective_content == "ugoira" {
+        throw "月榜与新生榜不支持动图（うごイラ）内容类型";
     }
-    if end_date == "" {
-        throw "排行榜模式请选择结束日期";
-    }
-    if start_date > end_date {
-        throw "结束日期不能早于起始日期";
-    }
-    let effective_content = content_mode;
-    // R18 等与站点一致固定全部；日/周/月/AI 日榜可按 content= 传插画、漫画、动图等
-    if ranking_mode == "daily_r18" || ranking_mode == "weekly_r18" || ranking_mode == "male_r18" || ranking_mode == "female_r18" || ranking_mode == "daily_r18_ai" {
-        effective_content = "all";
+    let api_mode = ranking_pixiv_mode(ranking_mode, age_mode);
+    if age_mode == "r18" {
+        if user_id == "" {
+            throw "R18 排行榜请在「用户 UID」填写登录账号 UID（x-user-id）";
+        }
+        set_header("x-user-id", user_id);
     }
     set_header("x-requested-with", "XMLHttpRequest");
-    let artworks_per_page = 50;
     let done = 0;
-    let date_val = start_date;
-    // 外层仅按日期区间推进；404 等只结束「当日」的 p 循环，不结束整段任务（未满 num_artworks 则继续后续日期）
-    while date_val <= end_date {
+    let p = 1;
+    while done < num_artworks {
+        let date_q = if ranking_date == "" { "" } else { "&date=" + ranking_date };
+        let ref_base = "https://www.pixiv.net/ranking.php?mode=" + api_mode + "&content=" + effective_content + date_q;
+        set_header("Referer", ref_base);
+        let list_url = "https://www.pixiv.net/ranking.php?mode=" + api_mode + "&content=" + effective_content + date_q + "&p=" + p.to_string() + "&format=json";
+        let json = ();
+        try {
+            json = fetch_json(list_url);
+        } catch {
+            break;
+        }
+        let contents = json["contents"];
+        if contents == () {
+            break;
+        }
+        let i = 0;
+        while i < contents.len() && done < num_artworks {
+            let item = contents[i];
+            let id = item["illust_id"];
+            if id != () {
+                download_illust(id.to_string());
+                done += 1;
+                add_artwork_progress();
+            }
+            i += 1;
+        }
         if done >= num_artworks {
             break;
         }
-        let p = 1;
-        while done < num_artworks {
-            set_header("Referer", "https://www.pixiv.net/ranking.php?mode=" + ranking_mode + "&content=" + effective_content + "&date=" + date_val);
-            let url = "https://www.pixiv.net/ranking.php?mode=" + ranking_mode + "&content=" + effective_content + "&date=" + date_val + "&p=" + p + "&format=json";
-            let json = ();
-            try {
-                json = fetch_json(url);
-            } catch {
-                // HTTP 404 等：仅表示当日列表页用尽或该 URL 不可用，属「数量不足」路径，继续下一日历日
-                break;
-            }
-            let contents = json["contents"];
-            if contents == () {
-                break;
-            }
-            let i = 0;
-            while i < contents.len() && done < num_artworks {
-                let item = contents[i];
-                let id = item["illust_id"];
-                if id != () {
-                    download_illust(id.to_string());
-                    done += 1;
-                    add_artwork_progress();
-                }
-                i += 1;
-            }
-            if contents.len() < artworks_per_page {
-                break;
-            }
-            p += 1;
+        let nxt = json["next"];
+        if nxt == () {
+            break;
         }
-        date_val = next_date(date_val);
+        if nxt == false {
+            break;
+        }
+        p = parse_int(nxt.to_string());
+    }
+    if done < num_artworks {
+        warn("排行榜实际只获取到 " + done.to_string() + " 个作品，少于请求的 " + num_artworks.to_string() + " 个（可能已到底或无更多页）");
     }
 } else if source == "bookmark" {
     if user_id == "" {
@@ -190,13 +233,20 @@ if source == "ranking" {
     let illusts = body["illusts"];
     let done = 0;
     if illusts != () {
-        for id in illusts.keys() {
+        // profile/all 的 illusts 为对象，键顺序与站点列表一致；站点从后往前加载，故逆序遍历
+        let key_list = illusts.keys();
+        let ki = key_list.len() - 1;
+        while ki >= 0 {
             if done >= num_artworks {
                 break;
             }
+            let id = key_list[ki];
             download_illust(id);
+            // TODO: 去掉限制（done默认为0）
+            // TODO: 添加起止页数，每页48个，程序计算，不指定默认全部
             done += 1;
             add_artwork_progress();
+            ki -= 1;
         }
     }
 } else if source == "keyword" {

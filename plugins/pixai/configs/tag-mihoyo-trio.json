@@ -1,0 +1,23 @@
+{
+  "name": "标签示例（原神 / 星铁 / 星原）",
+  "name.en": "Tags example (Genshin / Star Rail / Stella Sora)",
+  "name.ja": "タグ例（原神・スタレ・ステラソラ）",
+  "name.ko": "태그 예시(원신·스타레일·스텔라 소라)",
+  "name.zhtw": "標籤範例（原神／星鐵／星原）",
+  "description": "按标签 codeName 依次爬取原神、崩坏：星穹铁道、星原（Stella Sora）的公开作品，每标签约 3 页；可在运行配置里改标签列表或页数",
+  "description.en": "Crawl by tag codeName for Genshin Impact, Honkai: Star Rail, and Stella Sora (~3 pages each). Edit tag list or page count in run config.",
+  "description.ja": "codeName で原神・崩壊スターレイル・ステラソラのタグを順に取得（タグあたり約3ページ）。タグやページ数は実行設定で変更できます。",
+  "description.ko": "codeName으로 원신·붕괴: 스타레일·스텔라 소라 태그를 순서대로 크롤링(태그당 약 3페이지). 태그·페이지 수는 실행 설정에서 변경 가능합니다.",
+  "description.zhtw": "依標籤 codeName 輪流爬取原神、崩壞：星穹鐵道、星原（Stella Sora）的公開圖，每標籤約 3 頁；可在執行設定修改標籤或頁數。",
+  "userConfig": {
+    "crawl_type": "tag",
+    "tag_code_names": [
+      "genshin_impact",
+      "honkai:_star_rail",
+      "stella_sora"
+    ],
+    "max_tag_artwork_pages": 3,
+    "artwork_sort": "trending",
+    "skip_artwork_pages": 0
+  }
+}

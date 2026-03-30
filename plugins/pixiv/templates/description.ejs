@@ -4,7 +4,7 @@
   ================================================================================
   来源：crawl.rhai 中 download_image(..., #{ metadata: #{ body: illust_body } }) 或仅 #{ illustId }。
 
-  - metadata.body：Pixiv 作品详情 ajax（如 GET /ajax/illust/{id}）响应里的 body 对象，与官网作品页同源。
+  - metadata.body：入库时已由 crawl.rhai 的 pixiv_trim_illust_body 裁剪为 EJS 所需白名单字段（非完整 ajax body），避免 userIllusts / zoneConfig 等大字段占库与拖慢列表查询。
   - 无 body 时：metadata 可能只有 illustId（字符串），模板可解析作品链接，评论区等依赖字段会降级。
 
   模板内映射：m = metadata || {}；b =（m.body 为普通对象且非数组）? m.body : null。
@@ -14,7 +14,7 @@
   userId、userName、uploadDate / createDate、likeCount、bookmarkCount、viewCount；内联脚本另用 illustId 拉评论。
 
   ---------------------------------------------------------------------------
-  body 典型形状示例（字段以线上 API 为准；userIllusts、zoneConfig 等同型大块仅示意）
+  body 白名单字段与历史完整 ajax 响应的示意（后者仅作参考；入库 body 已不含 userIllusts 等）
   ---------------------------------------------------------------------------
   {
     "illustId": "141555883",

@@ -1,0 +1,21 @@
+{
+  "name": "趋势模型（每模型 1 页作品）",
+  "name.en": "Trending models (1 artwork page each)",
+  "name.ja": "トレンドモデル（モデルごと1ページ）",
+  "name.ko": "트렌드 모델(모델당 작품 1페이지)",
+  "name.zhtw": "趨勢模型（每模型 1 頁作品）",
+  "description": "遍历趋势下前 3 页模型，每个模型再取约 1 页作品；适合发现新模型与代表作",
+  "description.en": "Walk ~3 pages of trending models, ~1 artwork page per model—good for discovering models and sample works.",
+  "description.ja": "トレンドのモデル一覧を約3ページ、各モデルで作品を約1ページ取得。新しいモデルと代表作を探すのに向いています。",
+  "description.ko": "트렌드 모델 목록 약 3페이지, 모델당 작품 약 1페이지. 신규 모델과 대표작 탐색에 적합합니다.",
+  "description.zhtw": "走訪趨勢模型約 3 頁，每個模型再取約 1 頁作品；適合發現新模型與代表作。",
+  "userConfig": {
+    "crawl_type": "model",
+    "model_sort": "trending",
+    "max_model_pages": 3,
+    "skip_model_pages": 0,
+    "max_artwork_pages": 1,
+    "artwork_sort": "trending",
+    "skip_artwork_pages": 0
+  }
+}

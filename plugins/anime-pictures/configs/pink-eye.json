@@ -1,17 +1,17 @@
 {
-  "name": "粉瞳",
-  "name.en": "Pink Eyes",
-  "name.ja": "ピンク目",
-  "name.ko": "핑크아이즈",
-  "name.zhtw": "粉瞳",
-  "description": "粉瞳图片，页数可配置(共约300页左右)",
-  "description.en": "Pink Eyes images with page range configurable (about 300 pages)",
-  "description.ja": "ピンクアイズの画像をページ範囲を設定してクロール(約300ページぐらいある)",
-  "description.ko": "핑크아이즈의 이미지를 페이지 범위를 설정하여 크롤링(약 300페이지 정도)",
-  "description.zhtw": "粉瞳圖片，頁數可配置(約300頁左右)",
+  "name": "特征标签（例：粉瞳)",
+  "name.en": "Characteristic Tag (e.g., Pink Eyes)",
+  "name.ja": "特性タグ（例：ピンク目）",
+  "name.ko": "특징 태그 (예: 핑크아이즈)",
+  "name.zhtw": "特徵標籤（例：粉瞳）",
+  "description": "特征为粉瞳(ピンク目)的图片的前10页，页数可配置(共约300页左右)",
+  "description.en": "The first 10 pages of images featuring pink eyes (ピンク目), with configurable page range (about 300 pages in total).",
+  "description.ja": "特性がピンク目（ピンクアイズ）の画像を最初の10ページ分クロールします。ページ範囲は設定でき、全体で約300ページあります。",
+  "description.ko": "특징이 핑크아이즈(ピンク目)인 이미지의 처음 10페이지(총 약 300페이지, 범위 설정 가능)를 크롤링합니다.",
+  "description.zhtw": "特徵為粉瞳（ピンク目）的圖片，預設前10頁，可自訂頁數範圍（共約300頁）。",
   "userConfig": {
     "startPage": 0,
-    "endPage": 10,
+    "endPage": 9,
     "tag": "ピンク目"
   }
 }

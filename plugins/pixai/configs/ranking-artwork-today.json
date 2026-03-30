@@ -1,0 +1,17 @@
+{
+  "name": "排行榜 · 今日作品",
+  "name.en": "Ranking · today's artworks",
+  "name.ja": "ランキング・本日の作品",
+  "name.ko": "랭킹 · 오늘의 작품",
+  "name.zhtw": "排行榜 · 今日作品",
+  "description": "拉取 PixAI 今日作品榜一页榜单内的公开图（动图与静图以榜单类型为准）",
+  "description.en": "Downloads public images from PixAI's daily artwork ranking feed (static vs animated per rank type).",
+  "description.ja": "PixAI の本日作品ランキングフィードから公開画像を取得します（静的/うごイラはランキング種別に依存）。",
+  "description.ko": "PixAI 오늘 작품 랭킹 피드의 공개 이미지를 받습니다(정지/움직임은 랭킹 유형에 따름).",
+  "description.zhtw": "取得 PixAI 今日作品榜單內的公開圖（依榜單類型為靜圖或動圖）。",
+  "userConfig": {
+    "crawl_type": "ranking",
+    "rank_type": "artwork",
+    "rank_period": "today"
+  }
+}

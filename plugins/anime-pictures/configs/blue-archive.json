@@ -1,17 +1,17 @@
 {
-  "name": "蔚蓝档案",
-  "name.en": "Blue Archive",
-  "name.ja": "ブルーアーカイブ",
-  "name.ko": "블루아카이브",
-  "name.zhtw": "蔚藍檔案",
-  "description": "蔚蓝档案图片，页数可配置(共约100页左右)",
-  "description.en": "Blue Archive images with page range configurable (about 100 pages)",
-  "description.ja": "ブルーアーカイブの画像をページ範囲を設定してクロール(約100ページぐらいある)",
-  "description.ko": "블루아카이브의 이미지를 페이지 범위를 설정하여 크롤링(약 100페이지 정도)",
-  "description.zhtw": "蔚藍檔案圖片，頁數可配置(約100頁左右)",
+  "name": "作品标签(例：蔚蓝档案)",
+  "name.en": "Work Tag (example: Blue Archive)",
+  "name.ja": "作品タグ（例：ブルーアーカイブ）",
+  "name.ko": "작품 태그 (예: 블루 아카이브)",
+  "name.zhtw": "作品標籤（例：蔚藍檔案）",
+  "description": "爬取一个作品的图片，通过标签参数调整作品，页数可配置。例为蔚蓝档案图片前10页，该主题共约100页左右",
+  "description.en": "Crawl images for a topic by tag; change the work via the tag parameter, page range is configurable. Example: first 10 pages of Blue Archive images; this topic has roughly 100 pages in total.",
+  "description.ja": "タグパラメータで作品を切り替え、ページ範囲を設定して画像をクロールします。例はブルーアーカイブ画像の先頭10ページで、このテーマは合計約100ページです。",
+  "description.ko": "태그 매개변수로 작품을 바꾸고, 페이지 범위를 설정해 이미지를 크롤링합니다. 예시는 블루 아카이브 이미지 앞 10페이지이며, 해당 주제는 약 100페이지 정도입니다.",
+  "description.zhtw": "透過標籤參數調整作品，可設定頁數範圍以爬取圖片。範例為蔚藍檔案圖片前 10 頁，該主題共約 100 頁左右。",
   "userConfig": {
     "startPage": 0,
-    "endPage": 10,
+    "endPage": 9,
     "tag": "ブルーアーカイブ"
   }
 }

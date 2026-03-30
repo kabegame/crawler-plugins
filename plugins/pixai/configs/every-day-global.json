@@ -1,0 +1,23 @@
+{
+  "name": "每日全站日榜（前 5 页）",
+  "name.en": "Daily global daily-ranking (5 pages)",
+  "name.ja": "毎日・全サイト日間ランキング（5ページ）",
+  "name.ko": "매일 전체 일간 랭킹(5페이지)",
+  "name.zhtw": "每日全站日榜（前 5 頁）",
+  "description": "每天按全站作品日榜排序抓取约 5 页，便于持续更新壁纸库。默认定时为每天 18:00 触发，导入运行配置后可在调度里改时间。",
+  "description.en": "Daily run: global stream by daily ranking, ~5 pages. Default schedule: 18:00 every day; change the time in the run config after import.",
+  "description.ja": "毎日、全サイトの日間ランキング順で約5ページ取得。デフォルトは毎日 18:00 実行。インポート後に実行設定のスケジュールで時刻を変更できます。",
+  "description.ko": "매일 전체 일간 랭킹 순으로 약 5페이지. 기본 스케줄은 매일 18:00. 가져온 뒤 실행 설정에서 시각을 바꿀 수 있습니다.",
+  "description.zhtw": "每日依全站作品日榜約抓 5 頁。預設排程為每天 18:00；匯入執行設定後可在排程中修改時間。",
+  "userConfig": {
+    "crawl_type": "global",
+    "artwork_sort": "daily_ranking",
+    "max_global_pages": 5,
+    "skip_artwork_pages": 0
+  },
+  "scheduleSpec": {
+    "mode": "daily",
+    "hour": 18,
+    "minute": 0
+  }
+}

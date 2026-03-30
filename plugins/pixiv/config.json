@@ -54,113 +54,12 @@
       "name.ja": "ユーザー UID",
       "name.ko": "사용자 UID",
       "name.zhtw": "用戶 UID",
-      "descripts": "收藏：被爬取用户 UID（仅用于 URL，与 PixivCrawler 一致不发送 x-user-id）。画师：登录账号 UID，对应 PixivCrawler 的 x-user-id，必填。",
-      "descripts.en": "Bookmarks: target user UID (URL only; no x-user-id, same as PixivCrawler). Artist: your account UID for x-user-id (required, like PixivCrawler user_config.user_id).",
-      "descripts.ja": "ブックマーク：対象ユーザー UID（URL のみ、PixivCrawler と同様 x-user-id なし）。作家：ログイン UID（x-user-id 用、必須）。",
-      "descripts.ko": "북마크: 대상 UID(URL만, PixivCrawler처럼 x-user-id 없음). 작가: 로그인 UID(x-user-id, 필수).",
-      "descripts.zhtw": "收藏：被爬取用戶 UID（僅 URL，與 PixivCrawler 一致不送 x-user-id）。畫師：登入帳號 UID（x-user-id，必填）。",
-      "when": { "source": ["bookmark", "user"] }
-    },
-    {
-      "key": "ranking_mode",
-      "type": "options",
-      "name": "排行榜类型",
-      "name.en": "Ranking mode",
-      "name.ja": "ランキング種別",
-      "name.ko": "랭킹 유형",
-      "name.zhtw": "排行榜類型",
-      "default": "daily",
-      "options": [
-        {
-          "name": "日榜",
-          "name.en": "Daily",
-          "name.ja": "日間",
-          "name.ko": "일간",
-          "name.zhtw": "日榜",
-          "variable": "daily"
-        },
-        {
-          "name": "周榜",
-          "name.en": "Weekly",
-          "name.ja": "週間",
-          "name.ko": "주간",
-          "name.zhtw": "週榜",
-          "variable": "weekly"
-        },
-        {
-          "name": "月榜",
-          "name.en": "Monthly",
-          "name.ja": "月間",
-          "name.ko": "월간",
-          "name.zhtw": "月榜",
-          "variable": "monthly"
-        },
-        {
-          "name": "男性向",
-          "name.en": "Male",
-          "name.ja": "男性向け",
-          "name.ko": "남성향",
-          "name.zhtw": "男性向",
-          "variable": "male"
-        },
-        {
-          "name": "女性向",
-          "name.en": "Female",
-          "name.ja": "女性向け",
-          "name.ko": "여성향",
-          "name.zhtw": "女性向",
-          "variable": "female"
-        },
-        {
-          "name": "AI 日榜",
-          "name.en": "AI Daily",
-          "name.ja": "AI 日間",
-          "name.ko": "AI 일간",
-          "name.zhtw": "AI 日榜",
-          "variable": "daily_ai"
-        },
-        {
-          "name": "日榜 R18",
-          "name.en": "Daily R18",
-          "name.ja": "日間 R18",
-          "name.ko": "일간 R18",
-          "name.zhtw": "日榜 R18",
-          "variable": "daily_r18"
-        },
-        {
-          "name": "周榜 R18",
-          "name.en": "Weekly R18",
-          "name.ja": "週間 R18",
-          "name.ko": "주간 R18",
-          "name.zhtw": "週榜 R18",
-          "variable": "weekly_r18"
-        },
-        {
-          "name": "男性向 R18",
-          "name.en": "Male R18",
-          "name.ja": "男性向け R18",
-          "name.ko": "남성향 R18",
-          "name.zhtw": "男性向 R18",
-          "variable": "male_r18"
-        },
-        {
-          "name": "女性向 R18",
-          "name.en": "Female R18",
-          "name.ja": "女性向け R18",
-          "name.ko": "여성향 R18",
-          "name.zhtw": "女性向 R18",
-          "variable": "female_r18"
-        },
-        {
-          "name": "AI 日榜 R18",
-          "name.en": "AI Daily R18",
-          "name.ja": "AI 日間 R18",
-          "name.ko": "AI 일간 R18",
-          "name.zhtw": "AI 日榜 R18",
-          "variable": "daily_r18_ai"
-        }
-      ],
-      "when": { "source": ["ranking"] }
+      "default": "",
+      "descripts": "何时必填：收藏＝被爬取用户 UID（仅拼 URL，不发 x-user-id）；画师＝你登录账号 UID（x-user-id，必填）；排行榜且年龄向选 R18＝你登录账号 UID（x-user-id，必填，并需在高级设置填 Cookie）。排行榜（全年龄）、关键词可不填。",
+      "descripts.en": "When required: Bookmarks = target user UID (URL only, no x-user-id). Artist = your account UID (x-user-id, required). Ranking + R18 age = your account UID (x-user-id, required; Cookie in Advanced). Safe ranking and keyword: optional.",
+      "descripts.ja": "必須になる場合：ブックマーク＝対象 UID（URL のみ）。作家＝ログイン UID（x-user-id 必須）。ランキング＋R18＝ログイン UID（x-user-id 必須・Cookie 要）。全年齢ランキング・キーワードは任意。",
+      "descripts.ko": "필수 시점: 북마크=대상 UID(URL만). 작가=로그인 UID(x-user-id 필수). 랭킹+R18=로그인 UID(x-user-id·Cookie). 전연령 랭킹·키워드는 선택.",
+      "descripts.zhtw": "何時必填：收藏＝被爬取用戶 UID（僅 URL）；畫師＝登入帳號 UID（x-user-id）；排行榜且 R18＝登入 UID（x-user-id，並需 Cookie）。全齡排行榜、關鍵字可留空。"
     },
     {
       "key": "content_mode",
@@ -205,46 +104,146 @@
           "variable": "ugoira"
         }
       ],
-      "when": {
-        "source": ["ranking"],
-        "ranking_mode": ["daily", "weekly", "monthly", "daily_ai"]
-      }
-    },
-    {
-      "key": "start_date",
-      "type": "date",
-      "format": "YYYYMMDD",
-      "dateMin": "2007-01-01",
-      "dateMax": "yesterday",
-      "name": "起始日期",
-      "name.en": "Start date",
-      "name.ja": "開始日",
-      "name.ko": "시작일",
-      "name.zhtw": "起始日期",
-      "descripts": "排行榜统计起始日（含当日），须不晚于结束日期",
-      "descripts.en": "First ranking calendar day (inclusive); must not be after end date",
-      "descripts.ja": "ランキング取得の開始日（当日含む）。終了日以降にできません",
-      "descripts.ko": "랭킹 시작일(당일 포함). 종료일보다 늦을 수 없음",
-      "descripts.zhtw": "排行榜統計起始日（含當日），須不晚於結束日期",
-      "default": "",
       "when": { "source": ["ranking"] }
     },
     {
-      "key": "end_date",
+      "key": "ranking_mode",
+      "type": "options",
+      "name": "榜序",
+      "name.en": "Ranking order",
+      "name.ja": "ランキング順",
+      "name.ko": "랭킹 순서",
+      "name.zhtw": "榜序",
+      "default": "daily",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "daily",
+          "when": { "content_mode": ["all", "illust", "manga", "ugoira"] }
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "weekly",
+          "when": { "content_mode": ["all", "illust", "manga", "ugoira"] }
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "monthly",
+          "when": { "content_mode": ["all", "illust", "manga"] }
+        },
+        {
+          "name": "新生榜",
+          "name.en": "Rookie",
+          "name.ja": "ルーキー",
+          "name.ko": "루키",
+          "name.zhtw": "新生榜",
+          "variable": "rookie",
+          "when": { "content_mode": ["all", "illust", "manga"] }
+        },
+        {
+          "name": "原创榜",
+          "name.en": "Original",
+          "name.ja": "オリジナル",
+          "name.ko": "오리지널",
+          "name.zhtw": "原創榜",
+          "variable": "original",
+          "when": { "content_mode": ["all"] }
+        },
+        {
+          "name": "AI 日榜",
+          "name.en": "AI Daily",
+          "name.ja": "AI 日間",
+          "name.ko": "AI 일간",
+          "name.zhtw": "AI 日榜",
+          "variable": "daily_ai",
+          "when": { "content_mode": ["all"] }
+        },
+        {
+          "name": "男性向",
+          "name.en": "Male",
+          "name.ja": "男性向け",
+          "name.ko": "남성향",
+          "name.zhtw": "男性向",
+          "variable": "male",
+          "when": { "content_mode": ["all"] }
+        },
+        {
+          "name": "女性向",
+          "name.en": "Female",
+          "name.ja": "女性向け",
+          "name.ko": "여성향",
+          "name.zhtw": "女性向",
+          "variable": "female",
+          "when": { "content_mode": ["all"] }
+        }
+      ],
+      "when": { "source": ["ranking"] }
+    },
+    {
+      "key": "age_mode",
+      "type": "options",
+      "name": "年龄向",
+      "name.en": "Age rating",
+      "name.ja": "年齢区分",
+      "name.ko": "연령",
+      "name.zhtw": "年齡向",
+      "default": "safe",
+      "descripts": "R18 需在「高级设置 → HTTP 头」填写有效 Cookie（含年龄认证），并在「用户 UID」填写登录账号 UID（x-user-id）。",
+      "descripts.en": "R18 needs Cookie in Advanced → HTTP headers and your account UID in User UID (x-user-id).",
+      "descripts.ja": "R18 は「詳細設定→HTTP ヘッダ」の Cookie と「ユーザー UID」にログイン UID（x-user-id）が必要です。",
+      "descripts.ko": "R18은 고급→HTTP 헤더 Cookie와「사용자 UID」에 로그인 UID(x-user-id)가 필요합니다.",
+      "descripts.zhtw": "R18 須在「進階設定→HTTP 標頭」填 Cookie，並在「用戶 UID」填登入帳號（x-user-id）。",
+      "options": [
+        {
+          "name": "全年龄",
+          "name.en": "General",
+          "name.ja": "全年齢",
+          "name.ko": "전연령",
+          "name.zhtw": "全年齡",
+          "variable": "safe"
+        },
+        {
+          "name": "R18",
+          "name.en": "R18",
+          "name.ja": "R18",
+          "name.ko": "R18",
+          "name.zhtw": "R18",
+          "variable": "r18"
+        }
+      ],
+      "when": {
+        "source": ["ranking"],
+        "ranking_mode": ["daily", "weekly", "daily_ai", "male", "female"]
+      }
+    },
+    {
+      "key": "ranking_date",
       "type": "date",
       "format": "YYYYMMDD",
       "dateMin": "2007-01-01",
       "dateMax": "yesterday",
-      "name": "结束日期",
-      "name.en": "End date",
-      "name.ja": "終了日",
-      "name.ko": "종료일",
-      "name.zhtw": "結束日期",
-      "descripts": "排行榜统计结束日（含当日），须不早于起始日期",
-      "descripts.en": "Last ranking calendar day (inclusive); must not be before start date",
-      "descripts.ja": "ランキング取得の終了日（当日含む）。開始日より前にできません",
-      "descripts.ko": "랭킹 종료일(당일 포함). 시작일보다 이전일 수 없음",
-      "descripts.zhtw": "排行榜統計結束日（含當日），須不早於起始日期",
+      "name": "排行榜日期",
+      "name.en": "Ranking date",
+      "name.ja": "ランキング日付",
+      "name.ko": "랭킹 날짜",
+      "name.zhtw": "排行榜日期",
+      "descripts": "留空则使用 Pixiv 当前最新一期；填写为 YYYYMMDD。日榜为当日；周榜、月榜以该日为基准向前一周或一月（与官网一致）。",
+      "descripts.en": "Empty = latest period from Pixiv. YYYYMMDD: daily = that day; weekly/monthly = period ending on that day.",
+      "descripts.ja": "空欄は最新期。YYYYMMDD：日間はその日、週間・月間はその日を含む期間。",
+      "descripts.ko": "비우면 최신 기간. YYYYMMDD: 일간은 해당일, 주간·월간은 해당일 기준 기간.",
+      "descripts.zhtw": "留空為最新一期；填寫為 YYYYMMDD。日榜為當日；週榜、月榜以該日為基準向前一週或一月。",
       "default": "",
       "when": { "source": ["ranking"] }
     },

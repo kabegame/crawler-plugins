@@ -63,7 +63,7 @@ Open the user’s profile on Pixiv. The numeric part in the URL (middle or end) 
 
 ## Crawl Types
 
-- **Rankings**: Download works by daily/weekly/monthly ranking for a given date.
+- **Rankings**: Ranking order + content + age rating; single `ranking_date` (empty = Pixiv returns the latest period).
 - **Bookmarks**: Download your public bookmarks.
 - **Artist works**: Download public works of a given artist.
 - **Keyword search**: Search by keyword and download.
@@ -72,7 +72,7 @@ Open the user’s profile on Pixiv. The numeric part in the URL (middle or end) 
 
 Fields depend on the selected mode:
 
-- **Rankings**: Ranking type, content type, start date, end date (inclusive; calendar UI, stored as `YYYYMMDD`).
+- **Rankings**: **Ranking order** (daily/weekly/monthly/rookie/original/AI daily/male/female); **content type** only for daily/weekly/monthly/rookie; **age rating** (safe/R18) when supported—R18 requires Cookie and **User UID** (`user_id` for `x-user-id`); **ranking date** `YYYYMMDD` (omit `date` param when empty). Pagination follows the **`next`** field in the JSON response (~500 entries max per ranking).
 - **Bookmarks**: User UID.
 - **Artist**: User UID, artist UID.
 - **Keyword**: Search keyword, search mode (safe / R18 / all), sort (by date / by popularity). **Keyword + sort lets you target exactly what you want.**
@@ -86,7 +86,7 @@ The script is **streaming**: it requests list APIs **page by page**, and for eac
 ### Behaviour summary
 
 1. **Rankings**  
-   Days from start to end; each day starts at `p=1` for `ranking.php?...&format=json`. Each `illust_id` in `contents` is **downloaded before** counting toward the cap. If a page request fails (e.g. **404**, no next page), that day’s paging stops and the next day continues if still under the cap. Fewer than **50** `contents` entries means last page for that day.
+   One period per run; `p=1` then follow **`next`** (next page number) until `next` is false or the cap is reached. If fewer than `num_artworks` were downloaded, the script emits a **`warn`**.
 
 2. **Bookmarks**  
    `limit=48` per page; after each response, **download** works on that page until the cap or no more bookmarks.
@@ -101,21 +101,19 @@ The script is **streaming**: it requests list APIs **page by page**, and for eac
 
 Cookie and mode-specific query values come from your form; dates are **`YYYYMMDD`** (no dashes).
 
-### Example A: Rankings (streaming, by day)
+### Example A: Rankings (streaming, `next` pagination)
 
 | Field | Example |
 |-------|---------|
 | Source | Rankings |
 | Ranking mode | Daily (`daily`) |
 | Content | All (`all`) |
-| Start / end date | e.g. `20240101`–`20240102` |
+| Age rating | Safe (`safe`) |
+| Ranking date | empty (latest) or `YYYYMMDD` |
 | Max artworks | `120` |
 
 **Flow**  
-For each calendar day, request  
-`https://www.pixiv.net/ranking.php?mode=daily&content=all&date=YYYYMMDD&p={p}&format=json`.  
-For each `illust_id` in `contents`: **finish that artwork’s** `pages` → `urls.original`, then increment the counter; at **120** the **whole task** ends. If `p=k` errors (including 404), no more pages that day; if still under 120, move to the next day.  
-This **replaces** the old “precompute `num_pages` from `num_artworks`” batch list phase.
+Request `ranking.php?mode=daily&content=all&p={p}&format=json` (add `&date=` when set). Use the `next` field in the response as the next page; stop when `next` is false or the cap is reached.
 
 ---
 
@@ -161,10 +159,11 @@ One request to `https://www.pixiv.net/ajax/user/87654321/profile/all?lang=zh`, t
 
 ---
 
-These four examples map to the four `source` values. R18 / weekly / monthly only change URL semantics. **Common rule:** cap is `num_artworks`; modes with paged lists are **streaming** (the next list page is only fetched when more artworks are still needed).
+These four examples map to the four `source` values. **Common rule:** cap is `num_artworks`; modes with paged lists are **streaming**.
 
 ## Notes
 
+- If the ranking run ends with fewer artworks than `num_artworks`, a **warn** is logged.
 - On 403 errors, try refreshing your cookie. Occasional 403 may be rate limiting; run the task again or download manually from the Surf page.
 - Refresh cookie when it expires.
 - Keywords support advanced syntax, e.g. `(Lucy OR 边缘行者) AND 5000users`.

@@ -4,7 +4,7 @@
   "name.en": "anime-pictures anime gallery",
   "name.ja": "anime-picturesアニメ図庫",
   "name.ko": "anime-pictures 애니메이션 갤러리",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "minAppVersion": "3.3.1",
   "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
   "description.zh": "anime-pictures动漫图库收集源插件（可按标签检索）",
