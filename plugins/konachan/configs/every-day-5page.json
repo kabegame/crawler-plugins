@@ -15,7 +15,7 @@
     "start_page": 1,
     "end_page": 5
   },
-  "scheduleEnabled": {
+  "scheduleSpec": {
     "mode": "daily",
     "hour": 16,
     "minute": 0

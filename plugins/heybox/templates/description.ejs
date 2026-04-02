@@ -1,0 +1,635 @@
+<% const m = metadata || {}; %>
+<%
+  const base = 'https://www.xiaoheihe.cn';
+  function esc(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  const XHH_EMOJI_IMG = JSON.parse(decodeURIComponent('%7B%22cube_%E6%B4%9B%E7%9A%84%E7%82%B9%E8%B5%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_176.png%22%2C%22cube_%E5%B1%B1%E5%A7%86%E6%97%A0%E5%A5%88%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_175.png%22%2C%22cube_%E7%82%92%E8%8F%9C%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_174.png%22%2C%22cube_%E7%BA%A2%E5%8C%85%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_173.png%22%2C%22cube_%E9%A9%AC%E5%B9%B4%E5%90%89%E7%A5%A5%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_172.png%22%2C%22cube_%E6%AF%94%E8%80%B6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_154.png%22%2C%22cube_%E7%8E%AB%E7%91%B0%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_156.png%22%2C%22cube_%E7%88%B1%E5%BF%83%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_155.png%22%2C%22cube_%E6%9F%A0%E6%AA%AC%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_153.png%22%2C%22cube_%E8%8F%9Cdoge%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_152.png%22%2C%22cube_%E5%90%83%E7%93%9C%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_151.png%22%2C%22cube_%E5%AE%B3%E7%BE%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_146.png%22%2C%22cube_2026%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_145.png%22%2C%22cube_%E5%96%9C%2B1%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_144.png%22%2C%22cube_%E6%9D%A5%E8%B4%A2%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_142.png%22%2C%22cube_%E6%88%91%E6%96%B9%E4%BA%86%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_143.png%22%2C%22cube_%E6%97%B6%E9%97%B4%E6%97%85%E8%80%85%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_141.png%22%2C%22cube_%E7%8C%9B%E7%94%B7%E5%BE%AE%E7%AC%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_136.png%22%2C%22cube_%E5%89%91%E6%98%9F%E6%B8%A1%E9%B8%A6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_135.png%22%2C%22cube_%E5%89%91%E6%98%9F%E4%BC%8A%E8%8A%99%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_133.png%22%2C%22cube_%E6%82%9F%E7%A9%BA%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_105.png%22%2C%22cube_%E5%90%83%E9%B8%A1%E5%95%A6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_115.png%22%2C%22cube_%E9%B8%A1%E6%AF%99%E4%BD%A0%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_116.png%22%2C%22cube_%E6%AF%81%E7%81%AD%E6%88%98%E5%A3%AB%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_131.png%22%2C%22cube_P%E7%9A%84%E8%B0%8E%E8%A8%80%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_132.png%22%2C%22cube_%E8%89%AF%E6%B0%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_111.png%22%2C%22cube_%E6%B5%AA%E4%BA%BA%E7%A0%8D%E4%B8%80%E5%88%80%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_114.png%22%2C%22cube_%E5%AC%89%E6%B0%B4%E5%A5%B3%E7%8E%8B%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_112.png%22%2C%22cube_%E6%AC%A7%E6%B6%A6%E5%90%89%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_134.png%22%2C%22cube_%2B1%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_161.png%22%2C%22cube_-1%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_162.png%22%2C%22cube_%E7%82%B9%E8%B5%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_163.png%22%2C%22cube_%E7%9B%92%E5%8D%81%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_164.png%22%2C%22cube_%E8%80%B6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_165.png%22%2C%22cube_%E9%BC%93%E6%8E%8C%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_166.png%22%2C%22cube_%E7%A2%B0%E6%8B%B3%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_171.png%22%2C%22cube_%E6%91%B8%E6%91%B8%E5%A4%B4%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_102.png%22%2C%22cube_%E7%94%B5%E7%89%9B%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_103.png%22%2C%22cube_%E6%91%98%E5%A2%A8%E9%95%9C%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_104.png%22%2C%22cube_%E7%AA%9D%E5%9B%8A%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_101.png%22%2C%22cube_%E5%B0%8F%E9%B8%A1%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_96.png%22%2C%22cube_%E5%83%B5%E5%B0%B8%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_95.png%22%2C%22cube_2025%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_113.png%22%2C%22cube_doge%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_13.png%22%2C%22cube_%E6%BB%91%E7%A8%BD%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_34.png%22%2C%22cube_%E6%84%9F%E5%8A%A8%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_24.png%22%2C%22cube_%E5%BE%AE%E7%AC%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_62.png%22%2C%22cube_%E4%B9%96%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_31.png%22%2C%22cube_%E6%89%93%E8%84%B8%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_51.png%22%2C%22cube_%E9%97%AD%E5%98%B4%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_55.png%22%2C%22cube_%E6%99%95%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_23.png%22%2C%22cube_%E7%AC%91cry%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_32.png%22%2C%22cube_%E5%96%9C%E6%AC%A2%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_14.png%22%2C%22cube_%E6%8D%82%E8%84%B8%E5%93%AD%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_22.png%22%2C%22cube_%E6%83%8A%E8%AE%B6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_16.png%22%2C%22cube_%E5%BC%80%E5%BF%83%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_21.png%22%2C%22cube_%E5%93%AD%E6%B3%A3%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_11.png%22%2C%22cube_%E9%85%B7%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_12.png%22%2C%22cube_%E5%9B%B0%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_54.png%22%2C%22cube_%E5%96%B7%E6%B0%B4%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_46.png%22%2C%22cube_%E8%B5%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_41.png%22%2C%22cube_%E5%AD%A6%E4%B9%A0%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_42.png%22%2C%22cube_%E7%94%9F%E6%B0%94%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_53.png%22%2C%22cube_%E7%9D%A1%E8%A7%89%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_66.png%22%2C%22cube_%E5%8F%B9%E6%B0%94%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_43.png%22%2C%22cube_%E6%91%8A%E6%89%8B%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_45.png%22%2C%22cube_%E5%90%90%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_56.png%22%2C%22cube_%E5%93%87%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_63.png%22%2C%22cube_%E5%B9%B6%E4%B8%8D%E7%AE%80%E5%8D%95%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_26.png%22%2C%22cube_%E5%A7%94%E5%B1%88%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_25.png%22%2C%22cube_%E5%8A%A0%E6%B2%B9%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_44.png%22%2C%22cube_%E5%87%84%E5%87%89%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_36.png%22%2C%22cube_%E6%B2%A7%E6%A1%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_35.png%22%2C%22cube_%E5%90%93%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_65.png%22%2C%22cube_%E5%92%95%E5%92%95%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_61.png%22%2C%22cube_%E9%BB%91%E4%BA%BA%E9%97%AE%E5%8F%B7%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_15-1.png%22%2C%22cube_%E6%80%92%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_33.png%22%2C%22cube_%E6%B1%97%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_64.png%22%2C%22cube_%E6%8F%A1%E8%8D%89%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_85.png%22%2C%22cube_%E9%B9%85%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_84.png%22%2C%22cube_wota%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_83.png%22%2C%22cube_%E6%AF%94%E5%BF%83%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_82.png%22%2C%22cube_%E6%88%91%E6%87%82%E4%BD%A0%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_76.png%22%2C%22cube_%E4%BD%A0%E6%87%82%E6%88%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_75.png%22%2C%22cube_%E5%BA%86%E7%A5%9D-%E5%9C%A3%E8%AF%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_74.png%22%2C%22cube_2023%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_71.png%22%2C%22cube_%E9%98%B3%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_81.png%22%2C%22cube_%E8%BF%99%E6%98%AF%E4%BB%80%E4%B9%88%E9%B8%9F%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_86.png%22%2C%22cube_%E5%BA%86%E7%A5%9D%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_73.png%22%2C%22cube_%E5%9C%A3%E8%AF%9E%E6%A0%91%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_72.png%22%2C%22cube_H%E5%B8%81%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_52.png%22%2C%22cube_%E8%B6%85%E4%BA%BA%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_94.png%22%2C%22cube_%E6%89%93%E5%92%A9%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_93.png%22%2C%22cube_%E4%B8%8A%E5%AD%A6-%E4%B8%A7%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_92.png%22%2C%22cube_%E4%B8%8A%E5%AD%A6-%E4%B9%90%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_91.png%22%2C%22cube_2024%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_106.png%22%2C%22cube_%E5%90%B9%E5%8F%A3%E5%93%A8%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_123.png%22%2C%22cube_%E5%A4%AA%E9%85%B7%E5%95%A6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_125.png%22%2C%22cube_%E8%9B%8B%E7%B3%95%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fcube_126.png%22%2C%22heygirl_%E5%96%9D%E5%A5%B6%E8%8C%B6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_43.png%22%2C%22heygirl_%E5%93%88%E5%93%88%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_36.png%22%2C%22heygirl_%E6%BB%91%E7%A8%BD%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_41.png%22%2C%22heygirl_%E5%BC%80%E5%8F%AF%E4%B9%90%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_35.png%22%2C%22heygirl_%E5%81%B7%E7%9C%8B%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_42.png%22%2C%22heygirl_%E6%8C%A8%E5%88%80%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_46.png%22%2C%22heygirl_%E8%AE%B0%E4%B8%8B%E6%9D%A5%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_45.png%22%2C%22heygirl_%E6%83%8A%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_44.png%22%2C%22heygirl_%E6%95%B2%E5%BC%80%E5%BF%83%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_34.png%22%2C%22heygirl_%E8%BF%99%E2%80%A6%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_33.png%22%2C%22heygirl_%E6%97%A0%E8%AF%AD%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_32.png%22%2C%22heygirl_%E8%8C%84%E5%8C%96%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_31.png%22%2C%22heygirl_%E5%90%83%E7%93%9C%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_26.png%22%2C%22heygirl_rua!%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_25.png%22%2C%22heygirl_%E7%A7%83%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_24.png%22%2C%22heygirl_%E8%8B%A6%E9%85%92%E5%85%A5%E5%96%89%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_23.png%22%2C%22heygirl_%E5%AE%B3%E7%BE%9E%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_22.png%22%2C%22heygirl_%E6%8D%8F%E8%84%B8%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_21.png%22%2C%22heygirl_%E5%96%9C%E6%AC%A2%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_16.png%22%2C%22heygirl_%E7%97%B4%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_15.png%22%2C%22heygirl_%E7%96%91%E9%97%AE%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_14.png%22%2C%22heygirl_%E7%99%BD%E5%AB%96%E6%80%AA%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_13.png%22%2C%22heygirl_%E5%93%AD%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_12.png%22%2C%22heygirl_%E8%AF%B6%E5%98%BF%22%3A%22https%3A%2F%2Fimgheybox.max-c.com%2Fheybox%2Femoji%2Fheygirl_11.png%22%2C%22grandemoji_%E5%81%9A%E4%B8%AA%E5%A5%BD%E6%A2%A6%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F20.png%22%2C%22grandemoji_%E5%91%80%E5%98%9E%E5%91%80%E5%98%9E%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F27.png%22%2C%22grandemoji_awsl%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F28.png%22%2C%22grandemoji_%E4%B8%87%E8%83%BD%E7%9B%92%E5%A8%98%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F25.png%22%2C%22grandemoji_%E6%95%B4%E6%8C%BA%E5%A5%BD%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F31.png%22%2C%22grandemoji_mur%E5%8C%96%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F26.png%22%2C%22grandemoji_%E6%91%B8%E4%B8%8D%E7%9D%80%E5%A4%B4%E8%84%91%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F30.png%22%2C%22grandemoji_%E7%9B%92%E5%BC%B9%E6%9D%A5%E8%A2%AD%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F22.png%22%2C%22grandemoji_%E4%BA%A4%E4%B8%AA%E6%9C%8B%E5%8F%8B%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F32.png%22%2C%22grandemoji_%E6%88%91%E5%BE%88%E5%8F%AF%E7%88%B1%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F18.png%22%2C%22grandemoji_%E8%BA%BA%E5%B9%B3%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F23.png%22%2C%22grandemoji_%E7%97%B4%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F17.png%22%2C%22grandemoji_%E7%BC%A9%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F19.png%22%2C%22grandemoji_%E5%95%A5%E7%8E%A9%E6%84%8F%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F21.png%22%2C%22grandemoji_%E7%88%AC%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F24.png%22%2C%22grandemoji_%E7%88%AC%E4%BA%86%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F29.png%22%2C%22bigemoji_%E6%AF%94%E5%BF%83%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F1.png%22%2C%22bigemoji_%E6%9A%97%E4%B8%AD%E8%A7%82%E5%AF%9F%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F2.png%22%2C%22bigemoji_%E6%BB%91%E7%A8%BD%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F3.png%22%2C%22bigemoji_%EF%BC%9F%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F4.png%22%2C%22bigemoji_%E5%BC%80%E5%8F%AF%E4%B9%90%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F16.png%22%2C%22bigemoji_%E5%96%9C%E5%8A%A0%E4%B8%80%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F14.png%22%2C%22bigemoji_%E5%93%88%E5%93%88%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F5.png%22%2C%22bigemoji_%E5%8E%89%E5%AE%B3%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F7.png%22%2C%22bigemoji_%E6%B1%82%E5%B8%A6%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F12.png%22%2C%22bigemoji_%E7%BE%A1%E6%85%95%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F8.png%22%2C%22bigemoji_%E5%90%83%E7%93%9C%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F11.png%22%2C%22bigemoji_%E6%89%93%E6%8A%98%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F13.png%22%2C%22bigemoji_%E5%A7%94%E5%B1%88%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F6.png%22%2C%22bigemoji_%E5%81%9A%E6%A2%A6%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F10.png%22%2C%22bigemoji_%E9%A3%8E%E7%BA%AA%E5%A7%94%E5%91%98%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F15.png%22%2C%22bigemoji_%E6%91%94%22%3A%22https%3A%2F%2Fcdn.max-c.com%2Fstickers%2Fheyboxgirl%2F9.png%22%7D'));
+  function xhhReplaceHeyboxEmojiSpans(html) {
+    if (!html || typeof html !== "string") return html;
+    return html.replace(
+      /<span\b[^>]*\bdata-emoji="([^"]+)"[^>]*>\s*<\/span>/gi,
+      function (_full, key) {
+        var url = XHH_EMOJI_IMG[key];
+        if (!url) return _full;
+        return (
+          '<img class="xhh-inline-emoji" src="' +
+          esc(url) +
+          '" alt="" title="' +
+          esc(key) +
+          '" loading="lazy" decoding="async" referrerpolicy="no-referrer" />'
+        );
+      }
+    );
+  }
+  function xhhReplaceHeyboxEmojiBrackets(plain) {
+    if (plain == null || plain === "") return "";
+    const s = String(plain);
+    const re = /\[([^\[\]]+)\]/g;
+    let out = "";
+    let last = 0;
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      out += esc(s.slice(last, m.index));
+      const key = m[1].trim();
+      const url = XHH_EMOJI_IMG[key];
+      if (url) {
+        out +=
+          '<img class="xhh-inline-emoji" src="' +
+          esc(url) +
+          '" alt="" title="' +
+          esc(key) +
+          '" loading="lazy" decoding="async" referrerpolicy="no-referrer" />';
+      } else {
+        out += esc(m[0]);
+      }
+      last = re.lastIndex;
+    }
+    out += esc(s.slice(last));
+    return out;
+  }
+  function xhhUnescapeIfHeyboxAnchorsEscaped(s) {
+    if (!s || typeof s !== "string") return s;
+    if (!/&lt;a\b/i.test(s) || !/data-user-id/i.test(s)) return s;
+    return s
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  }
+  function xhhRewriteHeyboxUserMentionAnchors(html) {
+    if (!html || typeof html !== "string") return html;
+    return html.replace(
+      /<a\b[^>]*\bdata-user-id="(\d+)"[^>]*>([^<]*)<\/a>/gi,
+      function (full, uid, label) {
+        if (!/\bhref="[^"]*xiaoheihe\.cn/i.test(full)) return full;
+        if (!/^\d+$/.test(String(uid))) return full;
+        const href = base + "/app/user/profile/" + uid;
+        return (
+          '<a class="xhh-mention" href="' +
+          esc(href) +
+          '" target="_blank" rel="noopener noreferrer">' +
+          esc(label) +
+          "</a>"
+        );
+      }
+    );
+  }
+  function xhhFormatCommentSnapshotText(raw) {
+    const s0 = raw == null ? "" : String(raw);
+    const s = xhhUnescapeIfHeyboxAnchorsEscaped(s0);
+    const re = /<a\b([^>]*)>([^<]*)<\/a>/gi;
+    let out = "";
+    let last = 0;
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      out += xhhReplaceHeyboxEmojiBrackets(s.slice(last, m.index));
+      last = re.lastIndex;
+      const attrs = m[1];
+      const label = m[2];
+      const userIdMatch = /\bdata-user-id="(\d+)"/.exec(attrs);
+      const hrefMatch = /\bhref="([^"]*)"/.exec(attrs);
+      const href = hrefMatch ? hrefMatch[1] : '';
+      if (userIdMatch && /xiaoheihe\.cn/i.test(href)) {
+        const uid = userIdMatch[1];
+        if (/^\d+$/.test(uid)) {
+          out +=
+            '<a class="xhh-mention" href="' +
+            esc(base + '/app/user/profile/' + uid) +
+            '" target="_blank" rel="noopener noreferrer">' +
+            esc(label) +
+            '</a>';
+          continue;
+        }
+      }
+      if (/\bdata-link-type\b/.test(attrs)) {
+        const appIconUrl = 'https://imgheybox.max-c.com/dev/bbs/2024/11/22/703c83c2b5afec463ea33d259104dd19.png';
+        out +=
+          '<a class="xhh-app-link" href="' + esc(href) + '">' +
+          '<img class="xhh-app-link-icon" src="' + esc(appIconUrl) + '" alt="" loading="lazy" referrerpolicy="no-referrer" />' +
+          esc(label) +
+          '</a>';
+        continue;
+      }
+      // fallback: show label text only
+      out += esc(label);
+    }
+    out += xhhReplaceHeyboxEmojiBrackets(s.slice(last));
+    return out;
+  }
+  function xhhFormatUnixTs(ts) {
+    const t = Number(ts);
+    if (!isFinite(t) || t <= 0) return "";
+    if (t > 1e12) return new Date(t).toLocaleString();
+    if (t > 1e9) return new Date(t * 1000).toLocaleString();
+    return new Date(t * 1000).toLocaleString();
+  }
+  console.log('metadata', m);
+  const titleHtml = m.title_html != null ? String(m.title_html) : '';
+  const titlePlain = m.title_plain != null ? String(m.title_plain).trim() : '';
+  const linkTitle = m.link_title != null ? String(m.link_title).trim() : '';
+  const shareUrl = m.share_url != null ? String(m.share_url).trim() : '';
+  const postIp = m.post_ip != null ? String(m.post_ip).trim() : '';
+  const postCreateAt = m.post_create_at != null ? Number(m.post_create_at) : 0;
+  const author = m.author && typeof m.author === 'object' ? m.author : {};
+  const aName = author.username != null ? String(author.username) : '';
+  const aId = author.userid != null ? String(author.userid) : '';
+  const aAvatar = author.avatar != null ? String(author.avatar) : '';
+  const aDeco = author.avatar_decoration != null ? String(author.avatar_decoration).trim() : '';
+  const aLevel = author.level != null ? Number(author.level) : 0;
+  const aFan = author.fan_num != null ? Number(author.fan_num) : 0;
+  const profileHref = aId ? `${base}/app/user/profile/${aId}` : '';
+  const tags = Array.isArray(m.tags) ? m.tags.map((t) => String(t)) : [];
+  const comments = Array.isArray(m.comments_snapshot) ? m.comments_snapshot : [];
+  const commentsMax = m.comments_max != null ? Number(m.comments_max) : 120;
+  const prHtml = m.post_render_html != null ? String(m.post_render_html) : '';
+  const prCss = m.post_render_css != null ? String(m.post_render_css) : '';
+  const crHtml = m.comments_render_html != null ? String(m.comments_render_html) : '';
+  const crCss = m.comments_render_css != null ? String(m.comments_render_css) : '';
+  const imgIdx = m.image_index != null ? Number(m.image_index) : 0;
+  const imgTot = m.image_total != null ? Number(m.image_total) : 0;
+  let postTimeStr = '';
+  if (postCreateAt > 1e12) {
+    postTimeStr = new Date(postCreateAt).toLocaleString();
+  } else if (postCreateAt > 1e9) {
+    postTimeStr = new Date(postCreateAt * 1000).toLocaleString();
+  } else if (postCreateAt > 0) {
+    postTimeStr = new Date(postCreateAt * 1000).toLocaleString();
+  }
+  const hasRichPost = prHtml.length > 0;
+  const hasRichComments = crHtml.length > 0;
+  const hasStructured = !!(titleHtml || titlePlain || aName || tags.length || shareUrl || postIp || postTimeStr);
+  const hasCommentsList = comments.length > 0;
+  const hasAny = hasRichPost || hasRichComments || hasStructured || hasCommentsList;
+  const prHtmlRich = hasRichPost
+    ? xhhRewriteHeyboxUserMentionAnchors(xhhReplaceHeyboxEmojiSpans(prHtml))
+    : prHtml;
+  const crHtmlRich = hasRichComments
+    ? xhhRewriteHeyboxUserMentionAnchors(xhhReplaceHeyboxEmojiSpans(crHtml))
+    : crHtml;
+  const titleHtmlRich = titleHtml
+    ? xhhRewriteHeyboxUserMentionAnchors(xhhReplaceHeyboxEmojiSpans(titleHtml))
+    : "";
+  const titlePlainRich = titlePlain ? xhhReplaceHeyboxEmojiBrackets(titlePlain) : "";
+  const linkTitleRich = linkTitle ? xhhReplaceHeyboxEmojiBrackets(linkTitle) : "";
+  const descText = m.description != null ? String(m.description).trim() : '';
+  const descTextRich = descText ? xhhReplaceHeyboxEmojiBrackets(descText) : '';
+%>
+<% if (!hasAny) { %>
+<p class="xhh-desc-empty" style="font-size:0.875rem;opacity:0.75;">暂无小黑盒详情元数据。</p>
+<% } else { %>
+<style>
+.xhh-desc-wrap {
+  unicode-bidi: isolate;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: inherit;
+  box-sizing: border-box;
+}
+.xhh-desc-wrap * { box-sizing: border-box; }
+.xhh-desc-wrap .xhh-panel {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--anime-text-primary, currentColor) 12%, transparent);
+}
+.xhh-desc-wrap .xhh-panel:last-child { margin-bottom: 0; }
+.xhh-desc-wrap .xhh-title-html {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--anime-text-primary, inherit);
+}
+.xhh-desc-wrap .xhh-title-html em { font-style: normal; font-weight: 700; opacity: 0.95; }
+.xhh-desc-wrap .xhh-author-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 0.3rem 0.65rem;
+  align-items: start;
+  margin-bottom: 0.5rem;
+}
+.xhh-desc-wrap .xhh-author-av-slot {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  align-self: start;
+}
+.xhh-desc-wrap .xhh-author-av-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.xhh-desc-wrap .xhh-author-av-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+}
+.xhh-desc-wrap .xhh-author-av {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.xhh-desc-wrap .xhh-author-av-deco {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 43px;
+  height: 43px;
+  margin-left: -21.5px;
+  margin-top: -21.5px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.xhh-desc-wrap .xhh-author-av-placeholder {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 10%, transparent);
+}
+.xhh-desc-wrap .xhh-author-info {
+  grid-column: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+.xhh-desc-wrap .xhh-author-line1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.45rem;
+  font-size: 0.875rem;
+}
+.xhh-desc-wrap .xhh-author-line2 {
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+  line-height: 1.35;
+}
+.xhh-desc-wrap .xhh-author-name {
+  font-weight: 600;
+  color: var(--anime-primary, inherit);
+  text-decoration: none;
+}
+.xhh-desc-wrap .xhh-author-name:hover { text-decoration: underline; }
+.xhh-desc-wrap .xhh-author-name-plain {
+  font-weight: 600;
+  color: var(--anime-text-primary, inherit);
+}
+.xhh-desc-wrap .xhh-author-lv {
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 8%, transparent);
+}
+.xhh-desc-wrap .xhh-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.35rem; }
+.xhh-desc-wrap .xhh-tag {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 8%, transparent);
+}
+.xhh-desc-wrap .xhh-meta-line { font-size: 0.8rem; color: var(--anime-text-secondary, inherit); margin-top: 0.35rem; }
+.xhh-desc-wrap .xhh-link { color: var(--anime-primary, inherit); word-break: break-all; }
+.xhh-desc-wrap a.xhh-mention {
+  color: var(--anime-primary, inherit);
+  text-decoration: none;
+  font-weight: 500;
+}
+.xhh-desc-wrap a.xhh-mention:hover { text-decoration: underline; }
+.xhh-desc-wrap .xhh-rich-host { margin-top: 0.5rem; overflow-x: auto; }
+.xhh-desc-wrap .xhh-cmt {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0.25rem 0.55rem;
+  align-items: start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 40%, transparent);
+}
+.xhh-desc-wrap .xhh-cmt:last-child { border-bottom: none; }
+.xhh-desc-wrap .xhh-cmt-av-slot {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: start;
+}
+.xhh-desc-wrap .xhh-cmt-av-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.xhh-desc-wrap .xhh-cmt-av-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+}
+.xhh-desc-wrap .xhh-cmt-av {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+.xhh-desc-wrap .xhh-cmt-av-deco {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  object-fit: contain;
+  pointer-events: none;
+}
+.xhh-desc-wrap .xhh-cmt-av-placeholder {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 10%, transparent);
+}
+.xhh-desc-wrap .xhh-cmt-line1 {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.45rem;
+  font-size: 0.8125rem;
+  min-width: 0;
+}
+.xhh-desc-wrap .xhh-cmt-line2 {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+  line-height: 1.35;
+}
+.xhh-desc-wrap .xhh-cmt-name {
+  font-weight: 600;
+  color: var(--anime-primary, inherit);
+  text-decoration: none;
+}
+.xhh-desc-wrap .xhh-cmt-name:hover { text-decoration: underline; }
+.xhh-desc-wrap .xhh-cmt-name-plain {
+  font-weight: 600;
+  color: var(--anime-text-primary, inherit);
+}
+.xhh-desc-wrap .xhh-cmt-lv {
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 8%, transparent);
+}
+.xhh-desc-wrap .xhh-cmt-meta {
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+}
+.xhh-desc-wrap .xhh-cmt-up {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, inherit);
+  white-space: nowrap;
+}
+.xhh-desc-wrap .xhh-cmt-up-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+  fill: currentColor;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.xhh-desc-wrap .xhh-cmt-body {
+  grid-column: 2;
+  grid-row: 3;
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+.xhh-desc-wrap .xhh-cmt-body-text {
+  min-width: 0;
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.xhh-desc-wrap .xhh-cmt-cy {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  object-fit: contain;
+  display: block;
+}
+.xhh-desc-wrap .xhh-cmt-imgs {
+  grid-column: 2;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 4px;
+  margin-top: 6px;
+}
+.xhh-desc-wrap .xhh-cmt-img-wrap {
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.xhh-desc-wrap .xhh-cmt-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.xhh-desc-wrap .xhh-note { font-size: 0.75rem; opacity: 0.75; margin-top: 0.35rem; }
+.xhh-desc-wrap .xhh-inline-emoji {
+  display: inline-block;
+  vertical-align: text-bottom;
+  width: 1.25em;
+  height: 1.25em;
+  object-fit: contain;
+  margin: 0 0.12em;
+}
+.xhh-desc-wrap .xhh-app-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  color: var(--anime-text-primary, inherit);
+}
+.xhh-desc-wrap .xhh-app-link-icon {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: text-bottom;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+</style>
+<div class="xhh-desc-wrap">
+  <% if (imgTot > 1) { %>
+  <% if (imgIdx > 0) { %>
+  <p class="xhh-note">本帖第 <%= imgIdx %> / <%= imgTot %> 张图（元数据为帖子级快照，各图相同）。</p>
+  <% } else { %>
+  <p class="xhh-note">本帖共 <%= imgTot %> 张图（详情为帖子级共享元数据）。</p>
+  <% } %>
+  <% } %>
+
+  <% if (hasRichPost && prCss) { %>
+  <style><%= prCss %></style>
+  <% } %>
+  <% if (hasRichPost) { %>
+  <div class="xhh-panel xhh-rich-host" data-xhh="post-rich">
+    <%- prHtmlRich %>
+  </div>
+  <% } else { %>
+  <div class="xhh-panel" data-xhh="post-structured">
+    <% if (aName || aAvatar || (aFan > 0 && isFinite(aFan))) { %>
+    <div class="xhh-author-row">
+      <div class="xhh-author-av-slot">
+        <% if (profileHref) { %><a class="xhh-author-av-link" href="<%= esc(profileHref) %>" target="_blank" rel="noopener noreferrer"><% } %>
+        <span class="xhh-author-av-wrap">
+          <% if (aAvatar) { %>
+          <img class="xhh-author-av" src="<%= esc(aAvatar) %>" alt="" referrerpolicy="no-referrer" />
+          <% } else { %>
+          <div class="xhh-author-av-placeholder" aria-hidden="true"></div>
+          <% } %>
+          <% if (aDeco) { %>
+          <img class="xhh-author-av-deco" src="<%= esc(aDeco) %>" alt="" referrerpolicy="no-referrer" />
+          <% } %>
+        </span>
+        <% if (profileHref) { %></a><% } %>
+      </div>
+      <div class="xhh-author-info">
+        <div class="xhh-author-line1">
+          <% if (aName) { %>
+          <% if (profileHref) { %>
+          <a class="xhh-author-name" href="<%= esc(profileHref) %>" target="_blank" rel="noopener noreferrer"><%= esc(aName) %></a>
+          <% } else { %>
+          <span class="xhh-author-name-plain"><%= esc(aName) %></span>
+          <% } %>
+          <% } %>
+          <% if (aLevel > 0) { %><span class="xhh-author-lv">Lv.<%= esc(String(aLevel)) %></span><% } %>
+        </div>
+        <% if (aFan > 0 && isFinite(aFan)) { %>
+        <div class="xhh-author-line2"><span class="xhh-author-fans"><%= esc(String(Math.floor(aFan))) %> 粉丝</span></div>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+    <% if (titleHtml) { %>
+    <div class="xhh-title-html"><%- titleHtmlRich %></div>
+    <% } else if (titlePlain) { %>
+    <div class="xhh-title-html"><%- titlePlainRich %></div>
+    <% } else if (linkTitle) { %>
+    <div class="xhh-title-html"><%- linkTitleRich %></div>
+    <% } %>
+    <% if (tags.length) { %>
+    <div class="xhh-tags">
+      <% for (const tg of tags) { %><span class="xhh-tag"><%= esc(tg) %></span><% } %>
+    </div>
+    <% } %>
+    <div class="xhh-meta-line">
+      <% if (postTimeStr) { %>发布时间：<%= esc(postTimeStr) %><% } %>
+      <% if (postIp) { %><% if (postTimeStr) { %> · <% } %>IP：<%= esc(postIp) %><% } %>
+    </div>
+    <% if (descTextRich) { %>
+    <div class="xhh-meta-line" style="white-space:pre-wrap;"><%- descTextRich %></div>
+    <% } %>
+    <% if (shareUrl) { %>
+    <div class="xhh-meta-line"><a class="xhh-link" href="<%= esc(shareUrl) %>" target="_blank" rel="noopener noreferrer">打开小黑盒分享页</a></div>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (hasRichComments && crCss) { %>
+  <style><%= crCss %></style>
+  <% } %>
+  <% if (hasRichComments) { %>
+  <div class="xhh-panel xhh-rich-host" data-xhh="comments-rich">
+    <div class="xhh-title-html" style="font-size:0.95rem;margin-bottom:0.5rem;">评论（页面快照）</div>
+    <%- crHtmlRich %>
+  </div>
+  <% } else if (hasCommentsList) { %>
+  <div class="xhh-panel" data-xhh="comments-list">
+    <div class="xhh-title-html" style="font-size:0.95rem;margin-bottom:0.5rem;">评论快照</div>
+    <% const xhhCyMarkUrl = 'https://imgheybox.max-c.com/oa/2024/10/31/ce360d2affd7976e27e5c68a3de676c7.png'; %>
+    <% for (const c of comments) { %>
+    <%
+      const cIsCy = c.is_cy === true || Number(c.is_cy) === 1;
+      const cAvatar = c.avatar != null ? String(c.avatar).trim() : '';
+      const cName = c.username != null ? String(c.username) : '';
+      const cUid = c.userid != null ? String(c.userid).trim() : '';
+      const cProfile = cUid ? `${base}/app/user/profile/${cUid}` : '';
+      const cDeco = c.avatar_decoration != null ? String(c.avatar_decoration).trim() : '';
+      const cLv = c.level != null ? Number(c.level) : 0;
+      const cUp = c.up != null ? Number(c.up) : 0;
+      const cTimeStr = xhhFormatUnixTs(c.create_at);
+    %>
+    <div class="xhh-cmt">
+      <div class="xhh-cmt-av-slot">
+        <% if (cProfile) { %><a class="xhh-cmt-av-link" href="<%= esc(cProfile) %>" target="_blank" rel="noopener noreferrer"><% } %>
+        <span class="xhh-cmt-av-wrap">
+          <% if (cAvatar) { %>
+          <img class="xhh-cmt-av" src="<%= esc(cAvatar) %>" alt="" referrerpolicy="no-referrer" />
+          <% } else { %>
+          <div class="xhh-cmt-av-placeholder" aria-hidden="true"></div>
+          <% } %>
+          <% if (cDeco) { %>
+          <img class="xhh-cmt-av-deco" src="<%= esc(cDeco) %>" alt="" referrerpolicy="no-referrer" />
+          <% } %>
+        </span>
+        <% if (cProfile) { %></a><% } %>
+      </div>
+      <div class="xhh-cmt-line1">
+        <% if (cProfile) { %>
+        <a class="xhh-cmt-name" href="<%= esc(cProfile) %>" target="_blank" rel="noopener noreferrer"><%= esc(cName) %></a>
+        <% } else { %>
+        <span class="xhh-cmt-name-plain"><%= esc(cName) %></span>
+        <% } %>
+        <% if (cLv > 0) { %><span class="xhh-cmt-lv">Lv.<%= esc(String(cLv)) %></span><% } %>
+        <% if (c.is_reply) { %><span class="xhh-cmt-meta">· 回复 <% if (c.reply_to_username) { %><%= esc(String(c.reply_to_username)) %><% } %></span><% } %>
+        <% if (c.floor_num) { %><span class="xhh-cmt-meta">· #<%= esc(String(c.floor_num)) %></span><% } %>
+        <span class="xhh-cmt-up" title="赞"><svg class="xhh-cmt-up-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M832 364.8h-147.2s19.2-64 32-179.2c6.4-57.6-38.4-115.2-102.4-121.6h-12.8c-51.2 0-83.2 32-102.4 76.8l-38.4 96c-32 64-57.6 102.4-76.8 115.2-25.6 12.8-121.6 12.8-128 12.8H128c-38.4 0-64 25.6-64 57.6v480c0 32 25.6 57.6 64 57.6h646.4c96 0 121.6-64 134.4-153.6l51.2-307.2c6.4-70.4-6.4-134.4-128-134.4z m-576 537.6H128V422.4h128v480z m640-409.6l-51.2 307.2c-12.8 57.6-12.8 102.4-76.8 102.4H320V422.4c44.8 0 70.4-6.4 89.6-19.2 32-12.8 64-64 108.8-147.2 25.6-64 38.4-96 44.8-102.4 6.4-19.2 19.2-32 44.8-32h6.4c32 0 44.8 32 44.8 51.2-12.8 102.4-32 166.4-32 166.4l-25.6 83.2h243.2c19.2 0 32 0 44.8 12.8 12.8 12.8 6.4 38.4 6.4 57.6z"></path></svg><%= esc(String(cUp)) %></span>
+      </div>
+      <div class="xhh-cmt-line2">
+        <% if (cTimeStr) { %><span class="xhh-cmt-time"><%= esc(cTimeStr) %></span><% } %>
+        <% if (c.ip_location) { %><span class="xhh-cmt-ip"><% if (cTimeStr) { %> · <% } %><%= esc(String(c.ip_location)) %></span><% } %>
+      </div>
+      <div class="xhh-cmt-body">
+        <% if (cIsCy) { %>
+        <img class="xhh-cmt-cy" src="<%= esc(xhhCyMarkUrl) %>" alt="" title="插眼" referrerpolicy="no-referrer" />
+        <% } %>
+        <span class="xhh-cmt-body-text"><%- xhhFormatCommentSnapshotText(c.text != null ? String(c.text) : "") %></span>
+      </div>
+      <% if (c.imgs && c.imgs.length > 0) { %>
+      <div class="xhh-cmt-imgs">
+        <% for (const img of c.imgs) { %>
+        <% const imgSrc = img.thumb || img.url; %>
+        <% if (imgSrc) { %>
+        <div class="xhh-cmt-img-wrap">
+          <img class="xhh-cmt-img" src="<%= esc(String(imgSrc)) %>" alt="" referrerpolicy="no-referrer" />
+        </div>
+        <% } %>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+    <% } %>
+    <% if (comments.length >= commentsMax) { %>
+    <p class="xhh-note">仅保留前 <%= commentsMax %> 条，完整列表以当时接口为准。</p>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+<% } %>

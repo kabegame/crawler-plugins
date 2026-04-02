@@ -92,6 +92,12 @@ fn download_illust(illust_id) {
         } else {
             illust_id.to_string()
         };
+        let meta_id = if illust_body != () {
+            let trimmed = pixiv_trim_illust_body(illust_body);
+            create_image_metadata(#{ body: trimmed })
+        } else {
+            create_image_metadata(#{ illustId: illust_id })
+        };
         let i = 0;
         let page_idx = 0;
         while i < body.len() {
@@ -106,12 +112,7 @@ fn download_illust(illust_id) {
                     } else {
                         base
                     };
-                    if illust_body != () {
-                        let trimmed = pixiv_trim_illust_body(illust_body);
-                        download_image(orig, #{ name: disp, metadata: #{ body: trimmed } });
-                    } else {
-                        download_image(orig, #{ name: disp, metadata: #{ illustId: illust_id } });
-                    }
+                    download_image(orig, #{ name: disp, metadata_id: meta_id });
                 }
             }
             i += 1;

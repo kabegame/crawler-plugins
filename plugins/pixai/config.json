@@ -86,9 +86,7 @@
         }
       ],
       "when": {
-        "crawl_type": [
-          "ranking"
-        ]
+        "crawl_type": ["ranking"]
       }
     },
     {
@@ -123,9 +121,7 @@
         }
       ],
       "when": {
-        "crawl_type": [
-          "ranking"
-        ]
+        "crawl_type": ["ranking"]
       }
     },
     {
@@ -139,13 +135,8 @@
       "min": 1,
       "max": 50,
       "when": {
-        "crawl_type": [
-          "ranking"
-        ],
-        "rank_type": [
-          "model",
-          "lora"
-        ]
+        "crawl_type": ["ranking"],
+        "rank_type": ["model", "lora"]
       }
     },
     {
@@ -208,9 +199,7 @@
         }
       ],
       "when": {
-        "crawl_type": [
-          "model"
-        ]
+        "crawl_type": ["model"]
       }
     },
     {
@@ -221,9 +210,7 @@
       "min": 1,
       "max": 50,
       "when": {
-        "crawl_type": [
-          "model"
-        ]
+        "crawl_type": ["model"]
       }
     },
     {
@@ -241,9 +228,7 @@
       "min": 0,
       "max": 49,
       "when": {
-        "crawl_type": [
-          "model"
-        ]
+        "crawl_type": ["model"]
       }
     },
     {
@@ -306,12 +291,7 @@
         }
       ],
       "when": {
-        "crawl_type": [
-          "global",
-          "model",
-          "tag",
-          "author"
-        ]
+        "crawl_type": ["global", "model", "tag", "author"]
       }
     },
     {
@@ -327,9 +307,7 @@
       "descripts.ko": "PixAI 사용자 ID(숫자 문자열)를 입력하세요. 사용자 페이지 URL에서 확인할 수 있습니다",
       "default": "",
       "when": {
-        "crawl_type": [
-          "author"
-        ]
+        "crawl_type": ["author"]
       }
     },
     {
@@ -357,9 +335,7 @@
         }
       ],
       "when": {
-        "crawl_type": [
-          "author"
-        ]
+        "crawl_type": ["author"]
       }
     },
     {
@@ -377,12 +353,7 @@
       "min": 0,
       "max": 199,
       "when": {
-        "crawl_type": [
-          "global",
-          "model",
-          "tag",
-          "author"
-        ]
+        "crawl_type": ["global", "model", "tag", "author"]
       }
     },
     {
@@ -396,9 +367,7 @@
       "min": 1,
       "max": 200,
       "when": {
-        "crawl_type": [
-          "global"
-        ]
+        "crawl_type": ["global"]
       }
     },
     {
@@ -409,9 +378,7 @@
       "min": 1,
       "max": 50,
       "when": {
-        "crawl_type": [
-          "model"
-        ]
+        "crawl_type": ["model"]
       }
     },
     {
@@ -425,16 +392,10 @@
       "descripts.en": "Enter PixAI tag codeNames (e.g. spy_x_family, genshin_impact), found in pixai.art tag page URLs",
       "descripts.ja": "PixAI タグの codeName を入力（例: spy_x_family、genshin_impact）。pixai.art のタグページ URL で確認できます",
       "descripts.ko": "PixAI 태그 codeName 입력 (예: spy_x_family, genshin_impact). pixai.art 태그 페이지 URL에서 확인 가능",
-      "default": [
-        "genshin_impact",
-        "honkai_star_rail",
-        "zenless_zone_zero"
-      ],
+      "default": ["genshin_impact", "honkai_star_rail", "stella_sora"],
       "options": null,
       "when": {
-        "crawl_type": [
-          "tag"
-        ]
+        "crawl_type": ["tag"]
       }
     },
     {
@@ -448,9 +409,7 @@
       "min": 1,
       "max": 50,
       "when": {
-        "crawl_type": [
-          "tag"
-        ]
+        "crawl_type": ["tag"]
       }
     },
     {
@@ -464,9 +423,7 @@
       "min": 1,
       "max": 200,
       "when": {
-        "crawl_type": [
-          "author"
-        ]
+        "crawl_type": ["author"]
       }
     }
   ]
