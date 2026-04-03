@@ -74,6 +74,14 @@ fn xhh_challenge_exit(where_msg, status_val) {
     throw where_msg + " status=" + st + "。已触发小黑盒风控/验证码，请切换网络或代理 IP 后重试。";
 }
 
+// fast_crawl 为 true 时不休眠（与 config.json「快速爬取」一致）
+fn xhh_sleep_unless_fast(fast, lo, hi) {
+    if fast == true {
+        return;
+    }
+    sleep(rand_f64(lo, hi));
+}
+
 fn xhh_coerce_str(v) {
     if v == () {
         return "";
@@ -319,7 +327,7 @@ fn xhh_flatten_comments(tr, max_n) {
 
 // 爬取单个帖子（通过 link_id）；item_weight 为进度权重（单帖调用时传 100.0）
 // 注意：Rhai 函数体内不能读取脚本顶层 const / 注入变量，路径与开关须由调用方传入
-fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path_original, fetch_comment_images) {
+fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path_original, fetch_comment_images, fast_crawl) {
     let tree_extra = "link_id=" + url_encode(link_id) + "&is_first=1&page=1&index=1&limit=20&owner_only=0";
     let tree_url = signed_url(api_host, path_tree, COMMON_PARAMS, tree_extra);
     let tree = fetch_json(tree_url);
@@ -512,7 +520,7 @@ fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path
         add_progress(delta_per_image);
         k += 1;
 
-        sleep(rand_f64(8.0, 14.0));
+        xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
     }
 
     if fetch_comment_images {
@@ -580,7 +588,7 @@ fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path
                 } else {
                     warn("original/image 失败(评论图) link_id=" + link_id + " status=" + orig["status"].to_string());
                 }
-                sleep(rand_f64(8.0, 14.0));
+                xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
             }
         }
     }
@@ -619,7 +627,7 @@ if crawl_mode == "single_post" {
         throw "无法从 URL 中提取 link_id，请确认这是小黑盒帖子分享链接";
     }
     print(`[小黑盒] 单帖子模式：link_id=${link_id}`);
-    xhh_crawl_post(link_id, 100.0, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images);
+    xhh_crawl_post(link_id, 100.0, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, fast_crawl);
     print("[小黑盒] 任务结束");
     return;
 }
@@ -661,7 +669,7 @@ while page <= end_page {
         warn("第 " + page.to_string() + " 页无搜索结果");
         add_progress(page_weight);
         page += 1;
-        sleep(rand_f64(0.8, 2.0));
+        xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
         continue;
     }
 
@@ -683,7 +691,7 @@ while page <= end_page {
         warn("第 " + page.to_string() + " 页无含 link_id 的有效帖子");
         add_progress(page_weight);
         page += 1;
-        sleep(rand_f64(0.8, 2.0));
+        xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
         continue;
     }
 
@@ -700,13 +708,13 @@ while page <= end_page {
             let lid = info["linkid"];
             if lid != () { link_id = lid.to_string(); }
         }
-        xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images);
+        xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, fast_crawl);
         j += 1;
     }
 
     print("第 " + page.to_string() + " 页处理完成");
     page += 1;
-    sleep(rand_f64(8.0, 14.0));
+    xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
 }
 
 print("[小黑盒] 任务结束");

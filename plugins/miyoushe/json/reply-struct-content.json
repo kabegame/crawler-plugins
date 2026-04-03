@@ -1,0 +1,15 @@
+[
+  { "insert": "_(阿姬惊讶)" },
+  { "insert": " 不错呀 " },
+  { "insert": { "mention": { "uid": 378227958, "nickname": "原神千星奇域" } } },
+  { "insert": " 可以" },
+  { "insert": "_(站住)" },
+  { "insert": "\n" },
+  {
+    "insert": {
+      "image": "https://upload-bbs.miyoushe.com/upload/2026/04/03/288487832/2b5e421255369a665f01c8f650391270_8745755397159460268.png"
+    },
+    "attributes": { "height": 1732, "width": 2180 }
+  },
+  { "insert": "不错不错\n" }
+]

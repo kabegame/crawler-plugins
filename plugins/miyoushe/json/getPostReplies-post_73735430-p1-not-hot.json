@@ -1,0 +1,1074 @@
+{
+  "retcode": 0,
+  "message": "OK",
+  "data": {
+    "list": [
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2029237326580469760",
+          "uid": "308073990",
+          "r_uid": "0",
+          "content": "好好看_(爱芮-兴奋)_(爱芮-自信)",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 1,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1772642854,
+          "updated_at": 1772642855,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"好好看_(爱芮-兴奋)_(爱芮-自信)\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "308073990",
+          "nickname": "Futlali",
+          "introduce": "",
+          "avatar": "",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 5,
+            "exp": 1562
+          },
+          "avatar_url": "https://upload-bbs.miyoushe.com/upload/2025/04/04/308073990/70f6a2a18ce51bee49a752761db03235_2980596255394560175.jpg",
+          "pendant": "https://upload-bbs.mihoyo.com/upload/2021/02/10/617e0aaca2e5bd0b5effe87c15eaeeff_2024034687911830229.png",
+          "ip_region": "陕西",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": {
+            "assets_id": "1807967381478285312",
+            "bg_color": "f6f6f6",
+            "url": "https://bbs-static.miyoushe.com/static/2024/07/02/a865e1251ca78fbf4234bfdf9a2d7a56_8055954014184177150.png",
+            "name": "绝区零开服纪念评论装扮",
+            "animation_effects_gif_url": "",
+            "animation_effects_pag_url": ""
+          }
+        },
+        "stat": {
+          "reply_num": 1,
+          "like_num": 3,
+          "sub_num": 1,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [
+          {
+            "reply": {
+              "game_id": 8,
+              "post_id": "73735430",
+              "reply_id": "2029569510166417408",
+              "uid": "297161169",
+              "r_uid": "308073990",
+              "content": "那可不_(星谷米游姬-就是你啦)_(星谷米游姬-就是你啦)",
+              "f_forum_id": 57,
+              "f_reply_id": "2029237326580469760",
+              "floor_id": 1,
+              "is_deleted": 0,
+              "delete_src": 0,
+              "created_at": 1772722053,
+              "updated_at": 1772722053,
+              "deleted_at": 0,
+              "struct_content": "[{\"insert\":\"那可不_(星谷米游姬-就是你啦)_(星谷米游姬-就是你啦)\"}]",
+              "structured_content_rows": [],
+              "is_top": false,
+              "has_block_word": false,
+              "overt_status": 0,
+              "is_showing_missing": false,
+              "selected_comment_time": 0,
+              "is_mentor": false,
+              "view_status": 0,
+              "reply_extra": null
+            },
+            "user": {
+              "uid": "297161169",
+              "nickname": "琪亚娜小猫咪",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 1627
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+              "ip_region": "福建",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": {
+                "avatar_type": 3,
+                "avatar_assets_id": "2003020799727951872",
+                "resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/ae0198f7f942cbeecc367e570c74cc25_671101449471804047.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/a6e60328f2d4dbf5785d04dd27194fa6_2069503313059881721.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/bc3ff7728f5924d213e71f0ade15e247_2425222437274854251.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ],
+                "hd_resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/2b7c63b8d0bdf956ee5e8b04db403ad7_5928253525582704110.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/6c1da5e5b04583b99ff5542a695f19db_1079381538343371170.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_450133724412110645.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ]
+              },
+              "is_super_fan": false,
+              "reply_bubble": {
+                "assets_id": "2016825437925195776",
+                "bg_color": "fde2df",
+                "url": "https://bbs-static.miyoushe.com/static/2026/01/29/cf0866a9d21722f939dda4489b95ddc9_531946969762495398.png",
+                "name": "绝区零「妄想启动！」",
+                "animation_effects_gif_url": "",
+                "animation_effects_pag_url": ""
+              }
+            },
+            "stat": {
+              "reply_num": 0,
+              "like_num": 2,
+              "sub_num": 0,
+              "dislike_num": 0
+            },
+            "self_operation": {
+              "attitude": 0,
+              "reply_vote_attitude": 0
+            },
+            "master_status": {
+              "is_official_master": false,
+              "is_user_master": false
+            },
+            "images": [],
+            "sub_replies": [],
+            "is_lz": true,
+            "sub_reply_count": 0,
+            "r_user": {
+              "uid": "308073990",
+              "nickname": "Futlali",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 1562
+              },
+              "avatar_url": "https://upload-bbs.miyoushe.com/upload/2025/04/04/308073990/70f6a2a18ce51bee49a752761db03235_2980596255394560175.jpg",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2021/02/10/617e0aaca2e5bd0b5effe87c15eaeeff_2024034687911830229.png",
+              "ip_region": "",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": null,
+              "is_super_fan": false,
+              "reply_bubble": null
+            },
+            "r_reply": null,
+            "r_post": null,
+            "user_game_info": null,
+            "reply_full_extra": null
+          }
+        ],
+        "is_lz": false,
+        "sub_reply_count": 1,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      },
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2029533582501638144",
+          "uid": "318978680",
+          "r_uid": "0",
+          "content": "谢谢，已取",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 2,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1772713487,
+          "updated_at": 1772713488,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"谢谢，已取\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "318978680",
+          "nickname": "绯英单推人",
+          "introduce": "",
+          "avatar": "",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 5,
+            "exp": 2120
+          },
+          "avatar_url": "https://upload-bbs.miyoushe.com/upload/2025/11/04/318978680/25c77bb05eb80c2d86458c284d5363db_8177048620575840004.png",
+          "pendant": "https://bbs-static.miyoushe.com/static/2023/09/27/549f1034c4ef45c3d17dc1fd5773a601_824798917743388249.png",
+          "ip_region": "山东",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": null
+        },
+        "stat": {
+          "reply_num": 1,
+          "like_num": 2,
+          "sub_num": 1,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [
+          {
+            "reply": {
+              "game_id": 8,
+              "post_id": "73735430",
+              "reply_id": "2029569444565143552",
+              "uid": "297161169",
+              "r_uid": "318978680",
+              "content": "_(米游姬 抛心心)",
+              "f_forum_id": 57,
+              "f_reply_id": "2029533582501638144",
+              "floor_id": 2,
+              "is_deleted": 0,
+              "delete_src": 0,
+              "created_at": 1772722037,
+              "updated_at": 1772722038,
+              "deleted_at": 0,
+              "struct_content": "[{\"insert\":\"_(米游姬 抛心心)\"}]",
+              "structured_content_rows": [],
+              "is_top": false,
+              "has_block_word": false,
+              "overt_status": 0,
+              "is_showing_missing": false,
+              "selected_comment_time": 0,
+              "is_mentor": false,
+              "view_status": 0,
+              "reply_extra": null
+            },
+            "user": {
+              "uid": "297161169",
+              "nickname": "琪亚娜小猫咪",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 1627
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+              "ip_region": "福建",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": {
+                "avatar_type": 3,
+                "avatar_assets_id": "2003020799727951872",
+                "resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/ae0198f7f942cbeecc367e570c74cc25_671101449471804047.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/a6e60328f2d4dbf5785d04dd27194fa6_2069503313059881721.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/bc3ff7728f5924d213e71f0ade15e247_2425222437274854251.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ],
+                "hd_resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/2b7c63b8d0bdf956ee5e8b04db403ad7_5928253525582704110.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/6c1da5e5b04583b99ff5542a695f19db_1079381538343371170.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_450133724412110645.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ]
+              },
+              "is_super_fan": false,
+              "reply_bubble": {
+                "assets_id": "2016825437925195776",
+                "bg_color": "fde2df",
+                "url": "https://bbs-static.miyoushe.com/static/2026/01/29/cf0866a9d21722f939dda4489b95ddc9_531946969762495398.png",
+                "name": "绝区零「妄想启动！」",
+                "animation_effects_gif_url": "",
+                "animation_effects_pag_url": ""
+              }
+            },
+            "stat": {
+              "reply_num": 0,
+              "like_num": 2,
+              "sub_num": 0,
+              "dislike_num": 0
+            },
+            "self_operation": {
+              "attitude": 0,
+              "reply_vote_attitude": 0
+            },
+            "master_status": {
+              "is_official_master": false,
+              "is_user_master": false
+            },
+            "images": [],
+            "sub_replies": [],
+            "is_lz": true,
+            "sub_reply_count": 0,
+            "r_user": {
+              "uid": "318978680",
+              "nickname": "绯英单推人",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 2120
+              },
+              "avatar_url": "https://upload-bbs.miyoushe.com/upload/2025/11/04/318978680/25c77bb05eb80c2d86458c284d5363db_8177048620575840004.png",
+              "pendant": "https://bbs-static.miyoushe.com/static/2023/09/27/549f1034c4ef45c3d17dc1fd5773a601_824798917743388249.png",
+              "ip_region": "",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": null,
+              "is_super_fan": false,
+              "reply_bubble": null
+            },
+            "r_reply": null,
+            "r_post": null,
+            "user_game_info": null,
+            "reply_full_extra": null
+          }
+        ],
+        "is_lz": false,
+        "sub_reply_count": 1,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      },
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2029533812614541312",
+          "uid": "426715833",
+          "r_uid": "0",
+          "content": "好看！",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 3,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1772713542,
+          "updated_at": 1772713542,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"好看！\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "426715833",
+          "nickname": "brighoon",
+          "introduce": "",
+          "avatar": "101366",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 7,
+            "exp": 5610
+          },
+          "avatar_url": "https://bbs-static.miyoushe.com/static/2024/09/23/79a54f44d1663780f3b5015f6c982c52_7366889291248634864.png",
+          "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+          "ip_region": "河南",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": null
+        },
+        "stat": {
+          "reply_num": 1,
+          "like_num": 1,
+          "sub_num": 1,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [
+          {
+            "reply": {
+              "game_id": 8,
+              "post_id": "73735430",
+              "reply_id": "2029569466244558848",
+              "uid": "297161169",
+              "r_uid": "426715833",
+              "content": "嘿嘿_(星谷米游姬-比心)",
+              "f_forum_id": 57,
+              "f_reply_id": "2029533812614541312",
+              "floor_id": 3,
+              "is_deleted": 0,
+              "delete_src": 0,
+              "created_at": 1772722042,
+              "updated_at": 1772722043,
+              "deleted_at": 0,
+              "struct_content": "[{\"insert\":\"嘿嘿_(星谷米游姬-比心)\"}]",
+              "structured_content_rows": [],
+              "is_top": false,
+              "has_block_word": false,
+              "overt_status": 0,
+              "is_showing_missing": false,
+              "selected_comment_time": 0,
+              "is_mentor": false,
+              "view_status": 0,
+              "reply_extra": null
+            },
+            "user": {
+              "uid": "297161169",
+              "nickname": "琪亚娜小猫咪",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 1627
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+              "ip_region": "福建",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": {
+                "avatar_type": 3,
+                "avatar_assets_id": "2003020799727951872",
+                "resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/ae0198f7f942cbeecc367e570c74cc25_671101449471804047.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/a6e60328f2d4dbf5785d04dd27194fa6_2069503313059881721.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/bc3ff7728f5924d213e71f0ade15e247_2425222437274854251.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ],
+                "hd_resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/2b7c63b8d0bdf956ee5e8b04db403ad7_5928253525582704110.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/6c1da5e5b04583b99ff5542a695f19db_1079381538343371170.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_450133724412110645.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ]
+              },
+              "is_super_fan": false,
+              "reply_bubble": {
+                "assets_id": "2016825437925195776",
+                "bg_color": "fde2df",
+                "url": "https://bbs-static.miyoushe.com/static/2026/01/29/cf0866a9d21722f939dda4489b95ddc9_531946969762495398.png",
+                "name": "绝区零「妄想启动！」",
+                "animation_effects_gif_url": "",
+                "animation_effects_pag_url": ""
+              }
+            },
+            "stat": {
+              "reply_num": 0,
+              "like_num": 0,
+              "sub_num": 0,
+              "dislike_num": 0
+            },
+            "self_operation": {
+              "attitude": 0,
+              "reply_vote_attitude": 0
+            },
+            "master_status": {
+              "is_official_master": false,
+              "is_user_master": false
+            },
+            "images": [],
+            "sub_replies": [],
+            "is_lz": true,
+            "sub_reply_count": 0,
+            "r_user": {
+              "uid": "426715833",
+              "nickname": "brighoon",
+              "introduce": "",
+              "avatar": "101366",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 7,
+                "exp": 5610
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2024/09/23/79a54f44d1663780f3b5015f6c982c52_7366889291248634864.png",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+              "ip_region": "",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": null,
+              "is_super_fan": false,
+              "reply_bubble": null
+            },
+            "r_reply": null,
+            "r_post": null,
+            "user_game_info": null,
+            "reply_full_extra": null
+          }
+        ],
+        "is_lz": false,
+        "sub_reply_count": 1,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      },
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2030865360078041088",
+          "uid": "423997079",
+          "r_uid": "0",
+          "content": "大佬厉害_(米游姬 感谢)",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 4,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1773031008,
+          "updated_at": 1773031008,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"大佬厉害_(米游姬 感谢)\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "423997079",
+          "nickname": "青椒鸡蛋汤",
+          "introduce": "",
+          "avatar": "101337",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 1,
+            "exp": 21
+          },
+          "avatar_url": "https://bbs-static.miyoushe.com/static/2024/06/27/cdde614f343e4d7a307e0dcca8c6f7f6_2462555339759568418.png",
+          "pendant": "",
+          "ip_region": "四川",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": null
+        },
+        "stat": {
+          "reply_num": 1,
+          "like_num": 0,
+          "sub_num": 1,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [
+          {
+            "reply": {
+              "game_id": 8,
+              "post_id": "73735430",
+              "reply_id": "2031052860151664640",
+              "uid": "297161169",
+              "r_uid": "423997079",
+              "content": "_(3)_(3)",
+              "f_forum_id": 57,
+              "f_reply_id": "2030865360078041088",
+              "floor_id": 4,
+              "is_deleted": 0,
+              "delete_src": 0,
+              "created_at": 1773075711,
+              "updated_at": 1773075712,
+              "deleted_at": 0,
+              "struct_content": "[{\"insert\":\"_(3)_(3)\"}]",
+              "structured_content_rows": [],
+              "is_top": false,
+              "has_block_word": false,
+              "overt_status": 0,
+              "is_showing_missing": false,
+              "selected_comment_time": 0,
+              "is_mentor": false,
+              "view_status": 0,
+              "reply_extra": null
+            },
+            "user": {
+              "uid": "297161169",
+              "nickname": "琪亚娜小猫咪",
+              "introduce": "",
+              "avatar": "",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 5,
+                "exp": 1627
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png",
+              "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+              "ip_region": "福建",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": {
+                "avatar_type": 3,
+                "avatar_assets_id": "2003020799727951872",
+                "resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/ae0198f7f942cbeecc367e570c74cc25_671101449471804047.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/a6e60328f2d4dbf5785d04dd27194fa6_2069503313059881721.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/bc3ff7728f5924d213e71f0ade15e247_2425222437274854251.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ],
+                "hd_resources": [
+                  {
+                    "format": 3,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/2b7c63b8d0bdf956ee5e8b04db403ad7_5928253525582704110.gif"
+                  },
+                  {
+                    "format": 1,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/6c1da5e5b04583b99ff5542a695f19db_1079381538343371170.webp"
+                  },
+                  {
+                    "format": 2,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_450133724412110645.png"
+                  },
+                  {
+                    "format": 4,
+                    "url": "https://bbs-static.miyoushe.com/static/2025/12/22/0170a53c1f5eb5db3ae8616513cb64bd_8953540416449181199.png"
+                  }
+                ]
+              },
+              "is_super_fan": false,
+              "reply_bubble": {
+                "assets_id": "2016825437925195776",
+                "bg_color": "fde2df",
+                "url": "https://bbs-static.miyoushe.com/static/2026/01/29/cf0866a9d21722f939dda4489b95ddc9_531946969762495398.png",
+                "name": "绝区零「妄想启动！」",
+                "animation_effects_gif_url": "",
+                "animation_effects_pag_url": ""
+              }
+            },
+            "stat": {
+              "reply_num": 0,
+              "like_num": 0,
+              "sub_num": 0,
+              "dislike_num": 0
+            },
+            "self_operation": {
+              "attitude": 0,
+              "reply_vote_attitude": 0
+            },
+            "master_status": {
+              "is_official_master": false,
+              "is_user_master": false
+            },
+            "images": [],
+            "sub_replies": [],
+            "is_lz": true,
+            "sub_reply_count": 0,
+            "r_user": {
+              "uid": "423997079",
+              "nickname": "青椒鸡蛋汤",
+              "introduce": "",
+              "avatar": "101337",
+              "gender": 0,
+              "certification": {
+                "type": 0,
+                "label": ""
+              },
+              "level_exp": {
+                "level": 1,
+                "exp": 21
+              },
+              "avatar_url": "https://bbs-static.miyoushe.com/static/2024/06/27/cdde614f343e4d7a307e0dcca8c6f7f6_2462555339759568418.png",
+              "pendant": "",
+              "ip_region": "",
+              "is_following": false,
+              "is_followed": false,
+              "avatar_ext": null,
+              "is_super_fan": false,
+              "reply_bubble": null
+            },
+            "r_reply": null,
+            "r_post": null,
+            "user_game_info": null,
+            "reply_full_extra": null
+          }
+        ],
+        "is_lz": false,
+        "sub_reply_count": 1,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      },
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2032646646422966272",
+          "uid": "75742433",
+          "r_uid": "0",
+          "content": "谢谢",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 5,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1773455699,
+          "updated_at": 1773455700,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"谢谢\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "75742433",
+          "nickname": "羽明",
+          "introduce": "",
+          "avatar": "30020",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 3,
+            "exp": 290
+          },
+          "avatar_url": "https://bbs-static.miyoushe.com/avatar/avatar30020.png",
+          "pendant": "https://upload-bbs.mihoyo.com/upload/2021/12/01/74777e39b70f6c12f1e7dfad9882aa97_228393353990524873.png",
+          "ip_region": "江西",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": null
+        },
+        "stat": {
+          "reply_num": 0,
+          "like_num": 0,
+          "sub_num": 0,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [],
+        "is_lz": false,
+        "sub_reply_count": 0,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      },
+      {
+        "reply": {
+          "game_id": 8,
+          "post_id": "73735430",
+          "reply_id": "2033922128199348224",
+          "uid": "397009064",
+          "r_uid": "0",
+          "content": "好看",
+          "f_forum_id": 57,
+          "f_reply_id": "0",
+          "floor_id": 6,
+          "is_deleted": 0,
+          "delete_src": 0,
+          "created_at": 1773759798,
+          "updated_at": 1773759798,
+          "deleted_at": 0,
+          "struct_content": "[{\"insert\":\"好看\"}]",
+          "structured_content_rows": [],
+          "is_top": false,
+          "has_block_word": false,
+          "overt_status": 0,
+          "is_showing_missing": false,
+          "selected_comment_time": 0,
+          "is_mentor": false,
+          "view_status": 0,
+          "reply_extra": null
+        },
+        "user": {
+          "uid": "397009064",
+          "nickname": "黄金代理人",
+          "introduce": "",
+          "avatar": "",
+          "gender": 0,
+          "certification": {
+            "type": 0,
+            "label": ""
+          },
+          "level_exp": {
+            "level": 6,
+            "exp": 3745
+          },
+          "avatar_url": "https://upload-bbs.miyoushe.com/upload/2026/01/21/397009064/1a6c39541c03d3aee57ed7ede041c8a6_9158266517876171285.jpg",
+          "pendant": "https://upload-bbs.mihoyo.com/upload/2022/05/08/3d19b1be3da83b73331b4842aef67690_1625448778988124487.png",
+          "ip_region": "河南",
+          "is_following": false,
+          "is_followed": false,
+          "avatar_ext": {
+            "avatar_type": 0,
+            "avatar_assets_id": "",
+            "resources": [],
+            "hd_resources": []
+          },
+          "is_super_fan": false,
+          "reply_bubble": {
+            "assets_id": "2016825437925195776",
+            "bg_color": "fde2df",
+            "url": "https://bbs-static.miyoushe.com/static/2026/01/29/cf0866a9d21722f939dda4489b95ddc9_531946969762495398.png",
+            "name": "绝区零「妄想启动！」",
+            "animation_effects_gif_url": "",
+            "animation_effects_pag_url": ""
+          }
+        },
+        "stat": {
+          "reply_num": 0,
+          "like_num": 0,
+          "sub_num": 0,
+          "dislike_num": 0
+        },
+        "self_operation": {
+          "attitude": 0,
+          "reply_vote_attitude": 0
+        },
+        "master_status": {
+          "is_official_master": false,
+          "is_user_master": false
+        },
+        "images": [],
+        "sub_replies": [],
+        "is_lz": false,
+        "sub_reply_count": 0,
+        "r_user": null,
+        "r_reply": null,
+        "r_post": null,
+        "user_game_info": null,
+        "reply_full_extra": null
+      }
+    ],
+    "last_id": "6",
+    "is_last": false,
+    "post_owner_uid": "297161169",
+    "pin_reply_id": "0",
+    "fold_reply_num": 0,
+    "total_reply_num": 10
+  }
+}

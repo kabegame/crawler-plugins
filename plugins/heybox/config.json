@@ -10,8 +10,20 @@
       "name.ko": "크롤 모드",
       "default": "search",
       "options": [
-        { "name": "关键词搜索", "name.en": "Keyword Search", "name.ja": "キーワード検索", "name.ko": "키워드 검색", "variable": "search" },
-        { "name": "单帖子 URL", "name.en": "Single Post URL", "name.ja": "単一投稿 URL", "name.ko": "단일 포스트 URL", "variable": "single_post" }
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword Search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "variable": "search"
+        },
+        {
+          "name": "单帖子 URL",
+          "name.en": "Single Post URL",
+          "name.ja": "単一投稿 URL",
+          "name.ko": "단일 포스트 URL",
+          "variable": "single_post"
+        }
       ]
     },
     {
@@ -74,6 +86,19 @@
       "name.ja": "コメント画像をダウンロード",
       "name.ko": "댓글 이미지 다운로드",
       "default": true
+    },
+    {
+      "key": "fast_crawl",
+      "type": "boolean",
+      "name": "快速爬取（不等待间隔）",
+      "name.en": "Fast crawl (no delays)",
+      "name.ja": "高速クロール（待機なし）",
+      "name.ko": "빠른 크롤(대기 없음)",
+      "descripts": "开启后搜索、原图与翻页之间不再随机等待，速度更快但更容易触发风控。强烈建议在「高级设置 → HTTP 请求头」中配置小黑盒网页端 Cookie后再使用。",
+      "descripts.en": "When enabled, skips random delays between search, original-image requests, and page turns—faster but more likely to trigger anti-bot. Strongly add Heybox web cookies under Advanced → HTTP headers before using.",
+      "descripts.ja": "有効にすると検索・原画・ページ間のランダム待機を省略します（高速だが検知されやすい）。使用前に「詳細設定 → HTTP ヘッダ」で Heybox の Web Cookieを設定することを推奨。",
+      "descripts.ko": "켜면 검색·원본 이미지·페이지 전환 사이의 무작위 대기를 생략합니다(빠르지만 차단 위험 증가). 사용 전 「고급 → HTTP 헤더」에 Heybox 웹 Cookie를 넣는 것을 권장합니다.",
+      "default": false
     }
   ]
 }

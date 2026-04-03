@@ -1,0 +1,398 @@
+<%
+  const m = metadata || {};
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  const GAME_MAP = {
+    1: { slug: 'bh3', name: '崩坏冲击3' },
+    2: { slug: 'ys', name: '原神' },
+    3: { slug: 'bh2', name: '崩坏学园2' },
+    4: { slug: 'wd', name: '未定事件簿' },
+    5: { slug: 'dby', name: '大别野' },
+    6: { slug: 'sr', name: '崩坏：星穹铁道' },
+    8: { slug: 'zzz', name: '绝区零' },
+  };
+  const postId = m.post_id != null ? String(m.post_id) : '';
+  const gameId = m.game_id != null ? Number(m.game_id) : 0;
+  const gameInfo = GAME_MAP[gameId] || null;
+  const gameSlug = gameInfo ? gameInfo.slug : 'ys';
+  const gameName = gameInfo ? gameInfo.name : '';
+  const articleUrl = postId ? ('https://www.miyoushe.com/' + gameSlug + '/article/' + postId) : '';
+  const uid = m.uid != null ? String(m.uid) : '';
+  const authorUrl = uid ? ('https://www.miyoushe.com/' + gameSlug + '/accountCenter/postList?id=' + uid) : '';
+  const nickname = m.nickname != null ? String(m.nickname) : '';
+  const avatarUrl = m.avatar_url != null ? String(m.avatar_url) : '';
+  const pendant = m.pendant != null ? String(m.pendant) : '';
+  const certLabel = m.certification_label != null ? String(m.certification_label) : '';
+  const level = m.level != null ? Number(m.level) : 0;
+  const ipRegion = m.ip_region != null ? String(m.ip_region) : '';
+  const createdAt = m.created_at != null ? Number(m.created_at) : 0;
+  const postContent = m.post_content != null ? String(m.post_content) : '';
+  const postTitle = m.title != null ? String(m.title) : '';
+  const postStructuredContent = m.post_structured_content != null ? String(m.post_structured_content) : '';
+  const viewNum = m.view_num != null ? Number(m.view_num) : 0;
+  const replyNum = m.reply_num != null ? Number(m.reply_num) : 0;
+  const likeNum = m.like_num != null ? Number(m.like_num) : 0;
+  const bookmarkNum = m.bookmark_num != null ? Number(m.bookmark_num) : 0;
+  const forwardNum = m.forward_num != null ? Number(m.forward_num) : 0;
+  const postImageTotal = m.post_image_total != null ? Number(m.post_image_total) : (m.image_total != null ? Number(m.image_total) : 0);
+  const commentImageTotal = m.comment_image_total != null ? Number(m.comment_image_total) : 0;
+  const totalImageCount = m.total_image_count != null ? Number(m.total_image_count) : (postImageTotal + commentImageTotal);
+  const emoticonMap = (m.emoticon_map != null && typeof m.emoticon_map === 'object' && !Array.isArray(m.emoticon_map)) ? m.emoticon_map : {};
+  function fmtTs(ts) {
+    if (!ts) return '';
+    const d = new Date(ts * 1000);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+%>
+<style>
+.mys-wrap { font-size: 0.82rem; line-height: 1.5; color: inherit; word-break: break-word; box-sizing: border-box; }
+.mys-wrap * { box-sizing: border-box; }
+.mys-author-bar { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.mys-author-link { display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:inherit; }
+.mys-author-link:hover .mys-author-name { text-decoration:underline; text-underline-offset:2px; }
+.mys-avatar-wrap { flex-shrink:0; position:relative; width:38px; height:38px; }
+.mys-avatar { width:38px; height:38px; border-radius:50%; object-fit:cover; display:block; }
+.mys-avatar-pendant { position:absolute; inset:-20% -20%; width:140%; height:140%; object-fit:contain; pointer-events:none; }
+.mys-author-name { font-size:0.875rem; font-weight:600; color:var(--anime-text-primary,#1f2937); }
+.mys-author-meta { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; font-size:0.74rem; color:var(--anime-text-secondary,#6b7280); }
+.mys-level-badge, .mys-cert-badge { display:inline-flex; align-items:center; padding:0 6px; height:16px; border-radius:8px; font-size:0.66rem; }
+.mys-level-badge { background:color-mix(in srgb, var(--anime-primary,#6366f1) 15%, transparent); color:var(--anime-primary,#6366f1); }
+.mys-cert-badge { background:color-mix(in srgb, #f59e0b 15%, transparent); color:#b45309; }
+.mys-post-content { font-size:0.82rem; line-height:1.7; color:var(--anime-text-primary,#374151); margin-bottom:10px; }
+.mys-post-title { font-size:0.92rem; line-height:1.6; font-weight:600; color:var(--anime-text-primary,#1f2937); margin-bottom:8px; word-break:break-word; }
+.mys-image-summary { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; margin:2px 0 10px; border-radius:999px; font-size:0.75rem; color:var(--anime-text-secondary,#6b7280); border:1px solid color-mix(in srgb,var(--anime-border,#d1d5db) 75%, transparent); background:color-mix(in srgb,var(--anime-text-primary,#111827) 4%, transparent); }
+.mys-stat-bar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:10px; font-size:0.75rem; color:var(--anime-text-secondary,#6b7280); }
+.mys-stat-item { display:inline-flex; align-items:center; gap:4px; }
+.mys-stat-item svg { width:13px; height:13px; flex-shrink:0; opacity:0.78; }
+.mys-article-link { display:inline-flex; align-items:center; gap:5px; margin-bottom:10px; padding:5px 12px; border-radius:9999px; border:1px solid color-mix(in srgb,var(--anime-border,#d1d5db) 80%, transparent); font-size:0.75rem; text-decoration:none; color:var(--anime-text-secondary,#6b7280); }
+.mys-article-link:hover { color:var(--anime-text-primary,#1f2937); background:color-mix(in srgb,var(--anime-text-primary,#111827) 8%, transparent); text-decoration:underline; text-underline-offset:2px; }
+.mys-replies-title { font-size:0.8rem; font-weight:600; color:var(--anime-text-secondary,#6b7280); margin:0 0 4px; padding-bottom:6px; border-bottom:1px solid color-mix(in srgb,var(--anime-border,#e5e7eb) 60%, transparent); }
+.mys-rc { display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid color-mix(in srgb,var(--anime-border,#e5e7eb) 40%, transparent); }
+.mys-rc.is-sub { padding-left:16px; }
+.mys-rc__av { position:relative; width:44px; height:44px; display:block; flex-shrink:0; }
+.mys-rc__av-img { width:44px; height:44px; border-radius:50%; object-fit:cover; display:block; }
+.mys-rc__av-pendant { position:absolute; inset:-20% -20%; width:140%; height:140%; object-fit:contain; pointer-events:none; }
+.mys-rc__container { flex:1 1 auto; min-width:0; }
+.mys-rc__nickname { text-decoration:none; color:inherit; }
+.mys-rc__nickname:hover .mys-rc__name { text-decoration:underline; text-underline-offset:2px; }
+.mys-rc__name { font-size:0.82rem; font-weight:600; color:var(--anime-text-primary,#1f2937); }
+.mys-rc__content { font-size:0.8rem; color:var(--anime-text-primary,#374151); line-height:1.6; }
+.mys-rc__content pre { margin:0; white-space:normal; font-family:inherit; }
+.mys-rc__floor, .mys-rc__bottom { margin:2px 0 0; font-size:0.72rem; color:var(--anime-text-secondary,#9ca3af); }
+.mys-rc__bottom { display:flex; align-items:center; justify-content:space-between; margin-top:6px; }
+.mys-load-more { display:none; box-sizing:border-box; width:100%; align-items:center; justify-content:center; margin-top:8px; padding:8px 10px; border:1px solid color-mix(in srgb,var(--anime-border,#d1d5db) 80%, transparent); border-radius:8px; background:transparent; color:var(--anime-text-primary,#1f2937); cursor:pointer; font-size:0.78rem; }
+.mys-emoticon-badge { display:inline-flex; align-items:center; padding:0 5px; height:18px; border-radius:4px; font-size:0.68rem; background:color-mix(in srgb,var(--anime-text-secondary,#9ca3af) 14%, transparent); color:var(--anime-text-secondary,#6b7280); vertical-align:middle; margin:0 1px; }
+.mys-emoticon-img { display:inline-block; width:22px; height:22px; object-fit:contain; vertical-align:middle; margin:0 1px; }
+.mys-custom-emoticon { vertical-align:middle; margin:2px; }
+.mys-mention { color:var(--anime-primary,#6366f1); text-decoration:none; }
+</style>
+<div class="mys-wrap">
+  <div class="mys-author-bar">
+    <% if (authorUrl) { %><a class="mys-author-link" data-mys-id="author-link" href="<%= esc(authorUrl) %>" target="_blank" rel="noopener noreferrer"><% } else { %><div class="mys-author-link" data-mys-id="author-link"><% } %>
+      <div class="mys-avatar-wrap">
+        <% if (avatarUrl) { %><img class="mys-avatar" data-mys-id="author-avatar" src="<%= esc(avatarUrl) %>" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt=""><% } %>
+        <% if (pendant) { %><img class="mys-avatar-pendant" src="<%= esc(pendant) %>" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt=""><% } %>
+      </div>
+      <div>
+        <div class="mys-author-name" data-mys-id="author-name"><%= esc(nickname) %></div>
+        <div class="mys-author-meta">
+        <% if (level > 0) { %><span class="mys-level-badge">Lv.<%= level %></span><% } %>
+        <% if (certLabel) { %><span class="mys-cert-badge"><%= esc(certLabel) %></span><% } %>
+        <% if (createdAt) { %><span><%= esc(fmtTs(createdAt)) %></span><% } %>
+        <% if (gameName) { %><span>· <%= esc(gameName) %></span><% } %>
+        <% if (ipRegion) { %><span><%= esc(ipRegion) %></span><% } %>
+        </div>
+      </div>
+    <% if (authorUrl) { %></a><% } else { %></div><% } %>
+  </div>
+  <div class="mys-image-summary">
+    图片 <span data-mys-id="total-image-count"><%= totalImageCount %></span>
+    （正文 <span data-mys-id="post-image-total"><%= postImageTotal %></span> + 评论 <span data-mys-id="comment-image-total"><%= commentImageTotal %></span>）
+  </div>
+  <div class="mys-post-title" data-mys-id="post-title"></div>
+  <div class="mys-post-content" data-mys-id="post-content"></div>
+  <div class="mys-stat-bar">
+    <span class="mys-stat-item" title="浏览">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span data-mys-id="view-num"><%= viewNum %></span>
+    </span>
+    <span class="mys-stat-item" title="评论">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span data-mys-id="reply-num"><%= replyNum %></span>
+    </span>
+    <span class="mys-stat-item" title="点赞">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span data-mys-id="like-num"><%= likeNum %></span>
+    </span>
+    <span class="mys-stat-item" title="收藏">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      <span data-mys-id="bookmark-num"><%= bookmarkNum %></span>
+    </span>
+    <span class="mys-stat-item" title="转发">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 17 20 12 15 7"/><path d="M4 18v-2a4 4 0 0 1 4-4h12"/></svg>
+      <span data-mys-id="forward-num"><%= forwardNum %></span>
+    </span>
+  </div>
+  <% if (articleUrl) { %><a class="mys-article-link" href="<%= esc(articleUrl) %>" target="_blank" rel="noopener noreferrer" data-mys-lbl="viewPost">查看原帖</a><% } %>
+  <div class="mys-replies-wrap">
+    <p class="mys-replies-title"><span data-mys-lbl="comments">评论</span>（<span data-mys-id="comments-count">0</span>）</p>
+    <div data-mys-id="comments-list"></div>
+    <p data-mys-id="comments-empty" style="display:none;color:var(--anime-text-secondary,#9ca3af);font-size:0.75rem;margin:6px 0 2px;"></p>
+    <button type="button" class="mys-load-more" data-mys-id="load-more"><span data-mys-lbl="loadMore">加载更多</span></button>
+  </div>
+</div>
+<script>
+(function () {
+  var labels = {
+    zh: { viewPost: '查看原帖', comments: '评论', loadMore: '加载更多', noComments: '暂无评论', loading: '加载中...' },
+    zhtw: { viewPost: '查看原文', comments: '留言', loadMore: '載入更多', noComments: '暫無留言', loading: '載入中...' },
+    ja: { viewPost: '元の投稿を見る', comments: 'コメント', loadMore: 'もっと見る', noComments: 'コメントなし', loading: '読み込み中...' },
+    ko: { viewPost: '원문 보기', comments: '댓글', loadMore: '더 보기', noComments: '댓글 없음', loading: '불러오는 중...' },
+    en: { viewPost: 'View Post', comments: 'Comments', loadMore: 'Load more', noComments: 'No comments', loading: 'Loading...' }
+  };
+  function getLang(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return 'zhtw';
+    if (s.indexOf('zh') === 0) return 'zh';
+    if (s === 'ja') return 'ja';
+    if (s === 'ko') return 'ko';
+    return 'en';
+  }
+  var wrap = document.currentScript && document.currentScript.previousElementSibling;
+  if (!wrap) wrap = document.body;
+  var localeKey = getLang(typeof locale !== 'undefined' ? locale : 'en');
+  var lb = labels[localeKey] || labels.en;
+  wrap.querySelectorAll('[data-mys-lbl]').forEach(function (el) {
+    var key = el.getAttribute('data-mys-lbl');
+    if (lb[key] != null) el.textContent = lb[key];
+  });
+
+  var API_POST_FULL = 'https://bbs-api.miyoushe.com/post/wapi/getPostFull';
+  var API_REPLIES = 'https://bbs-api.miyoushe.com/post/wapi/getPostReplies';
+  var API_EMOTICONS = 'https://bbs-api-static.miyoushe.com/misc/api/emoticon_set';
+  var postId = <%- JSON.stringify(postId) %>;
+  var gameSlug = <%- JSON.stringify(gameSlug) %>;
+  var initialPostTitleRaw = <%- JSON.stringify(postTitle) %>;
+  var initialPostContentRaw = <%- JSON.stringify(postContent) %>;
+  var initialPostStructuredContentRaw = <%- JSON.stringify(postStructuredContent) %>;
+  var emoticonMap = Object.assign({}, <%- JSON.stringify(emoticonMap) %>);
+  var state = { comments: [], loading: false, loadingMore: false, lastId: '', hasMore: true, limit: 200 };
+
+  function esc(s) { return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function fmtMd(ts) { if (!ts) return ''; var d = new Date(ts * 1000); return String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function fetchByBridge(url) {
+    if (!window.__bridge || !window.__bridge.fetch) return Promise.reject(new Error('bridge 不可用'));
+    return window.__bridge.fetch(url, { headers: { Accept: 'application/json', Referer: 'https://www.miyoushe.com/' }, json: true });
+  }
+  function updateText(id, v) { var el = wrap.querySelector('[data-mys-id="' + id + '"]'); if (el) el.textContent = String(v); }
+  function normalizePostContentText(raw) {
+    if (raw == null) return '';
+    var s = String(raw);
+    if (!s) return '';
+    var t = s.trim();
+    if (t.charAt(0) === '{' && t.charAt(t.length - 1) === '}') {
+      try {
+        var obj = JSON.parse(t);
+        if (obj && typeof obj === 'object' && obj.describe != null) {
+          return String(obj.describe);
+        }
+      } catch (_) {}
+    }
+    return s;
+  }
+  function renderInline(s) {
+    if (!s) return '';
+    var re = /(_\([^)]+\)|@[^\s@]+)/g;
+    var out = '', last = 0, mm;
+    while ((mm = re.exec(s)) !== null) {
+      out += esc(s.slice(last, mm.index));
+      var token = mm[1];
+      if (token.indexOf('_(') === 0) {
+        var n = token.slice(2, -1), u = emoticonMap[n];
+        out += u ? ('<img class="mys-emoticon-img" src="' + esc(u) + '" alt="' + esc(n) + '" title="' + esc(n) + '">') : ('<span class="mys-emoticon-badge">' + esc(n) + '</span>');
+      } else {
+        out += '<span class="mys-mention">' + esc(token) + '</span>';
+      }
+      last = re.lastIndex;
+    }
+    out += esc(s.slice(last));
+    return out;
+  }
+  function renderPostContent(raw) {
+    var text = normalizePostContentText(raw);
+    if (!text) return '';
+    return text.split('\n').map(renderInline).join('<br>');
+  }
+  function renderPostTitle(raw) {
+    if (raw == null) return '';
+    var text = String(raw).trim();
+    if (!text) return '';
+    return renderInline(text);
+  }
+  function renderPostBody(structuredRaw, contentRaw) {
+    var structured = structuredRaw == null ? '' : String(structuredRaw).trim();
+    if (structured) {
+      var structuredHtml = renderStruct(structured);
+      if (structuredHtml) return structuredHtml;
+    }
+    return renderPostContent(contentRaw);
+  }
+  function renderStruct(structStr) {
+    if (!structStr) return '';
+    var ops; try { ops = JSON.parse(structStr); } catch (_) { return esc(structStr); }
+    if (!Array.isArray(ops)) return '';
+    var html = '';
+    ops.forEach(function (op) {
+      var ins = op && op.insert;
+      if (ins == null) return;
+      if (typeof ins === 'string') {
+        var lines = ins.split('\n');
+        for (var i = 0; i < lines.length; i++) {
+          if (i > 0) html += '<br>';
+          html += renderInline(lines[i]);
+        }
+      } else if (typeof ins === 'object') {
+        if (ins.image) html += '<img src="' + esc(String(ins.image)) + '" style="max-width:100%;height:auto;border-radius:4px;">';
+        else if (ins.custom_emoticon && ins.custom_emoticon.url) html += '<img class="mys-custom-emoticon" src="' + esc(String(ins.custom_emoticon.url)) + '" style="width:48px;height:48px;object-fit:cover;border-radius:4px;">';
+        else if (ins.mention) {
+          var uid = ins.mention.uid != null ? String(ins.mention.uid) : '';
+          var name = ins.mention.nickname != null ? String(ins.mention.nickname) : '';
+          var href = uid ? ('https://www.miyoushe.com/' + (gameSlug || 'ys') + '/accountCenter/postList?id=' + uid) : '';
+          html += href ? ('<a class="mys-mention" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">@' + esc(name) + '</a>') : ('<span class="mys-mention">@' + esc(name) + '</span>');
+        } else if (ins.backup_text != null) html += esc(String(ins.backup_text));
+      }
+    });
+    return html;
+  }
+  function mergeEmoticons(resp) {
+    if (!resp || resp.retcode !== 0 || !resp.data || !Array.isArray(resp.data.list)) return;
+    resp.data.list.forEach(function (g) {
+      if (!g || g.is_available !== true || !Array.isArray(g.list)) return;
+      g.list.forEach(function (it) {
+        if (!it || it.is_available !== true) return;
+        var n = it.name != null ? String(it.name) : '';
+        var icon = it.icon != null ? String(it.icon) : '';
+        if (n && icon) emoticonMap[n] = icon;
+      });
+    });
+  }
+  function rowFromReply(item, isSub) {
+    var reply = item && item.reply; if (!reply) return null;
+    var user = item.user || {}, stat = item.stat || {};
+    return {
+      uid: user.uid != null ? String(user.uid) : '',
+      nickname: user.nickname != null ? String(user.nickname) : '',
+      avatar_url: user.avatar_url != null ? String(user.avatar_url) : '',
+      pendant: user.pendant != null ? String(user.pendant) : '',
+      certification_label: user.certification && user.certification.type ? (user.certification.label || '') : '',
+      floor_id: Number(reply.floor_id || 0),
+      created_at: Number(reply.created_at || 0),
+      struct_content: reply.struct_content != null ? String(reply.struct_content) : '',
+      like_num: Number(stat.like_num || 0),
+      is_sub: !!isSub
+    };
+  }
+  function renderComments() {
+    var listEl = wrap.querySelector('[data-mys-id="comments-list"]');
+    var emptyEl = wrap.querySelector('[data-mys-id="comments-empty"]');
+    var moreBtn = wrap.querySelector('[data-mys-id="load-more"]');
+    if (!listEl || !emptyEl || !moreBtn) return;
+    listEl.innerHTML = '';
+    updateText('comments-count', state.comments.length);
+    if (!state.comments.length) {
+      emptyEl.style.display = '';
+      emptyEl.textContent = state.loading ? lb.loading : lb.noComments;
+    } else {
+      emptyEl.style.display = 'none';
+    }
+    state.comments.forEach(function (r) {
+      var rProfileUrl = r.uid ? ('https://www.miyoushe.com/' + (gameSlug || 'ys') + '/accountCenter/postList?id=' + r.uid) : '';
+      var rContent = renderStruct(r.struct_content);
+      var row = document.createElement('div');
+      row.className = 'mys-rc' + (r.is_sub ? ' is-sub' : '');
+      row.innerHTML =
+        (rProfileUrl ? ('<a class="mys-rc__av" href="' + esc(rProfileUrl) + '" target="_blank" rel="noopener noreferrer">') : '<div class="mys-rc__av">') +
+          (r.avatar_url ? '<img class="mys-rc__av-img" src="' + esc(r.avatar_url) + '" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="">' : '<div class="mys-rc__av-img"></div>') +
+          (r.pendant ? '<img class="mys-rc__av-pendant" src="' + esc(r.pendant) + '" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="">' : '') +
+        (rProfileUrl ? '</a>' : '</div>') +
+        '<div class="mys-rc__container">' +
+          (rProfileUrl ? '<a class="mys-rc__nickname" href="' + esc(rProfileUrl) + '" target="_blank" rel="noopener noreferrer"><span class="mys-rc__name">' + esc(r.nickname) + '</span></a>' : '<span class="mys-rc__name">' + esc(r.nickname) + '</span>') +
+          (r.certification_label ? (' <span class="mys-cert-badge">' + esc(r.certification_label) + '</span>') : '') +
+          '<p class="mys-rc__floor">' + (r.floor_id > 0 ? ('#' + r.floor_id) : '') + '</p>' +
+          (rContent ? ('<div class="mys-rc__content"><pre>' + rContent + '</pre></div>') : '') +
+          '<div class="mys-rc__bottom"><span>' + esc(fmtMd(r.created_at)) + '</span><span>' + (r.like_num > 0 ? ('❤ ' + r.like_num) : '') + '</span></div>' +
+        '</div>';
+      listEl.appendChild(row);
+    });
+    moreBtn.style.display = state.hasMore && state.comments.length < state.limit ? 'inline-flex' : 'none';
+    moreBtn.disabled = state.loadingMore;
+  }
+  function loadComments(first) {
+    if (!postId || state.loading || state.loadingMore || !state.hasMore) return;
+    if (first) state.loading = true; else state.loadingMore = true;
+    renderComments();
+    var size = Math.min(20, state.limit - state.comments.length);
+    if (size <= 0) { state.hasMore = false; state.loading = false; state.loadingMore = false; renderComments(); return; }
+    var url = API_REPLIES + '?post_id=' + encodeURIComponent(postId) + '&size=' + String(size) + '&order_type=1&is_hot=false';
+    if (state.lastId) url += '&last_id=' + encodeURIComponent(state.lastId);
+    fetchByBridge(url).then(function (resp) {
+      if (!resp || resp.retcode !== 0 || !resp.data) return;
+      var list = Array.isArray(resp.data.list) ? resp.data.list : [];
+      list.forEach(function (it) {
+        var row = rowFromReply(it, false); if (row) state.comments.push(row);
+        var subs = Array.isArray(it.sub_replies) ? it.sub_replies : [];
+        subs.forEach(function (sub) { var srow = rowFromReply(sub, true); if (srow) state.comments.push(srow); });
+      });
+      var newLast = resp.data.last_id != null ? String(resp.data.last_id) : '';
+      state.hasMore = resp.data.is_last !== true && !!newLast && newLast !== state.lastId && state.comments.length < state.limit;
+      state.lastId = newLast;
+    }).catch(function () {
+      state.hasMore = false;
+    }).finally(function () {
+      state.loading = false;
+      state.loadingMore = false;
+      renderComments();
+    });
+  }
+  function refreshPost() {
+    if (!postId) return Promise.resolve();
+    return fetchByBridge(API_POST_FULL + '?post_id=' + encodeURIComponent(postId)).then(function (resp) {
+      if (!resp || resp.retcode !== 0 || !resp.data || !resp.data.post) return;
+      var pw = resp.data.post, post = pw.post || {}, user = pw.user || {}, stat = pw.stat || {};
+      updateText('view-num', Number(stat.view_num || 0));
+      updateText('reply-num', Number(stat.reply_num || 0));
+      updateText('like-num', Number(stat.like_num || 0));
+      updateText('bookmark-num', Number(stat.bookmark_num || 0));
+      updateText('forward-num', Number(stat.forward_num || 0));
+      updateText('post-image-total', Array.isArray(post.images) ? post.images.length : 0);
+      if (Array.isArray(post.images)) updateText('total-image-count', post.images.length + Number(<%- JSON.stringify(commentImageTotal) %> || 0));
+      if (user.nickname) updateText('author-name', user.nickname);
+      var av = wrap.querySelector('[data-mys-id="author-avatar"]');
+      if (av && user.avatar_url) av.src = String(user.avatar_url);
+      var al = wrap.querySelector('[data-mys-id="author-link"]');
+      if (al && user.uid != null) {
+        var authorHref = 'https://www.miyoushe.com/' + (gameSlug || 'ys') + '/accountCenter/postList?id=' + encodeURIComponent(String(user.uid));
+        if (al.tagName && al.tagName.toLowerCase() === 'a') {
+          al.setAttribute('href', authorHref);
+        }
+      }
+      var titleEl = wrap.querySelector('[data-mys-id="post-title"]');
+      if (titleEl) titleEl.innerHTML = renderPostTitle(post.subject);
+      var ct = wrap.querySelector('[data-mys-id="post-content"]');
+      if (ct) ct.innerHTML = renderPostBody(post.structured_content, post.content);
+    }).catch(function () {});
+  }
+  var moreBtn = wrap.querySelector('[data-mys-id="load-more"]');
+  if (moreBtn) moreBtn.addEventListener('click', function () { loadComments(false); });
+  var initTitleEl = wrap.querySelector('[data-mys-id="post-title"]');
+  if (initTitleEl) initTitleEl.innerHTML = renderPostTitle(initialPostTitleRaw);
+  var initCt = wrap.querySelector('[data-mys-id="post-content"]');
+  if (initCt) initCt.innerHTML = renderPostBody(initialPostStructuredContentRaw, initialPostContentRaw);
+  renderComments();
+  loadComments(true);
+  fetchByBridge(API_EMOTICONS).then(function (resp) { mergeEmoticons(resp); renderComments(); }).catch(function () {});
+  refreshPost();
+})();
+</script>

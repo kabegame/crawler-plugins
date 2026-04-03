@@ -1,0 +1,14 @@
+[
+  {
+    "insert": {
+      "backup_text": "[自定义表情]",
+      "custom_emoticon": {
+        "id": "73796",
+        "url": "https://upload-bbs.miyoushe.com/upload/2026/03/10/301409277/1b8281340a06b8e992fc8f3767b41b26_2558812901533179907.jpg",
+        "size": { "width": 166, "height": 166, "file_size": 7651 },
+        "is_available": true,
+        "hash": "edbe34a57bd74b4f7cf0f904b172ae405836ddc7"
+      }
+    }
+  }
+]
