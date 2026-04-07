@@ -9,3 +9,10 @@ node_modules/
 .DS_Store
 Thumbs.db
 
+# 本地探测下载（try_download_images_probe.py）
+plugins/bilibili/tools/_probe_downloads/
+
+__pycache__/
+
+# 本地 B 站 Cookie（fetch_reply_sample.py）
+plugins/bilibili/.bili_cookie.local

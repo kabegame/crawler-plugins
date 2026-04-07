@@ -221,33 +221,57 @@
     {
       "key": "wallpaper_type",
       "type": "options",
-      "name": "壁纸类型",
-      "name.en": "Wallpaper type",
-      "name.ja": "壁紙タイプ",
-      "name.ko": "벽지 유형",
-      "name.zhtw": "壁紙類型",
-      "descripts": "选择要爬取的壁纸类型：桌面壁纸（imgpc）或手机壁纸（sp）",
-      "descripts.en": "Desktop (imgpc) or mobile (sp) wallpapers",
-      "descripts.ja": "デスクトップ（imgpc）またはモバイル（sp）壁紙",
-      "descripts.ko": "데스크톱(imgpc) 또는 모바일(sp) 벽지",
-      "descripts.zhtw": "選擇要爬取的壁紙類型：桌面壁紙（imgpc）或手機壁紙（sp）",
+      "name": "排行榜子类",
+      "name.en": "Ranking category",
+      "name.ja": "ランキング種別",
+      "name.ko": "랭킹 하위 종류",
+      "name.zhtw": "排行榜子類",
+      "descripts": "对应站点路径：综合为 ranking-{周期}，其余为 ranking-{周期}-{子类}（如日榜综合 ranking-daily，手机为 ranking-daily-sp）",
+      "descripts.en": "Combined uses ranking-{period}; others use ranking-{period}-{slug} (e.g. ranking-daily, ranking-daily-sp)",
+      "descripts.ja": "総合は ranking-{期間}、それ以外は ranking-{期間}-{種別}",
+      "descripts.ko": "종합은 ranking-{기간}, 나머지는 ranking-{기간}-{하위}",
+      "descripts.zhtw": "綜合為 ranking-{週期}，其餘為 ranking-{週期}-{子類}",
       "default": "imgpc",
       "options": [
         {
-          "name": "桌面壁纸",
-          "name.en": "Desktop",
-          "name.ja": "デスクトップ",
-          "name.ko": "데스크톱",
-          "name.zhtw": "桌面壁紙",
+          "name": "综合",
+          "name.en": "All",
+          "name.ja": "総合",
+          "name.ko": "종합",
+          "name.zhtw": "綜合",
+          "variable": "all"
+        },
+        {
+          "name": "手机壁纸 (sp)",
+          "name.en": "Mobile (sp)",
+          "name.ja": "スマホ壁紙 (sp)",
+          "name.ko": "모바일 (sp)",
+          "name.zhtw": "手機壁紙 (sp)",
+          "variable": "sp"
+        },
+        {
+          "name": "高质量图片 (image)",
+          "name.en": "High-quality images (image)",
+          "name.ja": "高品質画像 (image)",
+          "name.ko": "고품질 이미지 (image)",
+          "name.zhtw": "高品質圖片 (image)",
+          "variable": "image"
+        },
+        {
+          "name": "高质量PC壁纸 (imgpc)",
+          "name.en": "High-quality PC (imgpc)",
+          "name.ja": "高品質PC壁紙 (imgpc)",
+          "name.ko": "고품질 PC (imgpc)",
+          "name.zhtw": "高品質PC壁紙 (imgpc)",
           "variable": "imgpc"
         },
         {
-          "name": "手机壁纸",
-          "name.en": "Mobile",
-          "name.ja": "モバイル",
-          "name.ko": "모바일",
-          "name.zhtw": "手機壁紙",
-          "variable": "sp"
+          "name": "PC壁纸 (pc)",
+          "name.en": "PC wallpapers (pc)",
+          "name.ja": "PC壁紙 (pc)",
+          "name.ko": "PC 벽지 (pc)",
+          "name.zhtw": "PC壁紙 (pc)",
+          "variable": "pc"
         }
       ]
     }

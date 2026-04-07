@@ -6,22 +6,6 @@ fn anihonet_row_ids() {
     return ["a", "ka", "sa", "ta", "na", "ha", "ma", "ya", "ra", "wa"];
 }
 
-// 从 URL 中提取“文件名”（忽略 query/hash，只取最后一个 '/' 之后的部分）
-fn extract_filename(url) {
-    let no_query = url.split("?")[0];
-    let no_hash = no_query.split("#")[0];
-    let parts = no_hash.split("/");
-    if parts.len() == 0 {
-        return "";
-    }
-    return parts[parts.len() - 1];
-}
-
-fn is_android_image(url) {
-    let filename = extract_filename(url);
-    return re_is_match("(?i)android", filename);
-}
-
 fn total_pages() {
     return end_page - start_page + 1;
 }
@@ -187,7 +171,8 @@ fn crawl_theme_from_index(theme_query, page_start, page_end) {
     crawl_anime_series(rel, 100.0, "theme", 1, 1, page_start, page_end);
 }
 
-// 按 href 尝试下载（resize / 扩展名 / 桌面·手机 过滤）。progress_slice：本链接在「作品索引」模式下分摊到的进度（含跳过也计入，保证总和）；排行榜传 0
+// 按 href 尝试下载（resize / 扩展名）。分类由排行榜 slug 决定，不按文件名区分手机/桌面。
+// progress_slice：本链接在「作品索引」模式下分摊到的进度（含跳过也计入，保证总和）；排行榜传 0
 fn process_download_href(href, progress_slice) {
     if href == () || href == "" {
         print("[anihonet]     跳过：空 href");
@@ -206,21 +191,6 @@ fn process_download_href(href, progress_slice) {
     }
     if !is_image_url(full_image) {
         print(`[anihonet]     跳过：非图片扩展名 URL → ${full_image}`);
-        if progress_slice > 0.0 {
-            add_progress(progress_slice);
-        }
-        return;
-    }
-    let is_android = is_android_image(full_image);
-    if wallpaper_type == "sp" && !is_android {
-        print(`[anihonet]     跳过：当前为手机壁纸模式，跳过非 Android 文件名 → ${full_image}`);
-        if progress_slice > 0.0 {
-            add_progress(progress_slice);
-        }
-        return;
-    }
-    if wallpaper_type == "imgpc" && is_android {
-        print(`[anihonet]     跳过：当前为桌面壁纸模式，跳过 Android 文件名 → ${full_image}`);
         if progress_slice > 0.0 {
             add_progress(progress_slice);
         }
@@ -431,6 +401,15 @@ fn crawl_anime_game_index(rows) {
     }
 }
 
+// 综合榜：ranking-{period}；其余：ranking-{period}-{cate}（如日榜：ranking-daily-sp、ranking-daily-imgpc）
+fn ranking_list_slug(period, cate) {
+    let slug_cate = if cate == "img-pc" { "imgpc" } else { cate };
+    if slug_cate == "all" {
+        return `ranking-${period}`;
+    }
+    return `ranking-${period}-${slug_cate}`;
+}
+
 fn crawl_kind(kind, start_page, end_page, period) {
     let total_pg = total_pages();
     let pct_per_page = if total_pg > 0 {
@@ -438,10 +417,16 @@ fn crawl_kind(kind, start_page, end_page, period) {
     } else {
         0.0
     };
+    let slug = ranking_list_slug(period, kind);
     print(`[anihonet] 排行榜进度分摊：全任务 100% → 每列表页 ${pct_per_page}%（共 ${total_pg} 页）→ 页内每条 a 均分 → 详情内每图均分`);
     let pg = start_page;
     while pg <= end_page {
-        let start_url = `https://anihonetwallpaper.com/ranking-${period}-${kind}/${pg}`;
+        // 站点第一页 canonical 为 /{slug}，不带 /1
+        let start_url = if pg == 1 {
+            `https://anihonetwallpaper.com/${slug}`
+        } else {
+            `https://anihonetwallpaper.com/${slug}/${pg}`
+        };
         print(`[anihonet] 进入排行榜列表页 第${pg}/${end_page} 页：${start_url}`);
         to(start_url);
         let hrefs = get_attr("article .ranking-frame a", "href");
@@ -465,8 +450,9 @@ fn crawl_kind(kind, start_page, end_page, period) {
     }
 }
 
-if wallpaper_type != "imgpc" && wallpaper_type != "sp" {
-    print("错误：wallpaper_type 必须是 'imgpc' 或 'sp'");
+let wt_ok = wallpaper_type == "all" || wallpaper_type == "sp" || wallpaper_type == "image" || wallpaper_type == "img-pc" || wallpaper_type == "imgpc" || wallpaper_type == "pc";
+if !wt_ok {
+    print("错误：wallpaper_type 必须是 'all'（综合）、'sp'、'image'、'imgpc'、'pc'（旧版 'img-pc' 仍兼容为 imgpc）");
 } else if crawl_mode != "ranking" && crawl_mode != "anime_game" && crawl_mode != "by_theme" {
     print("错误：crawl_mode 必须是 'ranking'、'anime_game' 或 'by_theme'");
 } else if crawl_mode == "anime_game" {

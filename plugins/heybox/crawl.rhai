@@ -75,12 +75,12 @@ fn xhh_challenge_exit(where_msg, status_val) {
 }
 
 // fast_crawl 为 true 时不休眠（与 config.json「快速爬取」一致）
-fn xhh_sleep_unless_fast(fast, lo, hi) {
-    if fast == true {
-        return;
-    }
-    sleep(rand_f64(lo, hi));
-}
+// fn xhh_sleep_unless_fast(fast, lo, hi) {
+//     if fast == true {
+//         return;
+//     }
+//     sleep(rand_f64(lo, hi));
+// }
 
 fn xhh_coerce_str(v) {
     if v == () {
@@ -520,7 +520,7 @@ fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path
         add_progress(delta_per_image);
         k += 1;
 
-        xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
+        // xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
     }
 
     if fetch_comment_images {
@@ -588,7 +588,7 @@ fn xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, api_host, path_tree, path
                 } else {
                     warn("original/image 失败(评论图) link_id=" + link_id + " status=" + orig["status"].to_string());
                 }
-                xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
+                // xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
             }
         }
     }
@@ -669,7 +669,7 @@ while page <= end_page {
         warn("第 " + page.to_string() + " 页无搜索结果");
         add_progress(page_weight);
         page += 1;
-        xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
+        // xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
         continue;
     }
 
@@ -691,7 +691,7 @@ while page <= end_page {
         warn("第 " + page.to_string() + " 页无含 link_id 的有效帖子");
         add_progress(page_weight);
         page += 1;
-        xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
+        // xhh_sleep_unless_fast(fast_crawl, 0.8, 2.0);
         continue;
     }
 
@@ -714,7 +714,7 @@ while page <= end_page {
 
     print("第 " + page.to_string() + " 页处理完成");
     page += 1;
-    xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
+    // xhh_sleep_unless_fast(fast_crawl, 8.0, 14.0);
 }
 
 print("[小黑盒] 任务结束");

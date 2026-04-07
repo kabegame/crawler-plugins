@@ -1,0 +1,524 @@
+<%#
+  数据来源：crawl.rhai build_article_metadata / opus metadata → download_image metadata
+  - bilibili_article：cvid、title、desc、total_image_count（正文解析图数）、publish_time、author、stats、tags、categories、reply_total、replies（爬取时快照）
+  - bilibili_opus：opus_id、total_image_count
+  每张图展示名由 crawl.rhai 的 download_image name 提供（与米游社类似：多图为标题(序号)）
+%>
+<%
+  const m = metadata || {};
+  function esc(s) {
+    if (s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function escAttr(s) {
+    return esc(s).replace(/"/g, '&quot;');
+  }
+  function renderRcMsg(message, emotes) {
+    if (message == null) message = '';
+    emotes = emotes || {};
+    var re = /(\[[^\[\]]+\])/g;
+    var out = [];
+    var last = 0;
+    var m;
+    while ((m = re.exec(message)) !== null) {
+      if (m.index > last) out.push(esc(message.slice(last, m.index)));
+      var token = m[1];
+      var info = emotes[token];
+      if (info && info.url) {
+        var lg = Number(info.size) === 2;
+        var cls = lg ? 'bili-rc-emote-lg' : 'bili-rc-emote-sm';
+        var u = String(info.url).replace(/^http:\/\//i, 'https://');
+        out.push(
+          '<img class="bili-rc-emote ' +
+            cls +
+            '" src="' +
+            escAttr(u) +
+            '" alt="' +
+            escAttr(token) +
+            '" loading="lazy" decoding="async" referrerpolicy="no-referrer" />'
+        );
+      } else {
+        out.push(esc(token));
+      }
+      last = re.lastIndex;
+    }
+    if (last < message.length) out.push(esc(message.slice(last)));
+    return out.join('');
+  }
+  const src = m.source != null ? String(m.source) : '';
+  const cvid = m.cvid != null ? String(m.cvid) : '';
+  const opusId = m.opus_id != null ? String(m.opus_id) : '';
+  const title = m.title != null ? String(m.title) : '';
+  const desc = m.desc != null ? String(m.desc) : '';
+  const pub = m.publish_time != null ? Number(m.publish_time) : 0;
+  const author = (m.author != null && typeof m.author === 'object' && !Array.isArray(m.author)) ? m.author : {};
+  const mid = author.mid != null ? String(author.mid) : '';
+  const authorName = author.name != null ? String(author.name) : '';
+  const authorFace = author.face != null ? String(author.face) : '';
+  const fans = author.fans != null ? Number(author.fans) : NaN;
+  const level = author.level != null ? Number(author.level) : 0;
+  const stats = (m.stats != null && typeof m.stats === 'object' && !Array.isArray(m.stats)) ? m.stats : {};
+  const viewN = stats.view != null ? Number(stats.view) : NaN;
+  const likeN = stats.like != null ? Number(stats.like) : NaN;
+  const replyN = stats.reply != null ? Number(stats.reply) : NaN;
+  const favN = stats.favorite != null ? Number(stats.favorite) : NaN;
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  const categories = Array.isArray(m.categories) ? m.categories : [];
+  const replyTotal = m.reply_total != null ? Number(m.reply_total) : 0;
+  const replies = Array.isArray(m.replies) ? m.replies : [];
+  const totalImageCount = m.total_image_count != null ? Number(m.total_image_count) : 0;
+  const categoryLine = categories
+    .map(function (c) { return c && c.name != null ? String(c.name).trim() : ''; })
+    .filter(function (s) { return !!s; })
+    .join(' · ');
+  const articleHref = cvid ? ('https://www.bilibili.com/read/cv' + encodeURIComponent(cvid) + '/?opus_fallback=1') : '';
+  const spaceHref = mid ? ('https://space.bilibili.com/' + encodeURIComponent(mid)) : '';
+  const opusHref = opusId ? ('https://www.bilibili.com/opus/' + encodeURIComponent(opusId)) : '';
+%>
+<% if (src === 'bilibili_opus') { %>
+<style>
+.bili-opus-mini { font-size: 0.82rem; color: var(--anime-text-secondary, #6b7280); line-height: 1.5; }
+.bili-opus-mini a { color: var(--anime-primary, #6366f1); }
+</style>
+<div class="bili-opus-mini">
+  <% if (opusHref) { %><p><a href="<%= esc(opusHref) %>" target="_blank" rel="noopener noreferrer">Bilibili 图文帖</a></p><% } %>
+  <% if (opusId) { %><p><code style="font-size:0.78rem;word-break:break-all;"><%= esc(opusId) %></code></p><% } %>
+  <% if (totalImageCount > 0) { %><p class="bili-image-summary bili-image-summary--opus">图片 <span><%= totalImageCount %></span></p><% } %>
+</div>
+<% } else if (src !== 'bilibili_article' || !cvid) { %>
+<p style="font-size:0.82rem;color:var(--anime-text-secondary,#6b7280);margin:0;">—</p>
+<% } else { %>
+<style>
+.bili-desc-root { font-size: 0.82rem; line-height: 1.5; color: var(--anime-text-primary, #1f2937); word-break: break-word; box-sizing: border-box; }
+.bili-desc-root * { box-sizing: border-box; }
+.bili-title-container { margin-bottom: 10px; }
+.bili-title-container h1.bili-title {
+  margin: 0 0 8px;
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--anime-text-primary, #1f2937);
+}
+.bili-title-container h1.bili-title a {
+  color: inherit;
+  text-decoration: none;
+}
+.bili-title-container h1.bili-title a:hover {
+  color: var(--anime-primary, #6366f1);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bili-image-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  margin: 0 0 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--anime-text-secondary, #6b7280);
+  border: 1px solid color-mix(in srgb, var(--anime-border, #d1d5db) 75%, transparent);
+  background: color-mix(in srgb, var(--anime-text-primary, #111827) 4%, transparent);
+}
+.bili-image-summary--opus { margin-top: 6px; }
+.bili-article-read-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 0.76rem;
+  color: var(--anime-text-secondary, #6b7280);
+}
+.bili-article-read-panel .bili-dot { opacity: 0.65; }
+.bili-up-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 12px 0 10px;
+  padding: 10px 0;
+  border-top: 1px solid color-mix(in srgb, var(--anime-border, #e5e7eb) 55%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--anime-border, #e5e7eb) 55%, transparent);
+}
+.bili-up-left { display: flex; gap: 10px; min-width: 0; flex: 1; }
+.bili-avatar-wrap {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--anime-text-secondary, #9ca3af) 12%, transparent);
+}
+.bili-avatar-wrap img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.bili-up-meta { min-width: 0; flex: 1; }
+.bili-up-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--anime-text-primary, #1f2937);
+  text-decoration: none;
+}
+.bili-up-name:hover { text-decoration: underline; text-underline-offset: 2px; }
+.bili-level {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 5px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 3px;
+  font-size: 0.66rem;
+  font-weight: 600;
+  vertical-align: middle;
+  color: #fff;
+  background: #999;
+}
+.bili-level.l1 { background: #939393; }
+.bili-level.l2 { background: #5cb85c; }
+.bili-level.l3 { background: #699efc; }
+.bili-level.l4 { background: #c37bff; }
+.bili-level.l5 { background: #ff6c00; }
+.bili-level.l6 { background: #ff0000; }
+.bili-avatar-info {
+  margin-top: 4px;
+  font-size: 0.74rem;
+  color: var(--anime-text-secondary, #6b7280);
+}
+.bili-desc-block {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--anime-text-primary, #111827) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--anime-border, #d1d5db) 70%, transparent);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--anime-text-primary, #374151);
+  white-space: pre-wrap;
+}
+.bili-desc-block[hidden] { display: none !important; }
+.bili-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin: 10px 0 0;
+  align-items: center;
+}
+.bili-tag-row a {
+  font-size: 0.74rem;
+  color: var(--anime-primary, #6366f1);
+  text-decoration: none;
+}
+.bili-tag-row a:hover { text-decoration: underline; }
+.bili-cat-row {
+  font-size: 0.72rem;
+  color: var(--anime-text-secondary, #9ca3af);
+  margin: 6px 0 0;
+}
+.bili-footer-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--anime-border, #d1d5db) 80%, transparent);
+  font-size: 0.76rem;
+  text-decoration: none;
+  color: var(--anime-text-secondary, #6b7280);
+}
+.bili-footer-link:hover {
+  color: var(--anime-text-primary, #1f2937);
+  background: color-mix(in srgb, var(--anime-text-primary, #111827) 6%, transparent);
+}
+.bili-rc-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--anime-border, #e5e7eb) 55%, transparent);
+}
+.bili-rc-title {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--anime-text-secondary, #6b7280);
+}
+.bili-rc-count { font-weight: 500; opacity: 0.85; margin-left: 4px; }
+.bili-rc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--anime-border, #e5e7eb) 40%, transparent);
+}
+.bili-rc-row:last-child { border-bottom: none; }
+.bili-rc-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--anime-text-secondary, #9ca3af) 12%, transparent);
+}
+.bili-rc-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.bili-rc-main { flex: 1; min-width: 0; }
+.bili-rc-userline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 4px;
+}
+.bili-rc-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--anime-text-primary, #1f2937);
+}
+.bili-rc-name:hover { text-decoration: underline; }
+.bili-rc-body {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--anime-text-primary, #374151);
+  word-break: break-word;
+  white-space: pre-line;
+}
+.bili-rc-emote {
+  vertical-align: text-bottom;
+  display: inline-block;
+  max-width: 96px;
+  height: auto;
+}
+.bili-rc-emote-sm { width: 20px; height: 20px; max-width: 96px; object-fit: contain; }
+.bili-rc-emote-lg { width: 50px; height: 50px; max-width: 96px; object-fit: contain; }
+.bili-rc-subhint {
+  font-size: 0.72rem;
+  color: var(--anime-primary, #6366f1);
+  margin-top: 4px;
+}
+.bili-rc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--anime-text-secondary, #9ca3af);
+}
+</style>
+<div class="bili-desc-root" data-bili-cv="<%= esc(cvid) %>">
+  <div class="bili-title-container">
+    <% if (articleHref) { %>
+    <h1 class="bili-title"><a href="<%= esc(articleHref) %>" target="_blank" rel="noopener noreferrer"><%= esc(title) %></a></h1>
+    <% } else { %>
+    <h1 class="bili-title"><%= esc(title) %></h1>
+    <% } %>
+    <% if (totalImageCount > 0) { %>
+    <div class="bili-image-summary" aria-label="images">图片 <span><%= totalImageCount %></span></div>
+    <% } %>
+    <div class="bili-article-read-panel" aria-label="stats">
+      <span class="publish-text" data-bili-id="pub"></span>
+      <% if (pub) { %><% if (!isNaN(viewN) || !isNaN(likeN) || !isNaN(replyN) || !isNaN(favN)) { %><span class="bili-dot">·</span><% } %><% } %>
+      <% if (!isNaN(viewN)) { %><span><%= viewN %><span data-bili-suf="view"></span></span><% } %>
+      <% if (!isNaN(viewN) && (!isNaN(likeN) || !isNaN(replyN) || !isNaN(favN))) { %><span class="bili-dot">·</span><% } %>
+      <% if (!isNaN(likeN)) { %><span><%= likeN %><span data-bili-suf="like"></span></span><% } %>
+      <% if (!isNaN(likeN) && (!isNaN(replyN) || !isNaN(favN))) { %><span class="bili-dot">·</span><% } %>
+      <% if (!isNaN(replyN)) { %><span><%= replyN %><span data-bili-suf="reply"></span></span><% } %>
+      <% if (!isNaN(replyN) && !isNaN(favN)) { %><span class="bili-dot">·</span><% } %>
+      <% if (!isNaN(favN)) { %><span><%= favN %><span data-bili-suf="fav"></span></span><% } %>
+    </div>
+  </div>
+
+  <div class="bili-up-info">
+    <div class="bili-up-left">
+      <% if (spaceHref && authorFace) { %>
+      <a class="bili-avatar-wrap" href="<%= esc(spaceHref) %>" target="_blank" rel="noopener noreferrer" aria-label="space">
+        <img src="<%= esc(authorFace) %>" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+      </a>
+      <% } else if (authorFace) { %>
+      <div class="bili-avatar-wrap"><img src="<%= esc(authorFace) %>" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" /></div>
+      <% } else if (spaceHref) { %>
+      <a class="bili-avatar-wrap" href="<%= esc(spaceHref) %>" target="_blank" rel="noopener noreferrer" aria-label="space"></a>
+      <% } %>
+      <div class="bili-up-meta">
+        <% if (spaceHref && authorName) { %>
+        <a class="bili-up-name" href="<%= esc(spaceHref) %>" target="_blank" rel="noopener noreferrer"><%= esc(authorName) %></a>
+        <% } else { %>
+        <span class="bili-up-name" style="text-decoration:none;cursor:default;"><%= esc(authorName) %></span>
+        <% } %>
+        <% if (level > 0 && level <= 6) { %><span class="bili-level l<%= level %>"></span><% } %>
+        <div class="bili-avatar-info">
+          <% if (!isNaN(fans)) { %><span data-bili-suf="fans"></span><span><%= fans %></span><% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (categoryLine) { %>
+  <div class="bili-cat-row"><%= esc(categoryLine) %></div>
+  <% } %>
+
+  <div class="bili-desc-block" id="bili-desc-text"<% if (!desc.trim()) { %> hidden<% } %>><%= esc(desc) %></div>
+
+  <% if (tags.length) { %>
+  <div class="bili-tag-row" aria-label="tags">
+    <% tags.forEach(function (t) { const name = t && t.name != null ? String(t.name) : ''; if (!name) return; const th = 'https://search.bilibili.com/article?keyword=' + encodeURIComponent(name); %>
+    <a href="<%= esc(th) %>" target="_blank" rel="noopener noreferrer">#<%= esc(name) %></a>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <% if (articleHref) { %>
+  <a class="bili-footer-link" href="<%= esc(articleHref) %>" target="_blank" rel="noopener noreferrer" data-bili-open-article></a>
+  <% } %>
+
+  <% if (replyTotal > 0 || replies.length > 0) { %>
+  <section class="bili-rc-section" aria-label="comments">
+    <h2 class="bili-rc-title">
+      <span data-bili-rc-lbl="title">评论</span><% if (replyTotal > 0) { %><span class="bili-rc-count">(<%= replyTotal %>)</span><% } %>
+    </h2>
+    <% replies.forEach(function (r) {
+      var rmid = r && r.mid != null ? String(r.mid) : '';
+      var runame = r && r.uname != null ? String(r.uname) : '';
+      var rface = r && r.avatar != null ? String(r.avatar) : '';
+      var rspace = rmid ? ('https://space.bilibili.com/' + encodeURIComponent(rmid)) : '';
+      var msg = r && r.message != null ? String(r.message) : '';
+      var em = (r && r.emotes && typeof r.emotes === 'object' && !Array.isArray(r.emotes)) ? r.emotes : {};
+      var ctime = r && r.ctime != null ? Number(r.ctime) : 0;
+      var rlike = r && r.like != null ? Number(r.like) : 0;
+      var rloc = r && r.location != null ? String(r.location) : '';
+      var subHint = r && r.sub_count_text != null ? String(r.sub_count_text) : '';
+    %>
+    <div class="bili-rc-row">
+      <% if (rspace) { %>
+      <a class="bili-rc-avatar" href="<%= esc(rspace) %>" target="_blank" rel="noopener noreferrer" aria-label="avatar">
+        <% if (rface) { %><img src="<%= esc(rface) %>" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" /><% } %>
+      </a>
+      <% } else if (rface) { %>
+      <div class="bili-rc-avatar"><img src="<%= esc(rface) %>" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" /></div>
+      <% } else { %>
+      <div class="bili-rc-avatar"></div>
+      <% } %>
+      <div class="bili-rc-main">
+        <div class="bili-rc-userline">
+          <% if (rspace && runame) { %>
+          <a class="bili-rc-name" href="<%= esc(rspace) %>" target="_blank" rel="noopener noreferrer"><%= esc(runame) %></a>
+          <% } else { %>
+          <span class="bili-rc-name" style="text-decoration:none;cursor:default;"><%= esc(runame) %></span>
+          <% } %>
+        </div>
+        <div class="bili-rc-body"><%- renderRcMsg(msg, em) %></div>
+        <% if (subHint) { %><div class="bili-rc-subhint"><%= esc(subHint) %></div><% } %>
+        <div class="bili-rc-meta">
+          <% if (ctime) { %><span data-bili-reply-sec="<%= Math.floor(ctime) %>"></span><% } %>
+          <% if (rloc) { %><span><%= esc(rloc) %></span><% } %>
+          <% if (rlike > 0) { %><span><%= rlike %> <span data-bili-rc-suf="like">赞</span></span><% } %>
+        </div>
+      </div>
+    </div>
+    <% }); %>
+  </section>
+  <% } %>
+</div>
+<script>
+(function () {
+  var pubSec = <%- JSON.stringify(pub) %>;
+  var sufLabels = {
+    zh: { view: '浏览', like: '点赞', reply: '评论', fav: '收藏', fans: '粉丝：' },
+    zhtw: { view: '瀏覽', like: '按讚', reply: '留言', fav: '收藏', fans: '粉絲：' },
+    ja: { view: '閲覧', like: 'いいね', reply: 'コメント', fav: 'お気に入り', fans: 'フォロワー：' },
+    ko: { view: '조회', like: '좋아요', reply: '댓글', fav: '즐겨찾기', fans: '팔로워：' },
+    en: { view: ' views', like: ' likes', reply: ' replies', fav: ' favorites', fans: 'Fans: ' }
+  };
+  var openArticleLbl = {
+    zh: '查看原文', zhtw: '查看原文', ja: '記事を開く', ko: '원문 보기', en: 'Open article'
+  };
+  var rcLabels = {
+    zh: { title: '评论', like: '赞' },
+    zhtw: { title: '留言', like: '讚' },
+    ja: { title: 'コメント', like: 'いいね' },
+    ko: { title: '댓글', like: '좋아요' },
+    en: { title: 'Comments', like: 'likes' }
+  };
+  function getLang(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return 'zhtw';
+    if (s.indexOf('zh') === 0) return 'zh';
+    if (s === 'ja') return 'ja';
+    if (s === 'ko') return 'ko';
+    return 'en';
+  }
+  function localeTag(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') return 'zh-TW';
+    if (s.indexOf('zh') === 0) return 'zh-CN';
+    if (s === 'ja') return 'ja-JP';
+    if (s === 'ko') return 'ko-KR';
+    return 'en-US';
+  }
+  function fmtPub(sec, loc) {
+    if (!sec) return '';
+    var d = new Date(sec * 1000);
+    if (isNaN(d.getTime())) return '';
+    try {
+      return new Intl.DateTimeFormat(localeTag(loc), { dateStyle: 'long', timeStyle: 'short' }).format(d);
+    } catch (e) {
+      return d.toLocaleString(localeTag(loc));
+    }
+  }
+  function applySuffixes(loc) {
+    var lang = getLang(loc);
+    var S = sufLabels[lang] || sufLabels.en;
+    document.querySelectorAll('[data-bili-suf]').forEach(function (el) {
+      var k = el.getAttribute('data-bili-suf');
+      if (!k || !S[k]) return;
+      el.textContent = S[k];
+    });
+    var oa = document.querySelector('[data-bili-open-article]');
+    if (oa) oa.textContent = openArticleLbl[lang] || openArticleLbl.en;
+  }
+  function applyRcLabels(loc) {
+    var lang = getLang(loc);
+    var R = rcLabels[lang] || rcLabels.en;
+    document.querySelectorAll('[data-bili-rc-lbl]').forEach(function (el) {
+      var k = el.getAttribute('data-bili-rc-lbl');
+      if (k === 'title' && R.title) el.textContent = R.title;
+    });
+    document.querySelectorAll('[data-bili-rc-suf]').forEach(function (el) {
+      var k = el.getAttribute('data-bili-rc-suf');
+      if (k === 'like' && R.like) el.textContent = R.like;
+    });
+  }
+  function formatReplyTimes(loc) {
+    document.querySelectorAll('[data-bili-reply-sec]').forEach(function (el) {
+      var raw = el.getAttribute('data-bili-reply-sec');
+      var sec = raw != null ? parseInt(raw, 10) : 0;
+      if (!sec || isNaN(sec)) return;
+      var d = new Date(sec * 1000);
+      if (isNaN(d.getTime())) return;
+      try {
+        el.textContent = new Intl.DateTimeFormat(localeTag(loc), { dateStyle: 'medium', timeStyle: 'short' }).format(d);
+      } catch (e) {
+        el.textContent = d.toLocaleString(localeTag(loc));
+      }
+    });
+  }
+  function run() {
+    function finish(l) {
+      var loc = l || 'en';
+      var pubEl = document.querySelector('[data-bili-id="pub"]');
+      if (pubEl && pubSec) pubEl.textContent = fmtPub(pubSec, loc);
+      applySuffixes(loc);
+      applyRcLabels(loc);
+      formatReplyTimes(loc);
+    }
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(finish).catch(function () { finish('en'); });
+    } else {
+      finish((navigator.language || 'en').split('-')[0]);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
+</script>
+<% } %>
