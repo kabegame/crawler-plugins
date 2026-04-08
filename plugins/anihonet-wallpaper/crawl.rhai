@@ -171,9 +171,86 @@ fn crawl_theme_from_index(theme_query, page_start, page_end) {
     crawl_anime_series(rel, 100.0, "theme", 1, 1, page_start, page_end);
 }
 
+// 详情页 blogbox：投稿日 ISO datetime + tags（span.tagst > a）
+fn parse_anihonet_metadata() {
+    let date = "";
+    let dt_attr = get_attr("time.entry-date", "datetime");
+    if dt_attr.len() > 0 {
+        date = dt_attr[0];
+    }
+    let hrefs = get_attr("span.tagst a", "href");
+    let labels = query("span.tagst a");
+    let tags = [];
+    let n = hrefs.len();
+    if labels.len() < n {
+        n = labels.len();
+    }
+    let i = 0;
+    while i < n {
+        let lab = labels[i];
+        if lab == () {
+            lab = "";
+        } else {
+            lab.trim();
+        }
+        let h = hrefs[i];
+        tags.push(#{ name: lab, href: h });
+        i += 1;
+    }
+    #{ date: date, tags: tags }
+}
+
+// 原图说明：含「画像サイズ」的 p.wp-img3；去掉尺寸括号后为展示名（不含缩小图「最大長辺」段）
+fn parse_anihonet_names() {
+    let lines = query("p.wp-img3.clearfix.center");
+    let out = [];
+    let i = 0;
+    while i < lines.len() {
+        let raw = lines[i];
+        if raw != () && raw.contains("画像サイズ") {
+            let s = re_replace_all("(?s)\\([^)]*画像サイズ[^)]*\\)", "", raw);
+            if s == () {
+                s = "";
+            } else {
+                s.trim();
+            }
+            if s.len() > 0 {
+                out.push(s);
+            }
+        }
+        i += 1;
+    }
+    out
+}
+
+// 多图时 name 为「标题(序号)」，单图为标题；无标题时仅 metadata_id
+fn anihonet_build_download_opts(base_name, img_idx_1based, total_imgs, meta_id) {
+    let disp = base_name;
+    if disp == () {
+        disp = "";
+    } else {
+        disp.trim();
+    }
+    let name = if total_imgs > 1 {
+        if disp != "" {
+            disp + "(" + img_idx_1based.to_string() + ")"
+        } else {
+            "(" + img_idx_1based.to_string() + ")"
+        }
+    } else {
+        disp
+    };
+    if name != "" {
+        #{ name: name, metadata_id: meta_id }
+    } else {
+        #{ metadata_id: meta_id }
+    }
+}
+
 // 按 href 尝试下载（resize / 扩展名）。分类由排行榜 slug 决定，不按文件名区分手机/桌面。
 // progress_slice：本链接在「作品索引」模式下分摊到的进度（含跳过也计入，保证总和）；排行榜传 0
-fn process_download_href(href, progress_slice) {
+// dl_opts：可为空 map；非空时传入 download_image（name / metadata_id）
+fn process_download_href(href, progress_slice, dl_opts) {
     if href == () || href == "" {
         print("[anihonet]     跳过：空 href");
         if progress_slice > 0.0 {
@@ -197,7 +274,7 @@ fn process_download_href(href, progress_slice) {
         return;
     }
     print(`[anihonet]     开始下载：${full_image}`);
-    download_image(full_image);
+    download_image(full_image, dl_opts);
     if progress_slice > 0.0 {
         add_progress(progress_slice);
     }
@@ -208,9 +285,15 @@ fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
     let full_url = resolve_url(href);
     print(`[anihonet] 进入排行榜详情页 ${item_idx}/${item_total}：${full_url}`);
     to(full_url);
+    let meta_map = parse_anihonet_metadata();
+    let names = parse_anihonet_names();
+    let meta_id = create_image_metadata(meta_map);
     let dl_hrefs = get_attr("a.button:not(.add)", "href");
     let ne = dl_hrefs.len();
     print(`[anihonet]   本页共 ${ne} 个 a.button:not(.add) 下载链接`);
+    if names.len() != ne {
+        print(`[anihonet]   提示：原图说明段落数 ${names.len()} 与下载按钮数 ${ne} 不一致，按索引对齐`);
+    }
     let pct_per_img = if ne > 0 {
         work_pct_budget / ne
     } else {
@@ -223,7 +306,9 @@ fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
     while elem_idx < ne {
         let img_i = elem_idx + 1;
         print(`[anihonet]   下载第 ${img_i}/${ne} 张（按链接顺序尝试）`);
-        process_download_href(dl_hrefs[elem_idx], pct_per_img);
+        let base = if elem_idx < names.len() { names[elem_idx] } else { "" };
+        let dl_opts = anihonet_build_download_opts(base, img_i, ne, meta_id);
+        process_download_href(dl_hrefs[elem_idx], pct_per_img, dl_opts);
         elem_idx += 1;
     }
     back();
@@ -234,9 +319,15 @@ fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
     let full = resolve_url(href);
     print(`[anihonet]   进入作品详情页 ${work_idx}/${work_total}：${full}`);
     to(full);
+    let meta_map = parse_anihonet_metadata();
+    let names = parse_anihonet_names();
+    let meta_id = create_image_metadata(meta_map);
     let dl_hrefs = get_attr("a.button.add-dl", "href");
     let m = dl_hrefs.len();
     print(`[anihonet]     本页共 ${m} 个 a.button.add-dl 原图下载按钮`);
+    if names.len() != m {
+        print(`[anihonet]     提示：原图说明段落数 ${names.len()} 与下载按钮数 ${m} 不一致，按索引对齐`);
+    }
     let pct_per_img = if m > 0 {
         work_pct_budget / m
     } else {
@@ -249,7 +340,9 @@ fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
     while k < m {
         let img_i = k + 1;
         print(`[anihonet]     下载第 ${img_i}/${m} 张（按链接顺序尝试）`);
-        process_download_href(dl_hrefs[k], pct_per_img);
+        let base = if k < names.len() { names[k] } else { "" };
+        let dl_opts = anihonet_build_download_opts(base, img_i, m, meta_id);
+        process_download_href(dl_hrefs[k], pct_per_img, dl_opts);
         k += 1;
     }
     back();
