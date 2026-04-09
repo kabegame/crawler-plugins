@@ -708,7 +708,7 @@ while page <= end_page {
             let lid = info["linkid"];
             if lid != () { link_id = lid.to_string(); }
         }
-        xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, fast_crawl);
+        xhh_crawl_post(link_id, item_weight, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, false);
         j += 1;
     }
 
