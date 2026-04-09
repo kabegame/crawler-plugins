@@ -627,7 +627,7 @@ if crawl_mode == "single_post" {
         throw "无法从 URL 中提取 link_id，请确认这是小黑盒帖子分享链接";
     }
     print(`[小黑盒] 单帖子模式：link_id=${link_id}`);
-    xhh_crawl_post(link_id, 100.0, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, fast_crawl);
+    xhh_crawl_post(link_id, 100.0, COMMON_PARAMS, API_HOST, PATH_TREE, PATH_ORIGINAL, fetch_comment_images, false);
     print("[小黑盒] 任务结束");
     return;
 }
