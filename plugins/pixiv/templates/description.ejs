@@ -147,6 +147,46 @@
 <% const pxUserHref = pxUid ? ('https://www.pixiv.net/users/' + encodeURIComponent(pxUid)) : ''; %>
 <% const pxAuthorHref = pxAuthorId ? ('https://www.pixiv.net/users/' + encodeURIComponent(pxAuthorId)) : pxUserHref; %>
 <% const pxDateIso = b && (b.uploadDate != null || b.createDate != null) ? String(b.uploadDate != null ? b.uploadDate : b.createDate) : ''; %>
+<% const pxComments = Array.isArray(m.comments) ? m.comments : []; %>
+<%
+const PX_STAMP_NAME_TO_ID = {normal:101,surprise:102,serious:103,heaven:104,happy:105,excited:106,sing:107,cry:108,normal2:201,shame2:202,love2:203,interesting2:204,blush2:205,fire2:206,angry2:207,shine2:208,panic2:209,normal3:301,satisfaction3:302,surprise3:303,smile3:304,shock3:305,gaze3:306,wink3:307,happy3:308,excited3:309,love3:310,normal4:401,surprise4:402,serious4:403,love4:404,shine4:405,sweat4:406,shame4:407,sleep4:408,heart:501,teardrop:502,star:503};
+const PXIMG_STATIC = 'https://s.pximg.net/common/images/';
+function _pxEmojiImg(id, px) {
+  return '<img src="' + PXIMG_STATIC + 'emoji/' + id + '.png" width="' + px + '" height="' + px + '" alt="" class="px-comment-emoji" referrerpolicy="no-referrer" style="width:' + px + 'px;height:' + px + 'px;vertical-align:middle;display:inline-block;object-fit:contain;">';
+}
+function _pxStampImg(id, px) {
+  return '<img src="' + PXIMG_STATIC + 'stamp/generated-stamps/' + id + '_s.jpg?20180605" width="' + px + '" height="' + px + '" alt="" class="px-comment-emoji" referrerpolicy="no-referrer" style="width:' + px + 'px;height:' + px + 'px;vertical-align:middle;display:inline-block;object-fit:contain;">';
+}
+function pxCommentBodyHtml(comment, stampId) {
+  const c = String(comment || '');
+  const sid = (stampId != null && stampId !== '') ? String(stampId).trim() : '';
+  if (sid && !c.trim()) {
+    return '<div class="px-comment-body px-comment-body--solo">' + _pxStampImg(sid, 80) + '</div>';
+  }
+  const re = /\(([a-zA-Z0-9_]+)\)/g;
+  const parts = []; let last = 0, mx; let known = 0;
+  while ((mx = re.exec(c)) !== null) {
+    if (mx.index > last) parts.push({ t: 'text', v: c.slice(last, mx.index) });
+    const nid = PX_STAMP_NAME_TO_ID[mx[1]];
+    if (nid != null) { parts.push({ t: 'emoji', id: String(nid) }); known++; }
+    else parts.push({ t: 'text', v: mx[0] });
+    last = mx.index + mx[0].length;
+  }
+  if (last < c.length) parts.push({ t: 'text', v: c.slice(last) });
+  const solo = known === 1 && parts.length === 1 && parts[0].t === 'emoji';
+  const epx = solo ? 80 : 24;
+  let html = '<div class="px-comment-body' + (solo ? ' px-comment-body--solo' : '') + '">';
+  for (const p of parts) {
+    if (p.t === 'text') html += p.v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    else html += _pxEmojiImg(p.id, epx);
+  }
+  return html + '</div>';
+}
+function pxFmtDate(s) {
+  if (!s) return '';
+  try { return String(s).replace('T', ' ').slice(0, 16); } catch(e) { return String(s); }
+}
+%>
 <style>
 @keyframes px-spin{to{transform:rotate(360deg)}}
 .px-illust-desc{font-size:0.8rem;color:var(--anime-text-secondary,#4b5563);word-break:break-word;line-height:1.45;margin-bottom:0;}
@@ -236,28 +276,36 @@
   <% } %>
   <% if (illustId) { %>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
-    <span style="font-weight:600;font-size:0.8125rem;color:var(--anime-text-secondary,#6b7280);" id="px-comments-heading">…</span>
+    <span style="font-weight:600;font-size:0.8125rem;color:var(--anime-text-secondary,#6b7280);">Comments (<%= pxComments.length %>)</span>
     <% if (artworkHref) { %>
     <a href="#" class="px-open" data-url="<%= artworkHref %>" rel="noopener noreferrer" style="font-size:0.8rem;color:var(--anime-primary,#6366f1);cursor:pointer;text-decoration:underline;white-space:nowrap;">Pixiv</a>
     <% } %>
   </div>
-  <div id="px-comments-container" style="margin-bottom:8px;" role="list"></div>
-  <button type="button" id="px-load-more-comments" style="display:none;box-sizing:border-box;width:100%;align-items:center;justify-content:center;gap:6px;padding:8px 10px;margin-top:4px;background:transparent;border:1px solid var(--anime-border,#d1d5db);border-radius:8px;color:var(--anime-text-primary,#1f2937);cursor:pointer;font-size:0.8125rem;line-height:1.2;transition:background 0.075s ease;">
-    <span class="px-lm-chev" style="display:inline-flex;align-items:center;flex-shrink:0;"><svg viewBox="0 0 20 20" width="1.2em" height="1.2em" aria-hidden="true"><path fill="currentColor" d="M15.794 7.733a.75.75 0 0 1-.026 1.06l-5.25 5.001a.75.75 0 0 1-1.035 0l-5.25-5a.75.75 0 0 1 1.034-1.087l4.734 4.509l4.733-4.51a.75.75 0 0 1 1.06.027"></path></svg></span>
-    <span class="px-lm-label" style="white-space:nowrap;">…</span>
-    <svg class="px-lm-spin" viewBox="0 0 20 20" width="1.2em" height="1.2em" style="display:none;flex-shrink:0;animation:px-spin 0.75s linear infinite;" aria-hidden="true"><path fill="currentColor" d="M10 3.5A6.5 6.5 0 0 0 3.5 10A.75.75 0 0 1 2 10a8 8 0 1 1 8 8a.75.75 0 0 1 0-1.5a6.5 6.5 0 1 0 0-13"></path></svg>
-  </button>
+  <div id="px-comments-container" style="margin-bottom:8px;" role="list">
+    <% for (let pci = 0; pci < pxComments.length; pci++) { const pcm = pxComments[pci]; const pcUid = pcm.userId != null ? String(pcm.userId) : ''; const pcUname = pcm.userName != null ? String(pcm.userName) : ''; const pcImg = pcm.img != null ? String(pcm.img) : ''; const pcDate = pcm.commentDate != null ? pxFmtDate(String(pcm.commentDate)) : ''; %>
+    <div class="px-comment-row" role="listitem">
+      <div class="px-comment-avatar">
+        <% if (pcImg) { %><img src="<%= pcImg %>" alt="" referrerpolicy="no-referrer" /><% } %>
+      </div>
+      <div class="px-comment-main">
+        <div class="px-comment-name">
+          <% if (pcUid) { %><a href="#" class="px-open" data-url="https://www.pixiv.net/users/<%= encodeURIComponent(pcUid) %>" style="color:inherit;text-decoration:none;cursor:pointer;"><%= pcUname || pcUid %></a><% } else { %><%= pcUname || '?' %><% } %>
+        </div>
+        <%- pxCommentBodyHtml(pcm.comment, pcm.stampId) %>
+        <div class="px-comment-meta"><%= pcDate %></div>
+      </div>
+    </div>
+    <% } %>
+    <% if (!pxComments.length) { %><p style="font-size:0.8rem;color:var(--anime-text-secondary,#9ca3af);margin:4px 0;">No comments</p><% } %>
+  </div>
   <% } else { %>
-  <p id="px-no-illust-hint" style="font-size:0.8rem;color:var(--anime-text-secondary,#6b7280);margin:0;"></p>
+  <p style="font-size:0.8rem;color:var(--anime-text-secondary,#6b7280);margin:0;">Re-crawl with illust metadata to load comments.</p>
   <% } %>
 </div>
 <script>
 (function () {
   var ILLUST_ID = <%- JSON.stringify(illustId) %>;
   var PX_SEEDED_AUTHOR_ID = <%- JSON.stringify(pxAuthorId || '') %>;
-  /** 与 Pixiv 前端 emoji.js 一致：括号内 (heaven) 等 → emoji/{id}.png；API 的 stampId → generated-stamps/{id}_s.jpg */
-  var STAMP_NAME_TO_ID = {"normal":101,"surprise":102,"serious":103,"heaven":104,"happy":105,"excited":106,"sing":107,"cry":108,"normal2":201,"shame2":202,"love2":203,"interesting2":204,"blush2":205,"fire2":206,"angry2":207,"shine2":208,"panic2":209,"normal3":301,"satisfaction3":302,"surprise3":303,"smile3":304,"shock3":305,"gaze3":306,"wink3":307,"happy3":308,"excited3":309,"love3":310,"normal4":401,"surprise4":402,"serious4":403,"love4":404,"shine4":405,"sweat4":406,"shame4":407,"sleep4":408,"heart":501,"teardrop":502,"star":503};
-  var PXIMG_COMMON = 'https://s.pximg.net/common/images/';
   var PXIMG_PLACEHOLDER = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   var PXIMG_PROXY_HEADERS = {
     Referer: 'https://www.pixiv.net/',
@@ -275,33 +323,6 @@
     if (s.indexOf('zh') === 0) return 'zh';
     if (s === 'ko') return 'ko';
     return 'en';
-  }
-
-  function commentsHeading(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s === 'zhtw') return '留言';
-    if (s.indexOf('zh') === 0) return '评论';
-    if (s === 'ja') return 'コメント';
-    if (s === 'ko') return '댓글';
-    return 'Comments';
-  }
-
-  function noIllustHint(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s === 'zhtw') return '請重新爬取以顯示留言（需帶作品 ID）。';
-    if (s.indexOf('zh') === 0) return '请重新爬取以显示评论（需包含作品 ID）。';
-    if (s === 'ja') return 'コメントを表示するには、イラスト ID 付きで再取得してください。';
-    if (s === 'ko') return '댓글을 보려면 일러스트 ID가 포함되도록 다시 받아오세요.';
-    return 'Re-crawl with illust metadata to load comments.';
-  }
-
-  function loadMoreLabel(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s === 'zhtw') return '載入更多';
-    if (s.indexOf('zh') === 0) return '加载更多';
-    if (s === 'ja') return 'もっと見る';
-    if (s === 'ko') return '더 보기';
-    return 'Load more';
   }
 
   /** 作品说明折叠：与 Pixiv 作品页 expandable 段落类似（约 180px 高 + 続きを読む）；无溢出时不显示按钮 */
@@ -419,16 +440,6 @@
     }
   }
 
-  /** 评论正文里 (token) 解析出的 id：emoji/104.png 等 */
-  function pixivEmojiPngUrl(numericId) {
-    return PXIMG_COMMON + 'emoji/' + String(numericId) + '.png';
-  }
-
-  /** API stampId 字段：generated-stamps（与官网 backgroundImage 一致） */
-  function pixivGeneratedStampUrl(numericId) {
-    return PXIMG_COMMON + 'stamp/generated-stamps/' + encodeURIComponent(String(numericId)) + '_s.jpg?20180605';
-  }
-
   function setPxHidden(el, hidden) {
     if (!el) return;
     if (hidden) el.setAttribute('hidden', '');
@@ -511,18 +522,6 @@
       }
       hydratePxProfileImages(bar);
     }).catch(function () {});
-  }
-
-  function fetchCommentsPage(offset, limit, lang) {
-    var q = 'illust_id=' + encodeURIComponent(ILLUST_ID) + '&offset=' + offset + '&limit=' + limit + '&lang=' + encodeURIComponent(lang);
-    var url = 'https://www.pixiv.net/ajax/illusts/comments/roots?' + q;
-    var h = {
-      'Accept': 'application/json',
-      'Referer': 'https://www.pixiv.net/artworks/' + ILLUST_ID,
-      'Origin': 'https://www.pixiv.net',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36'
-    };
-    return window.__bridge.fetch(url, { headers: h, json: true });
   }
 
   function localeTagForIntl(loc) {
@@ -762,228 +761,6 @@
     }
   }
 
-  function appendStampImages(container, stampIds, kind, sizePx) {
-    var px = sizePx == null ? 24 : sizePx;
-    var urlFn = kind === 'emoji' ? pixivEmojiPngUrl : pixivGeneratedStampUrl;
-    for (var i = 0; i < stampIds.length; i++) {
-      var sid = stampIds[i];
-      if (sid == null || sid === '') continue;
-      var img = document.createElement('img');
-      img.src = urlFn(sid);
-      img.width = px;
-      img.height = px;
-      img.alt = '';
-      img.className = 'px-comment-emoji';
-      img.style.cssText = 'width:' + px + 'px;height:' + px + 'px;vertical-align:middle;display:inline-block;object-fit:contain;';
-      img.referrerPolicy = 'no-referrer';
-      container.appendChild(img);
-    }
-  }
-
-  /** 解析 comment 中的 (token) 为 emoji 图；仅 API stamp、或整段仅一个已知 token 时用大尺寸（对齐官网评论） */
-  function fillCommentBody(el, comment, stampId) {
-    el.className = 'px-comment-body';
-    var c = String(comment || '');
-    var sidRaw = stampId != null && stampId !== '' ? String(stampId).trim() : '';
-    if (sidRaw && !c.trim()) {
-      el.classList.add('px-comment-body--solo');
-      appendStampImages(el, [sidRaw], 'stamp', 80);
-      return;
-    }
-    var re = /\(([a-zA-Z0-9_]+)\)/g;
-    var parts = [];
-    var last = 0;
-    var m;
-    var knownEmojiCount = 0;
-    while ((m = re.exec(c)) !== null) {
-      if (m.index > last) {
-        var t0 = c.slice(last, m.index);
-        if (t0) parts.push({ type: 'text', v: t0 });
-      }
-      var name = m[1];
-      var nid = STAMP_NAME_TO_ID[name];
-      if (nid != null) {
-        parts.push({ type: 'emoji', id: String(nid) });
-        knownEmojiCount++;
-      } else {
-        parts.push({ type: 'text', v: m[0] });
-      }
-      last = m.index + m[0].length;
-    }
-    if (last < c.length) {
-      var t1 = c.slice(last);
-      if (t1) parts.push({ type: 'text', v: t1 });
-    }
-    var soloBracketEmoji = knownEmojiCount === 1 && parts.length === 1 && parts[0].type === 'emoji';
-    var emojiPx = soloBracketEmoji ? 80 : 24;
-    if (soloBracketEmoji) el.classList.add('px-comment-body--solo');
-    for (var i = 0; i < parts.length; i++) {
-      var p = parts[i];
-      if (p.type === 'text') {
-        el.appendChild(document.createTextNode(p.v));
-      } else {
-        appendStampImages(el, [p.id], 'emoji', emojiPx);
-      }
-    }
-  }
-
-  function runCommentsUi() {
-    var loadMoreBtn = document.getElementById('px-load-more-comments');
-    var commentsEl = document.getElementById('px-comments-container');
-    var headingEl = document.getElementById('px-comments-heading');
-    var seenIds = {};
-    var offset = 0;
-    var firstPage = true;
-    var appLocale = 'en';
-
-    function setLoadMoreLoading(on) {
-      if (!loadMoreBtn) return;
-      var chev = loadMoreBtn.querySelector('.px-lm-chev');
-      var spin = loadMoreBtn.querySelector('.px-lm-spin');
-      var lab = loadMoreBtn.querySelector('.px-lm-label');
-      loadMoreBtn.disabled = !!on;
-      loadMoreBtn.style.opacity = on ? '0.85' : '1';
-      if (chev) chev.style.display = on ? 'none' : 'inline-flex';
-      if (spin) spin.style.display = on ? 'inline-block' : 'none';
-      if (lab) lab.style.opacity = on ? '0.65' : '1';
-    }
-
-    function appendRow(item) {
-      if (!item || !commentsEl) return;
-      var cid = item.id != null ? String(item.id) : '';
-      if (cid && seenIds[cid]) return;
-      if (cid) seenIds[cid] = true;
-      var row = document.createElement('div');
-      row.className = 'px-comment-row';
-      row.setAttribute('role', 'listitem');
-
-      var avatarCol = document.createElement('div');
-      avatarCol.className = 'px-comment-avatar';
-      if (item.img) {
-        var avi = document.createElement('img');
-        avi.alt = '';
-        avi.referrerPolicy = 'no-referrer';
-        var iu = String(item.img);
-        if (iu.indexOf('i.pximg.net/user-profile') >= 0 && window.__bridge && window.__bridge.fetch) {
-          avi.src = PXIMG_PLACEHOLDER;
-          avi.setAttribute('data-px-profile-src', iu);
-        } else {
-          avi.src = iu;
-        }
-        avatarCol.appendChild(avi);
-      }
-
-      var main = document.createElement('div');
-      main.className = 'px-comment-main';
-
-      var nameEl = document.createElement('div');
-      nameEl.className = 'px-comment-name';
-      var uname = item.userName != null ? String(item.userName) : '';
-      var uid = item.userId != null ? String(item.userId) : '';
-      if (uid) {
-        var na = document.createElement('a');
-        na.href = '#';
-        na.className = 'px-open';
-        na.setAttribute('data-url', 'https://www.pixiv.net/users/' + encodeURIComponent(uid));
-        na.style.cssText = 'color:inherit;text-decoration:none;cursor:pointer;';
-        na.textContent = uname || uid;
-        nameEl.appendChild(na);
-      } else {
-        nameEl.textContent = uname || '?';
-      }
-
-      var body = document.createElement('div');
-      fillCommentBody(body, item.comment, item.stampId);
-
-      var meta = document.createElement('div');
-      meta.className = 'px-comment-meta';
-      meta.textContent = item.commentDate != null ? String(item.commentDate) : '';
-
-      main.appendChild(nameEl);
-      main.appendChild(body);
-      main.appendChild(meta);
-
-      row.appendChild(avatarCol);
-      row.appendChild(main);
-      commentsEl.appendChild(row);
-    }
-
-    function loadPage(opts) {
-      var fromClick = opts && opts.fromClick;
-      if (fromClick) setLoadMoreLoading(true);
-      if (!ILLUST_ID || !commentsEl) {
-        if (fromClick) setLoadMoreLoading(false);
-        return;
-      }
-      var limit = firstPage ? 3 : 50;
-      var lang = pixivLang(appLocale);
-      fetchCommentsPage(offset, limit, lang).then(function (json) {
-        if (!json || json.error) {
-          var msg = (json && json.message) ? String(json.message) : 'error';
-          throw new Error(msg);
-        }
-        var body = json.body || {};
-        var list = body.comments || [];
-        for (var i = 0; i < list.length; i++) {
-          appendRow(list[i]);
-        }
-        hydratePxProfileImages(commentsEl);
-        offset += list.length;
-        var hasNext = body.hasNext === true;
-        if (loadMoreBtn) {
-          if (hasNext) {
-            loadMoreBtn.style.display = 'flex';
-            loadMoreBtn.style.flexDirection = 'row';
-            loadMoreBtn.style.alignItems = 'center';
-            loadMoreBtn.style.justifyContent = 'center';
-          } else {
-            loadMoreBtn.style.display = 'none';
-          }
-        }
-        firstPage = false;
-      }).catch(function (err) {
-        if (commentsEl && commentsEl.children.length === 0) {
-          var p = document.createElement('p');
-          p.style.color = '#fca5a5';
-          p.style.fontSize = '0.8rem';
-          p.textContent = String(err && err.message ? err.message : err);
-          commentsEl.appendChild(p);
-        }
-      }).then(function () {
-        if (fromClick) setLoadMoreLoading(false);
-      });
-    }
-
-    function startWithLocale(loc) {
-      appLocale = loc || 'en';
-      if (headingEl) headingEl.textContent = commentsHeading(appLocale);
-      if (loadMoreBtn) {
-        var lab = loadMoreBtn.querySelector('.px-lm-label');
-        if (lab) lab.textContent = loadMoreLabel(appLocale);
-        loadMoreBtn.addEventListener('mouseenter', function () {
-          if (loadMoreBtn.disabled) return;
-          loadMoreBtn.style.background = 'color-mix(in srgb, ' + pxCssVar('--anime-text-primary', '#1f2937') + ' 10%, transparent)';
-        });
-        loadMoreBtn.addEventListener('mouseleave', function () {
-          loadMoreBtn.style.background = 'transparent';
-        });
-        loadMoreBtn.addEventListener('click', function () {
-          if (loadMoreBtn.disabled) return;
-          loadPage({ fromClick: true });
-        });
-      }
-      loadPage();
-    }
-
-    if (window.__bridge && window.__bridge.getLocale) {
-      window.__bridge.getLocale().then(startWithLocale).catch(function () {
-        startWithLocale('en');
-      });
-    } else {
-      startWithLocale((navigator.language || 'en').split('-')[0]);
-    }
-  }
-
   function onReady() {
     hydratePxIllustDate();
 
@@ -1003,22 +780,6 @@
       }
     }
 
-    if (!ILLUST_ID) {
-      var hintEl = document.getElementById('px-no-illust-hint');
-      function setHint(loc) {
-        if (hintEl) hintEl.textContent = noIllustHint(loc);
-      }
-      if (window.__bridge && window.__bridge.getLocale) {
-        window.__bridge.getLocale().then(setHint).catch(function () {
-          setHint((navigator.language || 'en').split('-')[0]);
-        });
-      } else {
-        setHint((navigator.language || 'en').split('-')[0]);
-      }
-      return;
-    }
-    if (!window.__bridge || !window.__bridge.fetch) return;
-    runCommentsUi();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);

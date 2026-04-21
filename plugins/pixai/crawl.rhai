@@ -13,6 +13,39 @@ let ranking_artworks_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client
 let ranking_models_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"1658f8e716184e95d3177d20fad189d8f7b250fb30e8401496ed0aaf34e4ad83\"}}";
 let media_api_base = "https://api.pixai.art/v1/media/";
 
+// 静态获取评论快照（最近 20 条），失败只 warn 不中断
+fn fetch_pixai_comments(artwork_id) {
+    let comments = [];
+    if artwork_id == "" { return comments; }
+    try {
+        let gql_url = "https://api.pixai.art/graphql";
+        let ext = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"06b2c265be1ff58c8b5d4e744ba8d528c18136d7bf1d9f2691621e19c5333724\"}}";
+        let vars = "{\"topicId\":\"" + artwork_id + "\",\"last\":20}";
+        let url = gql_url + "?operation=listMessages&operationName=listMessages"
+            + "&variables=" + url_encode(vars)
+            + "&extensions=" + url_encode(ext);
+        set_header("x-apollo-operation-name", "listMessages");
+        let res = fetch_json(url);
+        if res != () && res["data"] != () {
+            let msgs = res["data"]["messages"];
+            if msgs != () && msgs["edges"] != () {
+                let edges = msgs["edges"];
+                let ei = 0;
+                while ei < edges.len() {
+                    let e = edges[ei];
+                    if e != () && e["node"] != () {
+                        comments.push(e["node"]);
+                    }
+                    ei += 1;
+                }
+            }
+        }
+    } catch {
+        warn("[PixAI] 评论获取失败，artwork_id=" + artwork_id);
+    }
+    return comments;
+}
+
 set_header("Accept", "application/json");
 set_header("Content-Type", "application/json");
 set_header("Origin", "https://pixai.art");
@@ -106,6 +139,9 @@ fn process_artworks_edges_for_download(
                 }
                 let download_url = `${media_api_base}${media_id_str}/image`;
                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
+                let art_id_str = if node != () && node["id"] != () { node["id"].to_string() } else { "" };
+                let art_comments = fetch_pixai_comments(art_id_str);
+                if node != () { node["comments"] = art_comments; }
                 download_image(download_url, #{ name: title, metadata: node });
                 downloaded += 1;
                 if progress_per > 0.0 {
@@ -155,6 +191,9 @@ fn process_artworks_edges_for_download(
                                     title = t.to_string();
                                 }
                                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
+                                let art_id_str2 = if node["id"] != () { node["id"].to_string() } else { "" };
+                                let art_comments2 = fetch_pixai_comments(art_id_str2);
+                                node["comments"] = art_comments2;
                                 download_image(image_url.to_string(), #{ name: title, metadata: node });
                                 downloaded += 1;
                                 if progress_per_download > 0.0 {

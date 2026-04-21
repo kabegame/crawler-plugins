@@ -92,9 +92,24 @@ fn download_illust(illust_id) {
         } else {
             illust_id.to_string()
         };
+        // ③ 评论快照：静态获取第一页评论存入元数据，供 EJS 静态渲染（失败只 warn，不中断）
+        let pixiv_comments = [];
+        try {
+            set_header("Referer", "https://www.pixiv.net/artworks/" + illust_id);
+            let c_url = "https://www.pixiv.net/ajax/illusts/comments/roots?illust_id="
+                + illust_id + "&offset=0&limit=20&lang=en";
+            let cj = fetch_json(c_url);
+            if cj != () && cj["error"] != true && cj["body"] != () {
+                let cl = cj["body"]["comments"];
+                if cl != () { pixiv_comments = cl; }
+            }
+        } catch {
+            warn("[Pixiv] 评论获取失败，illust_id=" + illust_id);
+        }
+
         let meta_id = if illust_body != () {
             let trimmed = pixiv_trim_illust_body(illust_body);
-            create_image_metadata(#{ body: trimmed })
+            create_image_metadata(#{ body: trimmed, comments: pixiv_comments })
         } else {
             create_image_metadata(#{ illustId: illust_id })
         };

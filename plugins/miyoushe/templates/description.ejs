@@ -170,7 +170,6 @@
   });
 
   var API_POST_FULL = 'https://bbs-api.miyoushe.com/post/wapi/getPostFull';
-  var API_REPLIES = 'https://bbs-api.miyoushe.com/post/wapi/getPostReplies';
   var API_EMOTICONS = 'https://bbs-api-static.miyoushe.com/misc/api/emoticon_set';
   var postId = <%- JSON.stringify(postId) %>;
   var gameSlug = <%- JSON.stringify(gameSlug) %>;
@@ -178,7 +177,8 @@
   var initialPostContentRaw = <%- JSON.stringify(postContent) %>;
   var initialPostStructuredContentRaw = <%- JSON.stringify(postStructuredContent) %>;
   var emoticonMap = Object.assign({}, <%- JSON.stringify(emoticonMap) %>);
-  var state = { comments: [], loading: false, loadingMore: false, lastId: '', hasMore: true, limit: 200 };
+  var staticReplies = <%- JSON.stringify(Array.isArray(m.replies) ? m.replies : []) %>;
+  var state = { comments: staticReplies, loading: false, loadingMore: false, lastId: '', hasMore: false, limit: staticReplies.length };
 
   function esc(s) { return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function fmtMd(ts) { if (!ts) return ''; var d = new Date(ts * 1000); return String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -278,22 +278,6 @@
       });
     });
   }
-  function rowFromReply(item, isSub) {
-    var reply = item && item.reply; if (!reply) return null;
-    var user = item.user || {}, stat = item.stat || {};
-    return {
-      uid: user.uid != null ? String(user.uid) : '',
-      nickname: user.nickname != null ? String(user.nickname) : '',
-      avatar_url: user.avatar_url != null ? String(user.avatar_url) : '',
-      pendant: user.pendant != null ? String(user.pendant) : '',
-      certification_label: user.certification && user.certification.type ? (user.certification.label || '') : '',
-      floor_id: Number(reply.floor_id || 0),
-      created_at: Number(reply.created_at || 0),
-      struct_content: reply.struct_content != null ? String(reply.struct_content) : '',
-      like_num: Number(stat.like_num || 0),
-      is_sub: !!isSub
-    };
-  }
   function renderComments() {
     var listEl = wrap.querySelector('[data-mys-id="comments-list"]');
     var emptyEl = wrap.querySelector('[data-mys-id="comments-empty"]');
@@ -329,33 +313,6 @@
     moreBtn.style.display = state.hasMore && state.comments.length < state.limit ? 'inline-flex' : 'none';
     moreBtn.disabled = state.loadingMore;
   }
-  function loadComments(first) {
-    if (!postId || state.loading || state.loadingMore || !state.hasMore) return;
-    if (first) state.loading = true; else state.loadingMore = true;
-    renderComments();
-    var size = Math.min(20, state.limit - state.comments.length);
-    if (size <= 0) { state.hasMore = false; state.loading = false; state.loadingMore = false; renderComments(); return; }
-    var url = API_REPLIES + '?post_id=' + encodeURIComponent(postId) + '&size=' + String(size) + '&order_type=1&is_hot=false';
-    if (state.lastId) url += '&last_id=' + encodeURIComponent(state.lastId);
-    fetchByBridge(url).then(function (resp) {
-      if (!resp || resp.retcode !== 0 || !resp.data) return;
-      var list = Array.isArray(resp.data.list) ? resp.data.list : [];
-      list.forEach(function (it) {
-        var row = rowFromReply(it, false); if (row) state.comments.push(row);
-        var subs = Array.isArray(it.sub_replies) ? it.sub_replies : [];
-        subs.forEach(function (sub) { var srow = rowFromReply(sub, true); if (srow) state.comments.push(srow); });
-      });
-      var newLast = resp.data.last_id != null ? String(resp.data.last_id) : '';
-      state.hasMore = resp.data.is_last !== true && !!newLast && newLast !== state.lastId && state.comments.length < state.limit;
-      state.lastId = newLast;
-    }).catch(function () {
-      state.hasMore = false;
-    }).finally(function () {
-      state.loading = false;
-      state.loadingMore = false;
-      renderComments();
-    });
-  }
   function refreshPost() {
     if (!postId) return Promise.resolve();
     return fetchByBridge(API_POST_FULL + '?post_id=' + encodeURIComponent(postId)).then(function (resp) {
@@ -384,15 +341,15 @@
       if (ct) ct.innerHTML = renderPostBody(post.structured_content, post.content);
     }).catch(function () {});
   }
-  var moreBtn = wrap.querySelector('[data-mys-id="load-more"]');
-  if (moreBtn) moreBtn.addEventListener('click', function () { loadComments(false); });
   var initTitleEl = wrap.querySelector('[data-mys-id="post-title"]');
   if (initTitleEl) initTitleEl.innerHTML = renderPostTitle(initialPostTitleRaw);
   var initCt = wrap.querySelector('[data-mys-id="post-content"]');
   if (initCt) initCt.innerHTML = renderPostBody(initialPostStructuredContentRaw, initialPostContentRaw);
   renderComments();
-  loadComments(true);
-  fetchByBridge(API_EMOTICONS).then(function (resp) { mergeEmoticons(resp); renderComments(); }).catch(function () {});
+  // 客户端兜底：仅在 Rhai 侧未能获取表情时补全（通常不触发）
+  // if (Object.keys(emoticonMap).length === 0) {
+  //   fetchByBridge(API_EMOTICONS).then(function (resp) { mergeEmoticons(resp); renderComments(); }).catch(function () {});
+  // }
   refreshPost();
 })();
 </script>

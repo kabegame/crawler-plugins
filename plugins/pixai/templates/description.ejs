@@ -1,5 +1,6 @@
 <% const m = metadata || {}; %>
-<% 
+<% const pdComments = Array.isArray(m.comments) ? m.comments : []; %>
+<%
   let frameUrl = '';
   const author = m.author;
   if (author && author.activeDecorations && Array.isArray(author.activeDecorations)) {
@@ -110,12 +111,19 @@
     </span>
   </div>
   <% } %>
-  <div id="comments-container" style="margin-bottom:8px;"></div>
-  <button type="button" id="load-more-comments" style="display:none;box-sizing:border-box;width:100%;align-items:center;justify-content:center;gap:6px;padding:8px 10px;margin-top:4px;background:transparent;border:1px solid var(--anime-border,#d1d5db);border-radius:8px;color:var(--anime-text-primary,#1f2937);cursor:pointer;font-size:0.8125rem;line-height:1.2;transition:background 0.075s ease;">
-    <span class="pd-lm-chev" style="display:inline-flex;align-items:center;flex-shrink:0;"><svg viewBox="0 0 20 20" width="1.2em" height="1.2em" aria-hidden="true"><path fill="currentColor" d="M15.794 7.733a.75.75 0 0 1-.026 1.06l-5.25 5.001a.75.75 0 0 1-1.035 0l-5.25-5a.75.75 0 0 1 1.034-1.087l4.734 4.509l4.733-4.51a.75.75 0 0 1 1.06.027"></path></svg></span>
-    <span class="pd-lm-label" style="white-space:nowrap;">…</span>
-    <svg class="pd-lm-spin" viewBox="0 0 20 20" width="1.2em" height="1.2em" style="display:none;flex-shrink:0;animation:pd-spin 0.75s linear infinite;" aria-hidden="true"><path fill="currentColor" d="M10 3.5A6.5 6.5 0 0 0 3.5 10A.75.75 0 0 1 2 10a8 8 0 1 1 8 8a.75.75 0 0 1 0-1.5a6.5 6.5 0 1 0 0-13"></path></svg>
-  </button>
+  <div id="comments-container" style="margin-bottom:8px;">
+    <% for (let pdci = 0; pdci < pdComments.length; pdci++) { const pdcn = pdComments[pdci]; const pdcAu = pdcn.author || {}; const pdcName = pdcAu.displayName || pdcAu.username || '?'; const pdcAvatar = pdcAu.avatarSmallThumbnailMediaUrl || ''; const pdcTime = pdcn.createdAt ? String(pdcn.createdAt).slice(0, 16).replace('T', ' ') : ''; %>
+    <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid color-mix(in srgb,var(--anime-border,#e5e7eb) 45%,transparent);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:0.75rem;color:var(--anime-text-secondary,#6b7280);">
+        <% if (pdcAvatar) { %><img src="<%= pdcAvatar %>" alt="" style="width:24px;height:24px;border-radius:50%;object-fit:cover;flex-shrink:0;" /><% } %>
+        <span style="font-weight:600;color:var(--anime-text-primary,#1f2937);"><%= pdcName %></span>
+        <span><%= pdcTime %></span>
+      </div>
+      <div style="font-size:0.8rem;color:var(--anime-text-primary,#1f2937);white-space:pre-wrap;word-break:break-word;"><%= pdcn.type === 'TEXT' && pdcn.content != null ? String(pdcn.content) : '' %></div>
+    </div>
+    <% } %>
+    <% if (!pdComments.length) { %><p style="font-size:0.8rem;color:var(--anime-text-secondary,#9ca3af);margin:4px 0;">No comments</p><% } %>
+  </div>
 </div>
 <script>
 (function () {
@@ -125,10 +133,8 @@
   }
 
   var GRAPHQL = 'https://api.pixai.art/graphql';
-  var LIST_MESSAGES_EXT = {"clientLibrary":{"name":"@apollo/client","version":"4.1.4"},"persistedQuery":{"version":1,"sha256Hash":"06b2c265be1ff58c8b5d4e744ba8d528c18136d7bf1d9f2691621e19c5333724"}};
   var GET_TACK_EXT = {"clientLibrary":{"name":"@apollo/client","version":"4.1.4"},"persistedQuery":{"version":1,"sha256Hash":"4517f9180265ab50f2cf3a92f33d146b957c8d73ed165ef39b4bb8ec927bf813"}};
   var TACK_IDS = <%- JSON.stringify((m.extra && m.extra.suggestedTacks) ? m.extra.suggestedTacks : []) %>;
-  var TOPIC_ID = <%- JSON.stringify(artworkId) %>;
 
   function gql(op, vars, ext) {
     var h = {
@@ -312,141 +318,11 @@
     chunk(0);
   }
 
-  var seenIds = {};
-  var loadMoreBtn = document.getElementById('load-more-comments');
-  var commentsEl = document.getElementById('comments-container');
-  var lastStartCursor = null;
-  var firstPage = true;
-  var appLocale = 'en';
-  /** 与官网 listMessages 一致：首屏少量，后续每页更大 */
-  var COMMENTS_FIRST_LAST = 3;
-  var COMMENTS_PAGE_LAST = 30;
-
-  function loadMoreLabel(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s === 'zhtw') return '載入更多';
-    if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) return '加载更多';
-    if (s === 'ja') return 'もっと見る';
-    if (s === 'ko') return '더 보기';
-    return 'Load more';
-  }
-
-  function setLoadMoreLoading(on) {
-    if (!loadMoreBtn) return;
-    var chev = loadMoreBtn.querySelector('.pd-lm-chev');
-    var spin = loadMoreBtn.querySelector('.pd-lm-spin');
-    var lab = loadMoreBtn.querySelector('.pd-lm-label');
-    loadMoreBtn.disabled = !!on;
-    loadMoreBtn.style.opacity = on ? '0.85' : '1';
-    if (chev) chev.style.display = on ? 'none' : 'inline-flex';
-    if (spin) spin.style.display = on ? 'inline-block' : 'none';
-    if (lab) lab.style.opacity = on ? '0.65' : '1';
-  }
-
-  function appendComment(node) {
-    if (!node || !commentsEl) return;
-    var id = node.id;
-    if (seenIds[id]) return;
-    seenIds[id] = true;
-    var row = document.createElement('div');
-    var sep = pdCssVar('--anime-border', '#e5e7eb');
-    row.style.cssText = 'margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid color-mix(in srgb, ' + sep + ' 45%, transparent);';
-    var head = document.createElement('div');
-    head.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:0.75rem;color:' + pdCssVar('--anime-text-secondary', '#6b7280') + ';';
-    var av = document.createElement('span');
-    var au = node.author;
-    if (au && au.avatarSmallThumbnailMediaUrl) {
-      var img = document.createElement('img');
-      img.src = au.avatarSmallThumbnailMediaUrl;
-      img.alt = '';
-      img.style.cssText = 'width:24px;height:24px;border-radius:50%;object-fit:cover;';
-      av.appendChild(img);
-    }
-    var name = document.createElement('span');
-    name.style.fontWeight = '600';
-    name.style.color = pdCssVar('--anime-text-primary', '#1f2937');
-    name.textContent = (au && au.displayName) ? au.displayName : (au && au.username) ? au.username : '?';
-    var time = document.createElement('span');
-    time.textContent = node.createdAt ? String(node.createdAt).slice(0, 19).replace('T', ' ') : '';
-    head.appendChild(av);
-    head.appendChild(name);
-    head.appendChild(time);
-    row.appendChild(head);
-    var body = document.createElement('div');
-    body.style.cssText = 'font-size:0.8rem;color:' + pdCssVar('--anime-text-primary', '#1f2937') + ';white-space:pre-wrap;word-break:break-word;';
-    if (node.type === 'TEXT' && node.content != null) body.textContent = String(node.content);
-    else body.textContent = '';
-    row.appendChild(body);
-    commentsEl.appendChild(row);
-  }
-
-  function loadCommentsPage(opts) {
-    var fromClick = opts && opts.fromClick;
-    if (fromClick) setLoadMoreLoading(true);
-    if (!TOPIC_ID || !commentsEl) {
-      if (fromClick) setLoadMoreLoading(false);
-      return;
-    }
-    var vars = firstPage
-      ? { topicId: TOPIC_ID, last: COMMENTS_FIRST_LAST }
-      : { topicId: TOPIC_ID, last: COMMENTS_PAGE_LAST, before: lastStartCursor };
-    gql('listMessages', vars, LIST_MESSAGES_EXT).then(function (json) {
-      var data = json && json.data && json.data.messages;
-      if (!data) return;
-      var edges = data.edges || [];
-      var pi = data.pageInfo || {};
-      edges.forEach(function (e) {
-        if (e && e.node) appendComment(e.node);
-      });
-      lastStartCursor = pi.startCursor || null;
-      if (loadMoreBtn) {
-        var more = pi.hasPreviousPage === true && !!lastStartCursor;
-        if (more) {
-          loadMoreBtn.style.display = 'flex';
-          loadMoreBtn.style.flexDirection = 'row';
-          loadMoreBtn.style.alignItems = 'center';
-          loadMoreBtn.style.justifyContent = 'center';
-        } else {
-          loadMoreBtn.style.display = 'none';
-        }
-      }
-      firstPage = false;
-    }).catch(function (err) {
-      if (commentsEl && commentsEl.children.length === 0) {
-        var p = document.createElement('p');
-        p.style.color = '#fca5a5';
-        p.style.fontSize = '0.8rem';
-        p.textContent = String(err && err.message ? err.message : err);
-        commentsEl.appendChild(p);
-      }
-    }).then(function () {
-      if (fromClick) setLoadMoreLoading(false);
-    });
-  }
-
   function onReady() {
     function startWithLocale(loc) {
-      appLocale = loc || 'en';
-      if (loadMoreBtn) {
-        var lab = loadMoreBtn.querySelector('.pd-lm-label');
-        if (lab) lab.textContent = loadMoreLabel(appLocale);
-        loadMoreBtn.addEventListener('mouseenter', function () {
-          if (loadMoreBtn.disabled) return;
-          loadMoreBtn.style.background = 'color-mix(in srgb, ' + pdCssVar('--anime-text-primary', '#1f2937') + ' 10%, transparent)';
-        });
-        loadMoreBtn.addEventListener('mouseleave', function () {
-          loadMoreBtn.style.background = 'transparent';
-        });
-      }
+      var appLocale = loc || 'en';
       pdBindAllExpands(appLocale);
       loadTacks(appLocale);
-      loadCommentsPage();
-      if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function () {
-          if (loadMoreBtn.disabled) return;
-          loadCommentsPage({ fromClick: true });
-        });
-      }
     }
     if (window.__bridge && window.__bridge.getLocale) {
       window.__bridge.getLocale().then(startWithLocale).catch(function () {

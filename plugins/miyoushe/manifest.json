@@ -3,7 +3,7 @@
   "name.en": "HoYoLAB",
   "name.ja": "HoYoLAB",
   "name.ko": "HoYoLAB",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "3.4.3",
   "description": "米游社（HoYoLAB）多游戏同人图与壁纸爬虫",
   "description.zh": "从米游社（HoYoLAB）按游戏与关键词抓取同人图、壁纸等图片内容的爬虫插件",

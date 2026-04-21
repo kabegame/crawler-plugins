@@ -41,10 +41,11 @@ fn mys_build_replies_url(api_replies, post_id, size, last_id) {
     url
 }
 
-fn mys_collect_emoticon_names_from_text(text, used_names) {
-    if text == () { return; }
+fn mys_collect_emoticon_names_from_text(text) {
+    let names = #{};
+    if text == () { return names; }
     let s = mys_coerce_str(text);
-    if s == "" { return; }
+    if s == "" { return names; }
     let cursor = 0;
     while cursor < s.len() {
         let rem = s.sub_string(cursor, s.len() - cursor);
@@ -61,10 +62,11 @@ fn mys_collect_emoticon_names_from_text(text, used_names) {
         let name = mys_coerce_str(raw_name);
         name.trim();
         if name != "" {
-            used_names[name] = true;
+            names[name] = true;
         }
         cursor = start + end_rel + 1;
     }
+    names
 }
 
 // 从 user 对象提取简要信息
@@ -106,9 +108,17 @@ fn mys_user_info(u) {
 // 一次性拉取全站表情集合，返回 name→icon_url 的 map（仅 published + is_available 条目）
 fn mys_build_emoticon_map(api_emoticons) {
     let map = #{};
-    let resp = fetch_json(api_emoticons);
-    if resp["retcode"] != 0 {
-        warn("emoticon_set 请求失败 retcode=" + resp["retcode"].to_string());
+    let resp = ();
+    try {
+        resp = fetch_json(api_emoticons);
+    } catch {
+        warn("[米游社] emoticon_set 网络错误，表情将降级为文本");
+        return map;
+    }
+    if resp == () || resp["retcode"] != 0 {
+        if resp != () {
+            warn("emoticon_set 请求失败 retcode=" + resp["retcode"].to_string());
+        }
         return map;
     }
     let data = resp["data"];
@@ -135,9 +145,16 @@ fn mys_build_emoticon_map(api_emoticons) {
 }
 
 fn mys_pick_required_emoticons(all_emoticon_map, post_subject, post_content) {
+    mys_pick_required_emoticons(all_emoticon_map, post_subject, post_content, [])
+}
+
+fn mys_pick_required_emoticons(all_emoticon_map, post_subject, post_content, replies) {
     let used_names = #{};
-    mys_collect_emoticon_names_from_text(post_subject, used_names);
-    mys_collect_emoticon_names_from_text(post_content, used_names);
+    used_names += mys_collect_emoticon_names_from_text(post_subject);
+    used_names += mys_collect_emoticon_names_from_text(post_content);
+    for r in replies {
+        used_names += mys_collect_emoticon_names_from_text(r["struct_content"]);
+    }
 
     let picked = #{};
     for n in used_names.keys() {
@@ -296,10 +313,18 @@ fn mys_collect_replies_until_limit(api_replies, post_id, reply_limit) {
         if size <= 0 { break; }
 
         let url = mys_build_replies_url(api_replies, post_id, size, last_id);
-        let resp = fetch_json(url);
-        if resp["retcode"] != 0 {
-            warn("getPostReplies 失败 post_id=" + post_id
-                + " retcode=" + resp["retcode"].to_string());
+        let resp = ();
+        try {
+            resp = fetch_json(url);
+        } catch {
+            warn("[米游社] getPostReplies 网络错误，post_id=" + post_id);
+            break;
+        }
+        if resp == () || resp["retcode"] != 0 {
+            if resp != () {
+                warn("getPostReplies 失败 post_id=" + post_id
+                    + " retcode=" + resp["retcode"].to_string());
+            }
             break;
         }
         let data = resp["data"];
@@ -491,10 +516,11 @@ fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limi
 
     print("[米游社] 拉取表情集合...");
     let all_emoticon_map = mys_build_emoticon_map(api_emoticons);
-    let emoticon_map = mys_pick_required_emoticons(all_emoticon_map, subject, post_content);
-    print("[米游社] 表情集合加载完成，正文必要表情 " + emoticon_map.keys().len().to_string() + " 个");
 
     let replies_data = mys_collect_replies_until_limit(api_replies, post_id, reply_limit);
+
+    let emoticon_map = mys_pick_required_emoticons(all_emoticon_map, subject, post_content, replies_data["replies"]);
+    print("[米游社] 表情集合加载完成，含评论必要表情 " + emoticon_map.keys().len().to_string() + " 个");
 
     let K = images.len();
     let reply_img_list = replies_data["images"];
@@ -525,7 +551,8 @@ fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limi
         bookmark_num: bookmark_num,
         forward_num: forward_num,
         post_snapshot: post,
-        emoticon_map: emoticon_map
+        emoticon_map: emoticon_map,
+        replies: replies_data["replies"]
     });
 
     if total_imgs == 0 {
@@ -688,7 +715,7 @@ if crawl_mode == "user_posts" {
             let reply_img_list = replies_data["images"];
             let total_imgs = K + (if fetch_comment_images { reply_img_list.len() } else { 0 });
 
-            let post_emoticon_map = mys_pick_required_emoticons(emoticon_map, subject, post_content);
+            let post_emoticon_map = mys_pick_required_emoticons(emoticon_map, subject, post_content, replies_data["replies"]);
             let post_meta_id = create_image_metadata(#{
                 post_id: post_id,
                 title: subject,
@@ -713,7 +740,8 @@ if crawl_mode == "user_posts" {
                 bookmark_num: bookmark_num,
                 forward_num: forward_num,
                 post_snapshot: post,
-                emoticon_map: post_emoticon_map
+                emoticon_map: post_emoticon_map,
+                replies: replies_data["replies"]
             });
 
             if total_imgs > 0 {
@@ -874,7 +902,6 @@ while page <= end_page {
             let post_images = post["images"];
             let K = post_images.len();
 
-            // 拉取评论仅用于评论图片统计/下载，不写入元数据；默认最多 max_comments 条
             let replies_data = mys_collect_replies_until_limit(API_REPLIES, post_id, max_comments);
 
             // 提前计算本帖总图片数，用于均分进度
@@ -882,7 +909,7 @@ while page <= end_page {
             let total_imgs = K + (if fetch_comment_images { reply_img_list.len() } else { 0 });
             let img_weight = if total_imgs > 0 { post_weight / total_imgs.to_float() } else { 0.0 };
 
-            let post_emoticon_map = mys_pick_required_emoticons(emoticon_map, subject, post_content);
+            let post_emoticon_map = mys_pick_required_emoticons(emoticon_map, subject, post_content, replies_data["replies"]);
             let post_meta_id = create_image_metadata(#{
                 post_id: post_id,
                 title: subject,
@@ -907,7 +934,8 @@ while page <= end_page {
                 bookmark_num: bookmark_num,
                 forward_num: forward_num,
                 post_snapshot: post,
-                emoticon_map: post_emoticon_map
+                emoticon_map: post_emoticon_map,
+                replies: replies_data["replies"]
             });
 
             if total_imgs == 0 {
