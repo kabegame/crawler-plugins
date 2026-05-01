@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.anihonet-wallpaper",
+  "name": "entry_provider",
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) AS tag_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) IS NOT NULL GROUP BY tag_name ORDER BY image_count DESC, tag_name ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${tag.tag_name}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${capture[1]}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "note": "{\"title\":\"anihonet tags\",\"content\":\"Group anihonet images by post tags from image metadata.\"}"
+}
