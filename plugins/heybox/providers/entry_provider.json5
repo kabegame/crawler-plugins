@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.heybox",
+  "name": "entry_provider",
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "SELECT tag.value AS tag_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE tag.value IS NOT NULL AND tag.value != '' GROUP BY tag_name ORDER BY image_count DESC, tag_name ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${tag.tag_name}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${tag.tag_name}",
+        "image_count": "${tag.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${capture[1]}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "note": "{\"title\":\"Heybox tags\",\"content\":\"Group Heybox images by post topic tags from image metadata.\"}"
+}

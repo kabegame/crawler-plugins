@@ -46,6 +46,104 @@ fn fetch_pixai_comments(artwork_id) {
     return comments;
 }
 
+fn pick_tack_display_name(tack) {
+    if tack == () {
+        return "";
+    }
+    let terms = tack["tackTerms"];
+    let prefs = ["zh", "zh-CN", "zh-Hans", "zh-TW", "zh-Hant", "en", "ja", "ko"];
+    if terms != () {
+        let pi = 0;
+        while pi < prefs.len() {
+            let pref = prefs[pi];
+            let ti = 0;
+            while ti < terms.len() {
+                let term = terms[ti];
+                if term != () && term["category"] == pref && term["name"] != () {
+                    return term["name"].to_string();
+                }
+                ti += 1;
+            }
+            pi += 1;
+        }
+        if terms.len() > 0 && terms[0]["name"] != () {
+            return terms[0]["name"].to_string();
+        }
+    }
+    if tack["defaultName"] != () {
+        return tack["defaultName"].to_string();
+    }
+    if tack["codeName"] != () {
+        return tack["codeName"].to_string();
+    }
+    if tack["id"] != () {
+        return tack["id"].to_string();
+    }
+    return "";
+}
+
+fn fetch_tack_by_id(tack_id, api_url, operation_get_tack, get_tack_extensions) {
+    if tack_id == () {
+        return ();
+    }
+    let tack_id_str = tack_id.to_string();
+    if tack_id_str == "" {
+        return ();
+    }
+    try {
+        set_header("x-apollo-operation-name", operation_get_tack);
+        let variables = `{"id":"${tack_id_str}"}`;
+        let url = `${api_url}?operation=${operation_get_tack}&operationName=${operation_get_tack}&variables=${url_encode(variables)}&extensions=${url_encode(get_tack_extensions)}`;
+        let res = fetch_json(url);
+        if res != () && res["data"] != () {
+            return res["data"]["tack"];
+        }
+    } catch {
+        warn("[PixAI] 标签详情获取失败，tack_id=" + tack_id_str);
+    }
+    return ();
+}
+
+fn resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions) {
+    let tags = [];
+    if node == () {
+        return tags;
+    }
+    let extra = node["extra"];
+    if extra == () {
+        return tags;
+    }
+    let tack_ids = extra["suggestedTacks"];
+    if tack_ids == () {
+        return tags;
+    }
+    let i = 0;
+    while i < tack_ids.len() && i < 15 {
+        let tack_id = tack_ids[i];
+        let tack_id_str = if tack_id == () { "" } else { tack_id.to_string() };
+        if tack_id_str != "" {
+            let tack = fetch_tack_by_id(tack_id_str, api_url, operation_get_tack, get_tack_extensions);
+            if tack != () {
+                let code_name = if tack["codeName"] != () { tack["codeName"].to_string() } else { "" };
+                let display_name = pick_tack_display_name(tack);
+                tags.push(#{
+                    id: tack_id_str,
+                    codeName: code_name,
+                    display: display_name,
+                });
+            } else {
+                tags.push(#{
+                    id: tack_id_str,
+                    codeName: "",
+                    display: tack_id_str,
+                });
+            }
+        }
+        i += 1;
+    }
+    return tags;
+}
+
 set_header("Accept", "application/json");
 set_header("Content-Type", "application/json");
 set_header("Origin", "https://pixai.art");
@@ -142,6 +240,8 @@ fn process_artworks_edges_for_download(
                 let art_id_str = if node != () && node["id"] != () { node["id"].to_string() } else { "" };
                 let art_comments = fetch_pixai_comments(art_id_str);
                 if node != () { node["comments"] = art_comments; }
+                let provider_tags = resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions);
+                if provider_tags.len() > 0 { node["provider_tags"] = provider_tags; }
                 download_image(download_url, #{ name: title, metadata: node });
                 downloaded += 1;
                 if progress_per > 0.0 {
@@ -194,6 +294,8 @@ fn process_artworks_edges_for_download(
                                 let art_id_str2 = if node["id"] != () { node["id"].to_string() } else { "" };
                                 let art_comments2 = fetch_pixai_comments(art_id_str2);
                                 node["comments"] = art_comments2;
+                                let provider_tags2 = resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions);
+                                if provider_tags2.len() > 0 { node["provider_tags"] = provider_tags2; }
                                 download_image(image_url.to_string(), #{ name: title, metadata: node });
                                 downloaded += 1;
                                 if progress_per_download > 0.0 {

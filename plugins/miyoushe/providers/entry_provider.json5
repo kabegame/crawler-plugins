@@ -1,0 +1,58 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.miyoushe",
+  "name": "entry_provider",
+  "list": {
+    "${game.name}": {
+      "sql": "SELECT CASE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) WHEN '1' THEN '崩坏冲击3' WHEN '2' THEN '原神' WHEN '3' THEN '崩坏学园2' WHEN '4' THEN '未定事件簿' WHEN '5' THEN '大别野' WHEN '6' THEN '崩坏：星穹铁道' WHEN '8' THEN '绝区零' END AS name, CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) AS game_id, COUNT(*) AS image_count FROM (${composed}) AS source WHERE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) IN ('1', '2', '3', '4', '5', '6', '8') GROUP BY game_id, name ORDER BY CAST(game_id AS INTEGER) ASC",
+      "data_var": "game",
+      "provider": "game_provider",
+      "properties": {
+        "game_id": "${game.game_id}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "game_id": "${game.game_id}",
+        "image_count": "${game.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    "崩坏冲击3": {
+      "provider": "game_provider",
+      "properties": { "game_id": "1" },
+      "meta": { "isLeaf": true, "game_id": "1" }
+    },
+    "原神": {
+      "provider": "game_provider",
+      "properties": { "game_id": "2" },
+      "meta": { "isLeaf": true, "game_id": "2" }
+    },
+    "崩坏学园2": {
+      "provider": "game_provider",
+      "properties": { "game_id": "3" },
+      "meta": { "isLeaf": true, "game_id": "3" }
+    },
+    "未定事件簿": {
+      "provider": "game_provider",
+      "properties": { "game_id": "4" },
+      "meta": { "isLeaf": true, "game_id": "4" }
+    },
+    "大别野": {
+      "provider": "game_provider",
+      "properties": { "game_id": "5" },
+      "meta": { "isLeaf": true, "game_id": "5" }
+    },
+    "崩坏：星穹铁道": {
+      "provider": "game_provider",
+      "properties": { "game_id": "6" },
+      "meta": { "isLeaf": true, "game_id": "6" }
+    },
+    "绝区零": {
+      "provider": "game_provider",
+      "properties": { "game_id": "8" },
+      "meta": { "isLeaf": true, "game_id": "8" }
+    }
+  },
+  "note": "{\"title\":\"米游社分区\",\"content\":\"按米游社帖子 metadata.game_id 将图片分到游戏分区。\"}"
+}

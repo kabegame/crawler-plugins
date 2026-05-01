@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.ziworld",
+  "name": "entry_provider",
+  "list": {
+    "${directory.directory_name}": {
+      "sql": "SELECT json_extract(plugin_metadata, '$.category') AS directory_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source WHERE json_valid(plugin_metadata) AND NULLIF(json_extract(plugin_metadata, '$.category'), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
+      "data_var": "directory",
+      "provider": "directory_provider",
+      "properties": {
+        "directory_name": "${directory.directory_name}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${directory.directory_name}",
+        "image_count": "${directory.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "directory_provider",
+      "properties": {
+        "directory_name": "${capture[1]}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "note": "{\"title\":\"Ziworld directories\",\"content\":\"Group Ziworld images by category directory from image metadata.\"}"
+}

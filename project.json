@@ -8,7 +8,11 @@
       "{projectRoot}/pnpm-lock.yaml",
       "{projectRoot}/project.tson"
     ],
-    "normalInputs": ["pluginFiles", "packageScript", "packageConfig"]
+    "cliBinary": [
+      "{workspaceRoot}/target/release/kabegame-cli",
+      "{workspaceRoot}/target/release/kabegame-cli.exe"
+    ],
+    "normalInputs": ["pluginFiles", "packageScript", "packageConfig", "cliBinary"]
   },
   "targets": {
     "package": {

@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.pixai",
+  "name": "entry_provider",
+  "list": {
+    "${tag.tag_key}": {
+      "sql": "SELECT COALESCE(NULLIF(json_extract(tag.value, '$.codeName'), ''), json_extract(tag.value, '$.id')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(json_extract(tag.value, '$.display'), '')), ''), COALESCE(NULLIF(json_extract(tag.value, '$.codeName'), ''), json_extract(tag.value, '$.id'))) AS display_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"provider_tags\":[]}' END, '$.provider_tags') AS tag WHERE COALESCE(NULLIF(json_extract(tag.value, '$.codeName'), ''), json_extract(tag.value, '$.id')) IS NOT NULL GROUP BY tag_key ORDER BY image_count DESC, tag_key ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_key": "${tag.tag_key}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${tag.display_name}",
+        "image_count": "${tag.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "tag_provider",
+      "properties": {
+        "tag_key": "${capture[1]}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "note": "{\"title\":\"PixAI tags\",\"content\":\"Group PixAI images by resolved provider tags from image metadata.\"}"
+}

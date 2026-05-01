@@ -130,7 +130,6 @@
     if (t > 1e9) return new Date(t * 1000).toLocaleString();
     return new Date(t * 1000).toLocaleString();
   }
-  console.log('metadata', m);
   const titleHtml = m.title_html != null ? String(m.title_html) : '';
   const titlePlain = m.title_plain != null ? String(m.title_plain).trim() : '';
   const linkTitle = m.link_title != null ? String(m.link_title).trim() : '';

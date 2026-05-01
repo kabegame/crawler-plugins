@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.pixiv",
+  "name": "entry_provider",
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "SELECT json_extract(tag.value, '$.tag') AS tag_name, COALESCE(MIN(NULLIF(json_extract(tag.value, '$.translation.en'), '')), json_extract(tag.value, '$.tag')) AS display_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"body\":{\"tags\":{\"tags\":[]}}}' END, '$.body.tags.tags') AS tag WHERE json_extract(tag.value, '$.tag') IS NOT NULL GROUP BY tag_name ORDER BY image_count DESC, tag_name ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${tag.tag_name}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${tag.display_name}",
+        "image_count": "${tag.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${capture[1]}"
+      },
+      "meta": {
+        "isLeaf": true
+      }
+    }
+  },
+  "note": "{\"title\":\"Pixiv tags\",\"content\":\"Group Pixiv images by artwork tags from image metadata.\"}"
+}

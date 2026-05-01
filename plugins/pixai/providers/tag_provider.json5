@@ -1,0 +1,40 @@
+{
+  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.pixai",
+  "name": "tag_provider",
+  "properties": {
+    "tag_key": { "type": "string", "default": "", "optional": false }
+  },
+  "query": {
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"provider_tags\":[]}' END, '$.provider_tags') AS tag WHERE COALESCE(NULLIF(json_extract(tag.value, '$.codeName'), ''), json_extract(tag.value, '$.id')) = ${properties.tag_key})"
+  },
+  "list": {
+    "${page.name}": {
+      "child_var": "page",
+      "delegate": {
+        "provider": "kabegame.page_size_provider",
+        "properties": { "page_size": 100 }
+      },
+      "provider": "kabegame.gallery_page_router",
+      "properties": {
+        "page_size": 100,
+        "page_num": "${page.meta.page_num}"
+      },
+      "meta": { "page_num": "${page.meta.page_num}" }
+    },
+  },
+  "resolve": {
+    "desc": { "provider": "kabegame.sort_router" },
+    "x([1-9][0-9]*)x": {
+      "provider": "kabegame.gallery_paginate_router",
+      "properties": { "page_size": "${capture[1]}" }
+    },
+    "([1-9][0-9]*)": {
+      "provider": "kabegame.gallery_page_router",
+      "properties": {
+        "page_size": 100,
+        "page_num": "${capture[1]}"
+      }
+    }
+  }
+}
