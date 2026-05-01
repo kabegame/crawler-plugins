@@ -6,7 +6,7 @@
     "directory_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "json_valid(plugin_metadata) AND json_extract(plugin_metadata, '$.category') = ${properties.directory_name}"
+    "where": "json_valid(plugin_metadata) AND NULLIF(TRIM(CAST(json_extract(plugin_metadata, '$.category') AS TEXT)), '') = ${properties.directory_name}"
   },
   "list": {
     "${page.name}": {

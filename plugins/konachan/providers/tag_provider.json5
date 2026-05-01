@@ -7,7 +7,7 @@
     "tag_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"sidebar_tags\":[]}' END, '$.sidebar_tags') AS tag WHERE COALESCE(NULLIF(json_extract(tag.value, '$.type'), ''), 'unknown') = ${properties.tag_type} AND COALESCE(NULLIF(json_extract(tag.value, '$.name'), ''), NULLIF(json_extract(tag.value, '$.display'), '')) = ${properties.tag_name})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"sidebar_tags\":[]}' END, '$.sidebar_tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') = ${properties.tag_type} AND COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.display') AS TEXT)), '')) = ${properties.tag_name})"
   },
   "list": {
     "${page.name}": {

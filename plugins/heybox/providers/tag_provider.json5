@@ -6,7 +6,7 @@
     "tag_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE tag.value = ${properties.tag_name})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE TRIM(CAST(tag.value AS TEXT)) = ${properties.tag_name})"
   },
   "list": {
     "${page.name}": {

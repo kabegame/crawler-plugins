@@ -6,7 +6,7 @@
     "tag_key": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"provider_tags\":[]}' END, '$.provider_tags') AS tag WHERE COALESCE(NULLIF(json_extract(tag.value, '$.codeName'), ''), json_extract(tag.value, '$.id')) = ${properties.tag_key})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"provider_tags\":[]}' END, '$.provider_tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) = ${properties.tag_key})"
   },
   "list": {
     "${page.name}": {

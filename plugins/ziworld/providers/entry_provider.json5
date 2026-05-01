@@ -4,7 +4,7 @@
   "name": "entry_provider",
   "list": {
     "${directory.directory_name}": {
-      "sql": "SELECT json_extract(plugin_metadata, '$.category') AS directory_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source WHERE json_valid(plugin_metadata) AND NULLIF(json_extract(plugin_metadata, '$.category'), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(plugin_metadata, '$.category') AS TEXT)), '') AS directory_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source WHERE json_valid(plugin_metadata) AND NULLIF(TRIM(CAST(json_extract(plugin_metadata, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
       "data_var": "directory",
       "provider": "directory_provider",
       "properties": {

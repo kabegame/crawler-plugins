@@ -6,7 +6,7 @@
     "tag_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"body\":{\"tags\":{\"tags\":[]}}}' END, '$.body.tags.tags') AS tag WHERE json_extract(tag.value, '$.tag') = ${properties.tag_name})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"body\":{\"tags\":{\"tags\":[]}}}' END, '$.body.tags.tags') AS tag WHERE NULLIF(TRIM(CAST(json_extract(tag.value, '$.tag') AS TEXT)), '') = ${properties.tag_name})"
   },
   "list": {
     "${page.name}": {
