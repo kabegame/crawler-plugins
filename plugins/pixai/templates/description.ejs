@@ -1,4 +1,5 @@
-<% const m = metadata || {}; %>
+<% const root = metadata || {}; %>
+<% const m = root.v2 && typeof root.v2 === 'object' ? root.v2 : root; %>
 <% const pdComments = Array.isArray(m.comments) ? m.comments : []; %>
 <%
   let frameUrl = '';
@@ -100,7 +101,7 @@
       </span>
     </div>
   <% } %>
-  <% if (m.extra && m.extra.suggestedTacks && m.extra.suggestedTacks.length) { %>
+  <% if (m.tacks && m.tacks.length) { %>
   <div class="pd-expand is-collapsed" data-pd-expand id="tags-expand-wrap" style="margin-bottom:12px;--pd-clamp-max:3.35rem;">
     <div class="pd-expand-viewport">
       <div id="tags-container" class="pd-expand-content" style="min-height:1.5em;color:var(--anime-text-secondary,#6b7280);font-size:0.8rem;">…</div>
@@ -132,23 +133,7 @@
     return v || fallback;
   }
 
-  var GRAPHQL = 'https://api.pixai.art/graphql';
-  var GET_TACK_EXT = {"clientLibrary":{"name":"@apollo/client","version":"4.1.4"},"persistedQuery":{"version":1,"sha256Hash":"4517f9180265ab50f2cf3a92f33d146b957c8d73ed165ef39b4bb8ec927bf813"}};
-  var TACK_IDS = <%- JSON.stringify((m.extra && m.extra.suggestedTacks) ? m.extra.suggestedTacks : []) %>;
-
-  function gql(op, vars, ext) {
-    var h = {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      'x-apollo-operation-name': op,
-      'Origin': 'https://pixai.art',
-      'Referer': 'https://pixai.art/'
-    };
-    var url = GRAPHQL + '?operation=' + encodeURIComponent(op) + '&operationName=' + encodeURIComponent(op)
-      + '&variables=' + encodeURIComponent(JSON.stringify(vars))
-      + '&extensions=' + encodeURIComponent(JSON.stringify(ext));
-    return window.__bridge.fetch(url, { headers: h, json: true });
-  }
+  var TACKS = <%- JSON.stringify(m.tacks || []) %>;
 
   function pdExpandLabels(loc) {
     var s = String(loc || 'en').toLowerCase();
@@ -237,6 +222,7 @@
   }
 
   function pickTackName(tack, appLocale) {
+    if (tack.displayName) return tack.displayName;
     var terms = tack.tackTerms || [];
     var prefs = tackLocalePrefs(appLocale);
     var i, j;
@@ -256,66 +242,44 @@
   function loadTacks(appLocale) {
     var el = document.getElementById('tags-container');
     if (!el) return;
-    if (!TACK_IDS || TACK_IDS.length === 0) {
+    var results = Array.isArray(TACKS) ? TACKS : [];
+    if (!results.length) {
       el.textContent = '';
       return;
     }
-    var max = Math.min(15, TACK_IDS.length);
-    var slice = TACK_IDS.slice(0, max);
-    var results = [];
-    function renderTags() {
-      el.innerHTML = '';
-      el.style.display = 'flex';
-      el.style.flexWrap = 'wrap';
-      el.style.gap = '6px';
-      results.forEach(function (tack) {
-        var name = pickTackName(tack, appLocale);
-        var code = tack.codeName || '';
-        var span = document.createElement('span');
-        var pillBg = 'color-mix(in srgb, ' + pdCssVar('--anime-primary', '#6366f1') + ' 18%, transparent)';
-        var pillFg = pdCssVar('--anime-primary', '#4f46e5');
-        span.style.cssText = 'display:inline-block;padding:2px 8px;border-radius:999px;background:' + pillBg + ';color:' + pillFg + ';font-size:0.75rem;';
-        if (code) {
-          var tagUrl = 'https://pixai.art/tags/artwork/' + encodeURIComponent(code);
-          var a = document.createElement('a');
-          a.href = '#';
-          a.className = 'pd-open';
-          a.setAttribute('data-url', tagUrl);
-          a.rel = 'noopener noreferrer';
-          a.style.cssText = 'color:inherit;text-decoration:none;cursor:pointer;';
-          a.textContent = name;
-          span.appendChild(a);
-        } else {
-          span.textContent = name;
-        }
-        el.appendChild(span);
-      });
-      var tw = document.getElementById('tags-expand-wrap');
-      if (tw) {
-        tw.classList.remove('is-expanded', 'pd-no-clamp');
-        tw.classList.add('is-collapsed');
-        pdRefreshExpand(tw);
-        pdUpdateExpandToggle(tw, appLocale);
+    el.innerHTML = '';
+    el.style.display = 'flex';
+    el.style.flexWrap = 'wrap';
+    el.style.gap = '6px';
+    results.forEach(function (tack) {
+      var name = pickTackName(tack, appLocale);
+      var code = tack.codeName || '';
+      var span = document.createElement('span');
+      var pillBg = 'color-mix(in srgb, ' + pdCssVar('--anime-primary', '#6366f1') + ' 18%, transparent)';
+      var pillFg = pdCssVar('--anime-primary', '#4f46e5');
+      span.style.cssText = 'display:inline-block;padding:2px 8px;border-radius:999px;background:' + pillBg + ';color:' + pillFg + ';font-size:0.75rem;';
+      if (code) {
+        var tagUrl = 'https://pixai.art/tags/artwork/' + encodeURIComponent(code);
+        var a = document.createElement('a');
+        a.href = '#';
+        a.className = 'pd-open';
+        a.setAttribute('data-url', tagUrl);
+        a.rel = 'noopener noreferrer';
+        a.style.cssText = 'color:inherit;text-decoration:none;cursor:pointer;';
+        a.textContent = name;
+        span.appendChild(a);
+      } else {
+        span.textContent = name;
       }
+      el.appendChild(span);
+    });
+    var tw = document.getElementById('tags-expand-wrap');
+    if (tw) {
+      tw.classList.remove('is-expanded', 'pd-no-clamp');
+      tw.classList.add('is-collapsed');
+      pdRefreshExpand(tw);
+      pdUpdateExpandToggle(tw, appLocale);
     }
-    function chunk(start) {
-      if (start >= slice.length) {
-        renderTags();
-        return;
-      }
-      var end = Math.min(start + 6, slice.length);
-      var chunkIds = slice.slice(start, end);
-      Promise.all(chunkIds.map(function (id) {
-        return gql('getTack', { id: id }, GET_TACK_EXT).then(function (json) {
-          var tack = json && json.data && json.data.tack;
-          return tack || null;
-        }).catch(function () { return null; });
-      })).then(function (parts) {
-        parts.forEach(function (t) { if (t) results.push(t); });
-        chunk(end);
-      });
-    }
-    chunk(0);
   }
 
   function onReady() {

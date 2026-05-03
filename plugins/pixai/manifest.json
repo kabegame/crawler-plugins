@@ -4,7 +4,7 @@
   "name.en": "PixAI",
   "name.ja": "PixAI",
   "name.ko": "PixAI",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "minAppVersion": "3.4.1",
   "description": "PixAI AI art community crawler: trending models and artworks. In many cases the quality can surpass Pixiv.",
   "description.zh": "PixAI AI 画像社区爬虫：遍历趋势模型与作品。某种意义上作品质量常优于 Pixiv。",

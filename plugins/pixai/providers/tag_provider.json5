@@ -1,12 +1,12 @@
 {
-  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.pixai",
   "name": "tag_provider",
   "properties": {
     "tag_key": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"provider_tags\":[]}' END, '$.provider_tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) = ${properties.tag_key})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"v2\":{\"tacks\":[]}}' END, '$.v2.tacks') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) = ${properties.tag_key} OR COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) = ${properties.tag_key})"
   },
   "list": {
     "${page.name}": {

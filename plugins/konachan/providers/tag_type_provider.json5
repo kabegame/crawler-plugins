@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../../src-tauri/core/src/providers/dsl/schema.json5",
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.konachan",
   "name": "tag_type_provider",
   "properties": {

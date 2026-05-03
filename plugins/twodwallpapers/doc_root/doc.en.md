@@ -1,52 +1,43 @@
 # 2dwallpaper Plugin Guide
 
-Fetches wallpapers from [2dwallpapers.com](https://2dwallpapers.com). When creating a task you choose a **main category**, optionally set a **subcategory keyword**, and choose **sort order**.
+Fetches wallpapers from [2dwallpapers.com](https://2dwallpapers.com). A task now only needs a **work**, **start page**, **end page**, and **sort order**.
 
-## Main category
+## Work
 
-The main category is the site’s top-level section (e.g. anime, game, uncategorized).
+The work is a concrete entry on the site category pages, such as `Genshin Impact`. The plugin searches the game, anime, and uncategorized sections for the first matching work, then crawls only that work's own paginated list.
 
-| UI label    | Description |
-|------------|-------------|
-| Anime      | `anime-wallpapers` |
-| Game       | `game-wallpapers` (e.g. Genshin, Honkai) |
-| Uncategorized | `uncategorized` |
+- Default value: `Genshin`
+- Matching: regular expression against the work name or link. For example, `Genshin` matches `Genshin Impact`
+- Prefer matching one work at a time, because page numbers belong to a specific work list
 
-The crawler opens that category’s list page, then filters subcategories by the keyword below.
+The highlighted item below is the work entry:
 
-![cate](./images/cate.png)
+![work-entry](./images/work-entry.png)
 
-## Subcategory keyword
+## Page Range
 
-The main page lists **subcategories** (e.g. Genshin, Honkai). The keyword filters which subcategory to crawl.
+`start_page` and `end_page` define the work-list pages to crawl. Page 1 uses the work list URL itself; page 2 and later use the site's `/page/{page}` path.
 
-- **Set a keyword**: Only subcategories whose name matches (regex) are crawled. e.g. `Genshin` for Genshin only; `Genshin|Honkai` for several.
-- **Leave empty**: No name filter; the script will use the first subcategory it finds. To crawl all, use a suitable keyword or run multiple tasks.
+The plugin reads the total page count from the site pagination and logs the site total, requested range, skipped pages, actual processed range, and each page as `current/total`.
 
-**Example**: Main category “Game”, keyword `Genshin` → only “Game → Genshin” is crawled.
+The highlighted area below is the work-list pagination:
 
-![scate](./images/scate.png)
+![work-pagination](./images/work-pagination.png)
 
-## Sort order
+## Sort Order
 
-List order is controlled by **orderby** and affects crawl order.
+The **orderby** option controls list order and therefore crawl order.
 
-| UI label   | Site value   | Description |
-|------------|--------------|-------------|
-| Newest     | `Newest`     | By publish time |
-| Most views | `Popularity` | By view count |
-| Most likes | `Likex`      | By like count |
-| Most favs  | `Favorites`  | By favorite count |
-| Recent update | `Update`  | By last update |
-| Random     | `Random`     | Random order |
-
-To get the most popular “Game → Genshin” wallpapers, choose “Most views” or “Most likes”.
-
-## Other options
-
-- **Max count**: Maximum images to download per task (1–1000).
+| UI label | Parameter | Description |
+|----------|-----------|-------------|
+| Latest | `date` | Newest first |
+| Most views | `views` | Highest view count first |
+| Most likes | `likes` | Highest like count first |
+| Most saved | `follow_num` | Highest favorite count first |
+| Recently updated | `modified` | Recently updated first |
+| Random | `rand` | Random order |
 
 ## Examples
 
-- “Game” + keyword `Genshin` + “Most views” + max 100 → first 100 most-viewed wallpapers in Game → Genshin.
-- “Anime” + keyword for a subcategory + “Newest” + max count → latest wallpapers in that anime subcategory.
+- Crawl the most-viewed pages 1 to 10 for `Genshin`: set work to `Genshin`, start page to `1`, end page to `10`, and sort to “Most views”.
+- Crawl another work: enter part of its name, such as `Honkai` or `Blue Archive`, then set the page range and sort order.

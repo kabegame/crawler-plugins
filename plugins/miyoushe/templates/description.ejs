@@ -176,7 +176,8 @@
   var initialPostTitleRaw = <%- JSON.stringify(postTitle) %>;
   var initialPostContentRaw = <%- JSON.stringify(postContent) %>;
   var initialPostStructuredContentRaw = <%- JSON.stringify(postStructuredContent) %>;
-  var emoticonMap = Object.assign({}, <%- JSON.stringify(emoticonMap) %>);
+  var metadataEmoticonMap = Object.assign({}, <%- JSON.stringify(emoticonMap) %>);
+  var emoticonMap = {};
   var staticReplies = <%- JSON.stringify(Array.isArray(m.replies) ? m.replies : []) %>;
   var state = { comments: staticReplies, loading: false, loadingMore: false, lastId: '', hasMore: false, limit: staticReplies.length };
 
@@ -278,6 +279,51 @@
       });
     });
   }
+  function mergeEmoticonMap(map) {
+    if (!map || typeof map !== 'object' || Array.isArray(map)) return 0;
+    var count = 0;
+    Object.keys(map).forEach(function (name) {
+      var icon = map[name];
+      if (name && icon != null) {
+        emoticonMap[name] = String(icon);
+        count++;
+      }
+    });
+    return count;
+  }
+  var EMOTICON_CACHE_KEY = 'miyoushe:emoticon_map:v1';
+  function getHostCache(key) {
+    if (!window.__bridge || !window.__bridge.getCache) return Promise.resolve(null);
+    return window.__bridge.getCache(key).catch(function () { return null; });
+  }
+  function setHostCache(key, data) {
+    if (!window.__bridge || !window.__bridge.setCache) return Promise.resolve(false);
+    return window.__bridge.setCache(key, data).catch(function () { return false; });
+  }
+  function loadPluginEmoticons() {
+    return getHostCache(EMOTICON_CACHE_KEY).then(function (cachedMap) {
+      if (mergeEmoticonMap(cachedMap) > 0) return true;
+      if (!window.__bridge || !window.__bridge.getPluginData) return false;
+      return window.__bridge.getPluginData().then(function (pluginData) {
+        var map = pluginData && pluginData.miyoushe_emoticon_map;
+        var ok = mergeEmoticonMap(map) > 0;
+        if (ok) setHostCache(EMOTICON_CACHE_KEY, map);
+        return ok;
+      }).catch(function () {
+        return false;
+      });
+    });
+  }
+  function loadEmoticons() {
+    return loadPluginEmoticons().then(function (loadedFromDb) {
+      if (loadedFromDb) return;
+      if (mergeEmoticonMap(metadataEmoticonMap) > 0) return;
+      return fetchByBridge(API_EMOTICONS).then(function (resp) {
+        mergeEmoticons(resp);
+        if (Object.keys(emoticonMap).length > 0) setHostCache(EMOTICON_CACHE_KEY, emoticonMap);
+      }).catch(function () {});
+    });
+  }
   function renderComments() {
     var listEl = wrap.querySelector('[data-mys-id="comments-list"]');
     var emptyEl = wrap.querySelector('[data-mys-id="comments-empty"]');
@@ -341,15 +387,16 @@
       if (ct) ct.innerHTML = renderPostBody(post.structured_content, post.content);
     }).catch(function () {});
   }
-  var initTitleEl = wrap.querySelector('[data-mys-id="post-title"]');
-  if (initTitleEl) initTitleEl.innerHTML = renderPostTitle(initialPostTitleRaw);
-  var initCt = wrap.querySelector('[data-mys-id="post-content"]');
-  if (initCt) initCt.innerHTML = renderPostBody(initialPostStructuredContentRaw, initialPostContentRaw);
-  renderComments();
-  // 客户端兜底：仅在 Rhai 侧未能获取表情时补全（通常不触发）
-  // if (Object.keys(emoticonMap).length === 0) {
-  //   fetchByBridge(API_EMOTICONS).then(function (resp) { mergeEmoticons(resp); renderComments(); }).catch(function () {});
-  // }
-  refreshPost();
+  function renderInitialContent() {
+    var initTitleEl = wrap.querySelector('[data-mys-id="post-title"]');
+    if (initTitleEl) initTitleEl.innerHTML = renderPostTitle(initialPostTitleRaw);
+    var initCt = wrap.querySelector('[data-mys-id="post-content"]');
+    if (initCt) initCt.innerHTML = renderPostBody(initialPostStructuredContentRaw, initialPostContentRaw);
+    renderComments();
+  }
+  loadEmoticons().then(function () {
+    renderInitialContent();
+    refreshPost();
+  });
 })();
 </script>

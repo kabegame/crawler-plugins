@@ -1,12 +1,12 @@
 {
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
-  "namespace": "plugins.anihonet-wallpaper",
-  "name": "tag_provider",
+  "namespace": "plugins.twodwallpapers",
+  "name": "category_provider",
   "properties": {
-    "tag_name": { "type": "string", "default": "", "optional": false }
+    "category_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "${properties.tag_name} NOT LIKE '%壁紙%' AND ${properties.tag_name} NOT LIKE '%画像%' AND EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})"
+    "where": "NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') = ${properties.category_name}"
   },
   "list": {
     "${page.name}": {

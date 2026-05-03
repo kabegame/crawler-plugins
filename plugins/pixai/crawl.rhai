@@ -4,10 +4,12 @@ let api_url = "https://api.pixai.art/graphql";
 let operation_models = "listGenerationModels";
 let operation_artworks = "listArtworks";
 let operation_get_tack = "getTack";
+let operation_get_artwork_detail = "getArtworkWithTaskDetail";
 let models_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"4d76952c681f7d0787077ddeec310f6475ab059e50546248120617abfb4031e9\"}}";
 
 let artworks_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"e0c938939452d33abf3289e74b9f9f7bebd749e065ee905e7e073aca6f05199c\"}}";
-let get_tack_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"4517f9180265ab50f2cf3a92f33d146b957c8d73ed165ef39b4bb8ec927bf813\"}}";
+let get_tack_query = "query getTack($id: ID, $defaultName: String, $codeName: String) { tack(id: $id, defaultName: $defaultName, codeName: $codeName) { id parentId codeName category defaultName weight mediaId safetyScore createdAt updatedAt tackTerms { id tackId category name createdAt updatedAt } } }";
+let artwork_detail_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"14ee05fd01b9b0912f04b207d4adbd84df8b2bfefe0bb145e5796ef2473e5006\"}}";
 
 let ranking_artworks_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"1e5f998b229a3701595632cbb2c28ee69534c22d7a3499ab657ca465fff85497\"}}";
 let ranking_models_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"1658f8e716184e95d3177d20fad189d8f7b250fb30e8401496ed0aaf34e4ad83\"}}";
@@ -46,43 +48,93 @@ fn fetch_pixai_comments(artwork_id) {
     return comments;
 }
 
-fn pick_tack_display_name(tack) {
-    if tack == () {
-        return "";
+fn fetch_pixai_artwork_detail(artwork_id, api_url, operation_get_artwork_detail, artwork_detail_extensions) {
+    if artwork_id == () {
+        return ();
     }
-    let terms = tack["tackTerms"];
-    let prefs = ["zh", "zh-CN", "zh-Hans", "zh-TW", "zh-Hant", "en", "ja", "ko"];
-    if terms != () {
-        let pi = 0;
-        while pi < prefs.len() {
-            let pref = prefs[pi];
-            let ti = 0;
-            while ti < terms.len() {
-                let term = terms[ti];
-                if term != () && term["category"] == pref && term["name"] != () {
-                    return term["name"].to_string();
-                }
-                ti += 1;
-            }
-            pi += 1;
+    let artwork_id_str = artwork_id.to_string();
+    if artwork_id_str == "" {
+        return ();
+    }
+    try {
+        set_header("x-apollo-operation-name", operation_get_artwork_detail);
+        let variables = `{"id":"${artwork_id_str}","tackLanguage":"ja"}`;
+        let url = `${api_url}?operation=${operation_get_artwork_detail}&operationName=${operation_get_artwork_detail}&variables=${url_encode(variables)}&extensions=${url_encode(artwork_detail_extensions)}`;
+        let res = fetch_json(url);
+        if res != () && res["data"] != () {
+            return res["data"]["artwork"];
         }
-        if terms.len() > 0 && terms[0]["name"] != () {
-            return terms[0]["name"].to_string();
-        }
+    } catch {
+        warn("[PixAI] 作品详情获取失败，artwork_id=" + artwork_id_str);
     }
-    if tack["defaultName"] != () {
-        return tack["defaultName"].to_string();
-    }
-    if tack["codeName"] != () {
-        return tack["codeName"].to_string();
-    }
-    if tack["id"] != () {
-        return tack["id"].to_string();
-    }
-    return "";
+    return ();
 }
 
-fn fetch_tack_by_id(tack_id, api_url, operation_get_tack, get_tack_extensions) {
+fn pixai_tag_cache_key_by_id() {
+    return "pixai_tacks_by_id";
+}
+
+fn pixai_tag_cache_key_by_code_name() {
+    return "pixai_tacks_by_code_name";
+}
+
+fn pixai_read_plugin_data_or_empty() {
+    try {
+        return plugin_data();
+    } catch {
+        return #{};
+    }
+}
+
+fn pixai_try_set_plugin_data(data) {
+    try {
+        set_plugin_data(data);
+    } catch {
+        // 旧 Kabegame 运行时没有 plugin_data API；缓存失败不影响爬取。
+    }
+}
+
+fn read_cached_tack_by_id(tack_id_str) {
+    let data = pixai_read_plugin_data_or_empty();
+    let cache = data[pixai_tag_cache_key_by_id()];
+    if cache == () {
+        return ();
+    }
+    return cache[tack_id_str];
+}
+
+fn read_cached_tack_by_code_name(code_name_str) {
+    let data = pixai_read_plugin_data_or_empty();
+    let cache = data[pixai_tag_cache_key_by_code_name()];
+    if cache == () {
+        return ();
+    }
+    return cache[code_name_str];
+}
+
+fn write_cached_tack(tack_id_str, tack) {
+    if tack == () {
+        return;
+    }
+    let data = pixai_read_plugin_data_or_empty();
+    let by_id_key = pixai_tag_cache_key_by_id();
+    let by_code_key = pixai_tag_cache_key_by_code_name();
+    let by_id = if data[by_id_key] == () { #{} } else { data[by_id_key] };
+    by_id[tack_id_str] = tack;
+    data[by_id_key] = by_id;
+
+    if tack["codeName"] != () {
+        let code_name = tack["codeName"].to_string();
+        if code_name != "" {
+            let by_code = if data[by_code_key] == () { #{} } else { data[by_code_key] };
+            by_code[code_name] = tack;
+            data[by_code_key] = by_code;
+        }
+    }
+    pixai_try_set_plugin_data(data);
+}
+
+fn fetch_tack_by_id(tack_id, api_url, operation_get_tack, get_tack_query) {
     if tack_id == () {
         return ();
     }
@@ -90,13 +142,19 @@ fn fetch_tack_by_id(tack_id, api_url, operation_get_tack, get_tack_extensions) {
     if tack_id_str == "" {
         return ();
     }
+    let cached = read_cached_tack_by_id(tack_id_str);
+    if cached != () {
+        return cached;
+    }
     try {
         set_header("x-apollo-operation-name", operation_get_tack);
         let variables = `{"id":"${tack_id_str}"}`;
-        let url = `${api_url}?operation=${operation_get_tack}&operationName=${operation_get_tack}&variables=${url_encode(variables)}&extensions=${url_encode(get_tack_extensions)}`;
+        let url = `${api_url}?operation=${operation_get_tack}&operationName=${operation_get_tack}&variables=${url_encode(variables)}&query=${url_encode(get_tack_query)}`;
         let res = fetch_json(url);
         if res != () && res["data"] != () {
-            return res["data"]["tack"];
+            let tack = res["data"]["tack"];
+            write_cached_tack(tack_id_str, tack);
+            return tack;
         }
     } catch {
         warn("[PixAI] 标签详情获取失败，tack_id=" + tack_id_str);
@@ -104,44 +162,33 @@ fn fetch_tack_by_id(tack_id, api_url, operation_get_tack, get_tack_extensions) {
     return ();
 }
 
-fn resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions) {
-    let tags = [];
-    if node == () {
-        return tags;
+fn fetch_tack_by_code_name(code_name, api_url, operation_get_tack, get_tack_query) {
+    if code_name == () {
+        return ();
     }
-    let extra = node["extra"];
-    if extra == () {
-        return tags;
+    let code_name_str = code_name.to_string();
+    if code_name_str == "" {
+        return ();
     }
-    let tack_ids = extra["suggestedTacks"];
-    if tack_ids == () {
-        return tags;
+    let cached = read_cached_tack_by_code_name(code_name_str);
+    if cached != () {
+        return cached;
     }
-    let i = 0;
-    while i < tack_ids.len() && i < 15 {
-        let tack_id = tack_ids[i];
-        let tack_id_str = if tack_id == () { "" } else { tack_id.to_string() };
-        if tack_id_str != "" {
-            let tack = fetch_tack_by_id(tack_id_str, api_url, operation_get_tack, get_tack_extensions);
-            if tack != () {
-                let code_name = if tack["codeName"] != () { tack["codeName"].to_string() } else { "" };
-                let display_name = pick_tack_display_name(tack);
-                tags.push(#{
-                    id: tack_id_str,
-                    codeName: code_name,
-                    display: display_name,
-                });
-            } else {
-                tags.push(#{
-                    id: tack_id_str,
-                    codeName: "",
-                    display: tack_id_str,
-                });
-            }
+    try {
+        set_header("x-apollo-operation-name", operation_get_tack);
+        let variables = `{"codeName":"${code_name_str}"}`;
+        let url = `${api_url}?operation=${operation_get_tack}&operationName=${operation_get_tack}&variables=${url_encode(variables)}&query=${url_encode(get_tack_query)}`;
+        let res = fetch_json(url);
+        if res != () && res["data"] != () {
+            let tack = res["data"]["tack"];
+            let tack_id_str = if tack != () && tack["id"] != () { tack["id"].to_string() } else { code_name_str };
+            write_cached_tack(tack_id_str, tack);
+            return tack;
         }
-        i += 1;
+    } catch {
+        warn("[PixAI] 标签详情获取失败，codeName=" + code_name_str);
     }
-    return tags;
+    return ();
 }
 
 set_header("Accept", "application/json");
@@ -190,6 +237,36 @@ fn pick_media_id_for_download(node) {
     return "";
 }
 
+fn pick_video_media_id_for_download(node, artwork_detail) {
+    if artwork_detail != () {
+        let detail_video_media_id = artwork_detail["videoMediaId"];
+        if detail_video_media_id != () {
+            let detail_vid_str = detail_video_media_id.to_string();
+            if detail_vid_str != "" {
+                return detail_vid_str;
+            }
+        }
+    }
+    if node != () {
+        let video_media_id = node["videoMediaId"];
+        if video_media_id != () {
+            let vid_str = video_media_id.to_string();
+            if vid_str != "" {
+                return vid_str;
+            }
+        }
+    }
+    return "";
+}
+
+fn pick_artwork_download_url(default_url, node, artwork_detail, media_api_base) {
+    let video_media_id = pick_video_media_id_for_download(node, artwork_detail);
+    if video_media_id != "" {
+        return `${media_api_base}${video_media_id}/image`;
+    }
+    return default_url;
+}
+
 // 处理单次 listArtworks 返回的 edges：按标签/模型流走 PUBLIC CDN；排行榜走 /v1/media/{id}/image
 fn process_artworks_edges_for_download(
     edges,
@@ -198,7 +275,10 @@ fn process_artworks_edges_for_download(
     progress_budget,
     use_media_api,
     media_api_base,
-    downloaded_offset
+    downloaded_offset,
+    api_url,
+    operation_get_artwork_detail,
+    artwork_detail_extensions
 ) {
     if edges == () || edges.len() == 0 {
         return 0;
@@ -238,14 +318,19 @@ fn process_artworks_edges_for_download(
                 let download_url = `${media_api_base}${media_id_str}/image`;
                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
                 let art_id_str = if node != () && node["id"] != () { node["id"].to_string() } else { "" };
-                let art_comments = fetch_pixai_comments(art_id_str);
-                if node != () { node["comments"] = art_comments; }
-                let provider_tags = resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions);
-                if provider_tags.len() > 0 { node["provider_tags"] = provider_tags; }
-                download_image(download_url, #{ name: title, metadata: node });
-                downloaded += 1;
-                if progress_per > 0.0 {
-                    add_progress(progress_per);
+                let artwork_detail = fetch_pixai_artwork_detail(art_id_str, api_url, operation_get_artwork_detail, artwork_detail_extensions);
+                if artwork_detail == () {
+                    warn("[PixAI] 跳过作品：详情为空，artwork_id=" + art_id_str);
+                } else {
+                    let art_comments = fetch_pixai_comments(art_id_str);
+                    artwork_detail["comments"] = art_comments;
+                    let detail_title = if artwork_detail["title"] != () { artwork_detail["title"].to_string() } else { title };
+                    let final_download_url = pick_artwork_download_url(download_url, node, artwork_detail, media_api_base);
+                    download_image(final_download_url, #{ name: detail_title, metadata: #{ v2: artwork_detail } });
+                    downloaded += 1;
+                    if progress_per > 0.0 {
+                        add_progress(progress_per);
+                    }
                 }
             }
             edge_idx += 1;
@@ -292,14 +377,19 @@ fn process_artworks_edges_for_download(
                                 }
                                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
                                 let art_id_str2 = if node["id"] != () { node["id"].to_string() } else { "" };
-                                let art_comments2 = fetch_pixai_comments(art_id_str2);
-                                node["comments"] = art_comments2;
-                                let provider_tags2 = resolve_pixai_provider_tags(node, api_url, operation_get_tack, get_tack_extensions);
-                                if provider_tags2.len() > 0 { node["provider_tags"] = provider_tags2; }
-                                download_image(image_url.to_string(), #{ name: title, metadata: node });
-                                downloaded += 1;
-                                if progress_per_download > 0.0 {
-                                    add_progress(progress_per_download);
+                                let artwork_detail2 = fetch_pixai_artwork_detail(art_id_str2, api_url, operation_get_artwork_detail, artwork_detail_extensions);
+                                if artwork_detail2 == () {
+                                    warn("[PixAI] 跳过作品：详情为空，artwork_id=" + art_id_str2);
+                                } else {
+                                    let art_comments2 = fetch_pixai_comments(art_id_str2);
+                                    artwork_detail2["comments"] = art_comments2;
+                                    let detail_title2 = if artwork_detail2["title"] != () { artwork_detail2["title"].to_string() } else { title };
+                                    let final_download_url = pick_artwork_download_url(image_url.to_string(), node, artwork_detail2, media_api_base);
+                                    download_image(final_download_url, #{ name: detail_title2, metadata: #{ v2: artwork_detail2 } });
+                                    downloaded += 1;
+                                    if progress_per_download > 0.0 {
+                                        add_progress(progress_per_download);
+                                    }
                                 }
                                 break;
                             }
@@ -323,6 +413,8 @@ fn process_artworks(
     api_url,
     operation_artworks,
     artworks_extensions,
+    operation_get_artwork_detail,
+    artwork_detail_extensions,
     per_item_progress,
     media_api_base,
     artwork_sort,
@@ -419,7 +511,10 @@ fn process_artworks(
                 per_page_progress,
                 false,
                 media_api_base,
-                downloaded
+                downloaded,
+                api_url,
+                operation_get_artwork_detail,
+                artwork_detail_extensions
             );
             downloaded += page_dl;
         }
@@ -475,6 +570,8 @@ fn process_author_artworks(
     api_url,
     operation_artworks,
     artworks_extensions,
+    operation_get_artwork_detail,
+    artwork_detail_extensions,
     per_item_progress,
     media_api_base,
     artwork_sort,
@@ -565,7 +662,10 @@ fn process_author_artworks(
                 per_page_progress,
                 false,
                 media_api_base,
-                downloaded
+                downloaded,
+                api_url,
+                operation_get_artwork_detail,
+                artwork_detail_extensions
             );
             downloaded += page_dl;
         }
@@ -617,7 +717,7 @@ fn resolve_tack_id(
     code_name,
     api_url,
     operation_get_tack,
-    get_tack_extensions
+    get_tack_query
 ) {
     if code_name == () {
         return "";
@@ -628,16 +728,7 @@ fn resolve_tack_id(
         return "";
     }
 
-    set_header("x-apollo-operation-name", operation_get_tack);
-    let variables = `{"codeName":"${code_name_str}"}`;
-    let url = `${api_url}?operation=${operation_get_tack}&operationName=${operation_get_tack}&variables=${url_encode(variables)}&extensions=${url_encode(get_tack_extensions)}`;
-    let res = fetch_json(url);
-    let data = res["data"];
-    if data == () {
-        print(`[PixAI] codeName=${code_name_str} 的 getTack 响应缺少 data`);
-        return "";
-    }
-    let tack = data["tack"];
+    let tack = fetch_tack_by_code_name(code_name_str, api_url, operation_get_tack, get_tack_query);
     if tack == () {
         print(`[PixAI] codeName=${code_name_str} 未解析到 tack`);
         return "";
@@ -668,6 +759,8 @@ if crawl_type == "global" {
         api_url,
         operation_artworks,
         artworks_extensions,
+        operation_get_artwork_detail,
+        artwork_detail_extensions,
         100.0,
         media_api_base,
         artwork_sort,
@@ -696,7 +789,7 @@ if crawl_type == "global" {
                 code_name_str,
                 api_url,
                 operation_get_tack,
-                get_tack_extensions
+                get_tack_query
             );
             if tag_id == "" {
                 print(`[PixAI] 跳过标签：codeName=${code_name_str} 无效或未找到对应 tackId`);
@@ -714,6 +807,8 @@ if crawl_type == "global" {
                 api_url,
                 operation_artworks,
                 artworks_extensions,
+                operation_get_artwork_detail,
+                artwork_detail_extensions,
                 per_tag_progress,
                 media_api_base,
                 artwork_sort,
@@ -753,6 +848,8 @@ if crawl_type == "global" {
             api_url,
             operation_artworks,
             artworks_extensions,
+            operation_get_artwork_detail,
+            artwork_detail_extensions,
             100.0,
             media_api_base,
             artwork_sort,
@@ -802,7 +899,10 @@ if crawl_type == "global" {
                         100.0,
                         true,
                         media_api_base,
-                        0
+                        0,
+                        api_url,
+                        operation_get_artwork_detail,
+                        artwork_detail_extensions
                     );
                     print(`[PixAI] 排行榜（${rank_ctx}）结束：下载 ${download_count} 张`);
                     if download_count == 0 {
@@ -861,6 +961,8 @@ if crawl_type == "global" {
                                     api_url,
                                     operation_artworks,
                                     artworks_extensions,
+                                    operation_get_artwork_detail,
+                                    artwork_detail_extensions,
                                     per_model_progress,
                                     media_api_base,
                                 "trending",
@@ -991,6 +1093,8 @@ if crawl_type == "global" {
                                 api_url,
                                 operation_artworks,
                                 artworks_extensions,
+                                operation_get_artwork_detail,
+                                artwork_detail_extensions,
                                 per_model_progress,
                                 media_api_base,
                                 artwork_sort,

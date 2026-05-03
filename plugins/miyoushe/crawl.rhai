@@ -12,6 +12,55 @@ fn mys_coerce_str(v) {
     v.to_string()
 }
 
+fn mys_emoticon_cache_key() {
+    return "miyoushe_emoticon_map";
+}
+
+fn mys_emoticon_cache_updated_at_key() {
+    return "miyoushe_emoticon_updated_at";
+}
+
+fn mys_read_plugin_data_or_empty() {
+    try {
+        return plugin_data();
+    } catch {
+        return #{};
+    }
+}
+
+fn mys_try_set_plugin_data(data) {
+    try {
+        set_plugin_data(data);
+    } catch {
+        // 旧 Kabegame 运行时没有 plugin_data API；缓存失败不影响爬取。
+    }
+}
+
+fn mys_read_cached_emoticon_map() {
+    let data = mys_read_plugin_data_or_empty();
+    let map = data[mys_emoticon_cache_key()];
+    if map == () {
+        return ();
+    }
+    try {
+        if map.keys().len() > 0 {
+            return map;
+        }
+    } catch {
+    }
+    return ();
+}
+
+fn mys_write_cached_emoticon_map(map) {
+    if map == () {
+        return;
+    }
+    let data = mys_read_plugin_data_or_empty();
+    data[mys_emoticon_cache_key()] = map;
+    data[mys_emoticon_cache_updated_at_key()] = unix_time_ms();
+    mys_try_set_plugin_data(data);
+}
+
 fn mys_build_search_url(api_search, keyword, size, last_id, gids) {
     let url = api_search + "?keyword=" + url_encode(keyword) + "&size=" + size.to_string();
     if last_id != "" {
@@ -108,6 +157,10 @@ fn mys_user_info(u) {
 // 一次性拉取全站表情集合，返回 name→icon_url 的 map（仅 published + is_available 条目）
 fn mys_build_emoticon_map(api_emoticons) {
     let map = #{};
+    let cached = mys_read_cached_emoticon_map();
+    if cached != () {
+        return cached;
+    }
     let resp = ();
     try {
         resp = fetch_json(api_emoticons);
@@ -140,6 +193,9 @@ fn mys_build_emoticon_map(api_emoticons) {
                 map[ns] = ics;
             }
         }
+    }
+    if map.keys().len() > 0 {
+        mys_write_cached_emoticon_map(map);
     }
     map
 }
