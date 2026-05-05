@@ -5,7 +5,7 @@
   "name.ja": "bilibili コラム",
   "name.ko": "빌리빌리 칼럼",
   "name.zhtw": "嗶哩嗶哩專欄",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minAppVersion": "3.5.0",
   "description": "bilibili 专栏：关键词搜索或单篇 cv/链接，提取正文图片；评论用于详情展示",
   "description.zh": "bilibili 专栏：关键词搜索或单篇 cv/链接，提取正文图片；评论用于详情展示",

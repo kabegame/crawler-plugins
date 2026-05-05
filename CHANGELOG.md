@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
+## [3.6.3]
+### Fixed
+- BiliBili 综合排序应为 totalrank
+- Pixiv 对分页枚举应该用id排序
+
+### Changed
+- Pixiv 画师爬取改用分页
+
 ## [3.0.0]
 ### Added
 - 新增webview后端插件

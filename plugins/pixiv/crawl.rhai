@@ -1,6 +1,6 @@
 // Pixiv 爬虫：排行榜 / 收藏 / 画师 / 关键词
 // 非 R18 排行榜一般无需 Cookie；R18 榜、收藏、画师、关键词等需在「高级设置 → HTTP 头」填写有效 Cookie（含年龄认证）。
-// 流式：按列表分页拉取，每拿到一个作品 ID 立即下载，达到 num_artworks 即停。
+// 流式：按列表分页拉取，每拿到一个作品 ID 立即下载；画师模式按 Pixiv 画师页的 48 作品/页切片。
 // 排行榜：榜序 + 内容类型 + 年龄向（config）；单日期 ranking_date，留空不传 date（Pixiv 返回最新）；分页由响应的 next 字段驱动。
 
 set_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
@@ -9,9 +9,9 @@ set_header("Origin", "https://www.pixiv.net");
 set_header("x-requested-with", "XMLHttpRequest");
 set_header("Accept", "application/json");
 
-fn add_artwork_progress() {
-    if num_artworks > 0 {
-        add_progress(99.0 / num_artworks);
+fn add_artwork_progress(total_artworks) {
+    if total_artworks > 0 {
+        add_progress(99.0 / total_artworks);
     }
 }
 
@@ -174,7 +174,7 @@ if source == "ranking" {
             if id != () {
                 download_illust(id.to_string());
                 done += 1;
-                add_artwork_progress();
+                add_artwork_progress(num_artworks);
             }
             i += 1;
         }
@@ -223,7 +223,7 @@ if source == "ranking" {
             if id != () {
                 download_illust(id.to_string());
                 done += 1;
-                add_artwork_progress();
+                add_artwork_progress(num_artworks);
             }
             i += 1;
         }
@@ -247,22 +247,59 @@ if source == "ranking" {
         throw "无法获取画师作品列表";
     }
     let illusts = body["illusts"];
-    let done = 0;
     if illusts != () {
-        // profile/all 的 illusts 为对象，键顺序与站点列表一致；站点从后往前加载，故逆序遍历
-        let key_list = illusts.keys();
-        let ki = key_list.len() - 1;
-        while ki >= 0 {
-            if done >= num_artworks {
-                break;
+        let per_page = 48;
+        let id_list = [];
+        for key in illusts.keys() {
+            try {
+                id_list.push(parse_int(key.to_string()));
+            } catch {
+                warn("[Pixiv] 跳过无法解析为数字的作品 ID：" + key.to_string());
             }
-            let id = key_list[ki];
-            download_illust(id);
-            // TODO: 去掉限制（done默认为0）
-            // TODO: 添加起止页数，每页48个，程序计算，不指定默认全部
-            done += 1;
-            add_artwork_progress();
-            ki -= 1;
+        }
+        let sort_i = 0;
+        while sort_i < id_list.len() {
+            let sort_j = sort_i + 1;
+            while sort_j < id_list.len() {
+                if id_list[sort_j] > id_list[sort_i] {
+                    let tmp_id = id_list[sort_i];
+                    id_list[sort_i] = id_list[sort_j];
+                    id_list[sort_j] = tmp_id;
+                }
+                sort_j += 1;
+            }
+            sort_i += 1;
+        }
+        let total_ids = id_list.len();
+        let total_pages = (total_ids + per_page - 1) / per_page;
+        let first_page = artist_start_page;
+        if first_page < 1 {
+            first_page = 1;
+        }
+        let last_page = artist_end_page;
+        if last_page <= 0 || last_page > total_pages {
+            last_page = total_pages;
+        }
+
+        if total_ids == 0 {
+            warn("该画师没有可抓取的作品");
+        } else if first_page > total_pages || first_page > last_page {
+            warn("画师作品页范围为空：起始页 " + first_page.to_string() + "，结束页 " + last_page.to_string() + "，总页数 " + total_pages.to_string());
+        } else {
+            let start_offset = (first_page - 1) * per_page;
+            let end_offset = last_page * per_page;
+            if end_offset > total_ids {
+                end_offset = total_ids;
+            }
+            let selected_total = end_offset - start_offset;
+            let visible_index = start_offset;
+            while visible_index < end_offset {
+                // 与 Pixiv 画师页一致：作品 ID 数字从大到小，第一页是大号新作品。
+                let id = id_list[visible_index];
+                download_illust(id.to_string());
+                add_artwork_progress(selected_total);
+                visible_index += 1;
+            }
         }
     }
 } else if source == "keyword" {
@@ -301,7 +338,7 @@ if source == "ranking" {
             if id != () {
                 download_illust(id.to_string());
                 done += 1;
-                add_artwork_progress();
+                add_artwork_progress(num_artworks);
             }
             i += 1;
         }

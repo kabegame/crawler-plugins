@@ -4,7 +4,7 @@
   "name.en": "Pixiv",
   "name.ja": "ピクシブ",
   "name.ko": "픽시브",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "minAppVersion": "3.4.3",
   "description": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
   "description.zh": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",

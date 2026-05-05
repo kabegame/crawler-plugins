@@ -53,10 +53,10 @@
             "name.zhtw": "排序",
             "descripts": "搜索列表排序方式（写入 WBI search 请求）",
             "descripts.en": "Search result sort (WBI search/type)",
-            "default": "",
+            "default": "totalrank",
             "when": { "mode": ["search"] },
             "options": [
-                { "name": "综合排序", "name.en": "Default", "name.ja": "総合", "name.ko": "종합", "name.zhtw": "綜合排序", "variable": "" },
+                { "name": "综合排序", "name.en": "Default", "name.ja": "総合", "name.ko": "종합", "name.zhtw": "綜合排序", "variable": "totalrank" },
                 { "name": "最新发布", "name.en": "Newest", "name.ja": "新着", "name.ko": "최신", "name.zhtw": "最新發佈", "variable": "pubdate" },
                 { "name": "最多点击", "name.en": "Most views", "name.ja": "クリック数", "name.ko": "조회수", "name.zhtw": "最多點擊", "variable": "click" },
                 { "name": "最多喜欢", "name.en": "Most likes", "name.ja": "いいね", "name.ko": "좋아요", "name.zhtw": "最多喜歡", "variable": "attention" },

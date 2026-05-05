@@ -263,6 +263,42 @@
       "when": { "source": ["user"] }
     },
     {
+      "key": "artist_start_page",
+      "type": "int",
+      "name": "画师起始页",
+      "name.en": "Artist start page",
+      "name.ja": "作家開始ページ",
+      "name.ko": "작가 시작 페이지",
+      "name.zhtw": "畫師起始頁",
+      "descripts": "画师作品从第几页开始爬取。按 Pixiv 画师页顺序计算，每页 48 个作品。",
+      "descripts.en": "Start crawling artist works from this page. Uses Pixiv artist page order, 48 artworks per page.",
+      "descripts.ja": "作家作品を取得し始めるページ。Pixiv の作家ページ順で、1 ページ 48 作品です。",
+      "descripts.ko": "작가 작품 수집을 시작할 페이지입니다. Pixiv 작가 페이지 순서 기준이며 페이지당 48개 작품입니다.",
+      "descripts.zhtw": "畫師作品從第幾頁開始爬取。依 Pixiv 畫師頁順序計算，每頁 48 個作品。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": { "source": ["user"] }
+    },
+    {
+      "key": "artist_end_page",
+      "type": "int",
+      "name": "画师结束页",
+      "name.en": "Artist end page",
+      "name.ja": "作家終了ページ",
+      "name.ko": "작가 종료 페이지",
+      "name.zhtw": "畫師結束頁",
+      "descripts": "画师作品爬取到第几页，包含该页。填 0 表示一直爬到最后一页。",
+      "descripts.en": "Last artist works page to crawl, inclusive. Use 0 to crawl through the final page.",
+      "descripts.ja": "取得する最後の作家作品ページ（このページを含む）。0 なら最後のページまで取得します。",
+      "descripts.ko": "수집할 마지막 작가 작품 페이지입니다(해당 페이지 포함). 0이면 마지막 페이지까지 수집합니다.",
+      "descripts.zhtw": "畫師作品爬取到第幾頁，包含該頁。填 0 表示一直爬到最後一頁。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": { "source": ["user"] }
+    },
+    {
       "key": "keyword",
       "type": "string",
       "name": "搜索关键词",
@@ -363,7 +399,8 @@
       "descripts.zhtw": "以「作品」計數（非單張圖）。腳本邊拉列表邊下載；漫畫多頁仍可能多檔，落盤檔數可能大於本值。詳見說明。",
       "default": 50,
       "min": 1,
-      "max": 1000
+      "max": 1000,
+      "when": { "source": ["ranking", "bookmark", "keyword"] }
     }
   ]
 }
