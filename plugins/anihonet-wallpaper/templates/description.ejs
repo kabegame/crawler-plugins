@@ -10,9 +10,13 @@
     displayDate = rawDate.split('T')[0];
   }
   const tags = Array.isArray(m.tags) ? m.tags : [];
+  const sourceId = m.post_id != null ? String(m.post_id).trim() : '';
+  const sourceUrl = sourceId ? `https://anihonetwallpaper.com/post/${sourceId}` : '';
+  const sourceText = sourceId ? `#${sourceId}` : '';
   const hasDate = !!displayDate;
   const hasTags = tags.length > 0;
-  const hasAny = hasDate || hasTags;
+  const hasSource = !!sourceUrl;
+  const hasAny = hasDate || hasTags || hasSource;
 %>
 <% if (!hasAny) { %>
 <p id="anihonet-desc-empty" class="anihonet-desc-empty" style="font-size:0.875rem;opacity:0.75;"></p>
@@ -44,11 +48,17 @@
   display: inline;
   margin-right: 0.35rem;
 }
-.anihonet-desc-wrap .anihonet-tagst a {
+.anihonet-desc-wrap .anihonet-source {
+  display: inline;
+  margin-right: 0.5rem;
+}
+.anihonet-desc-wrap .anihonet-tagst a,
+.anihonet-desc-wrap .anihonet-source a {
   color: var(--anime-primary, #a78bfa);
   text-decoration: none;
 }
-.anihonet-desc-wrap .anihonet-tagst a:hover {
+.anihonet-desc-wrap .anihonet-tagst a:hover,
+.anihonet-desc-wrap .anihonet-source a:hover {
   text-decoration: underline;
 }
 .anihonet-desc-wrap .anihonet-date-br {
@@ -64,7 +74,12 @@
         <span data-anihonet-lbl="posted"></span><time datetime="<%= esc(rawDate) %>"><%= esc(displayDate) %></time>
       </span>
       <% } %>
-      <% if (hasDate && hasTags) { %>
+      <% if (hasSource) { %>
+      <span class="anihonet-source">
+        <span data-anihonet-lbl="source"></span><a href="<%= esc(sourceUrl) %>" target="_blank" rel="noopener noreferrer"><%= esc(sourceText) %></a>
+      </span>
+      <% } %>
+      <% if ((hasDate || hasSource) && hasTags) { %>
       <span class="anihonet-date-br" aria-hidden="true"></span>
       <% } %>
       <% tags.forEach(function (t) {
@@ -88,6 +103,7 @@
     if (s === 'zhtw') {
       return {
         posted: '投稿日：',
+        source: '源帖：',
         panelAria: 'anihonet 投稿資訊',
         empty: '尚無 anihonet 元資料（請以最新版外掛重新抓取）。'
       };
@@ -95,6 +111,7 @@
     if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
       return {
         posted: '投稿日：',
+        source: '源帖：',
         panelAria: 'anihonet 投稿信息',
         empty: '暂无 anihonet 元数据（请使用最新版插件重新抓取）。'
       };
@@ -102,6 +119,7 @@
     if (s === 'ja') {
       return {
         posted: '投稿日：',
+        source: '投稿元：',
         panelAria: 'anihonet 投稿メタデータ',
         empty: 'anihonet のメタデータがありません（最新版プラグインで再取得してください）。'
       };
@@ -109,12 +127,14 @@
     if (s === 'ko') {
       return {
         posted: '게시일：',
+        source: '원본 게시글：',
         panelAria: 'anihonet 게시 메타데이터',
         empty: 'anihonet 메타데이터가 없습니다(최신 플러그인으로 다시 수집하세요).'
       };
     }
     return {
       posted: 'Posted: ',
+      source: 'Source: ',
       panelAria: 'anihonet post metadata',
       empty: 'No anihonet metadata (re-crawl with the latest plugin).'
     };
@@ -123,6 +143,8 @@
     var L = anihonetLabels(loc);
     var posted = document.querySelector('[data-anihonet-lbl="posted"]');
     if (posted && L.posted) posted.textContent = L.posted;
+    var source = document.querySelector('[data-anihonet-lbl="source"]');
+    if (source && L.source) source.textContent = L.source;
     var panel = document.querySelector('[data-anihonet-panel="1"]');
     if (panel && L.panelAria) panel.setAttribute('aria-label', L.panelAria);
     var emptyEl = document.getElementById('anihonet-desc-empty');

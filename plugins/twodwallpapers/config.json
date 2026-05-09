@@ -11,12 +11,12 @@
       "name.ja": "作品",
       "name.ko": "작품",
       "name.zhtw": "作品",
-      "descripts": "按作品名称匹配并抓取该作品的分页列表",
-      "descripts.en": "Match a work by name and crawl that work's paginated list",
-      "descripts.ja": "作品名で一致する作品のページ付き一覧を取得します",
-      "descripts.ko": "작품 이름으로 일치하는 작품의 페이지 목록을 수집합니다",
-      "descripts.zhtw": "依作品名稱匹配並抓取該作品的分頁列表",
-      "default": "Genshin"
+      "descripts": "不填则抓取未分类目录；填写作品名称则匹配并抓取该作品的分页列表",
+      "descripts.en": "Leave empty to crawl the uncategorized section; enter a work name to match and crawl that work's paginated list",
+      "descripts.ja": "空欄なら未分類カテゴリを取得します。作品名を入力すると一致した作品のページ付き一覧を取得します",
+      "descripts.ko": "비워두면 미분류 섹션을 수집합니다. 작품 이름을 입력하면 일치하는 작품의 페이지 목록을 수집합니다",
+      "descripts.zhtw": "不填則抓取未分類目錄；填寫作品名稱則匹配並抓取該作品的分頁列表",
+      "default": ""
     },
     {
       "key": "start_page",

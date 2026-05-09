@@ -17,16 +17,5 @@
       }
     }
   },
-  "resolve": {
-    "([^/]+)": {
-      "provider": "category_provider",
-      "properties": {
-        "category_name": "${capture[1]}"
-      },
-      "meta": {
-        "isLeaf": true
-      }
-    }
-  },
   "note": "{\"title\":\"2dwallpapers categories\",\"content\":\"Group 2dwallpapers images by category from plugin metadata.\"}"
 }

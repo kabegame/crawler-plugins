@@ -9,32 +9,23 @@
     "where": "CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) = ${properties.game_id}"
   },
   "list": {
-    "${page.name}": {
-      "child_var": "page",
-      "delegate": {
-        "provider": "kabegame.page_size_provider",
-        "properties": { "page_size": 100 }
-      },
-      "provider": "kabegame.gallery_page_router",
-      "properties": {
-        "page_size": 100,
-        "page_num": "${page.meta.page_num}"
-      },
-      "meta": { "page_num": "${page.meta.page_num}" }
-    }
+    "${out.name}": {
+          "child_var": "out",
+          "delegate": {
+              "provider": "kabegame.paginate100_provider",
+          },
+          "provider": "${out.provider}",
+          "meta": "${out.meta}"
+      }
   },
   "resolve": {
-    "desc": { "provider": "kabegame.sort_router" },
-    "x([1-9][0-9]*)x": {
-      "provider": "kabegame.gallery_paginate_router",
-      "properties": { "page_size": "${capture[1]}" }
-    },
-    "([1-9][0-9]*)": {
-      "provider": "kabegame.gallery_page_router",
-      "properties": {
-        "page_size": 100,
-        "page_num": "${capture[1]}"
-      }
+    "desc|x[1-9][0-9]*x|[1-9][0-9]*": {
+      "delegate": {
+        "provider": "kabegame.gallery_desc_pagination_page_comb"
+      },
+      "child_var": "child",
+      "provider": "${child.provider}",
+      "meta": "${child.meta}"
     }
   }
 }

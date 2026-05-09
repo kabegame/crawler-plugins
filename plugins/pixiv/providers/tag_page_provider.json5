@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.pixiv",
+  "name": "tag_page_provider",
+  "properties": {
+    "page_num": { "type": "number", "default": 1, "optional": false },
+    "page_tags_json": { "type": "string", "default": "[]", "optional": true }
+  },
+  "query": {
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(pixiv_tags) THEN pixiv_tags ELSE json('[]') END) AS image_tag WHERE NULLIF(TRIM(CAST(json_extract(image_tag.value, '$.tag') AS TEXT)), '') IN (SELECT NULLIF(TRIM(CAST(json_extract(page_tag.value, '$.tag_name') AS TEXT)), '') FROM json_each(CASE WHEN json_valid(${properties.page_tags_json}) THEN ${properties.page_tags_json} ELSE json('[]') END) AS page_tag WHERE NULLIF(TRIM(CAST(json_extract(page_tag.value, '$.tag_name') AS TEXT)), '') IS NOT NULL))"
+  },
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(tag.value, '$.tag_name') AS TEXT)), '') AS tag_name, COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.display_name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.tag_name') AS TEXT)), '')) AS display_name, CAST(json_extract(tag.value, '$.image_count') AS INTEGER) AS image_count FROM json_each(CASE WHEN json_valid(${properties.page_tags_json}) THEN ${properties.page_tags_json} ELSE json('[]') END) AS tag WHERE NULLIF(TRIM(CAST(json_extract(tag.value, '$.tag_name') AS TEXT)), '') IS NOT NULL ORDER BY CAST(tag.key AS INTEGER)",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${tag.tag_name}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${tag.display_name}",
+        "image_count": "${tag.image_count}"
+      }
+    }
+  }
+}

@@ -159,7 +159,17 @@ fn build_page_url(list_url, page_num) {
 }
 
 fn work_category_paths() {
-    return ["game-wallpapers", "anime-wallpapers", "uncategorized"];
+    return ["game-wallpapers", "anime-wallpapers"];
+}
+
+fn is_uncategorized_key(work_key) {
+    if work_key == () {
+        return true;
+    }
+
+    let q = work_key;
+    q.trim();
+    return q == "" || re_is_match("(?i)^(uncategorized|uncategorised|未分类|未分類)$", q);
 }
 
 fn find_work_entry(work_key) {
@@ -168,8 +178,10 @@ fn find_work_entry(work_key) {
         q = "";
     }
     q.trim();
-    if q == "" {
-        throw "作品关键字不能为空";
+    if is_uncategorized_key(q) {
+        let href = `${base_url}/uncategorized`;
+        print(`命中未分类目录，直接抓取分页列表: ${href}`);
+        return #{ label: "Uncategorized", href: href, category: "uncategorized" };
     }
 
     let categories = work_category_paths();

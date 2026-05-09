@@ -171,8 +171,32 @@ fn crawl_theme_from_index(theme_query, page_start, page_end) {
     crawl_anime_series(rel, 100.0, "theme", 1, 1, page_start, page_end);
 }
 
-// 详情页 blogbox：投稿日 ISO datetime + tags（span.tagst > a）
-fn parse_anihonet_metadata() {
+fn anihonet_source_post_id(detail_url) {
+    if detail_url == () || detail_url == "" {
+        return "";
+    }
+    let no_query = detail_url.split("?")[0].split("#")[0];
+    let parts = no_query.split("/");
+    let id = "";
+    let i = parts.len() - 1;
+    while i >= 0 {
+        let part = parts[i];
+        part.trim();
+        if part != "" {
+            id = part;
+            break;
+        }
+        i -= 1;
+    }
+    if id != "" && re_is_match("^[0-9]+$", id) {
+        return id;
+    }
+    return "";
+}
+
+// 详情页 blogbox：源帖子 ID + 投稿日 ISO datetime + tags（span.tagst > a）
+fn parse_anihonet_metadata(detail_url) {
+    let post_id = anihonet_source_post_id(detail_url);
     let date = "";
     let dt_attr = get_attr("time.entry-date", "datetime");
     if dt_attr.len() > 0 {
@@ -197,23 +221,110 @@ fn parse_anihonet_metadata() {
         tags.push(#{ name: lab, href: h });
         i += 1;
     }
-    #{ date: date, tags: tags }
+    #{ post_id: post_id, date: date, tags: tags }
 }
 
-// 原图说明：含「画像サイズ」的 p.wp-img3；去掉尺寸括号后为展示名（不含缩小图「最大長辺」段）
-fn parse_anihonet_names() {
+fn clean_anihonet_name(raw) {
+    if raw == () {
+        return "";
+    }
+    let s = raw;
+    s = re_replace_all("(?s)\\([^)]*画像サイズ[^)]*\\)", "", s);
+    s = re_replace_all("(?s)\\([^)]*サイズ[^)]*\\)", "", s);
+    s = re_replace_all("(?s)\\([^)]*最大長辺[^)]*\\)", "", s);
+    s = re_replace_all("[\\r\\n\\t]+", " ", s);
+    s = re_replace_all("  +", " ", s);
+    s.trim();
+    if s == "縮小画像" || s == "画像をダウンロード" {
+        return "";
+    }
+    return s;
+}
+
+fn anihonet_name_from_image_url(href) {
+    if href == () || href == "" {
+        return "";
+    }
+    let full = resolve_url(href);
+    let no_query = full.split("?")[0].split("#")[0];
+    let parts = no_query.split("/");
+    if parts.len() == 0 {
+        return "";
+    }
+    let file = parts[parts.len() - 1];
+    let stem = re_replace_all("(?i)\\.(jpg|jpeg|png|webp|gif)$", "", file);
+    stem.trim();
+    return stem;
+}
+
+fn collect_clean_names(values) {
+    let out = [];
+    let i = 0;
+    while i < values.len() {
+        let s = clean_anihonet_name(values[i]);
+        if s.len() > 0 {
+            out.push(s);
+        }
+        i += 1;
+    }
+    return out;
+}
+
+fn collect_raw_names(values) {
+    let out = [];
+    let i = 0;
+    while i < values.len() {
+        let s = values[i];
+        if s != () {
+            s.trim();
+            if s.len() > 0 {
+                out.push(s);
+            }
+        }
+        i += 1;
+    }
+    return out;
+}
+
+fn parse_anihonet_h3_names(expected_count) {
+    let h3_names = collect_raw_names(query(".post h3"));
+    if expected_count > 0 && h3_names.len() == expected_count {
+        return h3_names;
+    }
+    let article_h3_names = collect_raw_names(query("article h3"));
+    if expected_count > 0 && article_h3_names.len() == expected_count {
+        return article_h3_names;
+    }
+    return [];
+}
+
+fn parse_anihonet_image_attr_names(attr) {
+    return collect_clean_names(get_attr(".post-img img.size-full, .wp-img img.size-full, .wp-img-pc img.size-full, .pc-post img.size-full, .android-post img.size-full", attr));
+}
+
+// 原图名称优先取站点为每张图给出的 h3；title/alt 与 p.wp-img3 只作兜底。
+fn parse_anihonet_names(expected_count) {
+    let h3_names = parse_anihonet_h3_names(expected_count);
+    if h3_names.len() > 0 {
+        return h3_names;
+    }
+
+    let img_titles = parse_anihonet_image_attr_names("title");
+    if img_titles.len() > 0 {
+        return img_titles;
+    }
+    let img_alts = parse_anihonet_image_attr_names("alt");
+    if img_alts.len() > 0 {
+        return img_alts;
+    }
+
     let lines = query("p.wp-img3.clearfix.center");
     let out = [];
     let i = 0;
     while i < lines.len() {
         let raw = lines[i];
-        if raw != () && raw.contains("画像サイズ") {
-            let s = re_replace_all("(?s)\\([^)]*画像サイズ[^)]*\\)", "", raw);
-            if s == () {
-                s = "";
-            } else {
-                s.trim();
-            }
+        if raw != () && (raw.contains("画像サイズ") || raw.contains("サイズ:") || raw.contains("サイズ：")) && !raw.contains("最大長辺") && !raw.contains("比率のスマホ用") {
+            let s = clean_anihonet_name(raw);
             if s.len() > 0 {
                 out.push(s);
             }
@@ -223,7 +334,15 @@ fn parse_anihonet_names() {
     out
 }
 
-// 多图时 name 为「标题(序号)」，单图为标题；无标题时仅 metadata_id
+fn anihonet_name_has_image_index(name, img_idx_1based) {
+    if name == () || name == "" {
+        return false;
+    }
+    let idx = img_idx_1based.to_string();
+    return name.contains("【" + idx + "】") || name.contains(idx + "枚目");
+}
+
+// 多图时普通标题补「(序号)」；若页面标题已含图号则原样使用。
 fn anihonet_build_download_opts(base_name, img_idx_1based, total_imgs, meta_id) {
     let disp = base_name;
     if disp == () {
@@ -232,7 +351,9 @@ fn anihonet_build_download_opts(base_name, img_idx_1based, total_imgs, meta_id) 
         disp.trim();
     }
     let name = if total_imgs > 1 {
-        if disp != "" {
+        if disp != "" && anihonet_name_has_image_index(disp, img_idx_1based) {
+            disp
+        } else if disp != "" {
             disp + "(" + img_idx_1based.to_string() + ")"
         } else {
             "(" + img_idx_1based.to_string() + ")"
@@ -285,11 +406,11 @@ fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
     let full_url = resolve_url(href);
     print(`[anihonet] 进入排行榜详情页 ${item_idx}/${item_total}：${full_url}`);
     to(full_url);
-    let meta_map = parse_anihonet_metadata();
-    let names = parse_anihonet_names();
+    let meta_map = parse_anihonet_metadata(full_url);
     let meta_id = create_image_metadata(meta_map);
     let dl_hrefs = get_attr("a.button:not(.add)", "href");
     let ne = dl_hrefs.len();
+    let names = parse_anihonet_names(ne);
     print(`[anihonet]   本页共 ${ne} 个 a.button:not(.add) 下载链接`);
     if names.len() != ne {
         print(`[anihonet]   提示：原图说明段落数 ${names.len()} 与下载按钮数 ${ne} 不一致，按索引对齐`);
@@ -307,6 +428,9 @@ fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
         let img_i = elem_idx + 1;
         print(`[anihonet]   下载第 ${img_i}/${ne} 张（按链接顺序尝试）`);
         let base = if elem_idx < names.len() { names[elem_idx] } else { "" };
+        if base == "" {
+            base = anihonet_name_from_image_url(dl_hrefs[elem_idx]);
+        }
         let dl_opts = anihonet_build_download_opts(base, img_i, ne, meta_id);
         process_download_href(dl_hrefs[elem_idx], pct_per_img, dl_opts);
         elem_idx += 1;
@@ -319,11 +443,11 @@ fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
     let full = resolve_url(href);
     print(`[anihonet]   进入作品详情页 ${work_idx}/${work_total}：${full}`);
     to(full);
-    let meta_map = parse_anihonet_metadata();
-    let names = parse_anihonet_names();
+    let meta_map = parse_anihonet_metadata(full);
     let meta_id = create_image_metadata(meta_map);
     let dl_hrefs = get_attr("a.button.add-dl", "href");
     let m = dl_hrefs.len();
+    let names = parse_anihonet_names(m);
     print(`[anihonet]     本页共 ${m} 个 a.button.add-dl 原图下载按钮`);
     if names.len() != m {
         print(`[anihonet]     提示：原图说明段落数 ${names.len()} 与下载按钮数 ${m} 不一致，按索引对齐`);
@@ -341,6 +465,9 @@ fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
         let img_i = k + 1;
         print(`[anihonet]     下载第 ${img_i}/${m} 张（按链接顺序尝试）`);
         let base = if k < names.len() { names[k] } else { "" };
+        if base == "" {
+            base = anihonet_name_from_image_url(dl_hrefs[k]);
+        }
         let dl_opts = anihonet_build_download_opts(base, img_i, m, meta_id);
         process_download_href(dl_hrefs[k], pct_per_img, dl_opts);
         k += 1;

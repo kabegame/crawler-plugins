@@ -2,9 +2,18 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.pixai",
   "name": "entry_provider",
+  "query": {
+    "fields": [
+      {
+        "sql": "CASE WHEN json_valid(plugin_im.data) THEN COALESCE(json_extract(plugin_im.data, '$.v2.tacks'), json('[]')) ELSE json('[]') END",
+        "as": "pixai_tags",
+        "in_need": true
+      }
+    ]
+  },
   "list": {
     "${tag.display_name}": {
-      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), '')), ''), NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), '')), ''), COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), ''))) AS display_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"v2\":{\"tacks\":[]}}' END, '$.v2.tacks') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) IS NOT NULL GROUP BY tag_key ORDER BY image_count DESC, tag_key ASC",
+      "sql": "WITH source AS (SELECT pixai_tags FROM (${composed}) AS composed_result), grouped AS (SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), '')), ''), NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), '')), ''), COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), ''))) AS display_name, COUNT(*) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.pixai_tags) THEN source.pixai_tags ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) IS NOT NULL GROUP BY tag_key), counted AS (SELECT tag_key, display_name, image_count, COUNT(*) OVER () AS total_tag_count FROM grouped) SELECT tag_key, display_name, image_count FROM counted WHERE total_tag_count <= 100 ORDER BY image_count DESC, tag_key ASC",
       "data_var": "tag",
       "provider": "tag_provider",
       "properties": {
@@ -15,16 +24,18 @@
         "display": "${tag.display_name}",
         "image_count": "${tag.image_count}"
       }
-    }
-  },
-  "resolve": {
-    "([^/]+)": {
-      "provider": "tag_provider",
+    },
+    "page-${page.page_num}": {
+      "sql": "WITH source AS (SELECT pixai_tags FROM (${composed}) AS composed_result), grouped AS (SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), '')), ''), NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), '')), ''), COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), ''))) AS display_name, COUNT(*) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.pixai_tags) THEN source.pixai_tags ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) IS NOT NULL GROUP BY tag_key), numbered AS (SELECT tag_key, display_name, image_count, ROW_NUMBER() OVER (ORDER BY image_count DESC, tag_key ASC) AS rn, COUNT(*) OVER () AS total_tag_count FROM grouped), page_tags AS (SELECT ((rn - 1) / 100) + 1 AS page_num, tag_key, display_name, image_count, rn FROM numbered WHERE total_tag_count > 100) SELECT page_num, json_group_array(json_object('tag_key', tag_key, 'display_name', display_name, 'image_count', image_count)) AS page_tags_json FROM (SELECT page_num, tag_key, display_name, image_count, rn FROM page_tags ORDER BY rn) AS ordered_page_tags GROUP BY page_num ORDER BY page_num",
+      "data_var": "page",
+      "provider": "tag_page_provider",
       "properties": {
-        "tag_key": "${capture[1]}"
+        "page_num": "${page.page_num}",
+        "page_tags_json": "${page.page_tags_json}"
       },
       "meta": {
-        "isLeaf": true
+        "page_num": "${page.page_num}",
+        "plain": true
       }
     }
   },
