@@ -227,31 +227,35 @@ function resolveAbsHref(href) {
   }
 }
 
-/** 克隆 DOM 子树供详情 iframe 使用：绝对化链接与图片、外链新标签打开 */
-function cloneNodeForDescriptionHtml(node) {
-  const c = node.cloneNode(true);
-  c.querySelectorAll("a[href]").forEach((a) => {
-    const h = a.getAttribute("href");
-    if (h) a.setAttribute("href", resolveAbsHref(h));
-    a.setAttribute("target", "_blank");
-    a.setAttribute("rel", "noopener noreferrer");
-  });
-  c.querySelectorAll("img[src]").forEach((img) => {
-    const s = img.getAttribute("src");
-    if (s) img.setAttribute("src", resolveAbsHref(s));
-  });
-  return c;
+function cleanText(el) {
+  return (el?.textContent || "").replace(/\s+/g, " ").trim();
+}
+
+function colorFromInfoItem(item) {
+  const color = item.querySelector("span.color-sample");
+  if (!color) return null;
+  const style = color.getAttribute("style") || "";
+  const match = style.match(/background-color:\s*([^;]+)/i);
+  return match ? match[1].trim() : null;
+}
+
+function linksFromInfoItem(item) {
+  return Array.from(item.querySelectorAll("a[href]"))
+    .map((a) => {
+      const text = cleanText(a);
+      const url = resolveAbsHref(a.getAttribute("href"));
+      if (!text && !url) return null;
+      return { text: text || url, url };
+    })
+    .filter(Boolean);
 }
 
 function infoItemPlainText(item) {
   const clone = item.cloneNode(true);
   clone.querySelectorAll("svg").forEach((s) => s.remove());
-  clone.querySelectorAll("a[href]").forEach((a) => {
-    const text = (a.textContent || "").replace(/\s+/g, " ").trim();
-    const href = resolveAbsHref(a.getAttribute("href"));
-    const rep = href ? `${text || href} (${href})` : text;
-    a.replaceWith(document.createTextNode(rep));
-  });
+  clone
+    .querySelectorAll("a[href]")
+    .forEach((a) => a.replaceWith(document.createTextNode(cleanText(a))));
   clone.querySelectorAll("span.color-sample").forEach((sp) => {
     const st = sp.getAttribute("style") || "";
     const m = st.match(/background-color:\s*([^;]+)/i);
@@ -260,6 +264,71 @@ function infoItemPlainText(item) {
   const raw = (clone.textContent || "").replace(/\s+/g, " ").trim();
   if (!raw) return "";
   return raw;
+}
+
+function detailItemFromInfoItem(item) {
+  const text = infoItemPlainText(item);
+  if (!text) return null;
+  const links = linksFromInfoItem(item);
+  const color = colorFromInfoItem(item);
+  const out = { text };
+  if (links.length) out.links = links;
+  if (color) out.color = color;
+  return out;
+}
+
+function postTitleFromHead(head) {
+  const h1 = head.querySelector("h1");
+  if (!h1) return "";
+  return cleanText(h1);
+}
+
+function tagTypeFromAnchor(anchor) {
+  if (anchor.classList.contains("copyright")) return "copyright";
+  if (anchor.classList.contains("character")) return "character";
+  if (anchor.classList.contains("artist")) return "artist";
+  if (anchor.classList.contains("object")) return "object";
+  if (anchor.classList.contains("reference")) return "reference";
+  return "";
+}
+
+function extractTagGroups() {
+  const tagsUl =
+    document.querySelector("ul.tags[itemprop='keywords']") ||
+    document.querySelector(".wrapper.page-tags ul.tags");
+  if (!tagsUl) return [];
+
+  const groups = [];
+  let current = null;
+  for (const child of Array.from(tagsUl.children)) {
+    if (child.tagName === "SPAN") {
+      const name = cleanText(child);
+      if (!name) continue;
+      current = { name, tags: [] };
+      groups.push(current);
+      continue;
+    }
+
+    if (child.tagName !== "LI") continue;
+    const anchor = child.querySelector("a[href]");
+    if (!anchor) continue;
+    if (!current) {
+      current = { name: "", tags: [] };
+      groups.push(current);
+    }
+    const count = cleanText(child.querySelector(".edit_tag"));
+    const tag = {
+      name: cleanText(anchor),
+      url: resolveAbsHref(anchor.getAttribute("href")),
+      type: tagTypeFromAnchor(anchor),
+    };
+    const by = (child.getAttribute("title") || "").replace(/^by\s+/i, "").trim();
+    if (count) tag.count = count;
+    if (by) tag.by = by;
+    current.tags.push(tag);
+  }
+
+  return groups.filter((group) => group.name || group.tags.length);
 }
 
 /** 详情 metadata（由前端 `templates/description.ejs` 渲染） */
@@ -286,14 +355,14 @@ function buildAnimePicturesMetadata() {
     }
   }
 
-  const lines = [];
-  const details = head.querySelector(".details-section");
-  if (details) {
-    for (const line of details.querySelectorAll(":scope > .info-line")) {
+  const detailItems = [];
+  const detailsSection = head.querySelector(".details-section");
+  if (detailsSection) {
+    for (const line of detailsSection.querySelectorAll(":scope > .info-line")) {
       if (line.querySelector("button.metrics-toggle")) continue;
       for (const item of line.querySelectorAll(":scope > .info-item")) {
-        const ln = infoItemPlainText(item);
-        if (ln) lines.push(ln);
+        const detail = detailItemFromInfoItem(item);
+        if (detail) detailItems.push(detail);
       }
     }
   }
@@ -313,19 +382,14 @@ function buildAnimePicturesMetadata() {
     }
   }
 
-  const headClone = cloneNodeForDescriptionHtml(head);
-  headClone.querySelectorAll("button.metrics-toggle").forEach((b) => {
-    const line = b.closest(".info-line");
-    if (line) line.remove();
-  });
-  const headInfoHtml = headClone.outerHTML;
-
-  const tagsUl =
-    document.querySelector("ul.tags[itemprop='keywords']") ||
-    document.querySelector(".wrapper.page-tags ul.tags");
-  const tagsHtml = tagsUl ? cloneNodeForDescriptionHtml(tagsUl).outerHTML : "";
-
-  return { author, lines, rating, headInfoHtml, tagsHtml };
+  return {
+    schema: 1,
+    title: postTitleFromHead(head),
+    author,
+    details: detailItems,
+    rating,
+    tagGroups: extractTagGroups(),
+  };
 }
 
 async function handleDetail(ctx) {
@@ -350,6 +414,7 @@ async function handleDetail(ctx) {
     const opts = { cookie: true };
     if (displayName) opts.name = displayName;
     if (metadata) opts.metadata = metadata;
+    if (metadata) opts.metadata_version = 1;
     await ctx.downloadImage(href, opts);
   }
   await ctx.back();

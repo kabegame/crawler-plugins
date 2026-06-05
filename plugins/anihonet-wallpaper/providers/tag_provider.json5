@@ -3,10 +3,11 @@
   "namespace": "plugins.anihonet-wallpaper",
   "name": "tag_provider",
   "properties": {
+    "tag_category": { "type": "string", "default": "character", "optional": false },
     "tag_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "${properties.tag_name} NOT LIKE '%壁紙%' AND ${properties.tag_name} NOT LIKE '%画像%' AND EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(plugin_metadata, '$.characterTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})"
   },
   "list": {
     "${out.name}": {

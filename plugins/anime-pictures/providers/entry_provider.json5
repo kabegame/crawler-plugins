@@ -1,0 +1,20 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.anime-pictures",
+  "name": "entry_provider",
+  "list": {
+    "${tag_type.tag_type}": {
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(tag_group.value, '$.name') AS TEXT)), '') AS tag_type, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, metadata_version, plugin_metadata FROM (${composed}) AS composed_result) AS source JOIN json_each(CASE WHEN source.metadata_version = 1 AND json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"tagGroups\":[]}' END, '$.tagGroups') AS tag_group WHERE NULLIF(TRIM(CAST(json_extract(tag_group.value, '$.name') AS TEXT)), '') IS NOT NULL GROUP BY tag_type ORDER BY image_count DESC, tag_type ASC",
+      "data_var": "tag_type",
+      "provider": "tag_type_provider",
+      "properties": {
+        "tag_type": "${tag_type.tag_type}"
+      },
+      "meta": {
+        "image_count": "${tag_type.image_count}",
+        "plain": true
+      }
+    }
+  },
+  "note": "{\"title\":\"Anime Pictures tag groups\",\"content\":\"Group anime-pictures images by version 1 metadata tag group names.\"}"
+}

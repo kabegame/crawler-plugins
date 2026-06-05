@@ -1,13 +1,31 @@
-<% const m = metadata || {}; const a = m.author; %>
+<%
+const m = metadata || {};
+const a = m.author || {};
+const schema = Number(m.schema || 0);
+const isSchema1 = schema === 1;
+const hasLegacyHtml = !isSchema1 && (m.headInfoHtml || m.tagsHtml);
+const details = isSchema1 && Array.isArray(m.details) ? m.details : (Array.isArray(m.lines) ? m.lines.map((text) => ({ text })) : []);
+const tagGroups = isSchema1 && Array.isArray(m.tagGroups) ? m.tagGroups : [];
+const tagClass = (type) => {
+  if (type === "copyright") return "green";
+  if (type === "character") return "blue";
+  if (type === "artist") return "orange";
+  if (type === "object") return "object";
+  if (type === "reference") return "reference";
+  return "";
+};
+%>
 <style>
   .ap-ap-desc { font-size: 0.875rem; line-height: 1.55; color: inherit; }
   .ap-ap-desc .post_content.head-info { margin-bottom: 0; }
-  .ap-ap-desc .post_content.head-info h1 {
+  .ap-ap-desc h1 {
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0 0 0.75rem;
     line-height: 1.35;
   }
+  .ap-ap-desc a { color: inherit; text-decoration: none; }
+  .ap-ap-desc a:hover { text-decoration: underline; }
   .ap-ap-desc .post_content.head-info h1 a { text-decoration: underline; text-underline-offset: 2px; color: inherit; }
   .ap-ap-desc .info-grid {
     display: grid;
@@ -18,7 +36,7 @@
   @media (max-width: 480px) {
     .ap-ap-desc .info-grid { grid-template-columns: 1fr; }
   }
-  .ap-ap-desc .author-section { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .ap-ap-desc .author-section { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
   .ap-ap-desc .author-section img {
     width: 2.75rem;
     height: 2.75rem;
@@ -26,6 +44,7 @@
     object-fit: cover;
     flex-shrink: 0;
   }
+  .ap-ap-desc .user-link { font-weight: 600; }
   .ap-ap-desc .user_link { font-weight: 600; text-decoration: none; color: inherit; }
   .ap-ap-desc .user_link:hover { text-decoration: underline; }
   .ap-ap-desc .details-section { min-width: 0; }
@@ -41,28 +60,46 @@
   .ap-ap-desc .light { opacity: 0.7; }
   .ap-ap-desc .desktop_only,
   .ap-ap-desc .desktop-only { display: revert; }
+  .ap-ap-desc .details { display: flex; flex-direction: column; gap: 0.35rem; margin: 0 0 0.85rem; }
+  .ap-ap-desc .detail-item { font-size: 0.8125rem; }
+  .ap-ap-desc .detail-links { display: inline-flex; flex-wrap: wrap; gap: 0.25rem; margin-left: 0.35rem; }
+  .ap-ap-desc .detail-link { opacity: 0.8; text-decoration: underline; text-underline-offset: 2px; }
   .ap-ap-desc .color-sample {
     display: inline-block;
     width: 1em;
     height: 1em;
     border-radius: 2px;
-    vertical-align: middle;
+    vertical-align: -0.12em;
     border: 1px solid rgba(128, 128, 128, 0.35);
+    margin-left: 0.25rem;
+  }
+  .ap-ap-desc .tag-groups {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.22);
   }
   .ap-ap-desc .wrapper.page-tags {
     margin-top: 1rem;
     padding-top: 0.75rem;
     border-top: 1px solid rgba(128, 128, 128, 0.22);
   }
-  .ap-ap-desc ul.tags {
-    list-style: none;
-    padding: 0;
-    margin: 0.5rem 0 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 0.5rem;
-    align-items: center;
+  .ap-ap-desc .tag-group { margin-top: 0.65rem; }
+  .ap-ap-desc .tag-group:first-child { margin-top: 0; }
+  .ap-ap-desc .tag-group-title { font-size: 0.75rem; opacity: 0.75; font-weight: 500; margin-bottom: 0.35rem; }
+  .ap-ap-desc .tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 0.5rem; }
+  .ap-ap-desc .tag { display: inline-flex; align-items: center; gap: 0.25rem; list-style: none; }
+  .ap-ap-desc .tag-link {
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.8125rem;
+    display: inline-block;
   }
+  .ap-ap-desc .tag.green .tag-link { background: rgba(22, 163, 74, 0.18); }
+  .ap-ap-desc .tag.blue .tag-link { background: rgba(37, 99, 235, 0.18); }
+  .ap-ap-desc .tag.orange .tag-link { background: rgba(234, 88, 12, 0.18); }
+  .ap-ap-desc .tag.reference .tag-link { background: rgba(107, 114, 128, 0.16); }
+  .ap-ap-desc .tag.object .tag-link { background: rgba(147, 51, 234, 0.16); }
+  .ap-ap-desc .tag-count { font-size: 0.7rem; opacity: 0.6; white-space: nowrap; }
   .ap-ap-desc ul.tags > span {
     flex: 0 0 100%;
     margin-top: 0.5rem;
@@ -96,40 +133,116 @@
   }
   .ap-ap-desc a.big_tag:hover { filter: brightness(0.92); }
   .ap-ap-desc .edit_tag { font-size: 0.7rem; opacity: 0.6; white-space: nowrap; }
-  .ap-ap-desc .ap-rating-row { margin-top: 0.75rem; font-size: 0.8125rem; }
+  .ap-ap-desc .rating-row { margin-top: 0.75rem; font-size: 0.8125rem; }
 </style>
 <div class="ap-ap-desc">
-  <% if (m.headInfoHtml) { %>
-    <%- m.headInfoHtml %>
+  <% if (hasLegacyHtml) { %>
+    <% if (m.headInfoHtml) { %>
+      <%- m.headInfoHtml %>
+    <% } else { %>
+      <% if (a.name || a.avatarUrl) { %>
+        <div class="author-section">
+          <% if (a.avatarUrl) { %>
+            <img src="<%= a.avatarUrl %>" alt="" />
+          <% } %>
+          <div>
+            <% if (a.profileUrl && a.name) { %>
+              <a class="user-link" href="<%= a.profileUrl %>" target="_blank" rel="noopener noreferrer"><%= a.name %></a>
+            <% } else if (a.name) { %>
+              <span class="user-link"><%= a.name %></span>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+      <% if (Array.isArray(m.lines) && m.lines.length) { %>
+        <ul style="margin:0 0 8px 0;padding-left:1.1em;">
+          <% m.lines.forEach(function (line) { %>
+            <li style="margin-bottom:4px;"><%= line %></li>
+          <% }); %>
+        </ul>
+      <% } %>
+    <% } %>
+    <% if (m.tagsHtml) { %>
+      <div class="wrapper page-tags svelte-1ok3vri">
+        <%- m.tagsHtml %>
+      </div>
+    <% } %>
   <% } else { %>
-    <% if (a && (a.name || a.avatarUrl)) { %>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <% if (m.title) { %>
+      <h1><%= m.title %></h1>
+    <% } %>
+
+    <% if (a.name || a.avatarUrl) { %>
+      <div class="author-section">
         <% if (a.avatarUrl) { %>
-          <img src="<%= a.avatarUrl %>" alt="" style="width:2.75rem;height:2.75rem;border-radius:50%;object-fit:cover;flex-shrink:0;" />
+          <img src="<%= a.avatarUrl %>" alt="" />
         <% } %>
-        <div style="min-width:0;">
+        <div>
           <% if (a.profileUrl && a.name) { %>
-            <a href="<%= a.profileUrl %>" target="_blank" rel="noopener noreferrer" style="font-weight:600;"><%= a.name %></a>
+            <a class="user-link" href="<%= a.profileUrl %>" target="_blank" rel="noopener noreferrer"><%= a.name %></a>
           <% } else if (a.name) { %>
-            <span style="font-weight:600;"><%= a.name %></span>
+            <span class="user-link"><%= a.name %></span>
           <% } %>
         </div>
       </div>
     <% } %>
-    <% if (m.lines && m.lines.length) { %>
-      <ul style="margin:0 0 8px 0;padding-left:1.1em;">
-        <% m.lines.forEach(function (line) { %>
-          <li style="margin-bottom:4px;"><%= line %></li>
+
+    <% if (details.length) { %>
+      <div class="details">
+        <% details.forEach(function (item) { %>
+          <% const links = Array.isArray(item.links) ? item.links : []; %>
+          <div class="detail-item">
+            <span><%= item.text || "" %></span>
+            <% if (item.color) { %>
+              <span class="color-sample" style="background-color:<%= item.color %>;"></span>
+            <% } %>
+            <% if (links.length) { %>
+              <span class="detail-links">
+                <% links.forEach(function (link) { %>
+                  <% if (link.url) { %>
+                    <a class="detail-link" href="<%= link.url %>" target="_blank" rel="noopener noreferrer"><%= link.text || link.url %></a>
+                  <% } %>
+                <% }); %>
+              </span>
+            <% } %>
+          </div>
         <% }); %>
-      </ul>
+      </div>
+    <% } %>
+
+    <% if (tagGroups.length) { %>
+      <div class="tag-groups">
+        <% tagGroups.forEach(function (group) { %>
+          <% const tags = Array.isArray(group.tags) ? group.tags : []; %>
+          <% if (group.name || tags.length) { %>
+            <div class="tag-group">
+              <% if (group.name) { %>
+                <div class="tag-group-title"><%= group.name %></div>
+              <% } %>
+              <% if (tags.length) { %>
+                <ul class="tags">
+                  <% tags.forEach(function (tag) { %>
+                    <li class="tag <%= tagClass(tag.type) %>">
+                      <% if (tag.url) { %>
+                        <a class="tag-link" href="<%= tag.url %>" target="_blank" rel="noopener noreferrer"><%= tag.name || tag.url %></a>
+                      <% } else { %>
+                        <span class="tag-link"><%= tag.name || "" %></span>
+                      <% } %>
+                      <% if (tag.count) { %>
+                        <span class="tag-count"><%= tag.count %></span>
+                      <% } %>
+                    </li>
+                  <% }); %>
+                </ul>
+              <% } %>
+            </div>
+          <% } %>
+        <% }); %>
+      </div>
     <% } %>
   <% } %>
-  <% if (m.tagsHtml) { %>
-    <div class="wrapper page-tags svelte-1ok3vri">
-      <%- m.tagsHtml %>
-    </div>
-  <% } %>
+
   <% if (m.rating && m.rating.label) { %>
-    <div class="ap-rating-row"><strong style="color:#9ca3af;"><%= m.rating.label %></strong> <%= m.rating.count || "" %></div>
+    <div class="rating-row"><strong style="color:#9ca3af;"><%= m.rating.label %></strong> <%= m.rating.count || "" %></div>
   <% } %>
 </div>

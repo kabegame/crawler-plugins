@@ -194,6 +194,69 @@ fn anihonet_source_post_id(detail_url) {
     return "";
 }
 
+fn anihonet_tag_label(tag) {
+    if tag == () {
+        return "";
+    }
+    let name = if tag["name"] == () { "" } else { tag["name"].to_string() };
+    name.trim();
+    if name.len() > 0 {
+        return name;
+    }
+    let href = if tag["href"] == () { "" } else { tag["href"].to_string() };
+    href.trim();
+    href
+}
+
+fn anihonet_is_quality_tag(label) {
+    if label == () {
+        return false;
+    }
+    let s = label.to_string();
+    s.trim();
+    return s.contains("画像");
+}
+
+fn anihonet_is_work_tag(label) {
+    if label == () {
+        return false;
+    }
+    let s = label.to_string();
+    s.trim();
+    return s.contains("壁紙");
+}
+
+fn anihonet_tag_copy(tag) {
+    let name = if tag["name"] == () { "" } else { tag["name"].to_string() };
+    let href = if tag["href"] == () { "" } else { tag["href"].to_string() };
+    name.trim();
+    href.trim();
+    #{ name: name, href: href }
+}
+
+fn anihonet_classify_tags(tags) {
+    let quality_tags = [];
+    let work_tags = [];
+    let character_tags = [];
+    let i = 0;
+    while i < tags.len() {
+        let tag = tags[i];
+        let label = anihonet_tag_label(tag);
+        if label.len() > 0 {
+            // `画像`（quality）优先于 `壁紙`（作品），避免同时命中时被误判为作品。
+            if anihonet_is_quality_tag(label) {
+                quality_tags.push(anihonet_tag_copy(tag));
+            } else if anihonet_is_work_tag(label) {
+                work_tags.push(anihonet_tag_copy(tag));
+            } else {
+                character_tags.push(anihonet_tag_copy(tag));
+            }
+        }
+        i += 1;
+    }
+    #{ qualityTags: quality_tags, workTags: work_tags, characterTags: character_tags }
+}
+
 // 详情页 blogbox：源帖子 ID + 投稿日 ISO datetime + tags（span.tagst > a）
 fn parse_anihonet_metadata(detail_url) {
     let post_id = anihonet_source_post_id(detail_url);
@@ -221,7 +284,16 @@ fn parse_anihonet_metadata(detail_url) {
         tags.push(#{ name: lab, href: h });
         i += 1;
     }
-    #{ post_id: post_id, date: date, tags: tags }
+    let groups = anihonet_classify_tags(tags);
+    #{
+        schema: 2,
+        post_id: post_id,
+        date: date,
+        tags: tags,
+        qualityTags: groups["qualityTags"],
+        workTags: groups["workTags"],
+        characterTags: groups["characterTags"],
+    }
 }
 
 fn clean_anihonet_name(raw) {
@@ -407,7 +479,7 @@ fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
     print(`[anihonet] 进入排行榜详情页 ${item_idx}/${item_total}：${full_url}`);
     to(full_url);
     let meta_map = parse_anihonet_metadata(full_url);
-    let meta_id = create_image_metadata(meta_map);
+    let meta_id = create_image_metadata(meta_map, #{ version: 2 });
     let dl_hrefs = get_attr("a.button:not(.add)", "href");
     let ne = dl_hrefs.len();
     let names = parse_anihonet_names(ne);
@@ -444,7 +516,7 @@ fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
     print(`[anihonet]   进入作品详情页 ${work_idx}/${work_total}：${full}`);
     to(full);
     let meta_map = parse_anihonet_metadata(full);
-    let meta_id = create_image_metadata(meta_map);
+    let meta_id = create_image_metadata(meta_map, #{ version: 2 });
     let dl_hrefs = get_attr("a.button.add-dl", "href");
     let m = dl_hrefs.len();
     let names = parse_anihonet_names(m);

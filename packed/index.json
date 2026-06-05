@@ -1,6 +1,6 @@
 {
   "version": "v3.6.3",
-  "generated_at": "2026-05-05T04:40:32.996Z",
+  "generated_at": "2026-06-04T08:11:36.334Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -29,12 +29,12 @@
     },
     {
       "id": "anime-pictures",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "author": "Kabegame",
       "packageVersion": 2,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v3.6.3/anime-pictures.kgpg",
-      "sizeBytes": 609615,
-      "sha256": "7a81bcaef73fcff8f114268e2539186468d73e54304e815ae44e0e805902a0c2",
+      "sizeBytes": 612826,
+      "sha256": "b9ed1d1a44bcc895d0114598525a6dc95f4ca335b6ad596f9737ff04313e32d0",
       "name": "anime-pictures动漫图库",
       "name.zh": "anime-pictures动漫图库",
       "name.en": "anime-pictures anime gallery",

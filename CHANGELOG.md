@@ -7,6 +7,7 @@
 ## [3.6.4]
 ### Added
 - anihonet plugin add source post url
+- anime-pictures plugin metadata is now stored as structured JSON with a v1 migration for historical HTML metadata.
 
 ### Fixed
 - anihonet plugin resolve unstable title.
