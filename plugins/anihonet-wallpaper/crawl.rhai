@@ -82,10 +82,11 @@ fn parse_list_page_total_pages() {
         print("[anihonet]   未找到 .post_box2 .center，列表总页数按 1 计（进度分摊）");
         return 1;
     }
-    let raw = texts[0];
-    let s = raw.trim();
+    let s = texts[0];
+    s.trim();
+    print(`Texts ${texts}`);
     print(`[anihonet]   分页文案(.post_box2 .center)：${s}`);
-    if !re_is_match("(?s)[0-9]+[ \t]*/[ \t]*[0-9]+", s) {
+    if s == () || !re_is_match("(?s)[0-9]+[ \t]*/[ \t]*[0-9]+", s) {
         print("[anihonet]   分页文案未含「当前/总页」数字格式，总页数按 1 计");
         return 1;
     }
@@ -208,22 +209,93 @@ fn anihonet_tag_label(tag) {
     href
 }
 
+
 fn anihonet_is_quality_tag(label) {
     if label == () {
         return false;
     }
     let s = label.to_string();
     s.trim();
-    return s.contains("画像");
+    s.contains("高画質")
+}
+
+fn anihonet_is_type_tag(label) {
+    if label == () {
+        return false;
+    }
+    let s = label.to_string();
+    s.trim();
+
+    s.contains("PC壁紙") || s.contains("Android") || s.contains("iPhone") || s.contains("スマホ")
 }
 
 fn anihonet_is_work_tag(label) {
     if label == () {
         return false;
     }
+    let works = [
+        "アイ★チュウ", "ID-0", "IDOLY PRIDE", "アイドル", "アイマス", "蒼の彼方のフォーリズム", "赤髪の白雪姫", "アクセル・ワールド", "明日ちゃんのセーラー服", "亜人ちゃんは語りたい", "アズールレーン", "あそびあそばせ", "アニマエール！", "アブソリュート・デュオ", "甘々と稲妻", "甘城ブリリアントパーク", "アリスと蔵六", "暗殺教室", "アンジュ・ヴィエルジュ", "あんハピ♪", 
+        "イジらないで、長瀞さん", "異世界おじさん", "異世界かるてっと", "異世界食堂", "異世界はスマートフォンとともに。", "異世界魔王と召喚少女の奴隷魔術", "一週間フレンズ", "異能バトルは日常系のなかで", "妹さえいればいい。", "色づく世界の明日から", "インフィニット・ストラトス", 
+        "ヴァイオレット・エヴァーガーデン", "ViVid Strike!", "WIXOSS DIVA(A)LIVE", "WAVE!!〜サーフィンやっぺ!!〜", "宇崎ちゃんは遊びたい!", "うたの☆プリンスさまっ♪", "うたわれるもの", "うちの会社の小さい先輩の話", "うちのメイドがウザすぎる！", "宇宙よりも遠い場所", "ウマ娘 プリティーダービー", "裏世界ピクニック", "うらら迷路帖", "18TRIP", 
+        "86-エイティシックス-", "Extreme Hearts", "SK∞ エスケーエイト", "えとたま", "Eマンガ先生", "Angel Beats!", "えんどろ〜!", 
+        "Occultic;Nine-オカルティック・ナイン-", "幼なじみが絶対に負けないラブコメ", "推しが武道館いってくれたら死ぬ", "【推しの子】", "おそ松さん", "お隣の天使様にいつの間にか駄目人間にされていた件", "お兄ちゃんはおしまい!", "オルタンシア・サーガ", "俺がお嬢様学校に「庶民サンプル」として拉致られた件", "俺が好きなのは妹だけど妹じゃない", "俺だけ入れる隠しダンジョン", "俺の妹がこんなに可愛いわけがない", "orange", "終わりのセラフ", 
+        
+        "カードキャプターさくら", "ガーリッシュナンバー", "ガールズ&パンツァー", "ガールフレンド(仮)", "怪人開発部の黒井津さん", "ガヴリールドロップアウト", "CHAOS;CHILD(カオスチャイルド)", "学園アイドルマスター", "学戦都市アスタリスク", "かぐや様は告らせたい", "かげきしょうじょ!!", "賭ケグルイ", "がっこうぐらし！", "彼女、お借りします", "カノジョも彼女", "神様になった日", "からかい上手の高木さん", "ガラスの花と壊す世界", "可愛いだけじゃない式守さん", "艦隊これくしょん", 
+        "機動戦士ガンダム 鉄血のオルフェンズ", "キノの旅", "君の名は。", "鬼滅の刃", "逆転世界ノ電池少女", "CUE!", "境界の彼方", "ギルティクラウン", "きんいろモザイク", "銀魂", 
+        "空戦魔導士候補生の教官", "クズの本懐", "久保さんは僕を許さない", "くまみこ", "蜘蛛ですが、なにか?", "Classroom☆Crisis", "グラスリップ", "CLANNAD", "グランクレスト戦記", "グランブルーファンタジー", "グリザイアの果実", "SSSS.GRIDMAN", "黒子のバスケ", "クロックワーク・プラネット", "クロムクロ", 
+        "けいおん!", "GATE 自衛隊 彼の地にて、斯く戦えり", "ゲーマーズ！", "ゲキドル", "月刊少女野崎くん", "月曜日のたわわ", "けものフレンズ", "現実主義勇者の王国再建記", "賢者の孫", 
+        "恋×シンアイ彼女", "紅殻のパンドラ", "甲鉄城のカバネリ", "幸腹グラフィティ", "聲の形(こえのかたち)", "コードギアス", "ご注文はうさぎですか", "ゴッドイーター", "五等分の花嫁", "このはな綺譚", "この素晴らしい世界に祝福を！", "この美術部には問題がある！", "小林さんちのメイドラゴン", "ゴブリンスレイヤー", "古見さんは、コミュ症です。", "こみっくがーるず", "これはゾンビですか", "CONCEPTION", 
+        
+        "最弱無敗の神装機竜(バハムート)", "冴えない彼女の育てかた", "サクラクエスト", "櫻子さんの足下には", "さくら荘のペットな彼女", "サクラダリセット", "桜Trick", "3月のライオン", "三者三葉", 
+        "しかのこのこのここしたんたん", "実は俺、最強でした?", "自動販売機に生まれ変わった俺は迷宮を彷徨う", "Charlotte(シャーロット)", "シャインポスト", "弱キャラ友崎くん", "灼熱の卓球娘", "Just Because!", "終末なにしてますか？忙しいですか？救ってもらっていいですか？", "呪術廻戦", "少女☆歌劇レヴュースタァライト", "少女終末旅行", "少女たちは荒野を目指す", "SHOW BY ROCK!!", "食戟のソーマ", "白い砂のアクアトープ", "白聖女と黒牧師", "白猫プロジェクト", "SHIROBAKO", "進撃の巨人", "神撃のバハムート", "人生相談テレビアニメーション「人生」", "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました", 
+        "好きな子がめがねを忘れた", "スクールガールストライカーズ", "ステラのまほう", "ストライク・ザ・ブラッド", "スパイ教室", "スロウスタート", "スローループ", 
+        "青春ブタ野郎シリーズ", "聖女の魔力は万能です", "精霊幻想記", "精霊使いの剣舞", "セイレン", "世界最高の暗殺者、異世界貴族に転生する", "ゼロから始める魔法の書", "世話やきキツネの仙狐さん", "戦闘員、派遣します!", "川柳少女", 
+        "装神少女まとい", "双星の陰陽師", "ソードアート・オンライン", "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン", "その着せ替え人形は恋をする", "ゾン100〜ゾンビになるまでにしたい100のこと〜", "ゾンビランドサガ", 
+        
+        "ダーリン・イン・ザ・フランキス","天体のメソッド", "大図書館の羊飼い", "SSSS.DYNAZENON", "対魔導学園35試験小隊", "だがしかし", "盾の勇者の成り上がり", "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語", "ダンガンロンパ", "ダンジョンに出会いを求めるのは間違っているだろうか", "探偵オペラ ミルキィホームズ", "探偵はもう、死んでいる。", 
+        "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜", 
+        "ツインエンジェルBREAK", "つうかあ", "月がきれい", "月とライカと吸血姫", "つぐもも", "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜", "D4DJ", "ディバインゲート", "Dimension W", "テイルズ オブ エクシリア", "テイルズ オブ シリーズ", "テイルズ オブ ベルセリア", "デート・ア・ライブ", "デキる猫は今日も憂鬱", "デスマーチからはじまる異世界狂想曲", "デュラララ", "天気の子", "天才王子の赤字国家再生術", "天使の3P!", "転生王女と天才令嬢の魔法革命", "転生したらスライムだった件", "天体のメソッド", 
+        "とある科学の超電磁砲", "Tokyo 7th シスターズ", "刀剣乱舞", "東方Project", "ドールズフロントライン", "時々ボソッとロシア語でデレる隣のアーリャさん", "刀使ノ巫女", "ToLoveる-とらぶる-", "トリニティセブン", 
+        
+        "長門有希ちゃんの消失", "凪のあすから", "夏目友人帳", "なんでここに先生が!?", "ナンバカ", 
+        "ニーア オートマタ", "虹色デイズ", "ニセコイ", "NEW GAME!", 
+        "ネトゲの嫁は女の子じゃないと思った?", 
+        "ノーゲーム・ノーライフ", "ノラガミ", "NORN9 ノルン+ノネット", "のんのんびより", 
+        
+        "ハイキュー!!", "ハイスクールフリート(はいふり)", "灰と幻想のグリムガル", "這いよれ!ニャル子さん", "ばくおん!!", "ハクメイとミコチ", "はたらく細胞", "バック・アロウ", "ハナヤマタ", "ハルチカ", "叛逆性ミリオンアーサー", "パンでPeace!", "ハンドシェイカー", "BanG Dream!", 
+        "ひきこまり吸血姫の悶々", "ひげを剃る。そして女子高生を拾う。", "緋弾のアリア", "ひとりぼっちの○○生活", "ひなこのーと", "ヒナまつり", "響け！ユーフォニアム", "ヒプノシスマイク", "干物妹！うまるちゃん", "氷菓", "ファンタシースターオンライン2", "風夏", "フェアリーテイル", "Fateシリーズ", "武装少女マキャヴェリズム", 
+        "豚のレバーは加熱しろ", "普通の女子校生が【ろこどる】やってみた", "ふらいんぐうぃっち", "プラスティック・メモリーズ", "ブラック・ブレット", "BLOOD-C", "planetarian", "プリンス・オブ・ストライド", "Free!", "プリンセス・プリンシパル", "ブルーアーカイブ -Blue Archive-", "ブルーリフレクション", "フレームアームズ・ガール", "ブレイブ・ストーリー", "ブレイブウィッチーズ", "ブレンド・S", "プロジェクトセカイ", "文豪ストレイドッグス", 
+        "ヘヴィーオブジェクト", "ペルソナ4", "ペルソナ5", 
+        "放課後ていぼう日誌", "VOCALOID", "僕だけがいない街", "ぼくたちのリメイク", "ぼくたちは勉強ができない", "僕の心のヤバイやつ", "僕のヒーローアカデミア", "ポケモン", "星屑テレパス", "ぼっち・ざ・ろっく!", "ポッピンQ", "ポプテピピック", "ホリミヤ", 
+        
+        "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜", "マクロスΔ", "政宗くんのリベンジ", "まじもじるるも", "魔法科高校の劣等生", "魔法少女育成計画", "魔法少女まどか☆マギカ", "魔法少女リリカルなのはViVid", "迷家-マヨイガ-", 
+        "見える子ちゃん", "未確認で進行形", "三ツ星カラーズ", 
+        "無彩限のファントム・ワールド", "無職転生 〜異世界行ったら本気だす〜", 
+        "メイドインアビス", "メルヘン・メドヘン", 
+        "物語シリーズ", "モブサイコ100", "問題児たちが異世界から来るそうですよ？", 
+        
+        "やがて君になる", "やはり俺の青春ラブコメはまちがっている。", "ヤマノススメ", 
+        "結城友奈は勇者である", "ユーリ!!! on ICE", "夢見る男子は現実主義者", "ゆゆ式", "ゆらぎ荘の幽奈さん", "ゆるキャン△", "ゆるゆり", 
+        "ようこそ実力至上主義の教室へ", "幼女戦記", "弱虫ペダル", 
+        
+        "ラーメン大好き小泉さん", "ライアー・ライアー", "ライザのアトリエ", "らき☆すた", "ラクエンロジック", "ラピスリライツ", "ラブライブ！", "ラブライブ！サンシャイン!!", "ラブライブ！スーパースター!!", "ラブライブ！虹ヶ咲学園スクールアイドル同好会", "ラブライブ！蓮ノ空女学院スクールアイドルクラブ", "ランス・アンド・マスクス", 
+        "リコリス・リコイル", "Re:ゼロから始める異世界生活", "リトルウィッチアカデミア", "りゅうおうのおしごと！", "Rewrite", "ReLIFE", "RELEASE THE SPYCE", 
+        "RAIL WARS!", "レガリア The Three Sacred Stars", "Re:CREATORS(レクリエイターズ)", "恋愛暴君", "連盟空軍航空魔法音楽隊ルミナスウィッチーズ", 
+        "ロクでなし魔術講師と禁忌教典", "Lostorage incited WIXOSS", 
+        
+        "WORKING!!", "WWW.WORKING!!", "わかばガール", "ワガママハイスペック", "私に天使が舞い降りた！", "わたしの幸せな結婚", "咲う アルスノトリア", "ワンダーエッグ・プライオリティ", "ワンパンマン", "ワンピース", "OneRoom", "ワンルーム、日当たり普通、天使つき。"
+    ];
     let s = label.to_string();
     s.trim();
-    return s.contains("壁紙");
+    if !s.contains("壁紙") {
+        return false;
+    }
+    for work in works {
+        if s.contains(work) {
+            return true;
+        }
+    }
+    return false;
 }
 
 fn anihonet_tag_copy(tag) {
@@ -238,23 +310,30 @@ fn anihonet_classify_tags(tags) {
     let quality_tags = [];
     let work_tags = [];
     let character_tags = [];
+    let type_tags = [];
     let i = 0;
     while i < tags.len() {
         let tag = tags[i];
         let label = anihonet_tag_label(tag);
         if label.len() > 0 {
             // `画像`（quality）优先于 `壁紙`（作品），避免同时命中时被误判为作品。
-            if anihonet_is_quality_tag(label) {
-                quality_tags.push(anihonet_tag_copy(tag));
-            } else if anihonet_is_work_tag(label) {
+            if anihonet_is_work_tag(label) {
                 work_tags.push(anihonet_tag_copy(tag));
+            } else if anihonet_is_type_tag(label) {
+                type_tags.push(anihonet_tag_copy(tag));
+            } else if anihonet_is_quality_tag(label) {
+                quality_tags.push(anihonet_tag_copy(tag));
             } else {
-                character_tags.push(anihonet_tag_copy(tag));
+                if label.contains("壁紙") {
+                    work_tags.push(anihonet_tag_copy(tag));
+                } else {
+                    character_tags.push(anihonet_tag_copy(tag));
+                }
             }
         }
         i += 1;
     }
-    #{ qualityTags: quality_tags, workTags: work_tags, characterTags: character_tags }
+    #{ qualityTags: quality_tags, workTags: work_tags, characterTags: character_tags, typeTags: type_tags }
 }
 
 // 详情页 blogbox：源帖子 ID + 投稿日 ISO datetime + tags（span.tagst > a）
@@ -293,6 +372,7 @@ fn parse_anihonet_metadata(detail_url) {
         qualityTags: groups["qualityTags"],
         workTags: groups["workTags"],
         characterTags: groups["characterTags"],
+        typeTags: groups["typeTags"],
     }
 }
 
@@ -473,54 +553,29 @@ fn process_download_href(href, progress_slice, dl_opts) {
     }
 }
 
-// 排行榜详情：原图按钮 a.button:not(.add)。work_pct_budget 为本条排行作品在本页内分摊到的总进度，再均分到每张图
-fn process_ranking_detail_page(href, item_idx, item_total, work_pct_budget) {
-    let full_url = resolve_url(href);
-    print(`[anihonet] 进入排行榜详情页 ${item_idx}/${item_total}：${full_url}`);
-    to(full_url);
-    let meta_map = parse_anihonet_metadata(full_url);
-    let meta_id = create_image_metadata(meta_map, #{ version: 2 });
-    let dl_hrefs = get_attr("a.button:not(.add)", "href");
-    let ne = dl_hrefs.len();
-    let names = parse_anihonet_names(ne);
-    print(`[anihonet]   本页共 ${ne} 个 a.button:not(.add) 下载链接`);
-    if names.len() != ne {
-        print(`[anihonet]   提示：原图说明段落数 ${names.len()} 与下载按钮数 ${ne} 不一致，按索引对齐`);
-    }
-    let pct_per_img = if ne > 0 {
-        work_pct_budget / ne
-    } else {
-        0.0
-    };
-    if ne == 0 && work_pct_budget > 0.0 {
-        add_progress(work_pct_budget);
-    }
-    let elem_idx = 0;
-    while elem_idx < ne {
-        let img_i = elem_idx + 1;
-        print(`[anihonet]   下载第 ${img_i}/${ne} 张（按链接顺序尝试）`);
-        let base = if elem_idx < names.len() { names[elem_idx] } else { "" };
-        if base == "" {
-            base = anihonet_name_from_image_url(dl_hrefs[elem_idx]);
-        }
-        let dl_opts = anihonet_build_download_opts(base, img_i, ne, meta_id);
-        process_download_href(dl_hrefs[elem_idx], pct_per_img, dl_opts);
-        elem_idx += 1;
-    }
-    back();
-}
-
-// 作品索引详情页：原图按钮 a.button.add-dl。work_pct_budget 为本作品在当前「列表页」内分摊到的进度（= 主题按列表总页均分后再按本页作品数均分）；再均分到每张图
-fn process_anime_game_detail(href, work_pct_budget, work_idx, work_total) {
+// 作品详情页 work_pct_budget 为本作品在当前「列表页」内分摊到的进度（= 主题按列表总页均分后再按本页作品数均分）；再均分到每张图
+fn process_detail_page(href, work_pct_budget, work_idx, work_total) {
     let full = resolve_url(href);
-    print(`[anihonet]   进入作品详情页 ${work_idx}/${work_total}：${full}`);
+    print(`[anihonet]   进入详情页 ${work_idx}/${work_total}：${full}`);
     to(full);
     let meta_map = parse_anihonet_metadata(full);
     let meta_id = create_image_metadata(meta_map, #{ version: 2 });
     let dl_hrefs = get_attr("a.button.add-dl", "href");
     let m = dl_hrefs.len();
+    if m == 0 {
+        dl_hrefs = get_attr("a.button:not(.add)", "href");
+        m = dl_hrefs.len();
+        if m == 0 {
+            dl_hrefs = get_attr(".wp-img-pc > a", "href");
+            m = dl_hrefs.len();
+            if m == 0 {
+                dl_hrefs = get_attr(".wp-img > a", "href");
+                m = dl_hrefs.len();
+            }
+        }
+    }
     let names = parse_anihonet_names(m);
-    print(`[anihonet]     本页共 ${m} 个 a.button.add-dl 原图下载按钮`);
+    print(`[anihonet]     本页共 ${m} 个原图下载按钮`);
     if names.len() != m {
         print(`[anihonet]     提示：原图说明段落数 ${names.len()} 与下载按钮数 ${m} 不一致，按索引对齐`);
     }
@@ -603,7 +658,7 @@ fn crawl_anime_series(series_href, theme_pct_budget, row_id, idx_in_row, total_i
                 while d < n {
                     let wi = d + 1;
                     print(`[anihonet]     处理本页第 ${wi}/${n} 个作品（本页内进度权重 1/${n}）`);
-                    process_anime_game_detail(detail_hrefs[d], work_pct_budget, wi, n);
+                    process_detail_page(detail_hrefs[d], work_pct_budget, wi, n);
                     d += 1;
                 }
             }
@@ -735,7 +790,7 @@ fn crawl_kind(kind, start_page, end_page, period) {
         let idx = 0;
         while idx < total_links {
             let ii = idx + 1;
-            process_ranking_detail_page(hrefs[idx], ii, total_links, pct_per_item);
+            process_detail_page(hrefs[idx], ii, total_links, pct_per_item);
             idx += 1;
         }
         pg += 1;
@@ -745,12 +800,20 @@ fn crawl_kind(kind, start_page, end_page, period) {
 let wt_ok = wallpaper_type == "all" || wallpaper_type == "sp" || wallpaper_type == "image" || wallpaper_type == "img-pc" || wallpaper_type == "imgpc" || wallpaper_type == "pc";
 if !wt_ok {
     print("错误：wallpaper_type 必须是 'all'（综合）、'sp'、'image'、'imgpc'、'pc'（旧版 'img-pc' 仍兼容为 imgpc）");
-} else if crawl_mode != "ranking" && crawl_mode != "anime_game" && crawl_mode != "by_theme" {
-    print("错误：crawl_mode 必须是 'ranking'、'anime_game' 或 'by_theme'");
-} else if crawl_mode == "anime_game" {
-    crawl_anime_game_index(anime_game_rows);
+} else if crawl_mode == "single_work" {
+    let work_slug = selected_work;
+    if work_slug == () || work_slug == "" {
+        print("[anihonet] 错误：未选择作品，请在插件配置中选择「作品」");
+        add_progress(100.0);
+    } else {
+        let work_url = "https://anihonetwallpaper.com/" + work_slug;
+        print(`[anihonet] 单个作品模式：${work_url}`);
+        crawl_anime_series(work_url, 100.0, "single", 1, 1, 1, 0);
+    }
 } else if crawl_mode == "by_theme" {
     crawl_theme_from_index(theme_search, theme_start_page, theme_end_page);
-} else {
+} else if crawl_mode == "ranking" {
     crawl_kind(wallpaper_type, start_page, end_page, ranking_period);
+} else {
+    print("错误：crawl_mode 必须是 'ranking'、'single_work' 或 'by_theme'");
 }

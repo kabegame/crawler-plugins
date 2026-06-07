@@ -4,7 +4,7 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
-## [3.6.4]
+## [3.7.0]
 ### Added
 - anihonet plugin add source post url
 - anime-pictures plugin metadata is now stored as structured JSON with a v1 migration for historical HTML metadata.

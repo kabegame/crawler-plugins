@@ -6,11 +6,11 @@
     "tag_category": { "type": "string", "default": "character", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(plugin_metadata, '$.characterTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) IS NOT NULL)"
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(plugin_metadata, '$.characterTags'), json('[]')) WHEN 'type' THEN COALESCE(json_extract(plugin_metadata, '$.typeTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) IS NOT NULL)"
   },
   "list": {
     "${tag.tag_name}": {
-      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) AS tag_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(source.plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(source.plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(source.plugin_metadata, '$.characterTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) IS NOT NULL GROUP BY tag_name ORDER BY image_count DESC, tag_name ASC",
+      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) AS tag_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(source.plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(source.plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(source.plugin_metadata, '$.characterTags'), json('[]')) WHEN 'type' THEN COALESCE(json_extract(source.plugin_metadata, '$.typeTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) IS NOT NULL GROUP BY tag_name ORDER BY image_count DESC, tag_name ASC",
       "data_var": "tag",
       "provider": "tag_provider",
       "properties": {
@@ -20,18 +20,6 @@
       "meta": {
         "isLeaf": true,
         "image_count": "${tag.image_count}"
-      }
-    }
-  },
-  "resolve": {
-    "([^/]+)": {
-      "provider": "tag_provider",
-      "properties": {
-        "tag_category": "${properties.tag_category}",
-        "tag_name": "${capture[1]}"
-      },
-      "meta": {
-        "isLeaf": true
       }
     }
   }

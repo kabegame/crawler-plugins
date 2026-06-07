@@ -7,7 +7,7 @@
     "tag_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(plugin_metadata, '$.characterTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})"
+   "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN CASE ${properties.tag_category} WHEN 'quality' THEN COALESCE(json_extract(plugin_metadata, '$.qualityTags'), json('[]')) WHEN 'work' THEN COALESCE(json_extract(plugin_metadata, '$.workTags'), json('[]')) WHEN 'character' THEN COALESCE(json_extract(plugin_metadata, '$.characterTags'), json('[]')) WHEN 'type' THEN COALESCE(json_extract(plugin_metadata, '$.typeTags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})"
   },
   "list": {
     "${out.name}": {
@@ -19,14 +19,4 @@
           "meta": "${out.meta}"
       }
   },
-  "resolve": {
-    "desc|x[1-9][0-9]*x|[1-9][0-9]*": {
-      "delegate": {
-        "provider": "kabegame.gallery_desc_pagination_page_comb"
-      },
-      "child_var": "child",
-      "provider": "${child.provider}",
-      "meta": "${child.meta}"
-    }
-  }
 }

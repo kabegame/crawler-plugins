@@ -33,6 +33,7 @@
       { key: 'quality', tags: tagList(m.qualityTags) },
       { key: 'work', tags: tagList(m.workTags) },
       { key: 'character', tags: tagList(m.characterTags) },
+      { key: 'type', tags: tagList(m.typeTags) },
     ];
   } else if (schema === 1) {
     groups = [
@@ -158,7 +159,7 @@
         source: '源帖：',
         panelAria: 'anihonet 投稿資訊',
         empty: '尚無 anihonet 元資料（請以最新版外掛重新抓取）。',
-        groups: { quality: '畫質：', work: '作品：', character: '角色：' }
+        groups: { quality: '畫質：', work: '作品：', character: '角色：', type: '種類：' }
       };
     }
     if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
@@ -167,7 +168,7 @@
         source: '源帖：',
         panelAria: 'anihonet 投稿信息',
         empty: '暂无 anihonet 元数据（请使用最新版插件重新抓取）。',
-        groups: { quality: '画质：', work: '作品：', character: '角色：' }
+        groups: { quality: '画质：', work: '作品：', character: '角色：', type: '种类：' }
       };
     }
     if (s === 'ja') {
@@ -176,7 +177,7 @@
         source: '投稿元：',
         panelAria: 'anihonet 投稿メタデータ',
         empty: 'anihonet のメタデータがありません（最新版プラグインで再取得してください）。',
-        groups: { quality: '画質：', work: '作品：', character: 'キャラ：' }
+        groups: { quality: '画質：', work: '作品：', character: 'キャラ：', type: '種類：' }
       };
     }
     if (s === 'ko') {
@@ -185,7 +186,7 @@
         source: '원본 게시글：',
         panelAria: 'anihonet 게시 메타데이터',
         empty: 'anihonet 메타데이터가 없습니다(최신 플러그인으로 다시 수집하세요).',
-        groups: { quality: '화질: ', work: '작품: ', character: '캐릭터: ' }
+        groups: { quality: '화질: ', work: '작품: ', character: '캐릭터: ', type: '종류: ' }
       };
     }
     return {
@@ -193,7 +194,7 @@
       source: 'Source: ',
       panelAria: 'anihonet post metadata',
       empty: 'No anihonet metadata (re-crawl with the latest plugin).',
-      groups: { quality: 'Quality: ', work: 'Work: ', character: 'Character: ' }
+      groups: { quality: 'Quality: ', work: 'Work: ', character: 'Character: ', type: 'Type: ' }
     };
   }
   function apply(loc) {

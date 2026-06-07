@@ -5,14 +5,18 @@ let operation_models = "listGenerationModels";
 let operation_artworks = "listArtworks";
 let operation_get_tack = "getTack";
 let operation_get_artwork_detail = "getArtworkWithTaskDetail";
-let models_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"4d76952c681f7d0787077ddeec310f6475ab059e50546248120617abfb4031e9\"}}";
 
-let artworks_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"e0c938939452d33abf3289e74b9f9f7bebd749e065ee905e7e073aca6f05199c\"}}";
+// PixAI 使用 Apollo persisted query（仅传 sha256Hash），但其哈希会随站点发版轮换，
+// 一旦轮换旧哈希会返回 PersistedQueryNotFound（HTTP 200 但无 data），导致插件全面失效。
+// 改为像 getTack 一样直接通过 query= 传完整 GraphQL 查询文本，避免依赖会过期的哈希。
+// 字段选择集仅覆盖插件 + description.ejs 实际消费的字段。
+let models_query = "query listGenerationModels($feed: String, $first: Int, $last: Int, $orderBy: String, $before: String, $after: String, $type: GenerationModelType) { generationModels(feed: $feed, first: $first, last: $last, orderBy: $orderBy, before: $before, after: $after, type: $type) { edges { node { id title } } pageInfo { hasNextPage hasPreviousPage endCursor startCursor } } }";
+
+let artworks_query = "query listArtworks($isSafeSearch: Boolean, $first: Int, $last: Int, $feed: String, $orderBy: String, $before: String, $after: String, $tackId: String, $loraId: ID, $authorId: ID, $types: [ArtworkType], $rankMediaType: RankMediaType, $isNsfw: Boolean) { artworks(isSafeSearch: $isSafeSearch, first: $first, last: $last, feed: $feed, orderBy: $orderBy, before: $before, after: $after, tackId: $tackId, loraId: $loraId, authorId: $authorId, types: $types, rankMediaType: $rankMediaType, isNsfw: $isNsfw) { edges { node { id title mediaId videoMediaId media { urls { variant url } } } } pageInfo { hasNextPage hasPreviousPage endCursor startCursor } } }";
 let get_tack_query = "query getTack($id: ID, $defaultName: String, $codeName: String) { tack(id: $id, defaultName: $defaultName, codeName: $codeName) { id parentId codeName category defaultName weight mediaId safetyScore createdAt updatedAt tackTerms { id tackId category name createdAt updatedAt } } }";
-let artwork_detail_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"14ee05fd01b9b0912f04b207d4adbd84df8b2bfefe0bb145e5796ef2473e5006\"}}";
+let artwork_detail_query = "query getArtworkWithTaskDetail($id: ID!) { artwork(id: $id) { id title authorId prompts createdAt updatedAt mediaId videoMediaId likedCount commentCount extra media { id type width height imageType urls { variant url } } author { id username displayName avatarMediaId avatarSmallThumbnailMediaUrl accountType activeDecorations { id decorationId isEnabled decoration { id code type data } } } tacks { id codeName category defaultName displayName tackTerms { category name } } } }";
+// listMessages 查询文本在 fetch_pixai_comments 内就地定义：Rhai 函数无法捕获脚本顶层 let 变量。
 
-let ranking_artworks_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"1e5f998b229a3701595632cbb2c28ee69534c22d7a3499ab657ca465fff85497\"}}";
-let ranking_models_extensions = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"1658f8e716184e95d3177d20fad189d8f7b250fb30e8401496ed0aaf34e4ad83\"}}";
 let media_api_base = "https://api.pixai.art/v1/media/";
 
 // 静态获取评论快照（最近 20 条），失败只 warn 不中断
@@ -21,11 +25,11 @@ fn fetch_pixai_comments(artwork_id) {
     if artwork_id == "" { return comments; }
     try {
         let gql_url = "https://api.pixai.art/graphql";
-        let ext = "{\"clientLibrary\":{\"name\":\"@apollo/client\",\"version\":\"4.1.4\"},\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"06b2c265be1ff58c8b5d4e744ba8d528c18136d7bf1d9f2691621e19c5333724\"}}";
+        let msgs_query = "query listMessages($topicId: ID!, $last: Int) { messages(topicId: $topicId, last: $last) { edges { node { id type content createdAt author { id username displayName avatarSmallThumbnailMediaUrl } } } } }";
         let vars = "{\"topicId\":\"" + artwork_id + "\",\"last\":20}";
         let url = gql_url + "?operation=listMessages&operationName=listMessages"
             + "&variables=" + url_encode(vars)
-            + "&extensions=" + url_encode(ext);
+            + "&query=" + url_encode(msgs_query);
         set_header("x-apollo-operation-name", "listMessages");
         let res = fetch_json(url);
         if res != () && res["data"] != () {
@@ -48,7 +52,7 @@ fn fetch_pixai_comments(artwork_id) {
     return comments;
 }
 
-fn fetch_pixai_artwork_detail(artwork_id, api_url, operation_get_artwork_detail, artwork_detail_extensions) {
+fn fetch_pixai_artwork_detail(artwork_id, api_url, operation_get_artwork_detail, artwork_detail_query) {
     if artwork_id == () {
         return ();
     }
@@ -58,8 +62,8 @@ fn fetch_pixai_artwork_detail(artwork_id, api_url, operation_get_artwork_detail,
     }
     try {
         set_header("x-apollo-operation-name", operation_get_artwork_detail);
-        let variables = `{"id":"${artwork_id_str}","tackLanguage":"ja"}`;
-        let url = `${api_url}?operation=${operation_get_artwork_detail}&operationName=${operation_get_artwork_detail}&variables=${url_encode(variables)}&extensions=${url_encode(artwork_detail_extensions)}`;
+        let variables = `{"id":"${artwork_id_str}"}`;
+        let url = `${api_url}?operation=${operation_get_artwork_detail}&operationName=${operation_get_artwork_detail}&variables=${url_encode(variables)}&query=${url_encode(artwork_detail_query)}`;
         let res = fetch_json(url);
         if res != () && res["data"] != () {
             return res["data"]["artwork"];
@@ -278,7 +282,7 @@ fn process_artworks_edges_for_download(
     downloaded_offset,
     api_url,
     operation_get_artwork_detail,
-    artwork_detail_extensions
+    artwork_detail_query
 ) {
     if edges == () || edges.len() == 0 {
         return 0;
@@ -318,7 +322,7 @@ fn process_artworks_edges_for_download(
                 let download_url = `${media_api_base}${media_id_str}/image`;
                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
                 let art_id_str = if node != () && node["id"] != () { node["id"].to_string() } else { "" };
-                let artwork_detail = fetch_pixai_artwork_detail(art_id_str, api_url, operation_get_artwork_detail, artwork_detail_extensions);
+                let artwork_detail = fetch_pixai_artwork_detail(art_id_str, api_url, operation_get_artwork_detail, artwork_detail_query);
                 if artwork_detail == () {
                     warn("[PixAI] 跳过作品：详情为空，artwork_id=" + art_id_str);
                 } else {
@@ -377,7 +381,7 @@ fn process_artworks_edges_for_download(
                                 }
                                 print(`[PixAI] 下载 ${label} ${context_id} 第 ${downloaded_offset + downloaded + 1} 张（第 ${edge_idx + 1}/${edges.len()} 条）：${title}`);
                                 let art_id_str2 = if node["id"] != () { node["id"].to_string() } else { "" };
-                                let artwork_detail2 = fetch_pixai_artwork_detail(art_id_str2, api_url, operation_get_artwork_detail, artwork_detail_extensions);
+                                let artwork_detail2 = fetch_pixai_artwork_detail(art_id_str2, api_url, operation_get_artwork_detail, artwork_detail_query);
                                 if artwork_detail2 == () {
                                     warn("[PixAI] 跳过作品：详情为空，artwork_id=" + art_id_str2);
                                 } else {
@@ -412,9 +416,9 @@ fn process_artworks(
     max_pages,
     api_url,
     operation_artworks,
-    artworks_extensions,
+    artworks_query,
     operation_get_artwork_detail,
-    artwork_detail_extensions,
+    artwork_detail_query,
     per_item_progress,
     media_api_base,
     artwork_sort,
@@ -479,7 +483,7 @@ fn process_artworks(
 
         variables += "}";
 
-        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&extensions=${url_encode(artworks_extensions)}`;
+        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&query=${url_encode(artworks_query)}`;
 
         let res = fetch_json(url);
         let data = res["data"];
@@ -514,7 +518,7 @@ fn process_artworks(
                 downloaded,
                 api_url,
                 operation_get_artwork_detail,
-                artwork_detail_extensions
+                artwork_detail_query
             );
             downloaded += page_dl;
         }
@@ -569,9 +573,9 @@ fn process_author_artworks(
     max_pages,
     api_url,
     operation_artworks,
-    artworks_extensions,
+    artworks_query,
     operation_get_artwork_detail,
-    artwork_detail_extensions,
+    artwork_detail_query,
     per_item_progress,
     media_api_base,
     artwork_sort,
@@ -630,7 +634,7 @@ fn process_author_artworks(
 
         variables += "}";
 
-        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&extensions=${url_encode(artworks_extensions)}`;
+        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&query=${url_encode(artworks_query)}`;
 
         let res = fetch_json(url);
         let data = res["data"];
@@ -665,7 +669,7 @@ fn process_author_artworks(
                 downloaded,
                 api_url,
                 operation_get_artwork_detail,
-                artwork_detail_extensions
+                artwork_detail_query
             );
             downloaded += page_dl;
         }
@@ -758,9 +762,9 @@ if crawl_type == "global" {
         max_global_pages,
         api_url,
         operation_artworks,
-        artworks_extensions,
+        artworks_query,
         operation_get_artwork_detail,
-        artwork_detail_extensions,
+        artwork_detail_query,
         100.0,
         media_api_base,
         artwork_sort,
@@ -806,9 +810,9 @@ if crawl_type == "global" {
                 max_tag_artwork_pages,
                 api_url,
                 operation_artworks,
-                artworks_extensions,
+                artworks_query,
                 operation_get_artwork_detail,
-                artwork_detail_extensions,
+                artwork_detail_query,
                 per_tag_progress,
                 media_api_base,
                 artwork_sort,
@@ -847,9 +851,9 @@ if crawl_type == "global" {
             max_author_artwork_pages,
             api_url,
             operation_artworks,
-            artworks_extensions,
+            artworks_query,
             operation_get_artwork_detail,
-            artwork_detail_extensions,
+            artwork_detail_query,
             100.0,
             media_api_base,
             artwork_sort,
@@ -872,7 +876,7 @@ if crawl_type == "global" {
 
         set_header("x-apollo-operation-name", operation_artworks);
         let variables = `{"rankMediaType":"${rank_media_type}","feed":"${feed}","first":100,"isNsfw":false}`;
-        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&extensions=${url_encode(ranking_artworks_extensions)}`;
+        let url = `${api_url}?operation=${operation_artworks}&operationName=${operation_artworks}&variables=${url_encode(variables)}&query=${url_encode(artworks_query)}`;
 
         let res = fetch_json(url);
         let data = res["data"];
@@ -902,7 +906,7 @@ if crawl_type == "global" {
                         0,
                         api_url,
                         operation_get_artwork_detail,
-                        artwork_detail_extensions
+                        artwork_detail_query
                     );
                     print(`[PixAI] 排行榜（${rank_ctx}）结束：下载 ${download_count} 张`);
                     if download_count == 0 {
@@ -920,7 +924,7 @@ if crawl_type == "global" {
 
         set_header("x-apollo-operation-name", operation_models);
         let variables = `{"type":"${model_type}","orderBy":"${order_by}","first":100}`;
-        let url = `${api_url}?operation=${operation_models}&operationName=${operation_models}&variables=${url_encode(variables)}&extensions=${url_encode(ranking_models_extensions)}`;
+        let url = `${api_url}?operation=${operation_models}&operationName=${operation_models}&variables=${url_encode(variables)}&query=${url_encode(models_query)}`;
 
         let res = fetch_json(url);
         let data = res["data"];
@@ -960,9 +964,9 @@ if crawl_type == "global" {
                                     max_artwork_pages_ranking,
                                     api_url,
                                     operation_artworks,
-                                    artworks_extensions,
+                                    artworks_query,
                                     operation_get_artwork_detail,
-                                    artwork_detail_extensions,
+                                    artwork_detail_query,
                                     per_model_progress,
                                     media_api_base,
                                 "trending",
@@ -1038,7 +1042,7 @@ if crawl_type == "global" {
         }
         variables += "}";
 
-        let url = `${api_url}?operation=${operation_models}&operationName=${operation_models}&variables=${url_encode(variables)}&extensions=${url_encode(models_extensions)}`;
+        let url = `${api_url}?operation=${operation_models}&operationName=${operation_models}&variables=${url_encode(variables)}&query=${url_encode(models_query)}`;
 
         let res = fetch_json(url);
         let data = res["data"];
@@ -1092,9 +1096,9 @@ if crawl_type == "global" {
                                 max_artwork_pages,
                                 api_url,
                                 operation_artworks,
-                                artworks_extensions,
+                                artworks_query,
                                 operation_get_artwork_detail,
-                                artwork_detail_extensions,
+                                artwork_detail_query,
                                 per_model_progress,
                                 media_api_base,
                                 artwork_sort,

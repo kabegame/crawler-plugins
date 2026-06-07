@@ -7,26 +7,36 @@
       "provider": "tag_category_provider",
       "properties": {
         "tag_category": "quality"
+      },
+      "meta": {
+        "plain": true,
       }
     },
     "work": {
       "provider": "tag_category_provider",
       "properties": {
         "tag_category": "work"
+      },
+      "meta": {
+        "plain": true,
       }
     },
     "character": {
       "provider": "tag_category_provider",
       "properties": {
         "tag_category": "character"
+      },
+      "meta": {
+        "plain": true,
       }
-    }
-  },
-  "resolve": {
-    "([^/]+)": {
+    },
+    "type": {
       "provider": "tag_category_provider",
       "properties": {
-        "tag_category": "${capture[1]}"
+        "tag_category": "type"
+      },
+      "meta": {
+        "plain": true,
       }
     }
   },
