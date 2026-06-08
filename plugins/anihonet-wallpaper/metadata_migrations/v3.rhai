@@ -1,16 +1,14 @@
-// anihonet-wallpaper metadata migration v2.
+// anihonet-wallpaper metadata migration v3.
 //
 // Goal:
-// - v1 lumped every tag containing `壁紙` or `画像` into a single `qualityTags`
-//   bucket. v2 separates those two senses:
-//     * tags containing `画像` are quality labels      -> `qualityTags`
-//     * tags containing `壁紙` are the work/series      -> `workTags`
-//     * everything else stays as character labels       -> `characterTags`
-// - Reclassify from the authoritative flat `tags` array so the result is
-//   deterministic regardless of how v1 had split things.
+// - Fix only the v2 bucket mix-up, without reclassifying from flat `tags`.
+// - v2 had two mistakes:
+//     * some work tags were pushed into `qualityTags`
+//     * some type tags were pushed into `workTags`
+// - v3 only repairs those misplaced entries and keeps all other v2 semantics.
 //
 // Historical-migration rule: this script is self-contained and must not change
-// semantics once shipped. Any later fix is a new v3.rhai.
+// semantics once shipped. Any later fix is a new v4.rhai.
 
 fn declared_schema(m) {
     if m["schema"] == () {
@@ -22,13 +20,22 @@ fn declared_schema(m) {
 }
 
 fn is_current_schema(m) {
-    declared_schema(m) == "2" || declared_schema(m) == "2.1"
+    declared_schema(m) == "3"
+}
+
+fn is_v2_schema(m) {
+    declared_schema(m) == "2"
+}
+
+fn is_v2_1_schema(m) {
+    declared_schema(m) == "2.1"
 }
 
 fn tag_label(tag) {
     if tag == () {
         return "";
     }
+
     if tag.type_of() == "map" {
         if tag["name"] != () {
             let name = tag["name"].to_string();
@@ -37,15 +44,43 @@ fn tag_label(tag) {
                 return name;
             }
         }
+
         if tag["href"] != () {
             let href = tag["href"].to_string();
             href.trim();
             return href;
         }
     }
+
     let text = tag.to_string();
     text.trim();
     text
+}
+
+fn copy_tag(tag) {
+    if tag.type_of() == "map" {
+        let name = if tag["name"] == () { "" } else { tag["name"].to_string() };
+        let href = if tag["href"] == () { "" } else { tag["href"].to_string() };
+        name.trim();
+        href.trim();
+        return #{ name: name, href: href };
+    }
+
+    let name = tag.to_string();
+    name.trim();
+    #{ name: name, href: "" }
+}
+
+fn copy_array(arr) {
+    let out = [];
+    if arr == () || arr.type_of() != "array" {
+        return out;
+    }
+
+    for item in arr {
+        out.push(copy_tag(item));
+    }
+    out
 }
 
 fn is_quality_tag(label) {
@@ -71,7 +106,8 @@ fn is_work_tag(label) {
     if label == () {
         return false;
     }
-    let works = [
+
+       let works = [
         "アイ★チュウ", "ID-0", "IDOLY PRIDE", "アイドル", "アイマス", "蒼の彼方のフォーリズム", "赤髪の白雪姫", "アクセル・ワールド", "明日ちゃんのセーラー服", "亜人ちゃんは語りたい", "アズールレーン", "あそびあそばせ", "アニマエール！", "アブソリュート・デュオ", "甘々と稲妻", "甘城ブリリアントパーク", "アリスと蔵六", "暗殺教室", "アンジュ・ヴィエルジュ", "あんハピ♪", 
         "イジらないで、長瀞さん", "異世界おじさん", "異世界かるてっと", "異世界食堂", "異世界はスマートフォンとともに。", "異世界魔王と召喚少女の奴隷魔術", "一週間フレンズ", "異能バトルは日常系のなかで", "妹さえいればいい。", "色づく世界の明日から", "インフィニット・ストラトス", 
         "ヴァイオレット・エヴァーガーデン", "ViVid Strike!", "WIXOSS DIVA(A)LIVE", "WAVE!!〜サーフィンやっぺ!!〜", "宇崎ちゃんは遊びたい!", "うたの☆プリンスさまっ♪", "うたわれるもの", "うちの会社の小さい先輩の話", "うちのメイドがウザすぎる！", "宇宙よりも遠い場所", "ウマ娘 プリティーダービー", "裏世界ピクニック", "うらら迷路帖", "18TRIP", 
@@ -123,6 +159,7 @@ fn is_work_tag(label) {
         
         "WORKING!!", "WWW.WORKING!!", "わかばガール", "ワガママハイスペック", "私に天使が舞い降りた！", "わたしの幸せな結婚", "咲う アルスノトリア", "ワンダーエッグ・プライオリティ", "ワンパンマン", "ワンピース", "OneRoom", "ワンルーム、日当たり普通、天使つき。"
     ];
+
     let s = label.to_string();
     s.trim();
 
@@ -135,63 +172,66 @@ fn is_work_tag(label) {
             return true;
         }
     }
-    return false;
+    false
 }
 
-fn copy_tag(tag) {
-    if tag.type_of() == "map" {
-        let name = if tag["name"] == () { "" } else { tag["name"].to_string() };
-        let href = if tag["href"] == () { "" } else { tag["href"].to_string() };
-        name.trim();
-        href.trim();
-        return #{ name: name, href: href };
-    }
-    let name = tag.to_string();
-    name.trim();
-    #{ name: name, href: "" }
-}
-
-fn split_tags(tags) {
+fn repair_v2_buckets(m) {
     let quality = [];
     let work = [];
-    let character = [];
     let type = [];
-    if tags == () || tags.type_of() != "array" {
-        return #{ qualityTags: quality, workTags: work, characterTags: character };
-    }
 
-    for tag in tags {
-        let label = tag_label(tag);
-        if label.len() == 0 {
-            continue;
-        }
-        // `画像` wins over `壁紙` when a label somehow contains both, so quality
-        // labels are never misfiled as a work.
-        if is_work_tag(label) {
-            work.push(copy_tag(tag));
-        } else if is_type_tag(label) {
-            type.push(copy_tag(tag));
-        } else if is_quality_tag(tag) {
-            quality.push(copy_tag(tag))
-        } else {
-            if s.contains("壁紙") {
+    if m["qualityTags"] != () && m["qualityTags"].type_of() == "array" {
+        for tag in m["qualityTags"] {
+            let label = tag_label(tag);
+            if label.len() == 0 {
+                continue;
+            }
+
+            if is_work_tag(label) {
                 work.push(copy_tag(tag));
             } else {
-                character.push(copy_tag(tag));
+                quality.push(copy_tag(tag));
             }
         }
     }
 
-    #{ qualityTags: quality, workTags: work, characterTags: character, typeTags: type }
+    if m["workTags"] != () && m["workTags"].type_of() == "array" {
+        for tag in m["workTags"] {
+            let label = tag_label(tag);
+            if label.len() == 0 {
+                continue;
+            }
+
+            if is_work_tag(label) {
+                work.push(copy_tag(tag));
+            } else {
+                type.push(copy_tag(tag));
+            }
+        }
+    }
+
+    #{
+        qualityTags: quality,
+        workTags: work,
+        characterTags: m["characterTags"],
+        typeTags: type
+    }
 }
 
 fn migrate(metadata) {
     let m = parse_json(metadata);
+
     if is_current_schema(m) {
         return to_json(m);
     }
 
-    let out = #{ schema: "2.1" };
+    // v3 is only defined as a repair migration for v2 data.
+    if !is_v2_schema(m) && !is_v2_1_schema(m) {
+        return to_json(m);
+    }
+
+    let out = #{ schema: "3" };
+
     if m["post_id"] != () {
         out["post_id"] = m["post_id"];
     }
@@ -203,11 +243,11 @@ fn migrate(metadata) {
     } else {
         out["tags"] = [];
     }
-
-    let split = split_tags(out["tags"]);
-    out["qualityTags"] = split["qualityTags"];
-    out["workTags"] = split["workTags"];
-    out["characterTags"] = split["characterTags"];
+    let repaired = if is_v2_1_schema(m) { repair_v2_buckets(m) } else { m };
+    out["qualityTags"] = repaired["qualityTags"];
+    out["workTags"] = repaired["workTags"];
+    out["characterTags"] = repaired["characterTags"];
+    out["typeTags"] = repaired["typeTags"];
 
     to_json(out)
 }
