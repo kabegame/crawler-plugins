@@ -271,9 +271,9 @@ fn process_detail_page(href) {
             || (meta.related != () && meta.related.len() > 0)
             || st_ne;
         if nonempty {
-            download_image(images[0], #{ metadata: meta });
+            download_image(images[0], #{ url: full_url, metadata: meta });
         } else {
-            download_image(images[0]);
+            download_image(images[0], #{ url: full_url });
         }
     }
     back();

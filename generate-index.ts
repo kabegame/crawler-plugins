@@ -30,6 +30,18 @@ interface PackageJson {
   version?: string;
 }
 
+interface PluginPackageJson {
+  name?: string;
+  version?: string;
+  description?: string;
+  author?: string | { name?: string };
+  kbPackageVersion?: number;
+  engines?: {
+    kabegame?: string;
+  };
+  [key: string]: unknown;
+}
+
 /** 从 manifest 中复制 name / name.zh / description / description.zh 等扁平键到目标对象（供 index.json 写入，由后端解析生成 i18n 对象） */
 function copyFlatI18nKeys(
   manifest: Record<string, unknown>,
@@ -57,6 +69,7 @@ interface PluginInfo {
   version: string;
   author: string;
   packageVersion: number;
+  minAppVersion?: string;
   downloadUrl: string;
   sizeBytes: number;
   sha256: string;
@@ -95,6 +108,25 @@ function calculateSHA256(filePath: string): string {
   const hashSum = createHash("sha256");
   hashSum.update(fileBuffer);
   return hashSum.digest("hex");
+}
+
+function packageJsonIsV3(pkg: PluginPackageJson): boolean {
+  return (pkg.kbPackageVersion ?? 0) >= 3;
+}
+
+function normalizeEnginesKabegame(raw: string | undefined): string | undefined {
+  if (!raw) return undefined;
+  const trimmed = raw.trim();
+  const version = trimmed.startsWith(">=") ? trimmed.slice(2).trim() : trimmed;
+  return version.length > 0 ? version : undefined;
+}
+
+function authorString(author: PluginPackageJson["author"]): string {
+  if (typeof author === "string") return author;
+  if (author && typeof author === "object" && typeof author.name === "string") {
+    return author.name;
+  }
+  return "";
 }
 
 function generateIndex(options: GenerateIndexOptions): string {
@@ -172,13 +204,14 @@ function generateIndex(options: GenerateIndexOptions): string {
 
   for (const pluginName of pluginDirs) {
     const pluginDir = path.join(PLUGIN_DIR, pluginName);
+    const packageJsonPath = path.join(pluginDir, "package.json");
     const manifestPath = path.join(pluginDir, "manifest.json");
     const kgpgFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
 
-    // 检查 manifest.json 是否存在
-    if (!fs.existsSync(manifestPath)) {
+    // 检查 package.json / manifest.json 是否存在
+    if (!fs.existsSync(packageJsonPath) && !fs.existsSync(manifestPath)) {
       console.warn(
-        chalk.yellow(`⚠️  跳过 ${pluginName}: manifest.json 不存在`),
+        chalk.yellow(`⚠️  跳过 ${pluginName}: package.json/manifest.json 不存在`),
       );
       continue;
     }
@@ -192,10 +225,39 @@ function generateIndex(options: GenerateIndexOptions): string {
     }
 
     try {
-      // 读取 manifest.json（保留全部键，以便复制 name/name.zh、description/description.zh 等扁平键到 index）
-      const manifestRaw = JSON.parse(
-        fs.readFileSync(manifestPath, "utf-8"),
-      ) as Record<string, unknown>;
+      let manifestRaw: Record<string, unknown>;
+      let packageVersion = 2;
+      let minAppVersion: string | undefined;
+      let author = "";
+
+      if (fs.existsSync(packageJsonPath)) {
+        const pkgRaw = JSON.parse(
+          fs.readFileSync(packageJsonPath, "utf-8"),
+        ) as PluginPackageJson;
+        if (packageJsonIsV3(pkgRaw)) {
+          manifestRaw = pkgRaw;
+          packageVersion = pkgRaw.kbPackageVersion ?? 3;
+          minAppVersion = normalizeEnginesKabegame(pkgRaw.engines?.kabegame);
+          author = authorString(pkgRaw.author);
+        } else if (fs.existsSync(manifestPath)) {
+          manifestRaw = JSON.parse(
+            fs.readFileSync(manifestPath, "utf-8"),
+          ) as Record<string, unknown>;
+          const manifest = manifestRaw as Manifest;
+          author = (manifest.author as string) || "";
+        } else {
+          console.warn(
+            chalk.yellow(`⚠️  跳过 ${pluginName}: package.json 不是 v3 且 manifest.json 不存在`),
+          );
+          continue;
+        }
+      } else {
+        manifestRaw = JSON.parse(
+          fs.readFileSync(manifestPath, "utf-8"),
+        ) as Record<string, unknown>;
+        const manifest = manifestRaw as Manifest;
+        author = (manifest.author as string) || "";
+      }
       const manifest = manifestRaw as Manifest;
 
       // 获取文件大小
@@ -209,12 +271,15 @@ function generateIndex(options: GenerateIndexOptions): string {
       const pluginInfo: PluginInfo = {
         id: pluginName,
         version: manifest.version || "1.0.0",
-        author: (manifest.author as string) || "",
-        packageVersion: 2,
+        author,
+        packageVersion,
         downloadUrl: `${GITHUB_RELEASE_BASE}/${pluginName}.kgpg`,
         sizeBytes: fileSize,
         sha256: sha256,
       };
+      if (minAppVersion) {
+        pluginInfo.minAppVersion = minAppVersion;
+      }
       copyFlatI18nKeys(manifestRaw, pluginInfo, "name");
       copyFlatI18nKeys(manifestRaw, pluginInfo, "description");
 

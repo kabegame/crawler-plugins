@@ -53,6 +53,12 @@ interface ProjectJson {
   };
 }
 
+interface PluginPackageJson {
+  kbPackageVersion?: number;
+  main?: string;
+  scripts?: Record<string, string>;
+}
+
 function ensureCli(): void {
   if (!fs.existsSync(CLI_EXE)) {
     throw new Error(`找不到 cli ${CLI_EXE} 请在kabegame父仓库构建cli工具！`);
@@ -82,6 +88,32 @@ function cliPackPlugin(pluginDir: string, outputFile: string): void {
   );
   if (r.status !== 0) {
     throw new Error(`kabegame-cli 打包失败: ${path.basename(outputFile)}`);
+  }
+}
+
+function commandExists(command: string): boolean {
+  const r = spawnSync(command, ["--version"], { stdio: "ignore" });
+  return r.status === 0;
+}
+
+function runPluginBuild(pluginDir: string, pkg: PluginPackageJson): void {
+  const buildScript = pkg.scripts?.build;
+  if (typeof buildScript !== "string" || buildScript.trim().length === 0) {
+    return;
+  }
+
+  const runner = commandExists("bun") ? "bun" : commandExists("npm") ? "npm" : null;
+  if (!runner) {
+    throw new Error("未找到可用的包管理器（bun/npm），无法执行插件构建");
+  }
+
+  const r = spawnSync(runner, ["run", "build"], {
+    cwd: pluginDir,
+    stdio: "inherit",
+    env: { ...process.env },
+  });
+  if (r.status !== 0) {
+    throw new Error(`插件构建失败: ${path.basename(pluginDir)}`);
   }
 }
 
@@ -160,9 +192,9 @@ function getInputPatterns(): string[] {
  */
 function getDefaultPatterns(): string[] {
   return [
-    "{projectRoot}/plugins/**/manifest.json",
-    "{projectRoot}/plugins/**/config.json",
+    "{projectRoot}/plugins/**/package.json",
     "{projectRoot}/plugins/**/crawl.rhai",
+    "{projectRoot}/plugins/**/crawl.js",
     "{projectRoot}/plugins/**/icon.png",
     "{projectRoot}/plugins/**/doc_root/doc.md",
     "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
@@ -336,26 +368,56 @@ function extractReferencedImages(
   return Array.from(referencedImages);
 }
 
+function readPluginPackageJson(pluginDir: string): PluginPackageJson | null {
+  const packagePath = path.join(pluginDir, "package.json");
+  if (!fs.existsSync(packagePath)) return null;
+  const raw = fs.readFileSync(packagePath, "utf-8");
+  return JSON.parse(raw) as PluginPackageJson;
+}
+
+function isV3PluginPackage(pkg: PluginPackageJson | null): boolean {
+  return (pkg?.kbPackageVersion ?? 0) >= 3;
+}
+
 async function packagePlugin(
   pluginDir: string,
   outputFile: string,
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
-    // 检查 manifest.json 是否存在
-    const manifestPath = path.join(pluginDir, "manifest.json");
-    if (!fs.existsSync(manifestPath)) {
-      reject(new Error(`manifest.json 不存在: ${manifestPath}`));
-      return;
-    }
-
-    // 必需文件：crawl.rhai
-    const crawlPath = path.join(pluginDir, "crawl.rhai");
-    if (!fs.existsSync(crawlPath)) {
-      reject(new Error(`缺少必需文件: crawl.rhai`));
-      return;
-    }
-
     try {
+      const pkg = readPluginPackageJson(pluginDir);
+      if (isV3PluginPackage(pkg)) {
+        const main = pkg?.main;
+        if (!main || typeof main !== "string") {
+          reject(new Error(`v3 package.json 缺少 main 字段`));
+          return;
+        }
+        const mainPath = path.join(pluginDir, main);
+        const hasBuildScript =
+          typeof pkg?.scripts?.build === "string" &&
+          pkg.scripts.build.trim().length > 0;
+        if (hasBuildScript) {
+          runPluginBuild(pluginDir, pkg);
+        }
+        if (!fs.existsSync(mainPath)) {
+          reject(new Error(`main 脚本不存在: ${mainPath}`));
+          return;
+        }
+      } else {
+        const manifestPath = path.join(pluginDir, "manifest.json");
+        if (!fs.existsSync(manifestPath)) {
+          reject(new Error(`manifest.json 不存在: ${manifestPath}`));
+          return;
+        }
+
+        const crawlRhaiPath = path.join(pluginDir, "crawl.rhai");
+        const crawlJsPath = path.join(pluginDir, "crawl.js");
+        if (!fs.existsSync(crawlRhaiPath) && !fs.existsSync(crawlJsPath)) {
+          reject(new Error(`缺少必需文件: crawl.rhai 或 crawl.js`));
+          return;
+        }
+      }
+
       if (!fs.existsSync(path.dirname(outputFile))) {
         fs.mkdirSync(path.dirname(outputFile), { recursive: true });
       }

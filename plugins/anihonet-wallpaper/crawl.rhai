@@ -596,6 +596,7 @@ fn process_detail_page(href, work_pct_budget, work_idx, work_total) {
             base = anihonet_name_from_image_url(dl_hrefs[k]);
         }
         let dl_opts = anihonet_build_download_opts(base, img_i, m, meta_id);
+        dl_opts.url = full;
         process_download_href(dl_hrefs[k], pct_per_img, dl_opts);
         k += 1;
     }

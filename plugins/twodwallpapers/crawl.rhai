@@ -89,9 +89,9 @@ fn process_detail_page(href) {
     };
 
     if name != "" {
-        download_image(image, #{ name: name, metadata: meta });
+        download_image(image, #{ name: name, metadata: meta, url: detail_url });
     } else {
-        download_image(image, #{ metadata: meta });
+        download_image(image, #{ metadata: meta, url: detail_url });
     }
     back();
 }

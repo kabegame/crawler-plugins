@@ -210,9 +210,9 @@ fn download_with_wc_detail(full_url, detail_rel) {
     let meta = wc_fetch_detail_metadata();
     let dn = display_name_from_wallpaper_title(meta.wallpaper_title);
     if dn != "" {
-        download_image(full_url, #{ name: dn, metadata: meta });
+        download_image(full_url, #{ name: dn, metadata: meta, url: detail_abs });
     } else {
-        download_image(full_url, #{ metadata: meta });
+        download_image(full_url, #{ metadata: meta, url: detail_abs });
     }
     back();
 }

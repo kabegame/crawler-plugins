@@ -1,0 +1,150 @@
+{
+  "name": "twodwallpapers",
+  "version": "0.2.4",
+  "private": true,
+  "name.zh": "2dwallpapers二次元壁纸",
+  "name.en": "2dwallpapers anime wallpapers",
+  "name.ja": "2dwallpapers二次元壁紙",
+  "name.ko": "2dwallpapers 2차원 벽지",
+  "description": "2dwallpapers 壁纸网站爬虫",
+  "description.zh": "2dwallpapers 壁纸网站爬虫",
+  "description.en": "2dwallpapers wallpaper site crawler",
+  "description.ja": "2dwallpapers 壁紙サイトクローラー",
+  "description.ko": "2dwallpapers 벽지 사이트 크롤러",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://2dwallpapers.com",
+  "kbConfig": [
+    {
+      "key": "work_key",
+      "type": "string",
+      "name": "作品",
+      "name.en": "Work",
+      "name.ja": "作品",
+      "name.ko": "작품",
+      "name.zhtw": "作品",
+      "descripts": "不填则抓取未分类目录；填写作品名称则匹配并抓取该作品的分页列表",
+      "descripts.en": "Leave empty to crawl the uncategorized section; enter a work name to match and crawl that work's paginated list",
+      "descripts.ja": "空欄なら未分類カテゴリを取得します。作品名を入力すると一致した作品のページ付き一覧を取得します",
+      "descripts.ko": "비워두면 미분류 섹션을 수집합니다. 작품 이름을 입력하면 일치하는 작품의 페이지 목록을 수집합니다",
+      "descripts.zhtw": "不填則抓取未分類目錄；填寫作品名稱則匹配並抓取該作品的分頁列表",
+      "default": ""
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页数",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁數",
+      "descripts": "从该页开始抓取",
+      "descripts.en": "Crawl starts from this page number",
+      "descripts.ja": "このページ番号から取得を開始します",
+      "descripts.ko": "이 페이지 번호부터 수집을 시작합니다",
+      "descripts.zhtw": "從該頁開始抓取",
+      "default": 1,
+      "min": 1,
+      "max": 200
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "抓取到该页为止",
+      "descripts.en": "Crawl up to this page",
+      "descripts.ja": "このページまで取得します",
+      "descripts.ko": "이 페이지까지 수집합니다",
+      "descripts.zhtw": "抓取到該頁為止",
+      "default": 10,
+      "min": 1,
+      "max": 200
+    },
+    {
+      "key": "orderby",
+      "type": "options",
+      "name": "排序方式",
+      "name.en": "Sort by",
+      "name.ja": "並び順",
+      "name.ko": "정렬 기준",
+      "name.zhtw": "排序方式",
+      "default": "date",
+      "options": [
+        {
+          "name": "最新",
+          "name.en": "Latest",
+          "name.ja": "最新",
+          "name.ko": "최신",
+          "name.zhtw": "最新",
+          "variable": "date"
+        },
+        {
+          "name": "最多查看",
+          "name.en": "Most views",
+          "name.ja": "閲覧数順",
+          "name.ko": "조회수순",
+          "name.zhtw": "最多查看",
+          "variable": "views"
+        },
+        {
+          "name": "最多喜欢",
+          "name.en": "Most likes",
+          "name.ja": "いいね順",
+          "name.ko": "좋아요순",
+          "name.zhtw": "最多喜歡",
+          "variable": "likes"
+        },
+        {
+          "name": "最多收藏",
+          "name.en": "Most saved",
+          "name.ja": "保存数順",
+          "name.ko": "저장순",
+          "name.zhtw": "最多收藏",
+          "variable": "follow_num"
+        },
+        {
+          "name": "最近更新",
+          "name.en": "Recently updated",
+          "name.ja": "更新順",
+          "name.ko": "최근 업데이트",
+          "name.zhtw": "最近更新",
+          "variable": "modified"
+        },
+        {
+          "name": "随机",
+          "name.en": "Random",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "rand"
+        }
+      ]
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "doc_root/doc.en.md",
+    "ja": "doc_root/doc.ja.md",
+    "ko": "doc_root/doc.ko.md",
+    "default": "doc_root/doc.md",
+    "zh": "doc_root/doc.zh.md",
+    "zhtw": "doc_root/doc.zhtw.md"
+  },
+  "kbPathQLProviders": [
+    "providers/category_provider.json5",
+    "providers/entry_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
+}

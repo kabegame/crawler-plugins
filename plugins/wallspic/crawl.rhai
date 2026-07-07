@@ -184,7 +184,7 @@ fn run() {
         print(`第 ${page} 页: 解析到 ${count} 个图片地址，开始下载`);
 
         for image_url in image_urls {
-            download_image(image_url);
+            download_image(image_url, #{ url: page_url });
             add_progress(per_image_progress);
         }
 

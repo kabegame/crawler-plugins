@@ -1,0 +1,89 @@
+{
+  "name": "ziworld",
+  "version": "0.3.4",
+  "private": true,
+  "name.zh": "ziworld高质量壁纸",
+  "name.en": "ziworld high-quality wallpapers",
+  "name.ja": "ziworld高品質壁紙",
+  "name.ko": "ziworld 고품질 벽지",
+  "description": "ziworld高质量壁纸收集源插件",
+  "description.zh": "ziworld高质量壁纸收集源插件",
+  "description.en": "ziworld high-quality wallpaper crawler plugin",
+  "description.ja": "ziworld高品質壁紙収集プラグイン",
+  "description.ko": "ziworld 고품질 벽지 수집 플러그인",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://t.ziworld.top",
+  "kbConfig": [
+    {
+      "key": "category",
+      "type": "checkbox",
+      "name": "目录",
+      "name.en": "Category",
+      "name.ja": "カテゴリ",
+      "name.ko": "카테고리",
+      "name.zhtw": "目錄",
+      "descripts": "勾选要拉取的目录（可多选）",
+      "descripts.en": "Select categories to crawl (multiple)",
+      "descripts.ja": "取得するカテゴリを選択（複数可）",
+      "descripts.ko": "수집할 카테고리 선택 (복수 선택 가능)",
+      "descripts.zhtw": "勾選要拉取的目錄（可多選）",
+      "default": [
+        "PC",
+        "背景",
+        "二次元",
+        "移动端",
+        "手机壁纸",
+        "横版壁纸",
+        "头像",
+        "萌图MP",
+        "萌图PC",
+        "原神",
+        "崩坏",
+        "鸣潮",
+        "video",
+        "七濑胡桃",
+        "未归类"
+      ],
+      "options": [
+        "PC",
+        "背景",
+        "二次元",
+        "移动端",
+        "手机壁纸",
+        "横版壁纸",
+        "头像",
+        "萌图MP",
+        "萌图PC",
+        "原神",
+        "崩坏",
+        "鸣潮",
+        "video",
+        "七濑胡桃",
+        "未归类"
+      ]
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "doc_root/doc.en.md",
+    "ja": "doc_root/doc.ja.md",
+    "ko": "doc_root/doc.ko.md",
+    "default": "doc_root/doc.md",
+    "zh": "doc_root/doc.zh.md",
+    "zhtw": "doc_root/doc.zhtw.md"
+  },
+  "kbPathQLProviders": [
+    "providers/directory_provider.json5",
+    "providers/entry_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
+}

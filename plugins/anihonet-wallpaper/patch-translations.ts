@@ -1,8 +1,13 @@
-// bun patch-translations.ts  →  patches name.* fields in config.json selected_work options
+// bun patch-translations.ts  -> patches name.* fields in package.json kbConfig selected_work options
 // Format per option: name(zh)="原名(中文)", name.en="原名(English)", name.ja="原名", name.ko="原名(한국어)", name.zhtw="原名(繁中)"
 // Keys = Japanese title (text field). Missing keys keep the ja title in all fields.
 
-import config from "./config.json";
+import fs from "fs";
+
+const PACKAGE_JSON = "package.json";
+const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf-8")) as {
+  kbConfig?: unknown[];
+};
 
 type T = { zh: string; en: string; ko: string; zhtw: string };
 
@@ -452,7 +457,7 @@ const t: Record<string, T> = {
 };
 
 // find the selected_work var
-const vars = (config as any).var as any[];
+const vars = pkg.kbConfig as any[];
 const worksVar = vars.find((v: any) => v.key === "selected_work");
 if (!worksVar) { console.error("selected_work var not found"); process.exit(1); }
 
@@ -472,5 +477,5 @@ for (const opt of worksVar.options) {
   patched++;
 }
 
-await Bun.write("config.json", JSON.stringify(config, null, 2) + "\n");
+fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
 console.log(`Patched ${patched}/${worksVar.options.length} works.`);

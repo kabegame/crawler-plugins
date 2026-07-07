@@ -527,7 +527,7 @@ fn mys_extract_post_id(url) {
 }
 
 // 爬取单个帖子（post_id 已知），进度权重 100.0
-fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limit, fetch_comment_images) {
+fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limit, fetch_comment_images, post_page_url) {
     let url = api_post_full + "?post_id=" + url_encode(post_id);
     let resp = fetch_json(url);
     if resp["retcode"] != 0 {
@@ -622,7 +622,7 @@ fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limi
         let img_url = mys_coerce_str(images[k]);
         if img_url != "" && re_is_match("^https?://", img_url) {
             let name = if K > 1 { subject + "(" + (k + 1).to_string() + ")" } else { subject };
-            download_image(img_url, #{ name: name, metadata_id: post_meta_id });
+            download_image(img_url, #{ name: name, metadata_id: post_meta_id, url: post_page_url });
         } else {
             warn("正文图片 URL 无效，跳过：post_id=" + post_id + " idx=" + k.to_string());
         }
@@ -637,7 +637,7 @@ fn mys_crawl_post(api_post_full, api_replies, api_emoticons, post_id, reply_limi
             ri_idx += 1;
             if rimg_url != "" && re_is_match("^https?://", rimg_url) {
                 let rname = subject + "[评论" + ri_idx.to_string() + "]";
-                download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id });
+                download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id, url: post_page_url });
             } else {
                 warn("评论图片 URL 无效，跳过：post_id=" + post_id + " idx=" + ri_idx.to_string());
             }
@@ -663,7 +663,7 @@ if crawl_mode == "single_post" {
         throw "无法从 URL 中提取帖子 ID，请确认格式为 https://www.miyoushe.com/{游戏}/article/{id}";
     }
     print(`[米游社] 单帖子模式：post_id=${post_id}`);
-    mys_crawl_post(API_POST_FULL, API_REPLIES, API_EMOTICONS, post_id, max_comments, fetch_comment_images);
+    mys_crawl_post(API_POST_FULL, API_REPLIES, API_EMOTICONS, post_id, max_comments, fetch_comment_images, input_url);
     print("[米游社] 任务结束");
     return;
 }
@@ -802,6 +802,7 @@ if crawl_mode == "user_posts" {
 
             if total_imgs > 0 {
                 let img_weight = post_weight / total_imgs.to_float();
+                let post_page_url = current_url();
                 let k = 0;
                 while k < K {
                     let img_url = mys_coerce_str(post_images[k]);
@@ -809,7 +810,7 @@ if crawl_mode == "user_posts" {
                         let name = if K > 1 {
                             subject + "(" + (k + 1).to_string() + ")"
                         } else { subject };
-                        download_image(img_url, #{ name: name, metadata_id: post_meta_id });
+            download_image(img_url, #{ name: name, metadata_id: post_meta_id, url: post_page_url });
                     }
                     add_progress(img_weight);
                     k += 1;
@@ -820,7 +821,7 @@ if crawl_mode == "user_posts" {
                         ri_idx += 1;
                         if rimg_url != "" && re_is_match("^https?://", rimg_url) {
                             let rname = subject + "[评论" + ri_idx.to_string() + "]";
-                            download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id });
+                download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id, url: post_page_url });
                         }
                         add_progress(img_weight);
                     }
@@ -1000,6 +1001,7 @@ while page <= end_page {
             }
 
             // 下载帖子正文图片
+            let post_page_url = current_url();
             let k = 0;
             while k < K {
                 let img_url = mys_coerce_str(post_images[k]);
@@ -1009,7 +1011,7 @@ while page <= end_page {
                     } else {
                         subject
                     };
-                    download_image(img_url, #{ name: name, metadata_id: post_meta_id });
+                    download_image(img_url, #{ name: name, metadata_id: post_meta_id, url: post_page_url });
                 } else {
                     warn("正文图片 URL 无效，跳过：post_id=" + post_id + " idx=" + k.to_string());
                 }
@@ -1024,7 +1026,7 @@ while page <= end_page {
                     ri_idx += 1;
                     if rimg_url != "" && re_is_match("^https?://", rimg_url) {
                         let rname = subject + "[评论" + ri_idx.to_string() + "]";
-                        download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id });
+                        download_image(rimg_url, #{ name: rname, metadata_id: post_meta_id, url: post_page_url });
                     } else {
                         warn("评论图片 URL 无效，跳过：post_id=" + post_id + " idx=" + ri_idx.to_string());
                     }

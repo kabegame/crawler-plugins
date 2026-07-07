@@ -330,7 +330,8 @@ fn process_artworks_edges_for_download(
                     artwork_detail["comments"] = art_comments;
                     let detail_title = if artwork_detail["title"] != () { artwork_detail["title"].to_string() } else { title };
                     let final_download_url = pick_artwork_download_url(download_url, node, artwork_detail, media_api_base);
-                    download_image(final_download_url, #{ name: detail_title, metadata: #{ v2: artwork_detail } });
+                    let pixai_url = "https://pixai.art/artwork/" + art_id_str;
+                    download_image(final_download_url, #{ name: detail_title, metadata: #{ v2: artwork_detail }, url: pixai_url });
                     downloaded += 1;
                     if progress_per > 0.0 {
                         add_progress(progress_per);
@@ -389,7 +390,8 @@ fn process_artworks_edges_for_download(
                                     artwork_detail2["comments"] = art_comments2;
                                     let detail_title2 = if artwork_detail2["title"] != () { artwork_detail2["title"].to_string() } else { title };
                                     let final_download_url = pick_artwork_download_url(image_url.to_string(), node, artwork_detail2, media_api_base);
-                                    download_image(final_download_url, #{ name: detail_title2, metadata: #{ v2: artwork_detail2 } });
+                                    let pixai_url2 = "https://pixai.art/artwork/" + art_id_str2;
+                                    download_image(final_download_url, #{ name: detail_title2, metadata: #{ v2: artwork_detail2 }, url: pixai_url2 });
                                     downloaded += 1;
                                     if progress_per_download > 0.0 {
                                         add_progress(progress_per_download);

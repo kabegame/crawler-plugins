@@ -127,7 +127,8 @@ fn download_illust(illust_id) {
                     } else {
                         base
                     };
-                    download_image(orig, #{ name: disp, metadata_id: meta_id });
+                    let post_url = "https://www.pixiv.net/artworks/" + illust_id;
+                    download_image(orig, #{ name: disp, metadata_id: meta_id, url: post_url });
                 }
             }
             i += 1;

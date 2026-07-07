@@ -1,0 +1,3480 @@
+{
+  "name": "anihonet-wallpaper",
+  "version": "1.6.3",
+  "private": true,
+  "name.zh": "anihonet动漫壁纸",
+  "name.en": "anihonet anime wallpapers",
+  "name.ja": "anihonetアニメ壁紙",
+  "name.ko": "anihonet 애니메이션 벽지",
+  "description": "anihonet动漫壁纸收集源插件",
+  "description.zh": "anihonet动漫壁纸收集源插件",
+  "description.en": "anihonet anime wallpaper crawler plugin",
+  "description.ja": "anihonetアニメ壁紙収集プラグイン",
+  "description.ko": "anihonet 애니메이션 벽지 수집 플러그인",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://anihonetwallpaper.com",
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "取得モード",
+      "name.ko": "수집 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "排行榜：按周期排行页抓取。单个作品：从固定列表选择一部作品抓取。主题模式：在一覧页按标题关键字匹配进入该主题，再抓列表指定页范围",
+      "descripts.en": "Ranking, pick one work from the list, or find one theme by keyword on the index page",
+      "descripts.ja": "ランキング、作品リストから1作品を選択、またはキーワードで作品を検索",
+      "descripts.ko": "랭킹, 목록에서 작품 선택, 또는 키워드로 작품 검색",
+      "descripts.zhtw": "排行榜、從固定清單選取一部作品、或以關鍵字進入主題",
+      "default": "ranking",
+      "options": [
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "ranking"
+        },
+        {
+          "name": "单个作品",
+          "name.en": "Single work",
+          "name.ja": "作品指定",
+          "name.ko": "작품 지정",
+          "name.zhtw": "單個作品",
+          "variable": "single_work"
+        },
+        {
+          "name": "主题模式（一覧检索）",
+          "name.en": "By theme (index search)",
+          "name.ja": "テーマ指定（一覧から検索）",
+          "name.ko": "테마 지정(목록 검색)",
+          "name.zhtw": "主題模式（一覽搜尋）",
+          "variable": "by_theme"
+        }
+      ]
+    },
+    {
+      "key": "ranking_period",
+      "type": "options",
+      "name": "排行榜周期",
+      "name.en": "Ranking period",
+      "name.ja": "ランキング期間",
+      "name.ko": "랭킹 기간",
+      "name.zhtw": "排行榜週期",
+      "descripts": "选择要爬取的排行榜周期：日榜、周榜、月榜或年榜",
+      "descripts.en": "Daily, weekly, monthly or annual ranking",
+      "descripts.ja": "日間・週間・月間・年間ランキング",
+      "descripts.ko": "일간·주간·월간·연간 랭킹",
+      "descripts.zhtw": "選擇要爬取的排行榜週期：日榜、週榜、月榜或年榜",
+      "default": "daily",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "daily"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "weekly"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "monthly"
+        },
+        {
+          "name": "年榜",
+          "name.en": "Annual",
+          "name.ja": "年間",
+          "name.ko": "연간",
+          "name.zhtw": "年榜",
+          "variable": "annual"
+        }
+      ],
+      "min": null,
+      "max": null,
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "selected_work",
+      "type": "options",
+      "name": "作品",
+      "name.en": "Work",
+      "name.ja": "作品",
+      "name.ko": "작품",
+      "name.zhtw": "作品",
+      "descripts": "选择要爬取的动漫/游戏作品（固定列表，对应站点 images/、category/ 或 tag/ 路径）",
+      "descripts.en": "Select the anime/game work to crawl (hardcoded list matching the site's images/, category/, or tag/ paths)",
+      "descripts.ja": "爬取する作品を選択（サイトの images/・category/・tag/ パスに対応する固定リスト）",
+      "descripts.ko": "수집할 애니메이션/게임 작품 선택(사이트 images/·category/·tag/ 경로에 대응하는 고정 목록)",
+      "descripts.zhtw": "選擇要爬取的動漫/遊戲作品（固定清單，對應網站 images/、category/ 或 tag/ 路徑）",
+      "default": "images/%E3%82%A2%E3%82%A4%E3%82%AB%E3%83%84%E5%A3%81%E7%B4%99",
+      "options": [
+        {
+          "name": "アイカツ(偶像活动)",
+          "name.en": "アイカツ(Aikatsu!)",
+          "name.ja": "アイカツ",
+          "name.ko": "アイカツ(아이카츠!)",
+          "name.zhtw": "アイカツ(偶像活動)",
+          "variable": "images/%E3%82%A2%E3%82%A4%E3%82%AB%E3%83%84%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "アイ★チュウ(爱★球)",
+          "name.en": "アイ★チュウ(I★Chu)",
+          "name.ja": "アイ★チュウ",
+          "name.ko": "アイ★チュウ(아이★츄)",
+          "name.zhtw": "アイ★チュウ(愛★球)",
+          "variable": "images/ichu"
+        },
+        {
+          "name": "ID-0(ID-0)",
+          "name.en": "ID-0(ID-0)",
+          "name.ja": "ID-0",
+          "name.ko": "ID-0(ID-0)",
+          "name.zhtw": "ID-0(ID-0)",
+          "variable": "images/id_0%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "IDOLY PRIDE(IDOLY PRIDE)",
+          "name.en": "IDOLY PRIDE(IDOLY PRIDE)",
+          "name.ja": "IDOLY PRIDE",
+          "name.ko": "IDOLY PRIDE(IDOLY PRIDE)",
+          "name.zhtw": "IDOLY PRIDE(IDOLY PRIDE)",
+          "variable": "images/idoly_pride"
+        },
+        {
+          "name": "アイドル事変(偶像事变)",
+          "name.en": "アイドル事変(Idol Jihen)",
+          "name.ja": "アイドル事変",
+          "name.ko": "アイドル事変(아이돌 사변)",
+          "name.zhtw": "アイドル事変(偶像事變)",
+          "variable": "images/%e3%82%a2%e3%82%a4%e3%83%89%e3%83%ab%e4%ba%8b%e5%a4%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アイドルマスター(偶像大师)",
+          "name.en": "アイドルマスター(The Idolmaster)",
+          "name.ja": "アイドルマスター",
+          "name.ko": "アイドルマスター(아이돌 마스터)",
+          "name.zhtw": "アイドルマスター(偶像大師)",
+          "variable": "category/%e3%82%a2%e3%82%a4%e3%83%89%e3%83%ab%e3%83%9e%e3%82%b9%e3%82%bf%e3%83%bc%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アイドルマスターSideM(偶像大师 SideM)",
+          "name.en": "アイドルマスターSideM(THE iDOLM@STER SideM)",
+          "name.ja": "アイドルマスターSideM",
+          "name.ko": "アイドルマスターSideM(아이돌마스터 SideM)",
+          "name.zhtw": "アイドルマスターSideM(偶像大師 SideM)",
+          "variable": "images/m%e3%83%9e%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アイドルマスターシャイニーカラーズ(偶像大师 闪耀色彩)",
+          "name.en": "アイドルマスターシャイニーカラーズ(THE iDOLM@STER Shiny Colors)",
+          "name.ja": "アイドルマスターシャイニーカラーズ",
+          "name.ko": "アイドルマスターシャイニーカラーズ(아이돌마스터 샤이니 컬러즈)",
+          "name.zhtw": "アイドルマスターシャイニーカラーズ(偶像大師 閃耀色彩)",
+          "variable": "images/imas-shinycolors"
+        },
+        {
+          "name": "アイドルマスターシンデレラガールズ(偶像大师 灰姑娘女孩)",
+          "name.en": "アイドルマスターシンデレラガールズ(THE iDOLM@STER: Cinderella Girls)",
+          "name.ja": "アイドルマスターシンデレラガールズ",
+          "name.ko": "アイドルマスターシンデレラガールズ(아이돌마스터 신데렐라 걸즈)",
+          "name.zhtw": "アイドルマスターシンデレラガールズ(偶像大師 灰姑娘女孩)",
+          "variable": "category/%e3%82%a2%e3%82%a4%e3%83%89%e3%83%ab%e3%83%9e%e3%82%b9%e3%82%bf%e3%83%bc%e3%82%b7%e3%83%b3%e3%83%87%e3%83%ac%e3%83%a9%e3%82%ac%e3%83%bc%e3%83%ab%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アイドルマスターシンデレラガールズU149(偶像大师 灰姑娘女孩U149)",
+          "name.en": "アイドルマスターシンデレラガールズU149(THE iDOLM@STER Cinderella Girls U149)",
+          "name.ja": "アイドルマスターシンデレラガールズU149",
+          "name.ko": "アイドルマスターシンデレラガールズU149(아이돌마스터 신데렐라 걸즈 U149)",
+          "name.zhtw": "アイドルマスターシンデレラガールズU149(偶像大師 灰姑娘女孩U149)",
+          "variable": "images/idolmaster-cinderella-u149"
+        },
+        {
+          "name": "アイドルマスターミリオンライブ!(偶像大师 百万人演唱会)",
+          "name.en": "アイドルマスターミリオンライブ!(THE iDOLM@STER: Million Live!)",
+          "name.ja": "アイドルマスターミリオンライブ!",
+          "name.ko": "アイドルマスターミリオンライブ!(아이돌마스터 밀리언 라이브!)",
+          "name.zhtw": "アイドルマスターミリオンライブ!(偶像大師 百萬人演唱會!)",
+          "variable": "category/%e3%82%a2%e3%82%a4%e3%83%89%e3%83%ab%e3%83%9e%e3%82%b9%e3%82%bf%e3%83%bc%e3%83%9f%e3%83%aa%e3%82%aa%e3%83%b3%e3%83%a9%e3%82%a4%e3%83%96%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アイドルメモリーズ(偶像回忆录)",
+          "name.en": "アイドルメモリーズ(Idol Memories)",
+          "name.ja": "アイドルメモリーズ",
+          "name.ko": "アイドルメモリーズ(아이돌 메모리즈)",
+          "name.zhtw": "アイドルメモリーズ(偶像回憶錄)",
+          "variable": "images/%e3%82%a2%e3%82%a4%e3%83%89%e3%83%ab%e3%83%a1%e3%83%a2%e3%83%aa%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "蒼の彼方のフォーリズム(蓝彼方的四重奏)",
+          "name.en": "蒼の彼方のフォーリズム(Aokana: Four Rhythm Across the Blue)",
+          "name.ja": "蒼の彼方のフォーリズム",
+          "name.ko": "蒼の彼方のフォーリズム(창공의 저편 포리즘)",
+          "name.zhtw": "蒼の彼方のフォーリズム(蒼之彼方的四重奏)",
+          "variable": "images/%E8%92%BC%E3%81%AE%E5%BD%BC%E6%96%B9%E3%81%AE%E3%83%95%E3%82%A9%E3%83%BC%E3%83%AA%E3%82%BA%E3%83%A0%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "赤髪の白雪姫(赤发的白雪姬)",
+          "name.en": "赤髪の白雪姫(Snow White with the Red Hair)",
+          "name.ja": "赤髪の白雪姫",
+          "name.ko": "赤髪の白雪姫(빨강머리 백설공주)",
+          "name.zhtw": "赤髪の白雪姫(赤髮白雪姬)",
+          "variable": "category/%e8%b5%a4%e9%ab%aa%e3%81%ae%e7%99%bd%e9%9b%aa%e5%a7%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アクセル・ワールド(加速世界)",
+          "name.en": "アクセル・ワールド(Accel World)",
+          "name.ja": "アクセル・ワールド",
+          "name.ko": "アクセル・ワールド(액셀 월드)",
+          "name.zhtw": "アクセル・ワールド(加速世界)",
+          "variable": "tag/%e3%82%a2%e3%82%af%e3%82%bb%e3%83%ab%e3%83%bb%e3%83%af%e3%83%bc%e3%83%ab%e3%83%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "明日ちゃんのセーラー服(明日酱的水手服)",
+          "name.en": "明日ちゃんのセーラー服(Akebi's Sailor Uniform)",
+          "name.ja": "明日ちゃんのセーラー服",
+          "name.ko": "明日ちゃんのセーラー服(아케비의 세일러복)",
+          "name.zhtw": "明日ちゃんのセーラー服(明日醬的水手服)",
+          "variable": "images/akebi-chan"
+        },
+        {
+          "name": "アズールレーン(碧蓝航线)",
+          "name.en": "アズールレーン(Azur Lane)",
+          "name.ja": "アズールレーン",
+          "name.ko": "アズールレーン(벽람항로)",
+          "name.zhtw": "アズールレーン(碧藍航線)",
+          "variable": "images/%e3%82%a2%e3%82%ba%e3%83%ac%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "あそびあそばせ(玩耍玩耍)",
+          "name.en": "あそびあそばせ(Asobi Asobase)",
+          "name.ja": "あそびあそばせ",
+          "name.ko": "あそびあそばせ(아소비아소바세)",
+          "name.zhtw": "あそびあそばせ(玩耍玩耍)",
+          "variable": "images/%e3%81%82%e3%81%9d%e3%81%b3%e3%81%82%e3%81%9d%e3%81%b0%e3%81%9b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アニマエール！(加油！啦啦队！)",
+          "name.en": "アニマエール！(Anima Yell!)",
+          "name.ja": "アニマエール！",
+          "name.ko": "アニマエール！(애니마엘!)",
+          "name.zhtw": "アニマエール！(加油！啦啦隊！)",
+          "variable": "images/%e3%82%a2%e3%83%8b%e3%83%9e%e3%82%a8%e3%83%bc%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アブソリュート・デュオ(绝对双刃)",
+          "name.en": "アブソリュート・デュオ(Absolute Duo)",
+          "name.ja": "アブソリュート・デュオ",
+          "name.ko": "アブソリュート・デュオ(절대 듀오)",
+          "name.zhtw": "アブソリュート・デュオ(絕對雙刃)",
+          "variable": "images/%E3%82%A2%E3%83%96%E3%82%BD%E3%83%AA%E3%83%A5%E3%83%BC%E3%83%88%E3%83%BB%E3%83%87%E3%83%A5%E3%82%AA%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "甘々と稲妻(甜甜的闪电)",
+          "name.en": "甘々と稲妻(Sweetness & Lightning)",
+          "name.ja": "甘々と稲妻",
+          "name.ko": "甘々と稲妻(달콤달콤 이나즈마)",
+          "name.zhtw": "甘々と稲妻(甜甜的閃電)",
+          "variable": "images/%e7%94%98%e3%80%85%e3%81%a8%e7%a8%b2%e5%a6%bb%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "甘城ブリリアントパーク(甘城光辉乐园)",
+          "name.en": "甘城ブリリアントパーク(Amagi Brilliant Park)",
+          "name.ja": "甘城ブリリアントパーク",
+          "name.ko": "甘城ブリリアントパーク(아마기 브릴리언트 파크)",
+          "name.zhtw": "甘城ブリリアントパーク(甘城光輝樂園)",
+          "variable": "category/%e7%94%98%e5%9f%8e%e3%83%96%e3%83%aa%e3%83%aa%e3%82%a2%e3%83%b3%e3%83%88%e3%83%91%e3%83%bc%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "アリスと蔵六(爱丽丝与藏六)",
+          "name.en": "アリスと蔵六(Alice & Zouroku)",
+          "name.ja": "アリスと蔵六",
+          "name.ko": "アリスと蔵六(앨리스와 조로쿠)",
+          "name.zhtw": "アリスと蔵六(愛麗絲與藏六)",
+          "variable": "images/%e3%82%a2%e3%83%aa%e3%82%b9%e3%81%a8%e8%94%b5%e5%85%ad%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "暗殺教室(暗杀教室)",
+          "name.en": "暗殺教室(Assassination Classroom)",
+          "name.ja": "暗殺教室",
+          "name.ko": "暗殺教室(암살교실)",
+          "name.zhtw": "暗殺教室(暗殺教室)",
+          "variable": "images/%E6%9A%97%E6%AE%BA%E6%95%99%E5%AE%A4%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "アンジュ・ヴィエルジュ(天使圣战)",
+          "name.en": "アンジュ・ヴィエルジュ(Ange Vierge)",
+          "name.ja": "アンジュ・ヴィエルジュ",
+          "name.ko": "アンジュ・ヴィエルジュ(앙쥬 비에르쥬)",
+          "name.zhtw": "アンジュ・ヴィエルジュ(天使聖戰)",
+          "variable": "images/%e3%82%a2%e3%83%b3%e3%82%b8%e3%83%a5%e3%83%bb%e3%83%b4%e3%82%a3%e3%82%a8%e3%83%ab%e3%82%b8%e3%83%a5%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "あんハピ♪(不幸福♪)",
+          "name.en": "あんハピ♪(Anne Happy♪)",
+          "name.ja": "あんハピ♪",
+          "name.ko": "あんハピ♪(안해피♪)",
+          "name.zhtw": "あんハピ♪(不幸福♪)",
+          "variable": "images/%E3%81%82%E3%82%93%E3%83%8F%E3%83%94%E2%99%AA%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "イジらないで、長瀞さん(别捉弄我，长瀞同学！)",
+          "name.en": "イジらないで、長瀞さん(Don't Toy with Me, Miss Nagatoro)",
+          "name.ja": "イジらないで、長瀞さん",
+          "name.ko": "イジらないで、長瀞さん(나를 괴롭히지 마, 나가토로 양)",
+          "name.zhtw": "イジらないで、長瀞さん(別捉弄我，長瀞同學！)",
+          "variable": "images/nagatorosan"
+        },
+        {
+          "name": "異世界おじさん(异世界大叔)",
+          "name.en": "異世界おじさん(Uncle from Another World)",
+          "name.ja": "異世界おじさん",
+          "name.ko": "異世界おじさん(이세계 아저씨)",
+          "name.zhtw": "異世界おじさん(異世界大叔)",
+          "variable": "images/isekaiojisan"
+        },
+        {
+          "name": "異世界かるてっと(异世界四重奏)",
+          "name.en": "異世界かるてっと(Isekai Quartet)",
+          "name.ja": "異世界かるてっと",
+          "name.ko": "異世界かるてっと(이세계 콰르텟)",
+          "name.zhtw": "異世界かるてっと(異世界四重奏)",
+          "variable": "images/%e7%95%b0%e4%b8%96%e7%95%8c%e3%81%8b%e3%82%8b%e3%81%a6%e3%81%a3%e3%81%a8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "異世界食堂(异世界食堂)",
+          "name.en": "異世界食堂(Restaurant to Another World)",
+          "name.ja": "異世界食堂",
+          "name.ko": "異世界食堂(이세계 식당)",
+          "name.zhtw": "異世界食堂(異世界食堂)",
+          "variable": "images/%e7%95%b0%e4%b8%96%e7%95%8c%e9%a3%9f%e5%a0%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "異世界はスマートフォンとともに。(在异世界用智能手机随心所欲)",
+          "name.en": "異世界はスマートフォンとともに。(In Another World with My Smartphone)",
+          "name.ja": "異世界はスマートフォンとともに。",
+          "name.ko": "異世界はスマートフォンとともに。(이세계는 스마트폰과 함께)",
+          "name.zhtw": "異世界はスマートフォンとともに。(在異世界用智慧型手機隨心所欲)",
+          "variable": "images/%e3%81%84%e3%81%9b%e3%82%b9%e3%83%9e%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "異世界魔王と召喚少女の奴隷魔術(异世界魔王与召唤少女的奴隶魔术)",
+          "name.en": "異世界魔王と召喚少女の奴隷魔術(How Not to Summon a Demon Lord)",
+          "name.ja": "異世界魔王と召喚少女の奴隷魔術",
+          "name.ko": "異世界魔王と召喚少女の奴隷魔術(이세계 마왕과 소환소녀의 노예마술)",
+          "name.zhtw": "異世界魔王と召喚少女の奴隷魔術(異世界魔王與召喚少女的奴隸魔術)",
+          "variable": "images/%e7%95%b0%e4%b8%96%e7%95%8c%e9%ad%94%e7%8e%8b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "一週間フレンズ(一周的朋友)",
+          "name.en": "一週間フレンズ(One Week Friends)",
+          "name.ja": "一週間フレンズ",
+          "name.ko": "一週間フレンズ(일주일간 친구)",
+          "name.zhtw": "一週間フレンズ(一週的朋友)",
+          "variable": "category/%e4%b8%80%e9%80%b1%e9%96%93%e3%83%95%e3%83%ac%e3%83%b3%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "異能バトルは日常系のなかで(异能战斗在日常中)",
+          "name.en": "異能バトルは日常系のなかで(When Supernatural Battles Became Commonplace)",
+          "name.ja": "異能バトルは日常系のなかで",
+          "name.ko": "異能バトルは日常系のなかで(일상계 속의 이능배틀)",
+          "name.zhtw": "異能バトルは日常系のなかで(異能戰鬥在日常中)",
+          "variable": "tag/%e7%95%b0%e8%83%bd%e3%83%90%e3%83%88%e3%83%ab%e3%81%af%e6%97%a5%e5%b8%b8%e7%b3%bb%e3%81%ae%e3%81%aa%e3%81%8b%e3%81%a7%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "妹さえいればいい。(只要有妹妹就好了)",
+          "name.en": "妹さえいればいい。(A Sister's All You Need)",
+          "name.ja": "妹さえいればいい。",
+          "name.ko": "妹さえいればいい。(여동생만 있으면 돼.)",
+          "name.zhtw": "妹さえいればいい。(只要有妹妹就好了)",
+          "variable": "images/%e5%a6%b9%e3%81%95%e3%81%88%e3%81%84%e3%82%8c%e3%81%b0%e3%81%84%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "色づく世界の明日から(从充满色彩的世界的明天起)",
+          "name.en": "色づく世界の明日から(iroduku: The World in Colors)",
+          "name.ja": "色づく世界の明日から",
+          "name.ko": "色づく世界の明日から(색채가 없는 다린과 소녀의 팔레트)",
+          "name.zhtw": "色づく世界の明日から(從充滿色彩的世界的明天起)",
+          "variable": "images/%e8%89%b2%e3%81%a5%e3%81%8f%e4%b8%96%e7%95%8c%e3%81%ae%e6%98%8e%e6%97%a5%e3%81%8b%e3%82%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "インフィニット・ストラトス(IS〈Infinite Stratos〉)",
+          "name.en": "インフィニット・ストラトス(Infinite Stratos)",
+          "name.ja": "インフィニット・ストラトス",
+          "name.ko": "インフィニット・ストラトス(인피닛 스트라토스)",
+          "name.zhtw": "インフィニット・ストラトス(IS〈Infinite Stratos〉)",
+          "variable": "tag/%e3%82%a4%e3%83%b3%e3%83%95%e3%82%a3%e3%83%8b%e3%83%83%e3%83%88%e3%83%bb%e3%82%b9%e3%83%88%e3%83%a9%e3%83%88%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ヴァイオレット・エヴァーガーデン(紫罗兰永恒花园)",
+          "name.en": "ヴァイオレット・エヴァーガーデン(Violet Evergarden)",
+          "name.ja": "ヴァイオレット・エヴァーガーデン",
+          "name.ko": "ヴァイオレット・エヴァーガーデン(바이올렛 에버가든)",
+          "name.zhtw": "ヴァイオレット・エヴァーガーデン(紫羅蘭永恆花園)",
+          "variable": "images/%e3%83%b4%e3%82%a1%e3%82%a4%e3%82%aa%e3%83%ac%e3%83%83%e3%83%88%e3%82%a8%e3%83%b4%e3%82%a1%e3%83%bc%e3%82%ac%e3%83%bc%e3%83%87%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ViVid Strike!(ViVid Strike!)",
+          "name.en": "ViVid Strike!(ViVid Strike!)",
+          "name.ja": "ViVid Strike!",
+          "name.ko": "ViVid Strike!(ViVid Strike!)",
+          "name.zhtw": "ViVid Strike!(ViVid Strike!)",
+          "variable": "images/vivid_strike%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "WIXOSS DIVA(A)LIVE(WIXOSS DIVA(A)LIVE)",
+          "name.en": "WIXOSS DIVA(A)LIVE(WIXOSS DIVA(A)LIVE)",
+          "name.ja": "WIXOSS DIVA(A)LIVE",
+          "name.ko": "WIXOSS DIVA(A)LIVE(WIXOSS DIVA(A)LIVE)",
+          "name.zhtw": "WIXOSS DIVA(A)LIVE(WIXOSS DIVA(A)LIVE)",
+          "variable": "images/wixoss-diva"
+        },
+        {
+          "name": "WAVE!!〜サーフィンやっぺ!!〜(WAVE!! 冲浪吧!!)",
+          "name.en": "WAVE!!〜サーフィンやっぺ!!〜(WAVE!! Surfing Yappe!!)",
+          "name.ja": "WAVE!!〜サーフィンやっぺ!!〜",
+          "name.ko": "WAVE!!〜サーフィンやっぺ!!〜(WAVE!! ~서핑 야뻬!!~)",
+          "name.zhtw": "WAVE!!〜サーフィンやっぺ!!〜(WAVE!! 衝浪吧!!)",
+          "variable": "images/wave_surfing_yappe"
+        },
+        {
+          "name": "宇崎ちゃんは遊びたい!(宇崎酱想玩耍！)",
+          "name.en": "宇崎ちゃんは遊びたい!(Uzaki-chan Wants to Hang Out!)",
+          "name.ja": "宇崎ちゃんは遊びたい!",
+          "name.ko": "宇崎ちゃんは遊びたい!(우자키 짱은 놀고 싶어!)",
+          "name.zhtw": "宇崎ちゃんは遊びたい!(宇崎醬想玩耍！)",
+          "variable": "images/%e5%ae%87%e5%b4%8e%e3%81%a1%e3%82%83%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "うたの☆プリンスさまっ♪(歌之王子殿下♪)",
+          "name.en": "うたの☆プリンスさまっ♪(Uta no Prince-sama)",
+          "name.ja": "うたの☆プリンスさまっ♪",
+          "name.ko": "うたの☆プリンスさまっ♪(우타노 프린스사마)",
+          "name.zhtw": "うたの☆プリンスさまっ♪(歌之王子殿下♪)",
+          "variable": "category/%e3%81%86%e3%81%9f%e3%81%ae%e2%98%86%e3%83%97%e3%83%aa%e3%83%b3%e3%82%b9%e3%81%95%e3%81%be%e3%81%a3%e2%99%aa%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "うたわれるもの(传颂之物)",
+          "name.en": "うたわれるもの(Utawarerumono)",
+          "name.ja": "うたわれるもの",
+          "name.ko": "うたわれるもの(우타와레루모노)",
+          "name.zhtw": "うたわれるもの(傳頌之物)",
+          "variable": "category/%e3%81%86%e3%81%9f%e3%82%8f%e3%82%8c%e3%82%8b%e3%82%82%e3%81%ae%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "うちの会社の小さい先輩の話(我的小个子前辈)",
+          "name.en": "うちの会社の小さい先輩の話(My Tiny Senpai)",
+          "name.ja": "うちの会社の小さい先輩の話",
+          "name.ko": "うちの会社の小さい先輩の話(우리 회사의 작은 선배 이야기)",
+          "name.zhtw": "うちの会社の小さい先輩の話(我的小個子前輩)",
+          "variable": "images/chiisaisenpai"
+        },
+        {
+          "name": "うちのメイドがウザすぎる！(我家女仆太烦了！)",
+          "name.en": "うちのメイドがウザすぎる！(Miss Kobayashi's Dragon Maid... (Uzamaid!))",
+          "name.ja": "うちのメイドがウザすぎる！",
+          "name.ko": "うちのメイドがウザすぎる！(우리 집 메이드가 너무 귀찮아!)",
+          "name.zhtw": "うちのメイドがウザすぎる！(我家女僕太煩了！)",
+          "variable": "images/%e3%82%a6%e3%82%b6%e3%83%a1%e3%82%a4%e3%83%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ウマ娘 プリティーダービー(赛马娘 Pretty Derby)",
+          "name.en": "ウマ娘 プリティーダービー(Uma Musume Pretty Derby)",
+          "name.ja": "ウマ娘 プリティーダービー",
+          "name.ko": "ウマ娘 プリティーダービー(우마무스메 프리티 더비)",
+          "name.zhtw": "ウマ娘 プリティーダービー(賽馬娘 Pretty Derby)",
+          "variable": "images/%e3%82%a6%e3%83%9e%e5%a8%98%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "裏世界ピクニック(异世界野餐)",
+          "name.en": "裏世界ピクニック(Otherside Picnic)",
+          "name.ja": "裏世界ピクニック",
+          "name.ko": "裏世界ピクニック(이면세계 피크닉)",
+          "name.zhtw": "裏世界ピクニック(異世界野餐)",
+          "variable": "images/urasekai_picnic"
+        },
+        {
+          "name": "うらら迷路帖(花牌神占师)",
+          "name.en": "うらら迷路帖(Urara Meirocho)",
+          "name.ja": "うらら迷路帖",
+          "name.ko": "うらら迷路帖(우라라 미로첩)",
+          "name.zhtw": "うらら迷路帖(花牌神占師)",
+          "variable": "images/%e3%81%86%e3%82%89%e3%82%89%e8%bf%b7%e8%b7%af%e5%b8%96%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "18TRIP(18TRIP)",
+          "name.en": "18TRIP(18TRIP)",
+          "name.ja": "18TRIP",
+          "name.ko": "18TRIP(18TRIP)",
+          "name.zhtw": "18TRIP(18TRIP)",
+          "variable": "images/18trip"
+        },
+        {
+          "name": "86-エイティシックス-(86-不存在的战区-)",
+          "name.en": "86-エイティシックス-(86 EIGHTY-SIX)",
+          "name.ja": "86-エイティシックス-",
+          "name.ko": "86-エイティシックス-(86―에이티식스―)",
+          "name.zhtw": "86-エイティシックス-(86-不存在的戰區-)",
+          "variable": "images/eightysix"
+        },
+        {
+          "name": "Extreme Hearts(Extreme Hearts)",
+          "name.en": "Extreme Hearts(Extreme Hearts)",
+          "name.ja": "Extreme Hearts",
+          "name.ko": "Extreme Hearts(Extreme Hearts)",
+          "name.zhtw": "Extreme Hearts(Extreme Hearts)",
+          "variable": "images/exhearts"
+        },
+        {
+          "name": "SK∞ エスケーエイト(SK8 the Infinity)",
+          "name.en": "SK∞ エスケーエイト(SK8 the Infinity)",
+          "name.ja": "SK∞ エスケーエイト",
+          "name.ko": "SK∞ エスケーエイト(SK8 the Infinity)",
+          "name.zhtw": "SK∞ エスケーエイト(SK8 the Infinity)",
+          "variable": "images/sk8"
+        },
+        {
+          "name": "えとたま(十二生肖战记)",
+          "name.en": "えとたま(Etotama)",
+          "name.ja": "えとたま",
+          "name.ko": "えとたま(에토타마)",
+          "name.zhtw": "えとたま(十二生肖戰記)",
+          "variable": "tag/%e3%81%88%e3%81%a8%e3%81%9f%e3%81%be%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Eマンガ先生(E漫画老师)",
+          "name.en": "Eマンガ先生(E-Manga Sensei)",
+          "name.ja": "Eマンガ先生",
+          "name.ko": "Eマンガ先生(E망가 선생)",
+          "name.zhtw": "Eマンガ先生(E漫畫老師)",
+          "variable": "images/%e2%96%a1%e2%96%a1%e3%83%9e%e3%83%b3%e3%82%ac%e5%85%88%e7%94%9f%ef%bc%88%e9%9b%bb%e6%92%83%e6%96%87%e5%ba%ab%e3%83%a9%e3%83%8e%e3%83%99%ef%bc%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Angel Beats!(天使的心跳！)",
+          "name.en": "Angel Beats!(Angel Beats!)",
+          "name.ja": "Angel Beats!",
+          "name.ko": "Angel Beats!(엔젤 비츠!)",
+          "name.zhtw": "Angel Beats!(天使的心跳！)",
+          "variable": "images/Angel_Beats%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "えんどろ〜!(Endro~!)",
+          "name.en": "えんどろ〜!(Endro~!)",
+          "name.ja": "えんどろ〜!",
+          "name.ko": "えんどろ〜!(엔드로~!)",
+          "name.zhtw": "えんどろ〜!(Endro~!)",
+          "variable": "images/%e3%81%88%e3%82%93%e3%81%a9%e3%82%8d%e3%80%9c%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Occultic;Nine-オカルティック・ナイン-(神秘九人组)",
+          "name.en": "Occultic;Nine-オカルティック・ナイン-(Occultic;Nine)",
+          "name.ja": "Occultic;Nine-オカルティック・ナイン-",
+          "name.ko": "Occultic;Nine-オカルティック・ナイン-(오컬틱;나인)",
+          "name.zhtw": "Occultic;Nine-オカルティック・ナイン-(神秘九人組)",
+          "variable": "images/%e3%82%aa%e3%82%ab%e3%83%ab%e3%83%86%e3%82%a3%e3%83%83%e3%82%af%e3%83%bb%e3%83%8a%e3%82%a4%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "幼なじみが絶対に負けないラブコメ(青梅竹马绝对不会输的恋爱喜剧)",
+          "name.en": "幼なじみが絶対に負けないラブコメ(Osamake: Romcom Where The Childhood Friend Won't Lose)",
+          "name.ja": "幼なじみが絶対に負けないラブコメ",
+          "name.ko": "幼なじみが絶対に負けないラブコメ(소꿉친구가 절대로 지지 않는 러브코미디)",
+          "name.zhtw": "幼なじみが絶対に負けないラブコメ(青梅竹馬絕對不會輸的戀愛喜劇)",
+          "variable": "images/osamake"
+        },
+        {
+          "name": "推しが武道館いってくれたら死ぬ(如果最爱的偶像去武道馆演出我就去死)",
+          "name.en": "推しが武道館いってくれたら死ぬ(If My Favorite Pop Idol Made It to the Budokan I Would Die)",
+          "name.ja": "推しが武道館いってくれたら死ぬ",
+          "name.ko": "推しが武道館いってくれたら死ぬ(최애가 부도칸에 가준다면 난 죽어도 좋아)",
+          "name.zhtw": "推しが武道館いってくれたら死ぬ(如果最愛的偶像去武道館演出我就去死)",
+          "variable": "images/%e6%8e%a8%e3%81%97%e6%ad%a6%e9%81%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "【推しの子】(【我推的孩子】)",
+          "name.en": "【推しの子】([Oshi No Ko])",
+          "name.ja": "【推しの子】",
+          "name.ko": "【推しの子】(【오시노코】)",
+          "name.zhtw": "【推しの子】(【我推的孩子】)",
+          "variable": "images/oshinoko"
+        },
+        {
+          "name": "おそ松さん(阿松)",
+          "name.en": "おそ松さん(Osomatsu-san)",
+          "name.ja": "おそ松さん",
+          "name.ko": "おそ松さん(오소마츠 씨)",
+          "name.zhtw": "おそ松さん(阿松)",
+          "variable": "images/%E3%81%8A%E3%81%9D%E6%9D%BE%E3%81%95%E3%82%93%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "お隣の天使様にいつの間にか駄目人間にされていた件(邻家天使大人不知不觉间把我惯坏了这件事)",
+          "name.en": "お隣の天使様にいつの間にか駄目人間にされていた件(The Angel Next Door Spoils Me Rotten)",
+          "name.ja": "お隣の天使様にいつの間にか駄目人間にされていた件",
+          "name.ko": "お隣の天使様にいつの間にか駄目人間にされていた件(옆집 천사님이 어느새 나를 망쳐놨어)",
+          "name.zhtw": "お隣の天使様にいつの間にか駄目人間にされていた件(鄰家天使大人不知不覺間把我慣壞了)",
+          "variable": "images/otonari_no_tenshisama"
+        },
+        {
+          "name": "お兄ちゃんはおしまい!(哥哥完了！)",
+          "name.en": "お兄ちゃんはおしまい!(Onimai: I'm Now Your Sister!)",
+          "name.ja": "お兄ちゃんはおしまい!",
+          "name.ko": "お兄ちゃんはおしまい!(오빠는 끝이야!)",
+          "name.zhtw": "お兄ちゃんはおしまい!(哥哥完了！)",
+          "variable": "images/onimai"
+        },
+        {
+          "name": "オルタンシア・サーガ(赫腾西亚传奇)",
+          "name.en": "オルタンシア・サーガ(Hortensia Saga)",
+          "name.ja": "オルタンシア・サーガ",
+          "name.ko": "オルタンシア・サーガ(호르텐시아 사가)",
+          "name.zhtw": "オルタンシア・サーガ(赫腰西亞傳奇)",
+          "variable": "images/hortensia_saga"
+        },
+        {
+          "name": "俺がお嬢様学校に「庶民サンプル」として拉致られた件(庶民样本)",
+          "name.en": "俺がお嬢様学校に「庶民サンプル」として拉致られた件(The 'Ordinary' Us at School)",
+          "name.ja": "俺がお嬢様学校に「庶民サンプル」として拉致られた件",
+          "name.ko": "俺がお嬢様学校に「庶民サンプル」として拉致られた件(나는 아가씨 학교에 '서민 샘플'로 납치됐다)",
+          "name.zhtw": "俺がお嬢様学校に「庶民サンプル」として拉致られた件(庶民樣本)",
+          "variable": "tag/%e5%ba%b6%e6%b0%91%e3%82%b5%e3%83%b3%e3%83%97%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "俺が好きなのは妹だけど妹じゃない(我喜欢的是妹妹但却不是妹妹)",
+          "name.en": "俺が好きなのは妹だけど妹じゃない(My Sister, My Writer)",
+          "name.ja": "俺が好きなのは妹だけど妹じゃない",
+          "name.ko": "俺が好きなのは妹だけど妹じゃない(내가 좋아하는 건 여동생이지만 여동생이 아니야)",
+          "name.zhtw": "俺が好きなのは妹だけど妹じゃない(我喜歡的是妹妹但卻不是妹妹)",
+          "variable": "images/%e3%81%84%e3%82%82%e3%81%84%e3%82%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "俺だけ入れる隠しダンジョン(只有我能进的隐藏地城)",
+          "name.en": "俺だけ入れる隠しダンジョン(The Hidden Dungeon Only I Can Enter)",
+          "name.ja": "俺だけ入れる隠しダンジョン",
+          "name.ko": "俺だけ入れる隠しダンジョン(나만 들어갈 수 있는 숨겨진 던전)",
+          "name.zhtw": "俺だけ入れる隠しダンジョン(只有我能進的隱藏地城)",
+          "variable": "images/kakushidungeon"
+        },
+        {
+          "name": "俺の妹がこんなに可愛いわけがない(我的妹妹哪有这么可爱！)",
+          "name.en": "俺の妹がこんなに可愛いわけがない(Oreimo)",
+          "name.ja": "俺の妹がこんなに可愛いわけがない",
+          "name.ko": "俺の妹がこんなに可愛いわけがない(내 여동생이 이렇게 귀여울 리가 없어)",
+          "name.zhtw": "俺の妹がこんなに可愛いわけがない(我的妹妹哪有這麼可愛！)",
+          "variable": "tag/%e4%bf%ba%e3%81%ae%e5%a6%b9%e3%81%8c%e3%81%93%e3%82%93%e3%81%aa%e3%81%ab%e5%8f%af%e6%84%9b%e3%81%84%e3%82%8f%e3%81%91%e3%81%8c%e3%81%aa%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "orange(orange)",
+          "name.en": "orange(orange)",
+          "name.ja": "orange",
+          "name.ko": "orange(오렌지)",
+          "name.zhtw": "orange(orange)",
+          "variable": "images/orange%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "終わりのセラフ(终结的炽天使)",
+          "name.en": "終わりのセラフ(Seraph of the End)",
+          "name.ja": "終わりのセラフ",
+          "name.ko": "終わりのセラフ(종말의 세라프)",
+          "name.zhtw": "終わりのセラフ(終結的熾天使)",
+          "variable": "images/owarino_seraph"
+        },
+        {
+          "name": "カードキャプターさくら(魔卡少女樱)",
+          "name.en": "カードキャプターさくら(Cardcaptor Sakura)",
+          "name.ja": "カードキャプターさくら",
+          "name.ko": "カードキャプターさくら(카드캡터 사쿠라)",
+          "name.zhtw": "カードキャプターさくら(魔卡少女櫻)",
+          "variable": "images/cc%e3%81%95%e3%81%8f%e3%82%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ガーリッシュナンバー(美少女剧团)",
+          "name.en": "ガーリッシュナンバー(Girlish Number)",
+          "name.ja": "ガーリッシュナンバー",
+          "name.ko": "ガーリッシュナンバー(걸리쉬 넘버)",
+          "name.zhtw": "ガーリッシュナンバー(美少女劇團)",
+          "variable": "images/%E3%82%AC%E3%83%BC%E3%83%AA%E3%83%83%E3%82%B7%E3%83%A5%E3%83%8A%E3%83%B3%E3%83%90%E3%83%BC%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ガールズ&パンツァー(少女与战车)",
+          "name.en": "ガールズ&パンツァー(Girls und Panzer)",
+          "name.ja": "ガールズ&パンツァー",
+          "name.ko": "ガールズ&パンツァー(걸즈 앤 판처)",
+          "name.zhtw": "ガールズ&パンツァー(少女與戰車)",
+          "variable": "category/%e3%82%ac%e3%83%bc%e3%83%ab%e3%82%ba%e3%83%91%e3%83%b3%e3%83%84%e3%82%a1%e3%83%bc%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ガールフレンド(仮)(女友(试用版))",
+          "name.en": "ガールフレンド(仮)(Girl Friend Beta)",
+          "name.ja": "ガールフレンド(仮)",
+          "name.ko": "ガールフレンド(仮)(걸프렌드(가))",
+          "name.zhtw": "ガールフレンド(仮)(女友(試用版))",
+          "variable": "category/%e3%82%ac%e3%83%bc%e3%83%ab%e3%83%95%e3%83%ac%e3%83%b3%e3%83%89%e4%bb%ae%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "怪人開発部の黒井津さん(怪人开发部的黑井津小姐)",
+          "name.en": "怪人開発部の黒井津さん(Miss Kuroitsu from the Monster Development Department)",
+          "name.ja": "怪人開発部の黒井津さん",
+          "name.ko": "怪人開発部の黒井津さん(괴인 개발부의 쿠로이즈 씨)",
+          "name.zhtw": "怪人開発部の黒井津さん(怪人開發部的黑井津小姐)",
+          "variable": "images/kuroitsusan"
+        },
+        {
+          "name": "ガヴリールドロップアウト(加布利尔堕落)",
+          "name.en": "ガヴリールドロップアウト(Gabriel DropOut)",
+          "name.ja": "ガヴリールドロップアウト",
+          "name.ko": "ガヴリールドロップアウト(가브리얼 드롭아웃)",
+          "name.zhtw": "ガヴリールドロップアウト(加布利爾墮落)",
+          "variable": "images/%e3%82%ac%e3%83%b4%e3%83%aa%e3%83%bc%e3%83%ab%e3%83%89%e3%83%ad%e3%83%83%e3%83%97%e3%82%a2%e3%82%a6%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "CHAOS;CHILD(カオスチャイルド)(混沌之子)",
+          "name.en": "CHAOS;CHILD(カオスチャイルド)(CHAOS;CHILD)",
+          "name.ja": "CHAOS;CHILD(カオスチャイルド)",
+          "name.ko": "CHAOS;CHILD(カオスチャイルド)(카오스;차일드)",
+          "name.zhtw": "CHAOS;CHILD(カオスチャイルド)(混沌之子)",
+          "variable": "images/chaos_child-%e3%82%ab%e3%82%aa%e3%82%b9%e3%83%81%e3%83%a3%e3%82%a4%e3%83%ab%e3%83%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "学園アイドルマスター(学园偶像大师)",
+          "name.en": "学園アイドルマスター(Gakuen iDOLM@STER)",
+          "name.ja": "学園アイドルマスター",
+          "name.ko": "学園アイドルマスター(학원 아이돌마스터)",
+          "name.zhtw": "学園アイドルマスター(學園偶像大師)",
+          "variable": "images/gakuen-idolmaster"
+        },
+        {
+          "name": "学戦都市アスタリスク(学战都市星武祭)",
+          "name.en": "学戦都市アスタリスク(The Asterisk War)",
+          "name.ja": "学戦都市アスタリスク",
+          "name.ko": "学戦都市アスタリスク(학전도시 아스테리스크)",
+          "name.zhtw": "学戦都市アスタリスク(學戰都市星武祭)",
+          "variable": "category/%e5%ad%a6%e6%88%a6%e9%83%bd%e5%b8%82%e3%82%a2%e3%82%b9%e3%82%bf%e3%83%aa%e3%82%b9%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "かぐや様は告らせたい(辉夜大小姐想让我告白)",
+          "name.en": "かぐや様は告らせたい(Kaguya-sama: Love Is War)",
+          "name.ja": "かぐや様は告らせたい",
+          "name.ko": "かぐや様は告らせたい(카구야 님은 고백받고 싶어)",
+          "name.zhtw": "かぐや様は告らせたい(輝夜大小姐想讓我告白)",
+          "variable": "images/%e3%81%8b%e3%81%90%e3%82%84%e6%a7%98%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "かげきしょうじょ!!(歌剧少女！！)",
+          "name.en": "かげきしょうじょ!!(Kageki Shojo!!)",
+          "name.ja": "かげきしょうじょ!!",
+          "name.ko": "かげきしょうじょ!!(가게키 소녀!!)",
+          "name.zhtw": "かげきしょうじょ!!(歌劇少女！！)",
+          "variable": "images/kageki_shoujo"
+        },
+        {
+          "name": "賭ケグルイ(狂赌之渊)",
+          "name.en": "賭ケグルイ(Kakegurui)",
+          "name.ja": "賭ケグルイ",
+          "name.ko": "賭ケグルイ(카케구루이)",
+          "name.zhtw": "賭ケグルイ(狂賭之淵)",
+          "variable": "images/%e8%b3%ad%e3%82%b1%e3%82%b0%e3%83%ab%e3%82%a4%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "がっこうぐらし！(校园生活！)",
+          "name.en": "がっこうぐらし！(School-Live!)",
+          "name.ja": "がっこうぐらし！",
+          "name.ko": "がっこうぐらし！(학교생활!)",
+          "name.zhtw": "がっこうぐらし！(校園生活！)",
+          "variable": "category/%e3%81%8c%e3%81%a3%e3%81%93%e3%81%86%e3%81%90%e3%82%89%e3%81%97%ef%bc%81%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "彼女、お借りします(出租女友)",
+          "name.en": "彼女、お借りします(Rent-A-Girlfriend)",
+          "name.ja": "彼女、お借りします",
+          "name.ko": "彼女、お借りします(그녀, 빌려드립니다)",
+          "name.zhtw": "彼女、お借りします(出租女友)",
+          "variable": "images/%e3%81%8b%e3%81%ae%e3%81%8b%e3%82%8a%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "カノジョも彼女(她也是女友)",
+          "name.en": "カノジョも彼女(Girlfriend, Girlfriend)",
+          "name.ja": "カノジョも彼女",
+          "name.ko": "カノジョも彼女(그녀도 여자친구)",
+          "name.zhtw": "カノジョも彼女(她也是女友)",
+          "variable": "images/kanokano"
+        },
+        {
+          "name": "神様になった日(变成神明的那一天)",
+          "name.en": "神様になった日(The Day I Became a God)",
+          "name.ja": "神様になった日",
+          "name.ko": "神様になった日(내가 신이 된 날)",
+          "name.zhtw": "神様になった日(變成神明的那一天)",
+          "variable": "images/%e7%a5%9e%e6%a7%98%e3%81%ab%e3%81%aa%e3%81%a3%e3%81%9f%e6%97%a5%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "からかい上手の高木さん(擅长捉弄人的高木同学)",
+          "name.en": "からかい上手の高木さん(Teasing Master Takagi-san)",
+          "name.ja": "からかい上手の高木さん",
+          "name.ko": "からかい上手の高木さん(놀리기 잘하는 타카기 양)",
+          "name.zhtw": "からかい上手の高木さん(擅長捉弄人的高木同學)",
+          "variable": "images/%e3%81%8b%e3%82%89%e3%81%8b%e3%81%84%e4%b8%8a%e6%89%8b%e3%81%ae%e9%ab%98%e6%9c%a8%e3%81%95%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ガラスの花と壊す世界(玻璃之花与毁灭世界)",
+          "name.en": "ガラスの花と壊す世界(Glasslip...? (wrong) / Harmony)",
+          "name.ja": "ガラスの花と壊す世界",
+          "name.ko": "ガラスの花と壊す世界(유리꽃과 부수는 세계)",
+          "name.zhtw": "ガラスの花と壊す世界(玻璃之花與毀滅世界)",
+          "variable": "images/%E3%82%AC%E3%83%A9%E3%82%B9%E3%81%AE%E8%8A%B1%E3%81%A8%E5%A3%8A%E3%81%99%E4%B8%96%E7%95%8C%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "可愛いだけじゃない式守さん(不仅仅可爱的式守同学)",
+          "name.en": "可愛いだけじゃない式守さん(Shikimori's Not Just a Cutie)",
+          "name.ja": "可愛いだけじゃない式守さん",
+          "name.ko": "可愛いだけじゃない式守さん(귀엽기만 하지 않은 시키모리 양)",
+          "name.zhtw": "可愛いだけじゃない式守さん(不僅僅可愛的式守同學)",
+          "variable": "images/shikimorisan"
+        },
+        {
+          "name": "艦隊これくしょん(舰队Collection)",
+          "name.en": "艦隊これくしょん(Kantai Collection)",
+          "name.ja": "艦隊これくしょん",
+          "name.ko": "艦隊これくしょん(함대 컬렉션)",
+          "name.zhtw": "艦隊これくしょん(艦隊Collection)",
+          "variable": "category/%e8%89%a6%e3%81%93%e3%82%8c%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "機動戦士ガンダム 鉄血のオルフェンズ(机动战士高达 铁血的孤儿)",
+          "name.en": "機動戦士ガンダム 鉄血のオルフェンズ(Mobile Suit Gundam: Iron-Blooded Orphans)",
+          "name.ja": "機動戦士ガンダム 鉄血のオルフェンズ",
+          "name.ko": "機動戦士ガンダム 鉄血のオルフェンズ(기동전사 건담 철혈의 오펀스)",
+          "name.zhtw": "機動戦士ガンダム 鉄血のオルフェンズ(機動戰士鋼彈 鐵血的孤兒)",
+          "variable": "images/%e6%a9%9f%e5%8b%95%e6%88%a6%e5%a3%ab%e3%82%ac%e3%83%b3%e3%83%80%e3%83%a0-%e9%89%84%e8%a1%80%e3%81%ae%e3%82%aa%e3%83%ab%e3%83%95%e3%82%a7%e3%83%b3%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "キノの旅(奇诺之旅)",
+          "name.en": "キノの旅(Kino's Journey)",
+          "name.ja": "キノの旅",
+          "name.ko": "キノの旅(키노의 여행)",
+          "name.zhtw": "キノの旅(奇諾之旅)",
+          "variable": "images/%e3%82%ad%e3%83%8e%e3%81%ae%e6%97%85%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "君の名は。(你的名字。)",
+          "name.en": "君の名は。(Your Name.)",
+          "name.ja": "君の名は。",
+          "name.ko": "君の名は。(너의 이름은.)",
+          "name.zhtw": "君の名は。(你的名字。)",
+          "variable": "images/%e5%90%9b%e3%81%ae%e5%90%8d%e3%81%af%e3%80%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "鬼滅の刃(鬼灭之刃)",
+          "name.en": "鬼滅の刃(Demon Slayer: Kimetsu no Yaiba)",
+          "name.ja": "鬼滅の刃",
+          "name.ko": "鬼滅の刃(귀멸의 칼날)",
+          "name.zhtw": "鬼滅の刃(鬼滅之刃)",
+          "variable": "images/%e9%ac%bc%e6%bb%85%e3%81%ae%e5%88%83%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "逆転世界ノ電池少女(逆转世界的电池少女)",
+          "name.en": "逆転世界ノ電池少女(Battery Girl in the Reverse World)",
+          "name.ja": "逆転世界ノ電池少女",
+          "name.ko": "逆転世界ノ電池少女(역전세계의 전지소녀)",
+          "name.zhtw": "逆転世界ノ電池少女(逆轉世界的電池少女)",
+          "variable": "images/gyakutensekai_no_denchishoujo"
+        },
+        {
+          "name": "CUE!(CUE!)",
+          "name.en": "CUE!(CUE!)",
+          "name.ja": "CUE!",
+          "name.ko": "CUE!(CUE!)",
+          "name.zhtw": "CUE!(CUE!)",
+          "variable": "images/cue"
+        },
+        {
+          "name": "境界の彼方(境界的彼方)",
+          "name.en": "境界の彼方(Beyond the Boundary)",
+          "name.ja": "境界の彼方",
+          "name.ko": "境界の彼方(경계의 저편)",
+          "name.zhtw": "境界の彼方(境界的彼方)",
+          "variable": "category/%e5%a2%83%e7%95%8c%e3%81%ae%e5%bd%bc%e6%96%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ギルティクラウン(罪恶王冠)",
+          "name.en": "ギルティクラウン(Guilty Crown)",
+          "name.ja": "ギルティクラウン",
+          "name.ko": "ギルティクラウン(길티 크라운)",
+          "name.zhtw": "ギルティクラウン(罪惡王冠)",
+          "variable": "images/%e3%82%ae%e3%83%ab%e3%83%86%e3%82%a3%e3%82%af%e3%83%a9%e3%82%a6%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "きんいろモザイク(金色的摩赛克)",
+          "name.en": "きんいろモザイク(Kiniro Mosaic)",
+          "name.ja": "きんいろモザイク",
+          "name.ko": "きんいろモザイク(황금빛 모자이크)",
+          "name.zhtw": "きんいろモザイク(金色的馬賽克)",
+          "variable": "category/%e3%81%8d%e3%82%93%e3%81%84%e3%82%8d%e3%83%a2%e3%82%b6%e3%82%a4%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "銀魂(银魂)",
+          "name.en": "銀魂(Gintama)",
+          "name.ja": "銀魂",
+          "name.ko": "銀魂(은혼)",
+          "name.zhtw": "銀魂(銀魂)",
+          "variable": "images/%e9%8a%80%e9%ad%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "空戦魔導士候補生の教官(空战魔导士候补生的教官)",
+          "name.en": "空戦魔導士候補生の教官(Sky Wizards Academy)",
+          "name.ja": "空戦魔導士候補生の教官",
+          "name.ko": "空戦魔導士候補生の教官(공전마도사 후보생의 교관)",
+          "name.zhtw": "空戦魔導士候補生の教官(空戰魔導士候補生的教官)",
+          "variable": "images/%E7%A9%BA%E6%88%A6%E9%AD%94%E5%B0%8E%E5%A3%AB%E5%80%99%E8%A3%9C%E7%94%9F%E3%81%AE%E6%95%99%E5%AE%98%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "クズの本懐(废柴的心声)",
+          "name.en": "クズの本懐(Scum's Wish)",
+          "name.ja": "クズの本懐",
+          "name.ko": "クズの本懐(찌질이의 욕망)",
+          "name.zhtw": "クズの本懐(廢柴的心聲)",
+          "variable": "images/%e3%82%af%e3%82%ba%e3%81%ae%e6%9c%ac%e6%87%90%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "久保さんは僕を許さない(久保同学不放过我)",
+          "name.en": "久保さんは僕を許さない(Kubo Won't Let Me Be Invisible)",
+          "name.ja": "久保さんは僕を許さない",
+          "name.ko": "久保さんは僕を許さない(구보 양은 나를 내버려두지 않아)",
+          "name.zhtw": "久保さんは僕を許さない(久保同學不放過我)",
+          "variable": "images/kubosan"
+        },
+        {
+          "name": "くまみこ(小熊巫女)",
+          "name.en": "くまみこ(Kuma Miko)",
+          "name.ja": "くまみこ",
+          "name.ko": "くまみこ(쿠마미코)",
+          "name.zhtw": "くまみこ(小熊巫女)",
+          "variable": "images/%E3%81%8F%E3%81%BE%E3%81%BF%E3%81%93%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "蜘蛛ですが、なにか?(转生成蜘蛛又怎样！)",
+          "name.en": "蜘蛛ですが、なにか?(So I'm a Spider, So What?)",
+          "name.ja": "蜘蛛ですが、なにか?",
+          "name.ko": "蜘蛛ですが、なにか?(거미입니다만, 뭐가 문제인가요?)",
+          "name.zhtw": "蜘蛛ですが、なにか?(轉生成蜘蛛又怎樣！)",
+          "variable": "images/kumodesuga_nanika"
+        },
+        {
+          "name": "Classroom☆Crisis(Classroom☆Crisis)",
+          "name.en": "Classroom☆Crisis(Classroom☆Crisis)",
+          "name.ja": "Classroom☆Crisis",
+          "name.ko": "Classroom☆Crisis(클래스룸☆크라이시스)",
+          "name.zhtw": "Classroom☆Crisis(Classroom☆Crisis)",
+          "variable": "images/classroom%E2%98%86crisis%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "グラスリップ(玻璃唇)",
+          "name.en": "グラスリップ(Glasslip)",
+          "name.ja": "グラスリップ",
+          "name.ko": "グラスリップ(글라스립)",
+          "name.zhtw": "グラスリップ(玻璃唇)",
+          "variable": "tag/%e3%82%b0%e3%83%a9%e3%82%b9%e3%83%aa%e3%83%83%e3%83%97%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "CLANNAD(CLANNAD)",
+          "name.en": "CLANNAD(CLANNAD)",
+          "name.ja": "CLANNAD",
+          "name.ko": "CLANNAD(클라나드)",
+          "name.zhtw": "CLANNAD(CLANNAD)",
+          "variable": "category/clannad%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "グランクレスト戦記(圣印战记)",
+          "name.en": "グランクレスト戦記(Record of Grancrest War)",
+          "name.ja": "グランクレスト戦記",
+          "name.ko": "グランクレスト戦記(그랑크레스트 전기)",
+          "name.zhtw": "グランクレスト戦記(聖印戰記)",
+          "variable": "images/%e3%82%b0%e3%83%a9%e3%83%b3%e3%82%af%e3%83%ac%e3%82%b9%e3%83%88%e6%88%a6%e8%a8%98%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "グランブルーファンタジー(碧蓝幻想)",
+          "name.en": "グランブルーファンタジー(Granblue Fantasy The Animation)",
+          "name.ja": "グランブルーファンタジー",
+          "name.ko": "グランブルーファンタジー(그란블루 판타지)",
+          "name.zhtw": "グランブルーファンタジー(碧藍幻想)",
+          "variable": "images/%e3%82%b0%e3%83%a9%e3%83%96%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "グリザイアの果実(灰色的果实)",
+          "name.en": "グリザイアの果実(The Fruit of Grisaia)",
+          "name.ja": "グリザイアの果実",
+          "name.ko": "グリザイアの果実(그리자이아의 열매)",
+          "name.zhtw": "グリザイアの果実(灰色的果實)",
+          "variable": "category/%e3%82%b0%e3%83%aa%e3%82%b6%e3%82%a4%e3%82%a2%e3%81%ae%e6%9e%9c%e5%ae%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "SSSS.GRIDMAN(SSSS.GRIDMAN)",
+          "name.en": "SSSS.GRIDMAN(SSSS.GRIDMAN)",
+          "name.ja": "SSSS.GRIDMAN",
+          "name.ko": "SSSS.GRIDMAN(SSSS.그리드맨)",
+          "name.zhtw": "SSSS.GRIDMAN(SSSS.GRIDMAN)",
+          "variable": "images/ssss_gridman%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "黒子のバスケ(黑子的篮球)",
+          "name.en": "黒子のバスケ(Kuroko's Basketball)",
+          "name.ja": "黒子のバスケ",
+          "name.ko": "黒子のバスケ(쿠로코의 농구)",
+          "name.zhtw": "黒子のバスケ(黑子的籃球)",
+          "variable": "category/%e9%bb%92%e5%ad%90%e3%81%ae%e3%83%90%e3%82%b9%e3%82%b1%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "クロックワーク・プラネット(发条星球)",
+          "name.en": "クロックワーク・プラネット(Clockwork Planet)",
+          "name.ja": "クロックワーク・プラネット",
+          "name.ko": "クロックワーク・プラネット(클럭워크 플래닛)",
+          "name.zhtw": "クロックワーク・プラネット(發條星球)",
+          "variable": "images/%e3%82%af%e3%83%ad%e3%83%97%e3%83%a9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "クロムクロ(铬姬物语)",
+          "name.en": "クロムクロ(Kuromukuro)",
+          "name.ja": "クロムクロ",
+          "name.ko": "クロムクロ(크로무쿠로)",
+          "name.zhtw": "クロムクロ(鉻姬物語)",
+          "variable": "images/%E3%82%AF%E3%83%AD%E3%83%A0%E3%82%AF%E3%83%AD%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "けいおん!(轻音少女)",
+          "name.en": "けいおん!(K-On!)",
+          "name.ja": "けいおん!",
+          "name.ko": "けいおん!(케이온!)",
+          "name.zhtw": "けいおん!(輕音少女)",
+          "variable": "images/%E3%81%91%E3%81%84%E3%81%8A%E3%82%93%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "GATE 自衛隊 彼の地にて、斯く戦えり(GATE 奇幻自卫队)",
+          "name.en": "GATE 自衛隊 彼の地にて、斯く戦えり(GATE: The JSDF Fought There!)",
+          "name.ja": "GATE 自衛隊 彼の地にて、斯く戦えり",
+          "name.ko": "GATE 自衛隊 彼の地にて、斯く戦えり(GATE 자위대 그 곳에서 이렇게 싸웠다)",
+          "name.zhtw": "GATE 自衛隊 彼の地にて、斯く戦えり(GATE 奇幻自衛隊)",
+          "variable": "images/gate_%E8%87%AA%E8%A1%9B%E9%9A%8A_%E5%BD%BC%E3%81%AE%E5%9C%B0%E3%81%AB%E3%81%A6%E3%80%81%E6%96%AF%E3%81%8F%E6%88%A6%E3%81%88%E3%82%8A%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ゲーマーズ！(游戏人！)",
+          "name.en": "ゲーマーズ！(Gamers!)",
+          "name.ja": "ゲーマーズ！",
+          "name.ko": "ゲーマーズ！(게이머즈!)",
+          "name.zhtw": "ゲーマーズ！(遊戲人！)",
+          "variable": "images/%e3%82%b2%e3%83%bc%e3%83%9e%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゲキドル(极偶！)",
+          "name.en": "ゲキドル(Gekidol)",
+          "name.ja": "ゲキドル",
+          "name.ko": "ゲキドル(게키돌)",
+          "name.zhtw": "ゲキドル(極偶！)",
+          "variable": "images/gekidol"
+        },
+        {
+          "name": "月刊少女野崎くん(月刊少女野崎同学)",
+          "name.en": "月刊少女野崎くん(Monthly Girls' Nozaki-kun)",
+          "name.ja": "月刊少女野崎くん",
+          "name.ko": "月刊少女野崎くん(월간 소녀 노자키 군)",
+          "name.zhtw": "月刊少女野崎くん(月刊少女野崎同學)",
+          "variable": "images/%e6%9c%88%e5%88%8a%e5%b0%91%e5%a5%b3%e9%87%8e%e5%b4%8e%e3%81%8f%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "月曜日のたわわ(星期一的丰满)",
+          "name.en": "月曜日のたわわ(Tawawa on Monday)",
+          "name.ja": "月曜日のたわわ",
+          "name.ko": "月曜日のたわわ(월요일의 타와와)",
+          "name.zhtw": "月曜日のたわわ(星期一的豐滿)",
+          "variable": "images/%e6%9c%88%e6%9b%9c%e6%97%a5%e3%81%ae%e3%81%9f%e3%82%8f%e3%82%8f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "けものフレンズ(动物朋友)",
+          "name.en": "けものフレンズ(Kemono Friends)",
+          "name.ja": "けものフレンズ",
+          "name.ko": "けものフレンズ(케모노 프렌즈)",
+          "name.zhtw": "けものフレンズ(動物朋友)",
+          "variable": "images/%e3%81%91%e3%82%82%e3%81%ae%e3%83%95%e3%83%ac%e3%83%b3%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "現実主義勇者の王国再建記(现实主义勇者的王国再建记)",
+          "name.en": "現実主義勇者の王国再建記(How a Realist Hero Rebuilt the Kingdom)",
+          "name.ja": "現実主義勇者の王国再建記",
+          "name.ko": "現実主義勇者の王国再建記(현실주의 용사의 왕국 재건기)",
+          "name.zhtw": "現実主義勇者の王国再建記(現實主義勇者的王國再建記)",
+          "variable": "images/genkoku"
+        },
+        {
+          "name": "賢者の孫(贤者之孙)",
+          "name.en": "賢者の孫(Wise Man's Grandchild)",
+          "name.ja": "賢者の孫",
+          "name.ko": "賢者の孫(현자의 손자)",
+          "name.zhtw": "賢者の孫(賢者之孫)",
+          "variable": "images/%e8%b3%a2%e8%80%85%e3%81%ae%e5%ad%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "恋×シンアイ彼女(恋×心爱彼女)",
+          "name.en": "恋×シンアイ彼女(Koi x Shinai Kanojo)",
+          "name.ja": "恋×シンアイ彼女",
+          "name.ko": "恋×シンアイ彼女(연×심애 그녀)",
+          "name.zhtw": "恋×シンアイ彼女(戀×心愛彼女)",
+          "variable": "images/%e6%81%8bx%e3%82%b7%e3%83%b3%e3%82%a2%e3%82%a4%e5%bd%bc%e5%a5%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "紅殻のパンドラ(红壳潘多拉)",
+          "name.en": "紅殻のパンドラ(Pandora in the Crimson Shell: Ghost Urn)",
+          "name.ja": "紅殻のパンドラ",
+          "name.ko": "紅殻のパンドラ(홍갑의 판도라)",
+          "name.zhtw": "紅殻のパンドラ(紅殼潘多拉)",
+          "variable": "images/%E7%B4%85%E6%AE%BB%E3%81%AE%E3%83%91%E3%83%B3%E3%83%89%E3%83%A9%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "甲鉄城のカバネリ(甲铁城的卡巴内里)",
+          "name.en": "甲鉄城のカバネリ(Kabaneri of the Iron Fortress)",
+          "name.ja": "甲鉄城のカバネリ",
+          "name.ko": "甲鉄城のカバネリ(갑철성의 카바네리)",
+          "name.zhtw": "甲鉄城のカバネリ(甲鐵城的卡巴內里)",
+          "variable": "images/%E7%94%B2%E9%89%84%E5%9F%8E%E3%81%AE%E3%82%AB%E3%83%90%E3%83%8D%E3%83%AA%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "幸腹グラフィティ(腹式美食画报)",
+          "name.en": "幸腹グラフィティ(Koufuku Graffiti)",
+          "name.ja": "幸腹グラフィティ",
+          "name.ko": "幸腹グラフィティ(코후쿠 그라피티)",
+          "name.zhtw": "幸腹グラフィティ(腹式美食畫報)",
+          "variable": "tag/%e5%b9%b8%e8%85%b9%e3%82%b0%e3%83%a9%e3%83%95%e3%82%a3%e3%83%86%e3%82%a3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "聲の形(こえのかたち)(声之形)",
+          "name.en": "聲の形(こえのかたち)(A Silent Voice)",
+          "name.ja": "聲の形(こえのかたち)",
+          "name.ko": "聲の形(こえのかたち)(목소리의 형태)",
+          "name.zhtw": "聲の形(こえのかたち)(聲之形)",
+          "variable": "images/%e8%81%b2%e3%81%ae%e5%bd%a2%ef%bc%88%e3%81%93%e3%81%88%e3%81%ae%e3%81%8b%e3%81%9f%e3%81%a1%ef%bc%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "コードギアス(反叛的鲁路修)",
+          "name.en": "コードギアス(Code Geass)",
+          "name.ja": "コードギアス",
+          "name.ko": "コードギアス(코드 기어스)",
+          "name.zhtw": "コードギアス(反叛的魯魯修)",
+          "variable": "images/%E3%82%B3%E3%83%BC%E3%83%89%E3%82%AE%E3%82%A2%E3%82%B9%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ご注文はうさぎですか(请问您今天要来点兔子吗？)",
+          "name.en": "ご注文はうさぎですか(Is the Order a Rabbit?)",
+          "name.ja": "ご注文はうさぎですか",
+          "name.ko": "ご注文はうさぎですか(주문은 토끼입니까?)",
+          "name.zhtw": "ご注文はうさぎですか(請問您今天要來點兔子嗎？)",
+          "variable": "category/%e3%81%94%e6%b3%a8%e6%96%87%e3%81%af%e3%81%86%e3%81%95%e3%81%8e%e3%81%a7%e3%81%99%e3%81%8b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゴッドイーター(噬神者)",
+          "name.en": "ゴッドイーター(God Eater)",
+          "name.ja": "ゴッドイーター",
+          "name.ko": "ゴッドイーター(갓 이터)",
+          "name.zhtw": "ゴッドイーター(噬神者)",
+          "variable": "images/%E3%82%B4%E3%83%83%E3%83%89%E3%82%A4%E3%83%BC%E3%82%BF%E3%83%BC%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "五等分の花嫁(五等分的花嫁)",
+          "name.en": "五等分の花嫁(The Quintessential Quintuplets)",
+          "name.ja": "五等分の花嫁",
+          "name.ko": "五等分の花嫁(5등분의 신부)",
+          "name.zhtw": "五等分の花嫁(五等分的花嫁)",
+          "variable": "images/5%e7%ad%89%e5%88%86%e3%81%ae%e8%8a%b1%e5%ab%81%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "このはな綺譚(木花绮谭)",
+          "name.en": "このはな綺譚(Konohana Kitan)",
+          "name.ja": "このはな綺譚",
+          "name.ko": "このはな綺譚(코노하나 키탄)",
+          "name.zhtw": "このはな綺譚(木花綺譚)",
+          "variable": "images/%e3%81%93%e3%81%ae%e3%81%af%e3%81%aa%e7%b6%ba%e8%ad%9a%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "この素晴らしい世界に祝福を！(为美好的世界献上祝福！)",
+          "name.en": "この素晴らしい世界に祝福を！(KonoSuba)",
+          "name.ja": "この素晴らしい世界に祝福を！",
+          "name.ko": "この素晴らしい世界に祝福を！(이 멋진 세계에 축복을!)",
+          "name.zhtw": "この素晴らしい世界に祝福を！(為美好的世界獻上祝福！)",
+          "variable": "images/konosuba"
+        },
+        {
+          "name": "この美術部には問題がある！(这个美术社大有问题！)",
+          "name.en": "この美術部には問題がある！(This Art Club Has a Problem!)",
+          "name.ja": "この美術部には問題がある！",
+          "name.ko": "この美術部には問題がある！(이 미술부에는 문제가 있다!)",
+          "name.zhtw": "この美術部には問題がある！(這個美術社大有問題！)",
+          "variable": "images/%e3%81%93%e3%81%ae%e7%be%8e%e8%a1%93%e9%83%a8%e3%81%ab%e3%81%af%e5%95%8f%e9%a1%8c%e3%81%8c%e3%81%82%e3%82%8b%ef%bc%81%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "小林さんちのメイドラゴン(小林家的龙女仆)",
+          "name.en": "小林さんちのメイドラゴン(Miss Kobayashi's Dragon Maid)",
+          "name.ja": "小林さんちのメイドラゴン",
+          "name.ko": "小林さんちのメイドラゴン(고바야시 씨네 메이드래곤)",
+          "name.zhtw": "小林さんちのメイドラゴン(小林家的龍女僕)",
+          "variable": "images/%e5%b0%8f%e6%9e%97%e3%81%95%e3%82%93%e3%81%a1%e3%81%ae%e3%83%a1%e3%82%a4%e3%83%89%e3%83%a9%e3%82%b4%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゴブリンスレイヤー(哥布林杀手)",
+          "name.en": "ゴブリンスレイヤー(Goblin Slayer)",
+          "name.ja": "ゴブリンスレイヤー",
+          "name.ko": "ゴブリンスレイヤー(고블린 슬레이어)",
+          "name.zhtw": "ゴブリンスレイヤー(哥布林殺手)",
+          "variable": "images/%e3%82%b4%e3%83%96%e3%82%b9%e3%83%ac%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "古見さんは、コミュ症です。(古见同学有交流障碍症。)",
+          "name.en": "古見さんは、コミュ症です。(Komi Can't Communicate)",
+          "name.ja": "古見さんは、コミュ症です。",
+          "name.ko": "古見さんは、コミュ症です。(고미 씨는 커뮤증입니다.)",
+          "name.zhtw": "古見さんは、コミュ症です。(古見同學有溝通障礙症。)",
+          "variable": "images/komisan"
+        },
+        {
+          "name": "こみっくがーるず(漫画女孩)",
+          "name.en": "こみっくがーるず(Comic Girls)",
+          "name.ja": "こみっくがーるず",
+          "name.ko": "こみっくがーるず(코믹 걸즈)",
+          "name.zhtw": "こみっくがーるず(漫畫女孩)",
+          "variable": "images/%e3%81%93%e3%81%bf%e3%81%a3%e3%81%8f%e3%81%8c%e3%83%bc%e3%82%8b%e3%81%9a%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "これはゾンビですか(这是僵尸吗？)",
+          "name.en": "これはゾンビですか(Is This a Zombie?)",
+          "name.ja": "これはゾンビですか",
+          "name.ko": "これはゾンビですか(이것은 좀비입니까?)",
+          "name.zhtw": "これはゾンビですか(這是殭屍嗎？)",
+          "variable": "images/%E3%81%93%E3%82%8C%E3%81%AF%E3%82%BE%E3%83%B3%E3%83%93%E3%81%A7%E3%81%99%E3%81%8B%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "CONCEPTION(CONCEPTION)",
+          "name.en": "CONCEPTION(CONCEPTION)",
+          "name.ja": "CONCEPTION",
+          "name.ko": "CONCEPTION(CONCEPTION)",
+          "name.zhtw": "CONCEPTION(CONCEPTION)",
+          "variable": "images/conception%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "最弱無敗の神装機竜(バハムート)(最弱无败的神装机龙)",
+          "name.en": "最弱無敗の神装機竜(バハムート)(Undefeated Bahamut Chronicle)",
+          "name.ja": "最弱無敗の神装機竜(バハムート)",
+          "name.ko": "最弱無敗の神装機竜(バハムート)(최약무패의 신장기룡)",
+          "name.zhtw": "最弱無敗の神装機竜(バハムート)(最弱無敗的神裝機龍)",
+          "variable": "images/%E6%9C%80%E5%BC%B1%E7%84%A1%E6%95%97%E3%81%AE%E7%A5%9E%E8%A3%85%E6%A9%9F%E7%AB%9C%E3%83%90%E3%83%8F%E3%83%A0%E3%83%BC%E3%83%88%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "冴えない彼女の育てかた(不起眼女主角培育法)",
+          "name.en": "冴えない彼女の育てかた(Saekano: How to Raise a Boring Girlfriend)",
+          "name.ja": "冴えない彼女の育てかた",
+          "name.ko": "冴えない彼女の育てかた(시원찮은 그녀를 위한 육성방법)",
+          "name.zhtw": "冴えない彼女の育てかた(不起眼女主角培育法)",
+          "variable": "category/%e5%86%b4%e3%81%88%e3%81%aa%e3%81%84%e5%bd%bc%e5%a5%b3%e3%81%ae%e8%82%b2%e3%81%a6%e3%81%8b%e3%81%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "サクラクエスト(樱花任务)",
+          "name.en": "サクラクエスト(Sakura Quest)",
+          "name.ja": "サクラクエスト",
+          "name.ko": "サクラクエスト(사쿠라 퀘스트)",
+          "name.zhtw": "サクラクエスト(櫻花任務)",
+          "variable": "images/%e3%82%b5%e3%82%af%e3%83%a9%e3%82%af%e3%82%a8%e3%82%b9%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "櫻子さんの足下には(樱子小姐的脚下埋着尸体)",
+          "name.en": "櫻子さんの足下には(Beautiful Bones: Sakurako’s Investigation)",
+          "name.ja": "櫻子さんの足下には",
+          "name.ko": "櫻子さんの足下には(사쿠라코 씨의 발밑에는 시체가 묻혀 있다)",
+          "name.zhtw": "櫻子さんの足下には(櫻子小姐的腳下埋著屍體)",
+          "variable": "tag/%e6%ab%bb%e5%ad%90%e3%81%95%e3%82%93%e3%81%ae%e8%b6%b3%e4%b8%8b%e3%81%ab%e3%81%af-%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "さくら荘のペットな彼女(樱花庄的宠物女孩)",
+          "name.en": "さくら荘のペットな彼女(Sakurasou no Pet na Kanojo)",
+          "name.ja": "さくら荘のペットな彼女",
+          "name.ko": "さくら荘のペットな彼女(벚꽃기숙사의 애완 그녀)",
+          "name.zhtw": "さくら荘のペットな彼女(櫻花庄的寵物女孩)",
+          "variable": "category/%e3%81%95%e3%81%8f%e3%82%89%e8%8d%98%e3%81%ae%e3%83%9a%e3%83%83%e3%83%88%e3%81%aa%e5%bd%bc%e5%a5%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "サクラダリセット(樱花庄的宠物女孩…(错)/ Sakurada Reset)",
+          "name.en": "サクラダリセット(Sagrada Reset)",
+          "name.ja": "サクラダリセット",
+          "name.ko": "サクラダリセット(사쿠라다 리셋)",
+          "name.zhtw": "サクラダリセット(Sagrada Reset)",
+          "variable": "images/%e3%82%b5%e3%82%af%e3%83%a9%e3%83%80%e3%83%aa%e3%82%bb%e3%83%83%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "桜Trick(樱花技法)",
+          "name.en": "桜Trick(Sakura Trick)",
+          "name.ja": "桜Trick",
+          "name.ko": "桜Trick(사쿠라 트릭)",
+          "name.zhtw": "桜Trick(櫻花技法)",
+          "variable": "images/%E6%A1%9Ctrick%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "3月のライオン(3月的狮子)",
+          "name.en": "3月のライオン(March Comes in Like a Lion)",
+          "name.ja": "3月のライオン",
+          "name.ko": "3月のライオン(3월의 라이온)",
+          "name.zhtw": "3月のライオン(3月的獅子)",
+          "variable": "images/3%e6%9c%88%e3%81%ae%e3%83%a9%e3%82%a4%e3%82%aa%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "三者三葉(三者三叶)",
+          "name.en": "三者三葉(Sansha Sanyou)",
+          "name.ja": "三者三葉",
+          "name.ko": "三者三葉(세 사람 세 잎)",
+          "name.zhtw": "三者三葉(三者三葉)",
+          "variable": "images/%E4%B8%89%E8%80%85%E4%B8%89%E8%91%89%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "しかのこのこのここしたんたん(鹿乃子の子鹿的咚咚咚)",
+          "name.en": "しかのこのこのここしたんたん(Shikanoko Nokonoko Koshitantan)",
+          "name.ja": "しかのこのこのここしたんたん",
+          "name.ko": "しかのこのこのここしたんたん(시카노코 노코노코 코시탄탄)",
+          "name.zhtw": "しかのこのこのここしたんたん(鹿乃子の子鹿的咚咚咚)",
+          "variable": "images/shikanoko"
+        },
+        {
+          "name": "実は俺、最強でした?(其实我是最强的？)",
+          "name.en": "実は俺、最強でした?(Am I Actually the Strongest?)",
+          "name.ja": "実は俺、最強でした?",
+          "name.ko": "実は俺、最強でした?(사실 나, 최강이었어?)",
+          "name.zhtw": "実は俺、最強でした?(其實我是最強的？)",
+          "variable": "images/jitsuhaoresaikyo"
+        },
+        {
+          "name": "自動販売機に生まれ変わった俺は迷宮を彷徨う(重生成自动售货机的我在迷宫中彷徨)",
+          "name.en": "自動販売機に生まれ変わった俺は迷宮を彷徨う(Reborn as a Vending Machine, I Now Wander the Dungeon)",
+          "name.ja": "自動販売機に生まれ変わった俺は迷宮を彷徨う",
+          "name.ko": "自動販売機に生まれ変わった俺は迷宮を彷徨う(자동판매기로 태어난 나는 미궁을 방황한다)",
+          "name.zhtw": "自動販売機に生まれ変わった俺は迷宮を彷徨う(重生成自動販賣機的我在迷宮中彷徨)",
+          "variable": "images/jidouhanbaikiniumarekawattaore"
+        },
+        {
+          "name": "Charlotte(シャーロット)(夏洛特)",
+          "name.en": "Charlotte(シャーロット)(Charlotte)",
+          "name.ja": "Charlotte(シャーロット)",
+          "name.ko": "Charlotte(シャーロット)(샬럿)",
+          "name.zhtw": "Charlotte(シャーロット)(夏洛特)",
+          "variable": "category/charlotte%e3%82%b7%e3%83%a3%e3%83%bc%e3%83%ad%e3%83%83%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "シャインポスト(闪耀吧！偶像)",
+          "name.en": "シャインポスト(Shine Post)",
+          "name.ja": "シャインポスト",
+          "name.ko": "シャインポスト(샤인 포스트)",
+          "name.zhtw": "シャインポスト(閃耀吧！偶像)",
+          "variable": "images/shinepost"
+        },
+        {
+          "name": "弱キャラ友崎くん(弱角友崎同学)",
+          "name.en": "弱キャラ友崎くん(Bottom-Tier Character Tomozaki)",
+          "name.ja": "弱キャラ友崎くん",
+          "name.ko": "弱キャラ友崎くん(하위 캐릭터 토모자키 군)",
+          "name.zhtw": "弱キャラ友崎くん(弱角友崎同學)",
+          "variable": "images/jakuchara_tomozaki-kun"
+        },
+        {
+          "name": "灼熱の卓球娘(灼热的乒乓球少女)",
+          "name.en": "灼熱の卓球娘(Scorching Ping Pong Girls)",
+          "name.ja": "灼熱の卓球娘",
+          "name.ko": "灼熱の卓球娘(작열의 탁구 소녀)",
+          "name.zhtw": "灼熱の卓球娘(灼熱的乒乓球少女)",
+          "variable": "images/%e7%81%bc%e7%86%b1%e3%81%ae%e5%8d%93%e7%90%83%e5%a8%98%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Just Because!(Just Because!)",
+          "name.en": "Just Because!(Just Because!)",
+          "name.ja": "Just Because!",
+          "name.ko": "Just Because!(Just Because!)",
+          "name.zhtw": "Just Because!(Just Because!)",
+          "variable": "images/justbecause%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "終末なにしてますか？忙しいですか？救ってもらっていいですか？(末日时在做什么？有没有空？可以来拯救吗？)",
+          "name.en": "終末なにしてますか？忙しいですか？救ってもらっていいですか？(WorldEnd: What Do You Do at the End of the World?)",
+          "name.ja": "終末なにしてますか？忙しいですか？救ってもらっていいですか？",
+          "name.ko": "終末なにしてますか？忙しいですか？救ってもらっていいですか？(종말 뭐하세요? 바쁘세요? 구해줘도 될까요?)",
+          "name.zhtw": "終末なにしてますか？忙しいですか？救ってもらっていいですか？(末日時在做什麼？有沒有空？可以來拯救嗎？)",
+          "variable": "images/%e3%81%99%e3%81%8b%e3%81%99%e3%81%8b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "呪術廻戦(咒术回战)",
+          "name.en": "呪術廻戦(Jujutsu Kaisen)",
+          "name.ja": "呪術廻戦",
+          "name.ko": "呪術廻戦(주술회전)",
+          "name.zhtw": "呪術廻戦(咒術迴戰)",
+          "variable": "images/jujutsukaisen"
+        },
+        {
+          "name": "少女☆歌劇レヴュースタァライト(少女☆歌剧 Revue Starlight)",
+          "name.en": "少女☆歌劇レヴュースタァライト(Revue Starlight)",
+          "name.ja": "少女☆歌劇レヴュースタァライト",
+          "name.ko": "少女☆歌劇レヴュースタァライト(소녀☆가극 레뷰 스타라이트)",
+          "name.zhtw": "少女☆歌劇レヴュースタァライト(少女☆歌劇 Revue Starlight)",
+          "variable": "images/%e3%83%ac%e3%83%b4%e3%83%a5%e3%83%bc%e3%82%b9%e3%82%bf%e3%82%a1%e3%83%a9%e3%82%a4%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "少女終末旅行(少女末日旅行)",
+          "name.en": "少女終末旅行(Girls' Last Tour)",
+          "name.ja": "少女終末旅行",
+          "name.ko": "少女終末旅行(소녀의 마지막 여행)",
+          "name.zhtw": "少女終末旅行(少女末日旅行)",
+          "variable": "images/%e5%b0%91%e5%a5%b3%e7%b5%82%e6%9c%ab%e6%97%85%e8%a1%8c%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "少女たちは荒野を目指す(少女们奔向荒野)",
+          "name.en": "少女たちは荒野を目指す(Girls Beyond the Wasteland)",
+          "name.ja": "少女たちは荒野を目指す",
+          "name.ko": "少女たちは荒野を目指す(소녀들은 황야를 목표로)",
+          "name.zhtw": "少女たちは荒野を目指す(少女們奔向荒野)",
+          "variable": "images/%E5%B0%91%E5%A5%B3%E3%81%9F%E3%81%A1%E3%81%AF%E8%8D%92%E9%87%8E%E3%82%92%E7%9B%AE%E6%8C%87%E3%81%99%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "SHOW BY ROCK!!(SHOW BY ROCK!!)",
+          "name.en": "SHOW BY ROCK!!(SHOW BY ROCK!!)",
+          "name.ja": "SHOW BY ROCK!!",
+          "name.ko": "SHOW BY ROCK!!(SHOW BY ROCK!!)",
+          "name.zhtw": "SHOW BY ROCK!!(SHOW BY ROCK!!)",
+          "variable": "images/show_by_rock%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "食戟のソーマ(食戟之灵)",
+          "name.en": "食戟のソーマ(Food Wars! Shokugeki no Soma)",
+          "name.ja": "食戟のソーマ",
+          "name.ko": "食戟のソーマ(식극의 소마)",
+          "name.zhtw": "食戟のソーマ(食戟之靈)",
+          "variable": "category/%e9%a3%9f%e6%88%9f%e3%81%ae%e3%82%bd%e3%83%bc%e3%83%9e%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "白い砂のアクアトープ(白沙的水族馆)",
+          "name.en": "白い砂のアクアトープ(The Aquatope on White Sand)",
+          "name.ja": "白い砂のアクアトープ",
+          "name.ko": "白い砂のアクアトープ(흰 모래 아쿠아토프)",
+          "name.zhtw": "白い砂のアクアトープ(白沙的水族館)",
+          "variable": "images/shiroisuna_no_aquatope"
+        },
+        {
+          "name": "白聖女と黒牧師(白圣女与黑牧师)",
+          "name.en": "白聖女と黒牧師(The Holy Grail of Eris)",
+          "name.ja": "白聖女と黒牧師",
+          "name.ko": "白聖女と黒牧師(백성녀와 흑목사)",
+          "name.zhtw": "白聖女と黒牧師(白聖女與黑牧師)",
+          "variable": "images/shiroseijyo"
+        },
+        {
+          "name": "白猫プロジェクト(白猫计划)",
+          "name.en": "白猫プロジェクト(White Cat Project)",
+          "name.ja": "白猫プロジェクト",
+          "name.ko": "白猫プロジェクト(하얀고양이 프로젝트)",
+          "name.zhtw": "白猫プロジェクト(白貓計畫)",
+          "variable": "category/%e7%99%bd%e7%8c%ab%e3%83%97%e3%83%ad%e3%82%b8%e3%82%a7%e3%82%af%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "SHIROBAKO(白箱)",
+          "name.en": "SHIROBAKO(SHIROBAKO)",
+          "name.ja": "SHIROBAKO",
+          "name.ko": "SHIROBAKO(시로바코)",
+          "name.zhtw": "SHIROBAKO(白箱)",
+          "variable": "category/shirobako%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "進撃の巨人(进击的巨人)",
+          "name.en": "進撃の巨人(Attack on Titan)",
+          "name.ja": "進撃の巨人",
+          "name.ko": "進撃の巨人(진격의 거인)",
+          "name.zhtw": "進撃の巨人(進擊的巨人)",
+          "variable": "images/%e9%80%b2%e6%92%83%e3%81%ae%e5%b7%a8%e4%ba%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "神撃のバハムート(神击的巴哈姆特)",
+          "name.en": "神撃のバハムート(Rage of Bahamut)",
+          "name.ja": "神撃のバハムート",
+          "name.ko": "神撃のバハムート(신격의 바하무트)",
+          "name.zhtw": "神撃のバハムート(神擊的巴哈姆特)",
+          "variable": "images/shingeki_no_bahamut"
+        },
+        {
+          "name": "人生相談テレビアニメーション「人生」(人生相谈电视动画「人生」)",
+          "name.en": "人生相談テレビアニメーション「人生」(Life TV Animation 'Life')",
+          "name.ja": "人生相談テレビアニメーション「人生」",
+          "name.ko": "人生相談テレビアニメーション「人生」(인생 상담 TV 애니메이션 「인생」)",
+          "name.zhtw": "人生相談テレビアニメーション「人生」(人生相談電視動畫「人生」)",
+          "variable": "tag/%e4%ba%ba%e7%94%9f%e7%9b%b8%e8%ab%87%e3%83%86%e3%83%ac%e3%83%93%e3%82%a2%e3%83%8b%e3%83%a1%e3%83%bc%e3%82%b7%e3%83%a7%e3%83%b3%e3%80%8c%e4%ba%ba%e7%94%9f%e3%80%8d%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました(因为不是真正的伙伴被踢出了勇者队伍，我在边境悠哉度日)",
+          "name.en": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました(Banished from the Hero's Party, I Decided to Live a Quiet Life in the Countryside)",
+          "name.ja": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました",
+          "name.ko": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました(진정한 동료가 아니라며 용사 파티에서 쫓겨난 나, 변경에서 슬로우 라이프하기로 했습니다)",
+          "name.zhtw": "真の仲間じゃないと勇者のパーティーを追い出されたので、辺境でスローライフすることにしました(因為不是真正的夥伴被踢出了勇者隊伍，我在邊境悠哉度日)",
+          "variable": "images/shinnonakama"
+        },
+        {
+          "name": "好きな子がめがねを忘れた(喜欢的女孩忘了戴眼镜)",
+          "name.en": "好きな子がめがねを忘れた(The Girl I Like Forgot Her Glasses)",
+          "name.ja": "好きな子がめがねを忘れた",
+          "name.ko": "好きな子がめがねを忘れた(좋아하는 아이가 안경을 잊었다)",
+          "name.zhtw": "好きな子がめがねを忘れた(喜歡的女孩忘了戴眼鏡)",
+          "variable": "images/sukimega"
+        },
+        {
+          "name": "スクールガールストライカーズ(学院少女飞击者)",
+          "name.en": "スクールガールストライカーズ(Schoolgirl Strikers: Animation Channel)",
+          "name.ja": "スクールガールストライカーズ",
+          "name.ko": "スクールガールストライカーズ(스쿨걸 스트라이커즈)",
+          "name.zhtw": "スクールガールストライカーズ(學院少女飛擊者)",
+          "variable": "images/%e3%82%b9%e3%82%af%e3%83%bc%e3%83%ab%e3%82%ac%e3%83%bc%e3%83%ab%e3%82%b9%e3%83%88%e3%83%a9%e3%82%a4%e3%82%ab%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ステラのまほう(星空的魔法)",
+          "name.en": "ステラのまほう(Stella No Mahou)",
+          "name.ja": "ステラのまほう",
+          "name.ko": "ステラのまほう(스텔라의 마법)",
+          "name.zhtw": "ステラのまほう(星空的魔法)",
+          "variable": "images/%e3%82%b9%e3%83%86%e3%83%a9%e3%81%ae%e3%81%be%e3%81%bb%e3%81%86%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ストライク・ザ・ブラッド(噬血狂袭)",
+          "name.en": "ストライク・ザ・ブラッド(Strike the Blood)",
+          "name.ja": "ストライク・ザ・ブラッド",
+          "name.ko": "ストライク・ザ・ブラッド(스트라이크 더 블러드)",
+          "name.zhtw": "ストライク・ザ・ブラッド(噬血狂襲)",
+          "variable": "tag/%e3%82%b9%e3%83%88%e3%83%a9%e3%82%a4%e3%82%af%e3%83%bb%e3%82%b6%e3%83%bb%e3%83%96%e3%83%a9%e3%83%83%e3%83%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "スパイ教室(间谍教室)",
+          "name.en": "スパイ教室(Spy Classroom)",
+          "name.ja": "スパイ教室",
+          "name.ko": "スパイ教室(스파이 교실)",
+          "name.zhtw": "スパイ教室(間諜教室)",
+          "variable": "images/spy_kyoushitsu"
+        },
+        {
+          "name": "スロウスタート(慢慢开始)",
+          "name.en": "スロウスタート(Slow Start)",
+          "name.ja": "スロウスタート",
+          "name.ko": "スロウスタート(슬로우 스타트)",
+          "name.zhtw": "スロウスタート(慢慢開始)",
+          "variable": "images/%e3%82%b9%e3%83%ad%e3%82%b9%e3%82%bf%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "スローループ(悠然垂钓)",
+          "name.en": "スローループ(Slow Loop)",
+          "name.ja": "スローループ",
+          "name.ko": "スローループ(슬로우 루프)",
+          "name.zhtw": "スローループ(悠然垂釣)",
+          "variable": "images/slow_loop"
+        },
+        {
+          "name": "青春ブタ野郎シリーズ(青春猪头少年系列)",
+          "name.en": "青春ブタ野郎シリーズ(Rascal Does Not Dream Series)",
+          "name.ja": "青春ブタ野郎シリーズ",
+          "name.ko": "青春ブタ野郎シリーズ(청춘 돼지 시리즈)",
+          "name.zhtw": "青春ブタ野郎シリーズ(青春豬頭少年系列)",
+          "variable": "images/%e9%9d%92%e3%83%96%e3%82%bf%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "聖女の魔力は万能です(圣女的魔力是万能的)",
+          "name.en": "聖女の魔力は万能です(The Saint's Magic Power Is Omnipotent)",
+          "name.ja": "聖女の魔力は万能です",
+          "name.ko": "聖女の魔力は万能です(성녀의 마력은 만능입니다)",
+          "name.zhtw": "聖女の魔力は万能です(聖女的魔力是萬能的)",
+          "variable": "images/seijo_no_maryoku"
+        },
+        {
+          "name": "精霊幻想記(精灵幻想记)",
+          "name.en": "精霊幻想記(Seirei Gensouki: Spirit Chronicles)",
+          "name.ja": "精霊幻想記",
+          "name.ko": "精霊幻想記(정령환상기)",
+          "name.zhtw": "精霊幻想記(精靈幻想記)",
+          "variable": "images/seireigensouki"
+        },
+        {
+          "name": "精霊使いの剣舞(精灵舞者)",
+          "name.en": "精霊使いの剣舞(Seirei Tsukai no Blade Dance)",
+          "name.ja": "精霊使いの剣舞",
+          "name.ko": "精霊使いの剣舞(정령사의 검무)",
+          "name.zhtw": "精霊使いの剣舞(精靈舞者)",
+          "variable": "tag/%e7%b2%be%e9%9c%8a%e4%bd%bf%e3%81%84%e3%81%ae%e5%89%a3%e8%88%9e%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "セイレン(诚恋)",
+          "name.en": "セイレン(Seiren)",
+          "name.ja": "セイレン",
+          "name.ko": "セイレン(세이렌)",
+          "name.zhtw": "セイレン(誠戀)",
+          "variable": "images/%e3%82%bb%e3%82%a4%e3%83%ac%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "世界最高の暗殺者、異世界貴族に転生する(世界最强暗杀者转生为异世界贵族)",
+          "name.en": "世界最高の暗殺者、異世界貴族に転生する(The World's Finest Assassin Gets Reincarnated in Another World as an Aristocrat)",
+          "name.ja": "世界最高の暗殺者、異世界貴族に転生する",
+          "name.ko": "世界最高の暗殺者、異世界貴族に転生する(세계 최고의 암살자, 이세계 귀족으로 전생하다)",
+          "name.zhtw": "世界最高の暗殺者、異世界貴族に転生する(世界最強暗殺者轉生為異世界貴族)",
+          "variable": "images/ansatsukizoku"
+        },
+        {
+          "name": "ゼロから始める魔法の書(从零开始的魔法书)",
+          "name.en": "ゼロから始める魔法の書(Grimoire of Zero)",
+          "name.ja": "ゼロから始める魔法の書",
+          "name.ko": "ゼロから始める魔法の書(제로부터 시작하는 마법의 서)",
+          "name.zhtw": "ゼロから始める魔法の書(從零開始的魔法書)",
+          "variable": "images/%e3%82%bc%e3%83%ad%e3%81%ae%e6%9b%b8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "世話やきキツネの仙狐さん(照料人的仙狐小姐)",
+          "name.en": "世話やきキツネの仙狐さん(The Helpful Fox Senko-san)",
+          "name.ja": "世話やきキツネの仙狐さん",
+          "name.ko": "世話やきキツネの仙狐さん(돌봐주는 여우 센코 씨)",
+          "name.zhtw": "世話やきキツネの仙狐さん(照料人的仙狐小姐)",
+          "variable": "images/%e4%b8%96%e8%a9%b1%e3%82%84%e3%81%8d%e3%82%ad%e3%83%84%e3%83%8d%e3%81%ae%e4%bb%99%e7%8b%90%e3%81%95%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "戦闘員、派遣します!(战斗员，出动！)",
+          "name.en": "戦闘員、派遣します!(Combatants Will Be Dispatched!)",
+          "name.ja": "戦闘員、派遣します!",
+          "name.ko": "戦闘員、派遣します!(전투원, 파견합니다!)",
+          "name.zhtw": "戦闘員、派遣します!(戰鬥員，出動！)",
+          "variable": "images/sentouin_hakenshimasu"
+        },
+        {
+          "name": "川柳少女(川柳少女)",
+          "name.en": "川柳少女(Senryuu Shoujo)",
+          "name.ja": "川柳少女",
+          "name.ko": "川柳少女(센류 소녀)",
+          "name.zhtw": "川柳少女(川柳少女)",
+          "variable": "images/%e5%b7%9d%e6%9f%b3%e5%b0%91%e5%a5%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "装神少女まとい(神装少女纶)",
+          "name.en": "装神少女まとい(Matoi the Sacred Slayer)",
+          "name.ja": "装神少女まとい",
+          "name.ko": "装神少女まとい(장신소녀 마토이)",
+          "name.zhtw": "装神少女まとい(神裝少女綸)",
+          "variable": "images/%e8%a3%85%e7%a5%9e%e5%b0%91%e5%a5%b3%e3%81%be%e3%81%a8%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "双星の陰陽師(双星阴阳师)",
+          "name.en": "双星の陰陽師(Twin Star Exorcists)",
+          "name.ja": "双星の陰陽師",
+          "name.ko": "双星の陰陽師(쌍성의 음양사)",
+          "name.zhtw": "双星の陰陽師(雙星陰陽師)",
+          "variable": "images/%e5%8f%8c%e6%98%9f%e3%81%ae%e9%99%b0%e9%99%bd%e5%b8%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ソードアート・オンライン(刀剑神域)",
+          "name.en": "ソードアート・オンライン(Sword Art Online)",
+          "name.ja": "ソードアート・オンライン",
+          "name.ko": "ソードアート・オンライン(소드아트 온라인)",
+          "name.zhtw": "ソードアート・オンライン(刀劍神域)",
+          "variable": "category/%e3%82%bd%e3%83%bc%e3%83%89%e3%82%a2%e3%83%bc%e3%83%88%e3%83%bb%e3%82%aa%e3%83%b3%e3%83%a9%e3%82%a4%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン(刀剑神域外传 Gun Gale Online)",
+          "name.en": "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン(Sword Art Online Alternative: Gun Gale Online)",
+          "name.ja": "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン",
+          "name.ko": "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン(소드 아트 온라인 얼터너티브 건게일 온라인)",
+          "name.zhtw": "ソードアート・オンライン オルタナティブ ガンゲイル・オンライン(刀劍神域外傳 Gun Gale Online)",
+          "variable": "images/saoaggo%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "その着せ替え人形は恋をする(装扮人偶坠入爱河)",
+          "name.en": "その着せ替え人形は恋をする(My Dress-Up Darling)",
+          "name.ja": "その着せ替え人形は恋をする",
+          "name.ko": "その着せ替え人形は恋をする(그 코스프레 인형은 사랑을 한다)",
+          "name.zhtw": "その着せ替え人形は恋をする(裝扮人偶墜入愛河)",
+          "variable": "images/kisekoi"
+        },
+        {
+          "name": "天体のメソッド(星空方法)",
+          "name.en": "天体のメソッド(Celestial Method)",
+          "name.ja": "天体のメソッド",
+          "name.ko": "天体のメソッド(천체의 메소드)",
+          "name.zhtw": "天体のメソッド(星空方法)",
+          "variable": "category/%e5%a4%a9%e4%bd%93%e3%81%ae%e3%83%a1%e3%82%bd%e3%83%83%e3%83%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "宇宙よりも遠い場所(比宇宙更遥远的地方)",
+          "name.en": "宇宙よりも遠い場所(A Place Further Than the Universe)",
+          "name.ja": "宇宙よりも遠い場所",
+          "name.ko": "宇宙よりも遠い場所(우주보다 먼 곳)",
+          "name.zhtw": "宇宙よりも遠い場所(比宇宙更遙遠的地方)",
+          "variable": "images/%e3%82%88%e3%82%8a%e3%82%82%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゾン100〜ゾンビになるまでにしたい100のこと〜(僵尸百分百～死前想做的100件事～)",
+          "name.en": "ゾン100〜ゾンビになるまでにしたい100のこと〜(Zom 100: Bucket List of the Dead)",
+          "name.ja": "ゾン100〜ゾンビになるまでにしたい100のこと〜",
+          "name.ko": "ゾン100〜ゾンビになるまでにしたい100のこと〜(좀비100~좀비가 되기 전에 하고 싶은 100가지~)",
+          "name.zhtw": "ゾン100〜ゾンビになるまでにしたい100のこと〜(殭屍百分百～死前想做的100件事～)",
+          "variable": "images/zom100"
+        },
+        {
+          "name": "ゾンビランドサガ(佐贺偶像是传奇)",
+          "name.en": "ゾンビランドサガ(Zombie Land Saga)",
+          "name.ja": "ゾンビランドサガ",
+          "name.ko": "ゾンビランドサガ(좀비 랜드 사가)",
+          "name.zhtw": "ゾンビランドサガ(佐賀偶像是傳奇)",
+          "variable": "images/%e3%82%be%e3%83%b3%e3%83%93%e3%83%a9%e3%83%b3%e3%83%89%e3%82%b5%e3%82%ac%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ダーリン・イン・ザ・フランキス(DARLING in the FRANXX)",
+          "name.en": "ダーリン・イン・ザ・フランキス(DARLING in the FRANXX)",
+          "name.ja": "ダーリン・イン・ザ・フランキス",
+          "name.ko": "ダーリン・イン・ザ・フランキス(다알링 인 더 프랑키스)",
+          "name.zhtw": "ダーリン・イン・ザ・フランキス(DARLING in the FRANXX)",
+          "variable": "images/%e3%83%80%e3%83%aa%e3%83%95%e3%83%a9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "大図書館の羊飼い(大图书馆的牧羊人)",
+          "name.en": "大図書館の羊飼い(Daitoshokan no Hitsujikai)",
+          "name.ja": "大図書館の羊飼い",
+          "name.ko": "大図書館の羊飼い(큰 도서관의 목동)",
+          "name.zhtw": "大図書館の羊飼い(大圖書館的牧羊人)",
+          "variable": "tag/%e5%a4%a7%e5%9b%b3%e6%9b%b8%e9%a4%a8%e3%81%ae%e7%be%8a%e9%a3%bc%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "SSSS.DYNAZENON(SSSS.DYNAZENON)",
+          "name.en": "SSSS.DYNAZENON(SSSS.DYNAZENON)",
+          "name.ja": "SSSS.DYNAZENON",
+          "name.ko": "SSSS.DYNAZENON(SSSS.다이나제논)",
+          "name.zhtw": "SSSS.DYNAZENON(SSSS.DYNAZENON)",
+          "variable": "images/ssss_dynazenon"
+        },
+        {
+          "name": "対魔導学園35試験小隊(反魔法学园35试验小队)",
+          "name.en": "対魔導学園35試験小隊(AntiMagic Academy 35th Test Platoon)",
+          "name.ja": "対魔導学園35試験小隊",
+          "name.ko": "対魔導学園35試験小隊(반마도학원 35시험소대)",
+          "name.zhtw": "対魔導学園35試験小隊(反魔法學園35試驗小隊)",
+          "variable": "tag/%e5%af%be%e9%ad%94%e5%b0%8e%e5%ad%a6%e5%9c%9235%e8%a9%a6%e9%a8%93%e5%b0%8f%e9%9a%8a%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "だがしかし(零食妹妹)",
+          "name.en": "だがしかし(Dagashi Kashi)",
+          "name.ja": "だがしかし",
+          "name.ko": "だがしかし(다가시 과자)",
+          "name.zhtw": "だがしかし(零食妹妹)",
+          "variable": "images/%E3%81%A0%E3%81%8C%E3%81%97%E3%81%8B%E3%81%97%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "盾の勇者の成り上がり(盾之勇者成名录)",
+          "name.en": "盾の勇者の成り上がり(The Rising of the Shield Hero)",
+          "name.ja": "盾の勇者の成り上がり",
+          "name.ko": "盾の勇者の成り上がり(방패 용사 성공담)",
+          "name.zhtw": "盾の勇者の成り上がり(盾之勇者成名錄)",
+          "variable": "images/%e7%9b%be%e3%81%ae%e5%8b%87%e8%80%85%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語(在最后迷宫前的村庄里长大的少年在城市中生活)",
+          "name.en": "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語(Suppose a Kid from the Last Dungeon Boonies Moved to a Starter Town)",
+          "name.ja": "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語",
+          "name.ko": "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語(이를테면 라스트 던전 앞 마을의 소년이 초반 마을에서 사는 것처럼)",
+          "name.zhtw": "たとえばラストダンジョン前の村の少年が序盤の街で暮らすような物語(在最後迷宮前的村庄裡長大的少年在城市中生活)",
+          "variable": "images/tatoeba_last_dungeon_mae"
+        },
+        {
+          "name": "ダンガンロンパ(弹丸论破)",
+          "name.en": "ダンガンロンパ(Danganronpa)",
+          "name.ja": "ダンガンロンパ",
+          "name.ko": "ダンガンロンパ(단간론파)",
+          "name.zhtw": "ダンガンロンパ(彈丸論破)",
+          "variable": "images/%E3%83%80%E3%83%B3%E3%82%AC%E3%83%B3%E3%83%AD%E3%83%B3%E3%83%91%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ダンジョンに出会いを求めるのは間違っているだろうか(在地下城寻求邂逅是否搞错了什么)",
+          "name.en": "ダンジョンに出会いを求めるのは間違っているだろうか(Is It Wrong to Try to Pick Up Girls in a Dungeon?)",
+          "name.ja": "ダンジョンに出会いを求めるのは間違っているだろうか",
+          "name.ko": "ダンジョンに出会いを求めるのは間違っているだろうか(던전에서 만남을 추구하면 안 되는 걸까?)",
+          "name.zhtw": "ダンジョンに出会いを求めるのは間違っているだろうか(在地下城尋求邂逅是否搞錯了什麼)",
+          "variable": "category/%e3%83%80%e3%83%b3%e3%81%be%e3%81%a1%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "探偵オペラ ミルキィホームズ(侦探歌剧 米尔鲁帕尔斯)",
+          "name.en": "探偵オペラ ミルキィホームズ(Detective Opera Milky Holmes)",
+          "name.ja": "探偵オペラ ミルキィホームズ",
+          "name.ko": "探偵オペラ ミルキィホームズ(탐정 오페라 밀키 홈즈)",
+          "name.zhtw": "探偵オペラ ミルキィホームズ(偵探歌劇 Milky Holmes)",
+          "variable": "images/%E6%8E%A2%E5%81%B5%E3%82%AA%E3%83%9A%E3%83%A9_%E3%83%9F%E3%83%AB%E3%82%AD%E3%82%A3%E3%83%9B%E3%83%BC%E3%83%A0%E3%82%BA%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "探偵はもう、死んでいる。(侦探已经死了。)",
+          "name.en": "探偵はもう、死んでいる。(The Detective Is Already Dead)",
+          "name.ja": "探偵はもう、死んでいる。",
+          "name.ko": "探偵はもう、死んでいる。(탐정은 이미 죽어있다.)",
+          "name.zhtw": "探偵はもう、死んでいる。(偵探已經死了。)",
+          "variable": "images/tanmoshi"
+        },
+        {
+          "name": "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜(开挂药师的慢生活～在异世界开药妆店～)",
+          "name.en": "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜(Slow Life in Another World (I Wish!))",
+          "name.ja": "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜",
+          "name.ko": "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜(치트 약사의 슬로우 라이프~이세계에 드러그스토어 만들기~)",
+          "name.zhtw": "チート薬師のスローライフ〜異世界に作ろうドラッグストア〜(開掛藥師的慢生活～在異世界開藥妝店～)",
+          "variable": "images/cheat-kusushi"
+        },
+        {
+          "name": "ツインエンジェルBREAK(双子天使BREAK)",
+          "name.en": "ツインエンジェルBREAK(Twin Angel BREAK)",
+          "name.ja": "ツインエンジェルBREAK",
+          "name.ko": "ツインエンジェルBREAK(트윈 엔젤 BREAK)",
+          "name.zhtw": "ツインエンジェルBREAK(雙子天使BREAK)",
+          "variable": "images/%e3%83%84%e3%82%a4%e3%83%b3%e3%82%a8%e3%83%b3%e3%82%b8%e3%82%a7%e3%83%abbreak%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "つうかあ(吐嘈啊)",
+          "name.en": "つうかあ(Tsuugaika)",
+          "name.ja": "つうかあ",
+          "name.ko": "つうかあ(쓰우카아)",
+          "name.zhtw": "つうかあ(吐嘈啊)",
+          "variable": "images/%e3%81%a4%e3%81%86%e3%81%8b%e3%81%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "月がきれい(月色真美)",
+          "name.en": "月がきれい(Tsuki ga Kirei)",
+          "name.ja": "月がきれい",
+          "name.ko": "月がきれい(달이 아름다워)",
+          "name.zhtw": "月がきれい(月色真美)",
+          "variable": "images/%e6%9c%88%e3%81%8c%e3%81%8d%e3%82%8c%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "月とライカと吸血姫(月与莱卡与吸血公主)",
+          "name.en": "月とライカと吸血姫(Tsuki to Laika to Nosferatu)",
+          "name.ja": "月とライカと吸血姫",
+          "name.ko": "月とライカと吸血姫(달과 라이카와 흡혈공주)",
+          "name.zhtw": "月とライカと吸血姫(月與萊卡與吸血公主)",
+          "variable": "images/tsuki_to_laika_to_nosferatu"
+        },
+        {
+          "name": "つぐもも(付丧神)",
+          "name.en": "つぐもも(Tsugumomo)",
+          "name.ja": "つぐもも",
+          "name.ko": "つぐもも(쓰구모모)",
+          "name.zhtw": "つぐもも(付喪神)",
+          "variable": "images/%e3%81%a4%e3%81%90%e3%82%82%e3%82%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜(泪月帝国物语)",
+          "name.en": "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜(Tearmoon Empire)",
+          "name.ja": "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜",
+          "name.ko": "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜(티아문 제국 이야기)",
+          "name.zhtw": "ティアムーン帝国物語〜断頭台から始まる、姫の転生逆転ストーリー〜(淚月帝國物語)",
+          "variable": "images/tearmoon_empire"
+        },
+        {
+          "name": "D4DJ(D4DJ)",
+          "name.en": "D4DJ(D4DJ)",
+          "name.ja": "D4DJ",
+          "name.ko": "D4DJ(D4DJ)",
+          "name.zhtw": "D4DJ(D4DJ)",
+          "variable": "images/d4dj"
+        },
+        {
+          "name": "ディバインゲート(天界之门)",
+          "name.en": "ディバインゲート(Divine Gate)",
+          "name.ja": "ディバインゲート",
+          "name.ko": "ディバインゲート(디바인 게이트)",
+          "name.zhtw": "ディバインゲート(天界之門)",
+          "variable": "images/%E3%83%87%E3%82%A3%E3%83%90%E3%82%A4%E3%83%B3%E3%82%B2%E3%83%BC%E3%83%88%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "Dimension W(Dimension W)",
+          "name.en": "Dimension W(Dimension W)",
+          "name.ja": "Dimension W",
+          "name.ko": "Dimension W(Dimension W)",
+          "name.zhtw": "Dimension W(Dimension W)",
+          "variable": "images/Dimension_W%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "テイルズ オブ エクシリア(传奇系列：仙灵传说)",
+          "name.en": "テイルズ オブ エクシリア(Tales of Xillia)",
+          "name.ja": "テイルズ オブ エクシリア",
+          "name.ko": "テイルズ オブ エクシリア(테일즈 오브 엑실리아)",
+          "name.zhtw": "テイルズ オブ エクシリア(傳奇系列：仙靈傳說)",
+          "variable": "tag/%e3%83%86%e3%82%a4%e3%83%ab%e3%82%ba_%e3%82%aa%e3%83%96_%e3%82%a8%e3%82%af%e3%82%b7%e3%83%aa%e3%82%a2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "テイルズ オブ シリーズ(传奇系列)",
+          "name.en": "テイルズ オブ シリーズ(Tales of Series)",
+          "name.ja": "テイルズ オブ シリーズ",
+          "name.ko": "テイルズ オブ シリーズ(테일즈 오브 시리즈)",
+          "name.zhtw": "テイルズ オブ シリーズ(傳奇系列)",
+          "variable": "images/%e3%83%86%e3%82%a4%e3%83%ab%e3%82%ba_%e3%82%aa%e3%83%96_%e3%82%b7%e3%83%aa%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "テイルズ オブ ベルセリア(传奇系列：征战贝尔塞利亚)",
+          "name.en": "テイルズ オブ ベルセリア(Tales of Berseria)",
+          "name.ja": "テイルズ オブ ベルセリア",
+          "name.ko": "テイルズ オブ ベルセリア(테일즈 오브 베르세리아)",
+          "name.zhtw": "テイルズ オブ ベルセリア(傳奇系列：征戰貝爾塞利亞)",
+          "variable": "tag/%e3%83%86%e3%82%a4%e3%83%ab%e3%82%ba_%e3%82%aa%e3%83%96_%e3%83%99%e3%83%ab%e3%82%bb%e3%83%aa%e3%82%a2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "デート・ア・ライブ(约会大作战)",
+          "name.en": "デート・ア・ライブ(Date A Live)",
+          "name.ja": "デート・ア・ライブ",
+          "name.ko": "デート・ア・ライブ(데이트 어 라이브)",
+          "name.zhtw": "デート・ア・ライブ(約會大作戰)",
+          "variable": "category/%e3%83%87%e3%83%bc%e3%83%88%e3%83%bb%e3%82%a2%e3%83%bb%e3%83%a9%e3%82%a4%e3%83%96%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "デキる猫は今日も憂鬱(能干猫今天也忧郁)",
+          "name.en": "デキる猫は今日も憂鬱(The Masterful Cat Is Depressed Again Today)",
+          "name.ja": "デキる猫は今日も憂鬱",
+          "name.ko": "デキる猫は今日も憂鬱(잘나가는 고양이는 오늘도 우울)",
+          "name.zhtw": "デキる猫は今日も憂鬱(能幹貓今天也憂鬱)",
+          "variable": "images/dekineko"
+        },
+        {
+          "name": "デスマーチからはじまる異世界狂想曲(死亡行军的异世界狂想曲)",
+          "name.en": "デスマーチからはじまる異世界狂想曲(Death March to the Parallel World Rhapsody)",
+          "name.ja": "デスマーチからはじまる異世界狂想曲",
+          "name.ko": "デスマーチからはじまる異世界狂想曲(데스 마치에서 시작하는 이세계 광상곡)",
+          "name.zhtw": "デスマーチからはじまる異世界狂想曲(死亡行軍的異世界狂想曲)",
+          "variable": "images/%e3%83%87%e3%82%b9%e3%83%9e%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "亜人ちゃんは語りたい(亚人酱有话想说)",
+          "name.en": "亜人ちゃんは語りたい(Interviews with Monster Girls)",
+          "name.ja": "亜人ちゃんは語りたい",
+          "name.ko": "亜人ちゃんは語りたい(아인 짱은 말하고 싶어)",
+          "name.zhtw": "亜人ちゃんは語りたい(亞人醬有話想說)",
+          "variable": "images/%e3%83%87%e3%83%9f%e3%81%a1%e3%82%83%e3%82%93%e3%81%af%e8%aa%9e%e3%82%8a%e3%81%9f%e3%81%84%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "デュラララ(赫拉赫拉!!)",
+          "name.en": "デュラララ(Durarara!!)",
+          "name.ja": "デュラララ",
+          "name.ko": "デュラララ(듀라라라!!)",
+          "name.zhtw": "デュラララ(赫拉赫拉!!)",
+          "variable": "tag/%e3%83%87%e3%83%a5%e3%83%a9%e3%83%a9%e3%83%a9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "天気の子(天气之子)",
+          "name.en": "天気の子(Weathering with You)",
+          "name.ja": "天気の子",
+          "name.ko": "天気の子(날씨의 아이)",
+          "name.zhtw": "天気の子(天氣之子)",
+          "variable": "images/%e5%a4%a9%e6%b0%97%e3%81%ae%e5%ad%90%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "天才王子の赤字国家再生術(天才王子的赤字国家再生术)",
+          "name.en": "天才王子の赤字国家再生術(The Genius Prince's Guide to Raising a Nation Out of Debt)",
+          "name.ja": "天才王子の赤字国家再生術",
+          "name.ko": "天才王子の赤字国家再生術(천재 왕자의 적자국가 재건술)",
+          "name.zhtw": "天才王子の赤字国家再生術(天才王子的赤字國家再生術)",
+          "variable": "images/tensaiouji"
+        },
+        {
+          "name": "天使の3P!(天使的3P！)",
+          "name.en": "天使の3P!(Angel's 3Piece!)",
+          "name.ja": "天使の3P!",
+          "name.ko": "天使の3P!(천사의 3P!)",
+          "name.zhtw": "天使の3P!(天使的3P！)",
+          "variable": "images/%e5%a4%a9%e4%bd%bf%e3%81%ae3p%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "転生王女と天才令嬢の魔法革命(转生王女与天才令嬢的魔法革命)",
+          "name.en": "転生王女と天才令嬢の魔法革命(The Magical Revolution of the Reincarnated Princess and the Genius Young Lady)",
+          "name.ja": "転生王女と天才令嬢の魔法革命",
+          "name.ko": "転生王女と天才令嬢の魔法革命(환생왕녀와 천재영애의 마법혁명)",
+          "name.zhtw": "転生王女と天才令嬢の魔法革命(轉生王女與天才令嬢的魔法革命)",
+          "variable": "images/tenten_kakumei"
+        },
+        {
+          "name": "転生したらスライムだった件(关于我转生成史莱姆这件事)",
+          "name.en": "転生したらスライムだった件(That Time I Got Reincarnated as a Slime)",
+          "name.ja": "転生したらスライムだった件",
+          "name.ko": "転生したらスライムだった件(전생했더니 슬라임이었던 건에 대하여)",
+          "name.zhtw": "転生したらスライムだった件(關於我轉生成史萊姆這件事)",
+          "variable": "images/%e8%bb%a2%e3%82%b9%e3%83%a9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "とある科学の超電磁砲(某科学的超电磁炮)",
+          "name.en": "とある科学の超電磁砲(A Certain Scientific Railgun)",
+          "name.ja": "とある科学の超電磁砲",
+          "name.ko": "とある科学の超電磁砲(어떤 과학의 레일건)",
+          "name.zhtw": "とある科学の超電磁砲(某科學的超電磁炮)",
+          "variable": "category/%e3%81%a8%e3%81%82%e3%82%8b%e7%a7%91%e5%ad%a6%e3%81%ae%e8%b6%85%e9%9b%bb%e7%a3%81%e7%a0%b2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Tokyo 7th シスターズ(东京第七姐妹)",
+          "name.en": "Tokyo 7th シスターズ(Tokyo 7th Sisters)",
+          "name.ja": "Tokyo 7th シスターズ",
+          "name.ko": "Tokyo 7th シスターズ(도쿄 세번째 시스터즈)",
+          "name.zhtw": "Tokyo 7th シスターズ(東京第七姊妹)",
+          "variable": "images/%e3%83%8a%e3%83%8a%e3%82%b7%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "刀剣乱舞(刀剑乱舞)",
+          "name.en": "刀剣乱舞(Touken Ranbu)",
+          "name.ja": "刀剣乱舞",
+          "name.ko": "刀剣乱舞(도검난무)",
+          "name.zhtw": "刀剣乱舞(刀劍亂舞)",
+          "variable": "images/%e5%88%80%e5%89%a3%e4%b9%b1%e8%88%9e-%e3%81%a8%e3%81%86%e3%82%89%e3%81%b6%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "東方Project(东方Project)",
+          "name.en": "東方Project(Touhou Project)",
+          "name.ja": "東方Project",
+          "name.ko": "東方Project(동방 프로젝트)",
+          "name.zhtw": "東方Project(東方Project)",
+          "variable": "category/%e6%9d%b1%e6%96%b9project%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ドールズフロントライン(少女前线)",
+          "name.en": "ドールズフロントライン(Girls' Frontline)",
+          "name.ja": "ドールズフロントライン",
+          "name.ko": "ドールズフロントライン(소녀전선)",
+          "name.zhtw": "ドールズフロントライン(少女前線)",
+          "variable": "images/girls_frontline"
+        },
+        {
+          "name": "時々ボソッとロシア語でデレる隣のアーリャさん(邻座的阿丽雅同学有时会用俄语撒娇)",
+          "name.en": "時々ボソッとロシア語でデレる隣のアーリャさん(Alya Sometimes Hides Her Feelings in Russian)",
+          "name.ja": "時々ボソッとロシア語でデレる隣のアーリャさん",
+          "name.ko": "時々ボソッとロシア語でデレる隣のアーリャさん(가끔 러시아어로 데레는 옆자리 알랴 양)",
+          "name.zhtw": "時々ボソッとロシア語でデレる隣のアーリャさん(鄰座的阿麗雅同學有時會用俄語撒嬌)",
+          "variable": "images/roshidere"
+        },
+        {
+          "name": "刀使ノ巫女(刀使之巫女)",
+          "name.en": "刀使ノ巫女(Toji no Miko)",
+          "name.ja": "刀使ノ巫女",
+          "name.ko": "刀使ノ巫女(도사의 무녀)",
+          "name.zhtw": "刀使ノ巫女(刀使之巫女)",
+          "variable": "images/%e3%81%a8%e3%81%98%e3%83%8e%e3%81%bf%e3%81%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ToLoveる-とらぶる-(To Loveru-烦恼-)",
+          "name.en": "ToLoveる-とらぶる-(To Love Ru)",
+          "name.ja": "ToLoveる-とらぶる-",
+          "name.ko": "ToLoveる-とらぶる-(투 러브 루)",
+          "name.zhtw": "ToLoveる-とらぶる-(To Loveru-煩惱-)",
+          "variable": "category/tolove%e3%82%8b-%e3%81%a8%e3%82%89%e3%81%b6%e3%82%8b-%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "トリニティセブン(七魔法使)",
+          "name.en": "トリニティセブン(Trinity Seven)",
+          "name.ja": "トリニティセブン",
+          "name.ko": "トリニティセブン(트리니티 세븐)",
+          "name.zhtw": "トリニティセブン(七魔法使)",
+          "variable": "images/%e3%83%88%e3%83%aa%e3%83%8b%e3%83%86%e3%82%a3%e3%82%bb%e3%83%96%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "長門有希ちゃんの消失(长门有希酱的消失)",
+          "name.en": "長門有希ちゃんの消失(The Disappearance of Nagato Yuki-chan)",
+          "name.ja": "長門有希ちゃんの消失",
+          "name.ko": "長門有希ちゃんの消失(나가토 유키 양의 소실)",
+          "name.zhtw": "長門有希ちゃんの消失(長門有希醬的消失)",
+          "variable": "images/%E9%95%B7%E9%96%80%E6%9C%89%E5%B8%8C%E3%81%A1%E3%82%83%E3%82%93%E3%81%AE%E6%B6%88%E5%A4%B1%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "凪のあすから(来自风平浪静的明天)",
+          "name.en": "凪のあすから(A Lull in the Sea)",
+          "name.ja": "凪のあすから",
+          "name.ko": "凪のあすから(나기 아스카라)",
+          "name.zhtw": "凪のあすから(來自風平浪靜的明天)",
+          "variable": "images/%e5%87%aa%e3%81%ae%e3%81%82%e3%81%99%e3%81%8b%e3%82%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "夏目友人帳(夏目友人帐)",
+          "name.en": "夏目友人帳(Natsume's Book of Friends)",
+          "name.ja": "夏目友人帳",
+          "name.ko": "夏目友人帳(나츠메 우인장)",
+          "name.zhtw": "夏目友人帳(夏目友人帳)",
+          "variable": "category/%e5%a4%8f%e7%9b%ae%e5%8f%8b%e4%ba%ba%e5%b8%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "なんでここに先生が!?(老师为什么会在这里！？)",
+          "name.en": "なんでここに先生が!?(Why the Hell Are You Here, Teacher!?)",
+          "name.ja": "なんでここに先生が!?",
+          "name.ko": "なんでここに先生が!?(왜 여기에 선생님이!?)",
+          "name.zhtw": "なんでここに先生が!?(老師為什麼會在這裡！？)",
+          "variable": "images/%e3%81%aa%e3%82%93%e3%81%93%e3%81%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ナンバカ(监狱编号)",
+          "name.en": "ナンバカ(Nanbaka)",
+          "name.ja": "ナンバカ",
+          "name.ko": "ナンバカ(난바카)",
+          "name.zhtw": "ナンバカ(監獄編號)",
+          "variable": "images/%e3%83%8a%e3%83%b3%e3%83%90%e3%82%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ニーア オートマタ(尼尔：机械纪元)",
+          "name.en": "ニーア オートマタ(NieR: Automata)",
+          "name.ja": "ニーア オートマタ",
+          "name.ko": "ニーア オートマタ(니어: 오토마타)",
+          "name.zhtw": "ニーア オートマタ(尼爾：機械紀元)",
+          "variable": "images/%e3%83%8b%e3%83%bc%e3%82%a2%e3%82%aa%e3%83%bc%e3%83%88%e3%83%9e%e3%82%bf%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "虹色デイズ(彩虹色的日子)",
+          "name.en": "虹色デイズ(Rainbow Days)",
+          "name.ja": "虹色デイズ",
+          "name.ko": "虹色デイズ(무지개빛 데이즈)",
+          "name.zhtw": "虹色デイズ(彩虹色的日子)",
+          "variable": "images/%E8%99%B9%E8%89%B2%E3%83%87%E3%82%A4%E3%82%BA%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ニセコイ(伪恋)",
+          "name.en": "ニセコイ(Nisekoi)",
+          "name.ja": "ニセコイ",
+          "name.ko": "ニセコイ(니세코이)",
+          "name.zhtw": "ニセコイ(偽戀)",
+          "variable": "category/%e3%83%8b%e3%82%bb%e3%82%b3%e3%82%a4%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "NEW GAME!(NEW GAME!)",
+          "name.en": "NEW GAME!(NEW GAME!)",
+          "name.ja": "NEW GAME!",
+          "name.ko": "NEW GAME!(NEW GAME!)",
+          "name.zhtw": "NEW GAME!(NEW GAME!)",
+          "variable": "images/new_game%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ネトゲの嫁は女の子じゃないと思った?(以为网游里的老婆不是女孩子？)",
+          "name.en": "ネトゲの嫁は女の子じゃないと思った?(And you thought there is never a girl online?)",
+          "name.ja": "ネトゲの嫁は女の子じゃないと思った?",
+          "name.ko": "ネトゲの嫁は女の子じゃないと思った?(넷게임의 아내는 여자아이가 아닐 거라고 생각했어?)",
+          "name.zhtw": "ネトゲの嫁は女の子じゃないと思った?(以為網遊裡的老婆不是女孩子？)",
+          "variable": "images/%e3%83%8d%e3%83%88%e3%82%b2%e3%81%ae%e5%ab%81%e3%81%af%e5%a5%b3%e3%81%ae%e5%ad%90%e3%81%98%e3%82%83%e3%81%aa%e3%81%84%e3%81%a8%e6%80%9d%e3%81%a3%e3%81%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ノーゲーム・ノーライフ(游戏人生)",
+          "name.en": "ノーゲーム・ノーライフ(No Game No Life)",
+          "name.ja": "ノーゲーム・ノーライフ",
+          "name.ko": "ノーゲーム・ノーライフ(노 게임 노 라이프)",
+          "name.zhtw": "ノーゲーム・ノーライフ(遊戲人生)",
+          "variable": "category/%e3%83%8e%e3%83%bc%e3%82%b2%e3%83%bc%e3%83%a0%e3%83%bb%e3%83%8e%e3%83%bc%e3%83%a9%e3%82%a4%e3%83%95%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ノラガミ(野良神)",
+          "name.en": "ノラガミ(Noragami)",
+          "name.ja": "ノラガミ",
+          "name.ko": "ノラガミ(노라가미)",
+          "name.zhtw": "ノラガミ(野良神)",
+          "variable": "category/%e3%83%8e%e3%83%a9%e3%82%ac%e3%83%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "NORN9 ノルン+ノネット(NORN9 诺伦+诺奈特)",
+          "name.en": "NORN9 ノルン+ノネット(Norn9: Var Commons)",
+          "name.ja": "NORN9 ノルン+ノネット",
+          "name.ko": "NORN9 ノルン+ノネット(NORN9 노른+노네트)",
+          "name.zhtw": "NORN9 ノルン+ノネット(NORN9 諾倫+諾奈特)",
+          "variable": "images/NORN9_%E3%83%8E%E3%83%AB%E3%83%B3%E3%83%8E%E3%83%8D%E3%83%83%E3%83%88%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "のんのんびより(悠哉日常大王)",
+          "name.en": "のんのんびより(Non Non Biyori)",
+          "name.ja": "のんのんびより",
+          "name.ko": "のんのんびより(농농비요리)",
+          "name.zhtw": "のんのんびより(悠哉日常大王)",
+          "variable": "images/%E3%81%AE%E3%82%93%E3%81%AE%E3%82%93%E3%81%B3%E3%82%88%E3%82%8A%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ハイキュー!!(排球少年!!)",
+          "name.en": "ハイキュー!!(Haikyu!!)",
+          "name.ja": "ハイキュー!!",
+          "name.ko": "ハイキュー!!(하이큐!!)",
+          "name.zhtw": "ハイキュー!!(排球少年!!)",
+          "variable": "category/%e3%83%8f%e3%82%a4%e3%82%ad%e3%83%a5%e3%83%bc%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ハイスクールフリート(はいふり)(高校舰队)",
+          "name.en": "ハイスクールフリート(はいふり)(High School Fleet)",
+          "name.ja": "ハイスクールフリート(はいふり)",
+          "name.ko": "ハイスクールフリート(はいふり)(하이스쿨 플릿)",
+          "name.zhtw": "ハイスクールフリート(はいふり)(高校艦隊)",
+          "variable": "images/%E3%81%AF%E3%81%84%E3%81%B5%E3%82%8A%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "灰と幻想のグリムガル(灰与幻想的格林姆迦尔)",
+          "name.en": "灰と幻想のグリムガル(Grimgar: Ashes and Illusions)",
+          "name.ja": "灰と幻想のグリムガル",
+          "name.ko": "灰と幻想のグリムガル(재와 환상의 그림갈)",
+          "name.zhtw": "灰と幻想のグリムガル(灰與幻想的格林姆迦爾)",
+          "variable": "images/%E7%81%B0%E3%81%A8%E5%B9%BB%E6%83%B3%E3%81%AE%E3%82%B0%E3%83%AA%E3%83%A0%E3%82%AC%E3%83%AB%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "這いよれ!ニャル子さん(爬向我！奈亚子小姐)",
+          "name.en": "這いよれ!ニャル子さん(Haiyore! Nyaruko-san)",
+          "name.ja": "這いよれ!ニャル子さん",
+          "name.ko": "這いよれ!ニャル子さん(기어와! 냐루코 양)",
+          "name.zhtw": "這いよれ!ニャル子さん(爬向我！奈亞子小姐)",
+          "variable": "images/%E9%80%99%E3%81%84%E3%82%88%E3%82%8C%21_%E3%83%8B%E3%83%A3%E3%83%AB%E5%AD%90%E3%81%95%E3%82%93%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ばくおん!!(爆走！摩托少女！！)",
+          "name.en": "ばくおん!!(Bakuon!!)",
+          "name.ja": "ばくおん!!",
+          "name.ko": "ばくおん!!(바쿠온!!)",
+          "name.zhtw": "ばくおん!!(爆走！摩托少女！！)",
+          "variable": "images/%e3%81%b0%e3%81%8f%e3%81%8a%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ハクメイとミコチ(哈库美与米可奇)",
+          "name.en": "ハクメイとミコチ(Hakumei and Mikochi)",
+          "name.ja": "ハクメイとミコチ",
+          "name.ko": "ハクメイとミコチ(하쿠메이와 미코치)",
+          "name.zhtw": "ハクメイとミコチ(哈庫美與米可奇)",
+          "variable": "images/%e3%83%8f%e3%82%af%e3%83%9f%e3%82%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "はたらく細胞(工作细胞)",
+          "name.en": "はたらく細胞(Cells at Work!)",
+          "name.ja": "はたらく細胞",
+          "name.ko": "はたらく細胞(일하는 세포)",
+          "name.zhtw": "はたらく細胞(工作細胞)",
+          "variable": "images/%e3%81%af%e3%81%9f%e3%82%89%e3%81%8f%e7%b4%b0%e8%83%9e%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "バック・アロウ(巴克·阿罗)",
+          "name.en": "バック・アロウ(Back Arrow)",
+          "name.ja": "バック・アロウ",
+          "name.ko": "バック・アロウ(백 애로우)",
+          "name.zhtw": "バック・アロウ(巴克·阿羅)",
+          "variable": "images/back_arrow"
+        },
+        {
+          "name": "ハナヤマタ(花舞少女)",
+          "name.en": "ハナヤマタ(HaNaYaMaTa)",
+          "name.ja": "ハナヤマタ",
+          "name.ko": "ハナヤマタ(하나야마타)",
+          "name.zhtw": "ハナヤマタ(花舞少女)",
+          "variable": "category/%e3%83%8f%e3%83%8a%e3%83%a4%e3%83%9e%e3%82%bf%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ハルチカ(春风探偵)",
+          "name.en": "ハルチカ(HaruChika)",
+          "name.ja": "ハルチカ",
+          "name.ko": "ハルチカ(하루치카)",
+          "name.zhtw": "ハルチカ(春風偵探)",
+          "variable": "images/%E3%83%8F%E3%83%AB%E3%83%81%E3%82%AB%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "叛逆性ミリオンアーサー(叛逆性百万亚瑟王)",
+          "name.en": "叛逆性ミリオンアーサー(Rebellious Million Arthur)",
+          "name.ja": "叛逆性ミリオンアーサー",
+          "name.ko": "叛逆性ミリオンアーサー(반역성 밀리언 아서)",
+          "name.zhtw": "叛逆性ミリオンアーサー(叛逆性百萬亞瑟王)",
+          "variable": "images/%e5%8f%9b%e9%80%86%e6%80%a7%e3%83%9f%e3%83%aa%e3%82%aa%e3%83%b3%e3%82%a2%e3%83%bc%e3%82%b5%e3%83%bc%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "パンでPeace!(面包和平！)",
+          "name.en": "パンでPeace!(Pan de Peace!)",
+          "name.ja": "パンでPeace!",
+          "name.ko": "パンでPeace!(빵으로 평화!)",
+          "name.zhtw": "パンでPeace!(麵包和平！)",
+          "variable": "images/%E3%83%91%E3%83%B3%E3%81%A7Peace%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ハンドシェイカー(握手者)",
+          "name.en": "ハンドシェイカー(Hand Shakers)",
+          "name.ja": "ハンドシェイカー",
+          "name.ko": "ハンドシェイカー(핸드 쉐이커)",
+          "name.zhtw": "ハンドシェイカー(握手者)",
+          "variable": "images/%e3%83%8f%e3%83%b3%e3%83%89%e3%82%b7%e3%82%a7%e3%82%a4%e3%82%ab%e3%83%bc%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "BanG Dream!(BanG Dream!)",
+          "name.en": "BanG Dream!(BanG Dream!)",
+          "name.ja": "BanG Dream!",
+          "name.ko": "BanG Dream!(뱅 드림!)",
+          "name.zhtw": "BanG Dream!(BanG Dream!)",
+          "variable": "images/bang-dream-%e3%83%90%e3%83%b3%e3%83%89%e3%83%aa%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ひきこまり吸血姫の悶々(蜷居吸血鬼的苦恼)",
+          "name.en": "ひきこまり吸血姫の悶々(The Vexations of a Shut-In Vampire Princess)",
+          "name.ja": "ひきこまり吸血姫の悶々",
+          "name.ko": "ひきこまり吸血姫の悶々(히키코마리 흡혈귀의 번민)",
+          "name.zhtw": "ひきこまり吸血姫の悶々(蜷居吸血鬼的苦惱)",
+          "variable": "images/hikikomari"
+        },
+        {
+          "name": "ひげを剃る。そして女子高生を拾う。(剃须。然后捡到女高中生。)",
+          "name.en": "ひげを剃る。そして女子高生を拾う。(Higehiro: After Being Rejected, I Shaved and Took in a High School Runaway)",
+          "name.ja": "ひげを剃る。そして女子高生を拾う。",
+          "name.ko": "ひげを剃る。そして女子高生を拾う。(수염을 깎다. 그리고 여고생을 줍다.)",
+          "name.zhtw": "ひげを剃る。そして女子高生を拾う。(剃鬚。然後撿到女高中生。)",
+          "variable": "images/higehiro"
+        },
+        {
+          "name": "緋弾のアリア(绯弹的亚里亚)",
+          "name.en": "緋弾のアリア(Aria the Scarlet Ammo)",
+          "name.ja": "緋弾のアリア",
+          "name.ko": "緋弾のアリア(비탄의 아리아)",
+          "name.zhtw": "緋弾のアリア(緋彈的亞里亞)",
+          "variable": "category/%e7%b7%8b%e5%bc%be%e3%81%ae%e3%82%a2%e3%83%aa%e3%82%a2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ひとりぼっちの○○生活(一个人的○○生活)",
+          "name.en": "ひとりぼっちの○○生活(Hitoribocchi no ○○ Seikatsu)",
+          "name.ja": "ひとりぼっちの○○生活",
+          "name.ko": "ひとりぼっちの○○生活(혼자다니는 ○○ 생활)",
+          "name.zhtw": "ひとりぼっちの○○生活(一個人的○○生活)",
+          "variable": "images/%e3%81%b2%e3%81%a8%e3%82%8a%e3%81%bc%e3%81%a3%e3%81%a1%e3%81%ae%e2%97%8b%e2%97%8b%e7%94%9f%e6%b4%bb%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ひなこのーと(雏子的便条纸)",
+          "name.en": "ひなこのーと(Hinako Note)",
+          "name.ja": "ひなこのーと",
+          "name.ko": "ひなこのーと(히나코 노트)",
+          "name.zhtw": "ひなこのーと(雛子的便條紙)",
+          "variable": "images/%e3%81%b2%e3%81%aa%e3%81%93%e3%81%ae%e3%83%bc%e3%81%a8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ヒナまつり(雏祭)",
+          "name.en": "ヒナまつり(Hinamatsuri)",
+          "name.ja": "ヒナまつり",
+          "name.ko": "ヒナまつり(히나마츠리)",
+          "name.zhtw": "ヒナまつり(雛祭)",
+          "variable": "images/%e3%83%92%e3%83%8a%e3%81%be%e3%81%a4%e3%82%8a%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "響け！ユーフォニアム(吹响！悠风号)",
+          "name.en": "響け！ユーフォニアム(Sound! Euphonium)",
+          "name.ja": "響け！ユーフォニアム",
+          "name.ko": "響け！ユーフォニアム(울려라! 유포니엄)",
+          "name.zhtw": "響け！ユーフォニアム(吹響！悠風號)",
+          "variable": "category/%e9%9f%bf%e3%81%91%ef%bc%81%e3%83%a6%e3%83%bc%e3%83%95%e3%82%a9%e3%83%8b%e3%82%a2%e3%83%a0%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ヒプノシスマイク(催眠麦克风)",
+          "name.en": "ヒプノシスマイク(Hypnosis Mic)",
+          "name.ja": "ヒプノシスマイク",
+          "name.ko": "ヒプノシスマイク(힙노시스 마이크)",
+          "name.zhtw": "ヒプノシスマイク(催眠麥克風)",
+          "variable": "images/hypnosismic"
+        },
+        {
+          "name": "干物妹！うまるちゃん(宅妹！小埋)",
+          "name.en": "干物妹！うまるちゃん(Himouto! Umaru-chan)",
+          "name.ja": "干物妹！うまるちゃん",
+          "name.ko": "干物妹！うまるちゃん(히모토! 우마루짱)",
+          "name.zhtw": "干物妹！うまるちゃん(宅妹！小埋)",
+          "variable": "category/%e5%b9%b2%e7%89%a9%e5%a6%b9%ef%bc%81%e3%81%86%e3%81%be%e3%82%8b%e3%81%a1%e3%82%83%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "氷菓(冰菓)",
+          "name.en": "氷菓(Hyouka)",
+          "name.ja": "氷菓",
+          "name.ko": "氷菓(빙과)",
+          "name.zhtw": "氷菓(冰菓)",
+          "variable": "tag/%e6%b0%b7%e8%8f%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ファンタシースターオンライン2(梦幻之星Online 2)",
+          "name.en": "ファンタシースターオンライン2(Phantasy Star Online 2)",
+          "name.ja": "ファンタシースターオンライン2",
+          "name.ko": "ファンタシースターオンライン2(판타시 스타 온라인 2)",
+          "name.zhtw": "ファンタシースターオンライン2(夢幻之星Online 2)",
+          "variable": "images/%E3%83%95%E3%82%A1%E3%83%B3%E3%82%BF%E3%82%B7%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%BC%E3%82%AA%E3%83%B3%E3%83%A9%E3%82%A4%E3%83%B32%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "風夏(风夏)",
+          "name.en": "風夏(Fuuka)",
+          "name.ja": "風夏",
+          "name.ko": "風夏(후우카)",
+          "name.zhtw": "風夏(風夏)",
+          "variable": "images/%e9%a2%a8%e5%a4%8f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "フェアリーテイル(妖精的尾巴)",
+          "name.en": "フェアリーテイル(Fairy Tail)",
+          "name.ja": "フェアリーテイル",
+          "name.ko": "フェアリーテイル(페어리 테일)",
+          "name.zhtw": "フェアリーテイル(妖精的尾巴)",
+          "variable": "images/%E3%83%95%E3%82%A7%E3%82%A2%E3%83%AA%E3%83%BC%E3%83%86%E3%82%A4%E3%83%AB%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "Fateシリーズ(Fate系列)",
+          "name.en": "Fateシリーズ(Fate Series)",
+          "name.ja": "Fateシリーズ",
+          "name.ko": "Fateシリーズ(페이트 시리즈)",
+          "name.zhtw": "Fateシリーズ(Fate系列)",
+          "variable": "category/fate%e3%82%b7%e3%83%aa%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "武装少女マキャヴェリズム(武装少女马基雅维利主义)",
+          "name.en": "武装少女マキャヴェリズム(Armed Girl's Machiavellism)",
+          "name.ja": "武装少女マキャヴェリズム",
+          "name.ko": "武装少女マキャヴェリズム(무장소녀 마키아벨리즘)",
+          "name.zhtw": "武装少女マキャヴェリズム(武裝少女馬基雅維利主義)",
+          "variable": "images/%e6%ad%a6%e8%a3%85%e5%b0%91%e5%a5%b3%e3%83%9e%e3%82%ad%e3%83%a3%e3%83%b4%e3%82%a7%e3%83%aa%e3%82%ba%e3%83%a0%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "豚のレバーは加熱しろ(猪肝要充分加热)",
+          "name.en": "豚のレバーは加熱しろ(Campfire Cooking in Another World... (wrong) / Hog the Liver)",
+          "name.ja": "豚のレバーは加熱しろ",
+          "name.ko": "豚のレバーは加熱しろ(돼지 간은 충분히 가열하라)",
+          "name.zhtw": "豚のレバーは加熱しろ(豬肝要充分加熱)",
+          "variable": "images/butaliver"
+        },
+        {
+          "name": "普通の女子校生が【ろこどる】やってみた(普通女高生挑战地方偶像)",
+          "name.en": "普通の女子校生が【ろこどる】やってみた(Futsuu no Joshikousei ga 'Locodol' Yattemita)",
+          "name.ja": "普通の女子校生が【ろこどる】やってみた",
+          "name.ko": "普通の女子校生が【ろこどる】やってみた(평범한 여고생이 로코돌 해봤다)",
+          "name.zhtw": "普通の女子校生が【ろこどる】やってみた(普通女高生挑戰地方偶像)",
+          "variable": "tag/%e6%99%ae%e9%80%9a%e3%81%ae%e5%a5%b3%e5%ad%90%e6%a0%a1%e7%94%9f%e3%81%8c%e3%80%90%e3%82%8d%e3%81%93%e3%81%a9%e3%82%8b%e3%80%91%e3%82%84%e3%81%a3%e3%81%a6%e3%81%bf%e3%81%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ふらいんぐうぃっち(飞翔女巫)",
+          "name.en": "ふらいんぐうぃっち(Flying Witch)",
+          "name.ja": "ふらいんぐうぃっち",
+          "name.ko": "ふらいんぐうぃっち(플라잉 위치)",
+          "name.zhtw": "ふらいんぐうぃっち(飛翔女巫)",
+          "variable": "images/%e3%81%b5%e3%82%89%e3%81%84%e3%82%93%e3%81%90%e3%81%86%e3%81%83%e3%81%a3%e3%81%a1%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "プラスティック・メモリーズ(塑料记忆)",
+          "name.en": "プラスティック・メモリーズ(Plastic Memories)",
+          "name.ja": "プラスティック・メモリーズ",
+          "name.ko": "プラスティック・メモリーズ(플라스틱 메모리즈)",
+          "name.zhtw": "プラスティック・メモリーズ(塑料記憶)",
+          "variable": "images/%e3%83%97%e3%83%a9%e3%82%b9%e3%83%86%e3%82%a3%e3%83%83%e3%82%af%e3%83%a1%e3%83%a2%e3%83%aa%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ブラック・ブレット(黑色子弹)",
+          "name.en": "ブラック・ブレット(Black Bullet)",
+          "name.ja": "ブラック・ブレット",
+          "name.ko": "ブラック・ブレット(블랙 불릿)",
+          "name.zhtw": "ブラック・ブレット(黑色子彈)",
+          "variable": "category/%e3%83%96%e3%83%a9%e3%83%83%e3%82%af%e3%83%bb%e3%83%96%e3%83%ac%e3%83%83%e3%83%88%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "BLOOD-C(BLOOD-C)",
+          "name.en": "BLOOD-C(BLOOD-C)",
+          "name.ja": "BLOOD-C",
+          "name.ko": "BLOOD-C(BLOOD-C)",
+          "name.zhtw": "BLOOD-C(BLOOD-C)",
+          "variable": "images/BLOOD-C%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "planetarian(planetarian 小小星之梦)",
+          "name.en": "planetarian(planetarian: The Reverie of a Little Planet)",
+          "name.ja": "planetarian",
+          "name.ko": "planetarian(planetarian)",
+          "name.zhtw": "planetarian(planetarian 小小星之夢)",
+          "variable": "images/planetarian%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "プリンス・オブ・ストライド(跨越之王)",
+          "name.en": "プリンス・オブ・ストライド(Prince of Stride: Alternative)",
+          "name.ja": "プリンス・オブ・ストライド",
+          "name.ko": "プリンス・オブ・ストライド(프린스 오브 스트라이드)",
+          "name.zhtw": "プリンス・オブ・ストライド(跨越之王)",
+          "variable": "images/%E3%83%97%E3%83%AA%E3%83%B3%E3%82%B9%E3%83%BB%E3%82%AA%E3%83%96%E3%83%BB%E3%82%B9%E3%83%88%E3%83%A9%E3%82%A4%E3%83%89%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "Free!(Free!-游泳！-)",
+          "name.en": "Free!(Free! Iwatobi Swim Club)",
+          "name.ja": "Free!",
+          "name.ko": "Free!(프리!)",
+          "name.zhtw": "Free!(Free!-游泳！-)",
+          "variable": "images/free%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "プリンセス・プリンシパル(公主代理人)",
+          "name.en": "プリンセス・プリンシパル(Princess Principal)",
+          "name.ja": "プリンセス・プリンシパル",
+          "name.ko": "プリンセス・プリンシパル(프린세스 프린시팔)",
+          "name.zhtw": "プリンセス・プリンシパル(公主代理人)",
+          "variable": "images/%e3%83%97%e3%83%aa%e3%83%b3%e3%82%bb%e3%82%b9%e3%83%bb%e3%83%97%e3%83%aa%e3%83%b3%e3%82%b7%e3%83%91%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ブルーアーカイブ -Blue Archive-(蔚蓝档案)",
+          "name.en": "ブルーアーカイブ -Blue Archive-(Blue Archive)",
+          "name.ja": "ブルーアーカイブ -Blue Archive-",
+          "name.ko": "ブルーアーカイブ -Blue Archive-(블루 아카이브)",
+          "name.zhtw": "ブルーアーカイブ -Blue Archive-(蔚藍檔案)",
+          "variable": "images/bluearchive"
+        },
+        {
+          "name": "ブルーリフレクション(蓝色反射)",
+          "name.en": "ブルーリフレクション(BLUE REFLECTION)",
+          "name.ja": "ブルーリフレクション",
+          "name.ko": "ブルーリフレクション(블루 리플렉션)",
+          "name.zhtw": "ブルーリフレクション(藍色反射)",
+          "variable": "images/%e3%83%96%e3%83%ab%e3%83%bc%e3%83%aa%e3%83%95%e3%83%ac%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "フレームアームズ・ガール(骨装机娘)",
+          "name.en": "フレームアームズ・ガール(Frame Arms Girl)",
+          "name.ja": "フレームアームズ・ガール",
+          "name.ko": "フレームアームズ・ガール(프레임 암즈 걸)",
+          "name.zhtw": "フレームアームズ・ガール(骨裝機娘)",
+          "variable": "images/%e3%83%95%e3%83%ac%e3%83%bc%e3%83%a0%e3%82%a2%e3%83%bc%e3%83%a0%e3%82%ba%e3%83%bb%e3%82%ac%e3%83%bc%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ブレイブ・ストーリー(勇者物语)",
+          "name.en": "ブレイブ・ストーリー(Brave Story)",
+          "name.ja": "ブレイブ・ストーリー",
+          "name.ko": "ブレイブ・ストーリー(브레이브 스토리)",
+          "name.zhtw": "ブレイブ・ストーリー(勇者物語)",
+          "variable": "images/%E3%83%96%E3%83%AC%E3%82%A4%E3%83%96%E3%83%BB%E3%82%B9%E3%83%88%E3%83%BC%E3%83%AA%E3%83%BC%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ブレイブウィッチーズ(勇敢的女巫们)",
+          "name.en": "ブレイブウィッチーズ(Brave Witches)",
+          "name.ja": "ブレイブウィッチーズ",
+          "name.ko": "ブレイブウィッチーズ(브레이브 위치즈)",
+          "name.zhtw": "ブレイブウィッチーズ(勇敢的女巫們)",
+          "variable": "images/%e3%83%96%e3%83%ac%e3%82%a4%e3%83%96%e3%82%a6%e3%82%a3%e3%83%83%e3%83%81%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ブレンド・S(混合S)",
+          "name.en": "ブレンド・S(Blend S)",
+          "name.ja": "ブレンド・S",
+          "name.ko": "ブレンド・S(블렌드·S)",
+          "name.zhtw": "ブレンド・S(混合S)",
+          "variable": "images/%e3%83%96%e3%83%ac%e3%83%b3%e3%83%89s%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "プロジェクトセカイ(世界计划 彩色舞台)",
+          "name.en": "プロジェクトセカイ(Project SEKAI Colorful Stage!)",
+          "name.ja": "プロジェクトセカイ",
+          "name.ko": "プロジェクトセカイ(프로젝트 세카이)",
+          "name.zhtw": "プロジェクトセカイ(世界計劃 彩色舞台)",
+          "variable": "images/project_sekai"
+        },
+        {
+          "name": "文豪ストレイドッグス(文豪野犬)",
+          "name.en": "文豪ストレイドッグス(Bungo Stray Dogs)",
+          "name.ja": "文豪ストレイドッグス",
+          "name.ko": "文豪ストレイドッグス(문호 스트레이독스)",
+          "name.zhtw": "文豪ストレイドッグス(文豪野犬)",
+          "variable": "images/%e6%96%87%e8%b1%aa%e3%82%b9%e3%83%88%e3%83%ac%e3%82%a4%e3%83%89%e3%83%83%e3%82%b0%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ヘヴィーオブジェクト(重型武装战列舰)",
+          "name.en": "ヘヴィーオブジェクト(Heavy Object)",
+          "name.ja": "ヘヴィーオブジェクト",
+          "name.ko": "ヘヴィーオブジェクト(헤비 오브젝트)",
+          "name.zhtw": "ヘヴィーオブジェクト(重型武裝戰列艦)",
+          "variable": "images/%E3%83%98%E3%83%B4%E3%82%A3%E3%83%BC%E3%82%AA%E3%83%96%E3%82%B8%E3%82%A7%E3%82%AF%E3%83%88%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ペルソナ4(女神异闻录4)",
+          "name.en": "ペルソナ4(Persona 4)",
+          "name.ja": "ペルソナ4",
+          "name.ko": "ペルソナ4(페르소나 4)",
+          "name.zhtw": "ペルソナ4(女神異聞錄4)",
+          "variable": "images/%E3%83%9A%E3%83%AB%E3%82%BD%E3%83%8A4%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ペルソナ5(女神异闻录5)",
+          "name.en": "ペルソナ5(Persona 5)",
+          "name.ja": "ペルソナ5",
+          "name.ko": "ペルソナ5(페르소나 5)",
+          "name.zhtw": "ペルソナ5(女神異聞錄5)",
+          "variable": "images/%e3%83%9a%e3%83%ab%e3%82%bd%e3%83%8a5%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "放課後ていぼう日誌(放学后堤坝日志)",
+          "name.en": "放課後ていぼう日誌(Diary of Our Days at the Breakwater)",
+          "name.ja": "放課後ていぼう日誌",
+          "name.ko": "放課後ていぼう日誌(방과후 제방 일지)",
+          "name.zhtw": "放課後ていぼう日誌(放學後堤壩日誌)",
+          "variable": "images/%e6%94%be%e8%aa%b2%e5%be%8c%e3%81%a6%e3%81%84%e3%81%bc%e3%81%86%e6%97%a5%e8%aa%8c%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "VOCALOID(VOCALOID)",
+          "name.en": "VOCALOID(VOCALOID)",
+          "name.ja": "VOCALOID",
+          "name.ko": "VOCALOID(보컬로이드)",
+          "name.zhtw": "VOCALOID(VOCALOID)",
+          "variable": "category/vocaloid%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "僕だけがいない街(只有我不在的城市)",
+          "name.en": "僕だけがいない街(ERASED)",
+          "name.ja": "僕だけがいない街",
+          "name.ko": "僕だけがいない街(나만이 없는 거리)",
+          "name.zhtw": "僕だけがいない街(只有我不在的城市)",
+          "variable": "images/%E5%83%95%E3%81%A0%E3%81%91%E3%81%8C%E3%81%84%E3%81%AA%E3%81%84%E8%A1%97%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ぼくたちのリメイク(我们的重制版)",
+          "name.en": "ぼくたちのリメイク(Our Making-of)",
+          "name.ja": "ぼくたちのリメイク",
+          "name.ko": "ぼくたちのリメイク(우리들의 리메이크)",
+          "name.zhtw": "ぼくたちのリメイク(我們的重製版)",
+          "variable": "images/%e3%81%bc%e3%81%8f%e3%83%aa%e3%83%a1"
+        },
+        {
+          "name": "ぼくたちは勉強ができない(我们无法一起学习)",
+          "name.en": "ぼくたちは勉強ができない(We Never Learn)",
+          "name.ja": "ぼくたちは勉強ができない",
+          "name.ko": "ぼくたちは勉強ができない(우리는 공부를 못해)",
+          "name.zhtw": "ぼくたちは勉強ができない(我們無法一起學習)",
+          "variable": "images/%e3%81%bc%e3%81%8f%e5%8b%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "僕の心のヤバイやつ(我心里危险的东西)",
+          "name.en": "僕の心のヤバイやつ(The Dangers in My Heart)",
+          "name.ja": "僕の心のヤバイやつ",
+          "name.ko": "僕の心のヤバイやつ(내 마음속의 위험한 녀석)",
+          "name.zhtw": "僕の心のヤバイやつ(我心裡危險的東西)",
+          "variable": "images/bokuyaba"
+        },
+        {
+          "name": "僕のヒーローアカデミア(我的英雄学院)",
+          "name.en": "僕のヒーローアカデミア(My Hero Academia)",
+          "name.ja": "僕のヒーローアカデミア",
+          "name.ko": "僕のヒーローアカデミア(나의 히어로 아카데미아)",
+          "name.zhtw": "僕のヒーローアカデミア(我的英雄學院)",
+          "variable": "images/%e5%83%95%e3%81%ae%e3%83%92%e3%83%bc%e3%83%ad%e3%83%bc%e3%82%a2%e3%82%ab%e3%83%87%e3%83%9f%e3%82%a2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ポケモン(宝可梦)",
+          "name.en": "ポケモン(Pokémon)",
+          "name.ja": "ポケモン",
+          "name.ko": "ポケモン(포켓몬스터)",
+          "name.zhtw": "ポケモン(寶可夢)",
+          "variable": "images/%e3%83%9d%e3%82%b1%e3%83%a2%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "星屑テレパス(星尘传心)",
+          "name.en": "星屑テレパス(Hoshikuzu Telepath)",
+          "name.ja": "星屑テレパス",
+          "name.ko": "星屑テレパス(별먼지 텔레파스)",
+          "name.zhtw": "星屑テレパス(星塵傳心)",
+          "variable": "images/hoshitele"
+        },
+        {
+          "name": "ぼっち・ざ・ろっく!(孤独摇滚！)",
+          "name.en": "ぼっち・ざ・ろっく!(Bocchi the Rock!)",
+          "name.ja": "ぼっち・ざ・ろっく!",
+          "name.ko": "ぼっち・ざ・ろっく!(봇치 더 록!)",
+          "name.zhtw": "ぼっち・ざ・ろっく!(孤獨搖滾！)",
+          "variable": "images/bocchi_the_rock"
+        },
+        {
+          "name": "ポッピンQ(踢踏Q！)",
+          "name.en": "ポッピンQ(Poppin'Q)",
+          "name.ja": "ポッピンQ",
+          "name.ko": "ポッピンQ(팝핀 Q)",
+          "name.zhtw": "ポッピンQ(踢踏Q！)",
+          "variable": "images/%e3%83%9d%e3%83%83%e3%83%94%e3%83%b3q%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ポプテピピック(大波普子)",
+          "name.en": "ポプテピピック(Pop Team Epic)",
+          "name.ja": "ポプテピピック",
+          "name.ko": "ポプテピピック(팝팀에픽)",
+          "name.zhtw": "ポプテピピック(大波普子)",
+          "variable": "images/%e3%83%9d%e3%83%97%e3%83%86%e3%83%94%e3%83%94%e3%83%83%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ホリミヤ(堀与宫村)",
+          "name.en": "ホリミヤ(Horimiya)",
+          "name.ja": "ホリミヤ",
+          "name.ko": "ホリミヤ(호리미야)",
+          "name.zhtw": "ホリミヤ(堀與宮村)",
+          "variable": "images/horimiya"
+        },
+        {
+          "name": "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜(不适合魔王学院)",
+          "name.en": "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜(The Misfit of Demon King Academy)",
+          "name.ja": "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜",
+          "name.ko": "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜(마왕학원의 부적합자)",
+          "name.zhtw": "魔王学院の不適合者 〜史上最強の魔王の始祖、転生して子孫たちの学校へ通う〜(不適合魔王學院)",
+          "variable": "images/%e9%ad%94%e7%8e%8b%e5%ad%a6%e9%99%a2%e3%81%ae%e4%b8%8d%e9%81%a9%e5%90%88%e8%80%85%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "マクロスΔ(超时空要塞Δ)",
+          "name.en": "マクロスΔ(Macross Delta)",
+          "name.ja": "マクロスΔ",
+          "name.ko": "マクロスΔ(마크로스 델타)",
+          "name.zhtw": "マクロスΔ(超時空要塞Δ)",
+          "variable": "images/%e3%83%9e%e3%82%af%e3%83%ad%e3%82%b9%ce%b4%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "政宗くんのリベンジ(政宗君的复仇)",
+          "name.en": "政宗くんのリベンジ(Masamune-kun's Revenge)",
+          "name.ja": "政宗くんのリベンジ",
+          "name.ko": "政宗くんのリベンジ(마사무네 군의 복수)",
+          "name.zhtw": "政宗くんのリベンジ(政宗君的復仇)",
+          "variable": "images/%e6%94%bf%e5%ae%97%e3%81%8f%e3%82%93%e3%81%ae%e3%83%aa%e3%83%99%e3%83%b3%e3%82%b8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "まじもじるるも(魔法少女Rurumo)",
+          "name.en": "まじもじるるも(Majimoji Rurumo)",
+          "name.ja": "まじもじるるも",
+          "name.ko": "まじもじるるも(마지모지 루루모)",
+          "name.zhtw": "まじもじるるも(魔法少女Rurumo)",
+          "variable": "tag/%e3%81%be%e3%81%98%e3%82%82%e3%81%98%e3%82%8b%e3%82%8b%e3%82%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "魔法科高校の劣等生(魔法科高校的劣等生)",
+          "name.en": "魔法科高校の劣等生(The Irregular at Magic High School)",
+          "name.ja": "魔法科高校の劣等生",
+          "name.ko": "魔法科高校の劣等生(마법과 고교의 열등생)",
+          "name.zhtw": "魔法科高校の劣等生(魔法科高校的劣等生)",
+          "variable": "category/%e9%ad%94%e6%b3%95%e7%a7%91%e9%ab%98%e6%a0%a1%e3%81%ae%e5%8a%a3%e7%ad%89%e7%94%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "魔法少女育成計画(魔法少女育成计划)",
+          "name.en": "魔法少女育成計画(Magical Girl Raising Project)",
+          "name.ja": "魔法少女育成計画",
+          "name.ko": "魔法少女育成計画(마법소녀 육성계획)",
+          "name.zhtw": "魔法少女育成計画(魔法少女育成計劃)",
+          "variable": "images/%e9%ad%94%e6%b3%95%e5%b0%91%e5%a5%b3%e8%82%b2%e6%88%90%e8%a8%88%e7%94%bb%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "魔法少女まどか☆マギカ(魔法少女小圆)",
+          "name.en": "魔法少女まどか☆マギカ(Puella Magi Madoka Magica)",
+          "name.ja": "魔法少女まどか☆マギカ",
+          "name.ko": "魔法少女まどか☆マギカ(마법소녀 마도카☆마기카)",
+          "name.zhtw": "魔法少女まどか☆マギカ(魔法少女小圓)",
+          "variable": "category/%e9%ad%94%e6%b3%95%e5%b0%91%e5%a5%b3%e3%81%be%e3%81%a9%e3%81%8b%e3%83%9e%e3%82%ae%e3%82%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "魔法少女リリカルなのはViVid(魔法少女奈叶ViVid)",
+          "name.en": "魔法少女リリカルなのはViVid(Magical Girl Lyrical Nanoha ViVid)",
+          "name.ja": "魔法少女リリカルなのはViVid",
+          "name.ko": "魔法少女リリカルなのはViVid(마법소녀 리리컬 나노하 ViVid)",
+          "name.zhtw": "魔法少女リリカルなのはViVid(魔法少女奈葉ViVid)",
+          "variable": "images/%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%83%AA%E3%83%AA%E3%82%AB%E3%83%AB%E3%81%AA%E3%81%AE%E3%81%AFvivid%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "迷家-マヨイガ-(迷宅-MAYOIGA-)",
+          "name.en": "迷家-マヨイガ-(Mayoiga)",
+          "name.ja": "迷家-マヨイガ-",
+          "name.ko": "迷家-マヨイガ-(마요이가)",
+          "name.zhtw": "迷家-マヨイガ-(迷宅-MAYOIGA-)",
+          "variable": "images/%e8%bf%b7%e5%ae%b6-%e3%83%9e%e3%83%a8%e3%82%a4%e3%82%ac-%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "見える子ちゃん(能看见妖怪的小酱)",
+          "name.en": "見える子ちゃん(Mieruko-chan)",
+          "name.ja": "見える子ちゃん",
+          "name.ko": "見える子ちゃん(미에루코 짱)",
+          "name.zhtw": "見える子ちゃん(能看見妖怪的小醬)",
+          "variable": "images/mierukochan"
+        },
+        {
+          "name": "未確認で進行形(以未确认的状态进行中)",
+          "name.en": "未確認で進行形(Unconfirmed Marching Band)",
+          "name.ja": "未確認で進行形",
+          "name.ko": "未確認で進行形(미확인으로 진행형)",
+          "name.zhtw": "未確認で進行形(以未確認的狀態進行中)",
+          "variable": "images/%E6%9C%AA%E7%A2%BA%E8%AA%8D%E3%81%A7%E9%80%B2%E8%A1%8C%E5%BD%A2%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "三ツ星カラーズ(三颗星彩色队)",
+          "name.en": "三ツ星カラーズ(Mitsuboshi Colors)",
+          "name.ja": "三ツ星カラーズ",
+          "name.ko": "三ツ星カラーズ(세 개의 별 컬러즈)",
+          "name.zhtw": "三ツ星カラーズ(三顆星彩色隊)",
+          "variable": "images/%e4%b8%89%e3%83%84%e6%98%9f%e3%82%ab%e3%83%a9%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "無彩限のファントム・ワールド(无彩限的幻影世界)",
+          "name.en": "無彩限のファントム・ワールド(Myriad Colors Phantom World)",
+          "name.ja": "無彩限のファントム・ワールド",
+          "name.ko": "無彩限のファントム・ワールド(무채한의 팬텀 월드)",
+          "name.zhtw": "無彩限のファントム・ワールド(無彩限的幻影世界)",
+          "variable": "images/%E7%84%A1%E5%BD%A9%E9%99%90%E3%81%AE%E3%83%95%E3%82%A1%E3%83%B3%E3%83%88%E3%83%A0%E3%83%BB%E3%83%AF%E3%83%BC%E3%83%AB%E3%83%89%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "無職転生 〜異世界行ったら本気だす〜(无职转生～到了异世界就拿出真本事～)",
+          "name.en": "無職転生 〜異世界行ったら本気だす〜(Mushoku Tensei: Jobless Reincarnation)",
+          "name.ja": "無職転生 〜異世界行ったら本気だす〜",
+          "name.ko": "無職転生 〜異世界行ったら本気だす〜(무직전생 ~이세계행으면 진심낸다~)",
+          "name.zhtw": "無職転生 〜異世界行ったら本気だす〜(無職轉生～到了異世界就拿出真本事～)",
+          "variable": "images/mushokutensei"
+        },
+        {
+          "name": "メイドインアビス(来自深渊)",
+          "name.en": "メイドインアビス(Made in Abyss)",
+          "name.ja": "メイドインアビス",
+          "name.ko": "メイドインアビス(메이드 인 어비스)",
+          "name.zhtw": "メイドインアビス(來自深淵)",
+          "variable": "images/%e3%83%a1%e3%82%a4%e3%83%89%e3%82%a4%e3%83%b3%e3%82%a2%e3%83%93%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "メルヘン・メドヘン(梅尔兴少女)",
+          "name.en": "メルヘン・メドヘン(Märchen Mädchen)",
+          "name.ja": "メルヘン・メドヘン",
+          "name.ko": "メルヘン・メドヘン(메르헨 메드헨)",
+          "name.zhtw": "メルヘン・メドヘン(梅爾興少女)",
+          "variable": "images/%e3%83%a1%e3%83%ab%e3%83%98%e3%83%b3%e3%83%a1%e3%83%89%e3%83%98%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "物語シリーズ(物语系列)",
+          "name.en": "物語シリーズ(Monogatari Series)",
+          "name.ja": "物語シリーズ",
+          "name.ko": "物語シリーズ(이야기 시리즈)",
+          "name.zhtw": "物語シリーズ(物語系列)",
+          "variable": "images/%e7%89%a9%e8%aa%9e%e3%82%b7%e3%83%aa%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "モブサイコ100(灵能百分百)",
+          "name.en": "モブサイコ100(Mob Psycho 100)",
+          "name.ja": "モブサイコ100",
+          "name.ko": "モブサイコ100(모브사이코 100)",
+          "name.zhtw": "モブサイコ100(靈能百分百)",
+          "variable": "images/%e3%83%a2%e3%83%96%e3%82%b5%e3%82%a4%e3%82%b3100%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "問題児たちが異世界から来るそうですよ？(问题少年从异世界而来？)",
+          "name.en": "問題児たちが異世界から来るそうですよ？(Problem Children Are Coming from Another World, Aren't They?)",
+          "name.ja": "問題児たちが異世界から来るそうですよ？",
+          "name.ko": "問題児たちが異世界から来るそうですよ？(문제아들이 이세계에서 온다는 것 아닌가요?)",
+          "name.zhtw": "問題児たちが異世界から来るそうですよ？(問題少年從異世界而來？)",
+          "variable": "images/%e5%95%8f%e9%a1%8c%e5%85%90%e3%81%9f%e3%81%a1%e3%81%8c%e7%95%b0%e4%b8%96%e7%95%8c%e3%81%8b%e3%82%89%e6%9d%a5%e3%82%8b%e3%81%9d%e3%81%86%e3%81%a7%e3%81%99%e3%82%88%ef%bc%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "やがて君になる(终将成为你)",
+          "name.en": "やがて君になる(Bloom Into You)",
+          "name.ja": "やがて君になる",
+          "name.ko": "やがて君になる(이윽고 너가 된다)",
+          "name.zhtw": "やがて君になる(終將成為你)",
+          "variable": "images/%e3%82%84%e3%81%8c%e5%90%9b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "やはり俺の青春ラブコメはまちがっている。(果然我的青春恋爱喜剧搞错了。)",
+          "name.en": "やはり俺の青春ラブコメはまちがっている。(My Teen Romantic Comedy SNAFU)",
+          "name.ja": "やはり俺の青春ラブコメはまちがっている。",
+          "name.ko": "やはり俺の青春ラブコメはまちがっている。(역시 내 청춘 러브코메디는 잘못됐다)",
+          "name.zhtw": "やはり俺の青春ラブコメはまちがっている。(果然我的青春戀愛喜劇搞錯了。)",
+          "variable": "category/%e3%82%84%e3%81%af%e3%82%8a%e4%bf%ba%e3%81%ae%e9%9d%92%e6%98%a5%e3%83%a9%e3%83%96%e3%82%b3%e3%83%a1%e3%81%af%e3%81%be%e3%81%a1%e3%81%8c%e3%81%a3%e3%81%a6%e3%81%84%e3%82%8b%e3%80%82%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ヤマノススメ(山野之鹰)",
+          "name.en": "ヤマノススメ(Encouragement of Climb)",
+          "name.ja": "ヤマノススメ",
+          "name.ko": "ヤマノススメ(야마노 스스메)",
+          "name.zhtw": "ヤマノススメ(山野之鷹)",
+          "variable": "tag/%e3%83%a4%e3%83%9e%e3%83%8e%e3%82%b9%e3%82%b9%e3%83%a1%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "結城友奈は勇者である(结城友奈是勇者)",
+          "name.en": "結城友奈は勇者である(Yuki Yuna is a Hero)",
+          "name.ja": "結城友奈は勇者である",
+          "name.ko": "結城友奈は勇者である(유키 유나는 용자다)",
+          "name.zhtw": "結城友奈は勇者である(結城友奈是勇者)",
+          "variable": "category/%e7%b5%90%e5%9f%8e%e5%8f%8b%e5%a5%88%e3%81%af%e5%8b%87%e8%80%85%e3%81%a7%e3%81%82%e3%82%8b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ユーリ!!! on ICE(冰上的尤里！！！)",
+          "name.en": "ユーリ!!! on ICE(Yuri!!! on ICE)",
+          "name.ja": "ユーリ!!! on ICE",
+          "name.ko": "ユーリ!!! on ICE(유리!!! on ICE)",
+          "name.zhtw": "ユーリ!!! on ICE(冰上的尤里！！！)",
+          "variable": "images/%e3%83%a6%e3%83%bc%e3%83%aa_on_ice%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "夢見る男子は現実主義者(做梦的男子是现实主义者)",
+          "name.en": "夢見る男子は現実主義者(A Dreaming Boy Is a Realist)",
+          "name.ja": "夢見る男子は現実主義者",
+          "name.ko": "夢見る男子は現実主義者(꿈꾸는 남자는 현실주의자)",
+          "name.zhtw": "夢見る男子は現実主義者(做夢的男子是現實主義者)",
+          "variable": "images/yumemirudanshi"
+        },
+        {
+          "name": "ゆゆ式(悠悠式)",
+          "name.en": "ゆゆ式(Yuyushiki)",
+          "name.ja": "ゆゆ式",
+          "name.ko": "ゆゆ式(유유식)",
+          "name.zhtw": "ゆゆ式(悠悠式)",
+          "variable": "images/%e3%82%86%e3%82%86%e5%bc%8f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゆらぎ荘の幽奈さん(游行荘的幽奈小姐)",
+          "name.en": "ゆらぎ荘の幽奈さん(Yuuna and the Haunted Hot Springs)",
+          "name.ja": "ゆらぎ荘の幽奈さん",
+          "name.ko": "ゆらぎ荘の幽奈さん(유라기 장의 유우나 씨)",
+          "name.zhtw": "ゆらぎ荘の幽奈さん(游行莊的幽奈小姐)",
+          "variable": "images/%e3%82%86%e3%82%89%e3%81%8e%e8%8d%98%e3%81%ae%e5%b9%bd%e5%a5%88%e3%81%95%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゆるキャン△(摇曳露营△)",
+          "name.en": "ゆるキャン△(Laid-Back Camp)",
+          "name.ja": "ゆるキャン△",
+          "name.ko": "ゆるキャン△(유루캠△)",
+          "name.zhtw": "ゆるキャン△(搖曳露營△)",
+          "variable": "images/%e3%82%86%e3%82%8b%e3%82%ad%e3%83%a3%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ゆるゆり(悠哉百合)",
+          "name.en": "ゆるゆり(YuruYuri)",
+          "name.ja": "ゆるゆり",
+          "name.ko": "ゆるゆり(유루유리)",
+          "name.zhtw": "ゆるゆり(悠哉百合)",
+          "variable": "images/%E3%82%86%E3%82%8B%E3%82%86%E3%82%8A%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ようこそ実力至上主義の教室へ(欢迎来到实力至上主义的教室)",
+          "name.en": "ようこそ実力至上主義の教室へ(Classroom of the Elite)",
+          "name.ja": "ようこそ実力至上主義の教室へ",
+          "name.ko": "ようこそ実力至上主義の教室へ(어서오세요, 실력지상주의 교실에)",
+          "name.zhtw": "ようこそ実力至上主義の教室へ(歡迎來到實力至上主義的教室)",
+          "variable": "images/%e3%82%88%e3%81%86%e5%ae%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "幼女戦記(幼女战记)",
+          "name.en": "幼女戦記(Saga of Tanya the Evil)",
+          "name.ja": "幼女戦記",
+          "name.ko": "幼女戦記(유녀전기)",
+          "name.zhtw": "幼女戦記(幼女戰記)",
+          "variable": "images/%e5%b9%bc%e5%a5%b3%e6%88%a6%e8%a8%98%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "弱虫ペダル(弱虫踏单车)",
+          "name.en": "弱虫ペダル(Yowamushi Pedal)",
+          "name.ja": "弱虫ペダル",
+          "name.ko": "弱虫ペダル(약충 페달)",
+          "name.zhtw": "弱虫ペダル(弱蟲踏單車)",
+          "variable": "category/%e5%bc%b1%e8%99%ab%e3%83%9a%e3%83%80%e3%83%ab%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ラーメン大好き小泉さん(超爱拉面的小泉小姐)",
+          "name.en": "ラーメン大好き小泉さん(Ms. Koizumi Loves Ramen Noodles)",
+          "name.ja": "ラーメン大好き小泉さん",
+          "name.ko": "ラーメン大好き小泉さん(라멘 좋아하는 코이즈미 양)",
+          "name.zhtw": "ラーメン大好き小泉さん(超愛拉麵的小泉小姐)",
+          "variable": "images/%e3%83%a9%e3%83%bc%e3%83%a1%e3%83%b3%e5%a4%a7%e5%a5%bd%e3%81%8d%e5%b0%8f%e6%b3%89%e3%81%95%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ライアー・ライアー(骗子骗子)",
+          "name.en": "ライアー・ライアー(Liar Liar)",
+          "name.ja": "ライアー・ライアー",
+          "name.ko": "ライアー・ライアー(라이어 라이어)",
+          "name.zhtw": "ライアー・ライアー(騙子騙子)",
+          "variable": "images/liar-liar"
+        },
+        {
+          "name": "ライザのアトリエ(莱莎的炼金工房)",
+          "name.en": "ライザのアトリエ(Atelier Ryza)",
+          "name.ja": "ライザのアトリエ",
+          "name.ko": "ライザのアトリエ(라이자의 아틀리에)",
+          "name.zhtw": "ライザのアトリエ(萊莎的鍊金工房)",
+          "variable": "images/%e3%83%a9%e3%82%a4%e3%82%b6%e3%81%ae%e3%82%a2%e3%83%88%e3%83%aa%e3%82%a8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "らき☆すた(幸运☆星)",
+          "name.en": "らき☆すた(Lucky Star)",
+          "name.ja": "らき☆すた",
+          "name.ko": "らき☆すた(러키☆스타)",
+          "name.zhtw": "らき☆すた(幸運☆星)",
+          "variable": "tag/%e3%82%89%e3%81%8d%e2%98%86%e3%81%99%e3%81%9f%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ラクエンロジック(乐园逻辑)",
+          "name.en": "ラクエンロジック(Luck & Logic)",
+          "name.ja": "ラクエンロジック",
+          "name.ko": "ラクエンロジック(라쿠엔 로직)",
+          "name.zhtw": "ラクエンロジック(樂園邏輯)",
+          "variable": "images/%E3%83%A9%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%AD%E3%82%B8%E3%83%83%E3%82%AF%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ラピスリライツ(碧辉纷呈！)",
+          "name.en": "ラピスリライツ(Lapis Re:LiGHTs)",
+          "name.ja": "ラピスリライツ",
+          "name.ko": "ラピスリライツ(라피스 리라이츠)",
+          "name.zhtw": "ラピスリライツ(碧輝紛呈！)",
+          "variable": "images/%e3%83%a9%e3%83%94%e3%83%a9%e3%82%a4%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ラブライブ！(LoveLive!)",
+          "name.en": "ラブライブ！(Love Live!)",
+          "name.ja": "ラブライブ！",
+          "name.ko": "ラブライブ！(러브라이브!)",
+          "name.zhtw": "ラブライブ！(LoveLive!)",
+          "variable": "category/%e3%83%a9%e3%83%96%e3%83%a9%e3%82%a4%e3%83%96%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ラブライブ！サンシャイン!!(LoveLive!阳光!!)",
+          "name.en": "ラブライブ！サンシャイン!!(Love Live! Sunshine!!)",
+          "name.ja": "ラブライブ！サンシャイン!!",
+          "name.ko": "ラブライブ！サンシャイン!!(러브라이브! 선샤인!!)",
+          "name.zhtw": "ラブライブ！サンシャイン!!(LoveLive!陽光!!)",
+          "variable": "%E3%83%A9%E3%83%96%E3%83%A9%E3%82%A4%E3%83%96-%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%B3%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ラブライブ！スーパースター!!(LoveLive!超级明星!!)",
+          "name.en": "ラブライブ！スーパースター!!(Love Live! Superstar!!)",
+          "name.ja": "ラブライブ！スーパースター!!",
+          "name.ko": "ラブライブ！スーパースター!!(러브라이브! 슈퍼스타!!)",
+          "name.zhtw": "ラブライブ！スーパースター!!(LoveLive!超級明星!!)",
+          "variable": "category/lovelive_superstar_liella"
+        },
+        {
+          "name": "ラブライブ！虹ヶ咲学園スクールアイドル同好会(LoveLive!虹咲学院学园偶像同好会)",
+          "name.en": "ラブライブ！虹ヶ咲学園スクールアイドル同好会(Love Live! Nijigasaki High School Idol Club)",
+          "name.ja": "ラブライブ！虹ヶ咲学園スクールアイドル同好会",
+          "name.ko": "ラブライブ！虹ヶ咲学園スクールアイドル同好会(러브라이브! 니지가사키 학원 스쿨 아이돌 동호회)",
+          "name.zhtw": "ラブライブ！虹ヶ咲学園スクールアイドル同好会(LoveLive!虹咲學院學園偶像同好會)",
+          "variable": "category/%e3%83%a9%e3%83%96%e3%83%a9%e3%82%a4%e3%83%96%e8%99%b9%e3%83%b6%e5%92%b2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ラブライブ！蓮ノ空女学院スクールアイドルクラブ(LoveLive!莲之空女学院学园偶像部)",
+          "name.en": "ラブライブ！蓮ノ空女学院スクールアイドルクラブ(Love Live! Hasu no Sora Jogakuin School Idol Club)",
+          "name.ja": "ラブライブ！蓮ノ空女学院スクールアイドルクラブ",
+          "name.ko": "ラブライブ！蓮ノ空女学院スクールアイドルクラブ(러브라이브! 하스노소라 여학원 스쿨 아이돌 클럽)",
+          "name.zhtw": "ラブライブ！蓮ノ空女学院スクールアイドルクラブ(LoveLive!蓮之空女學院學園偶像部)",
+          "variable": "category/lovelive_hasunosora"
+        },
+        {
+          "name": "ランス・アンド・マスクス(骑士与面具)",
+          "name.en": "ランス・アンド・マスクス(Lance N' Masques)",
+          "name.ja": "ランス・アンド・マスクス",
+          "name.ko": "ランス・アンド・マスクス(랜스 앤 마스크스)",
+          "name.zhtw": "ランス・アンド・マスクス(騎士與面具)",
+          "variable": "tag/%e3%83%a9%e3%83%b3%e3%82%b9%e3%83%bb%e3%82%a2%e3%83%b3%e3%83%89%e3%83%bb%e3%83%9e%e3%82%b9%e3%82%af%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "リコリス・リコイル(Lycoris Recoil)",
+          "name.en": "リコリス・リコイル(Lycoris Recoil)",
+          "name.ja": "リコリス・リコイル",
+          "name.ko": "リコリス・リコイル(리코리스 리코일)",
+          "name.zhtw": "リコリス・リコイル(Lycoris Recoil)",
+          "variable": "images/lycoris-recoil"
+        },
+        {
+          "name": "Re:ゼロから始める異世界生活(Re:从零开始的异世界生活)",
+          "name.en": "Re:ゼロから始める異世界生活(Re:ZERO -Starting Life in Another World-)",
+          "name.ja": "Re:ゼロから始める異世界生活",
+          "name.ko": "Re:ゼロから始める異世界生活(Re: 제로부터 시작하는 이세계 생활)",
+          "name.zhtw": "Re:ゼロから始める異世界生活(Re:從零開始的異世界生活)",
+          "variable": "images/rezero"
+        },
+        {
+          "name": "リトルウィッチアカデミア(小魔女学园)",
+          "name.en": "リトルウィッチアカデミア(Little Witch Academia)",
+          "name.ja": "リトルウィッチアカデミア",
+          "name.ko": "リトルウィッチアカデミア(리틀 위치 아카데미아)",
+          "name.zhtw": "リトルウィッチアカデミア(小魔女學園)",
+          "variable": "images/%e3%83%aa%e3%83%88%e3%83%ab%e3%82%a6%e3%82%a3%e3%83%83%e3%83%81%e3%82%a2%e3%82%ab%e3%83%87%e3%83%9f%e3%82%a2%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "りゅうおうのおしごと！(龙王的工作！)",
+          "name.en": "りゅうおうのおしごと！(The ryuo's Work is Never Done!)",
+          "name.ja": "りゅうおうのおしごと！",
+          "name.ko": "りゅうおうのおしごと！(용왕의 일)",
+          "name.zhtw": "りゅうおうのおしごと！(龍王的工作！)",
+          "variable": "images/%e3%82%8a%e3%82%85%e3%81%86%e3%81%8a%e3%81%86%e3%81%ae%e3%81%8a%e3%81%97%e3%81%94%e3%81%a8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Rewrite(Rewrite)",
+          "name.en": "Rewrite(Rewrite)",
+          "name.ja": "Rewrite",
+          "name.ko": "Rewrite(리라이트)",
+          "name.zhtw": "Rewrite(Rewrite)",
+          "variable": "images/rewrite%ef%bc%88%e3%83%aa%e3%83%a9%e3%82%a4%e3%83%88%ef%bc%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ReLIFE(ReLIFE)",
+          "name.en": "ReLIFE(ReLIFE)",
+          "name.ja": "ReLIFE",
+          "name.ko": "ReLIFE(리라이프)",
+          "name.zhtw": "ReLIFE(ReLIFE)",
+          "variable": "images/relife%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "RELEASE THE SPYCE(RELEASE THE SPYCE)",
+          "name.en": "RELEASE THE SPYCE(RELEASE THE SPYCE)",
+          "name.ja": "RELEASE THE SPYCE",
+          "name.ko": "RELEASE THE SPYCE(릴리스 더 스파이스)",
+          "name.zhtw": "RELEASE THE SPYCE(RELEASE THE SPYCE)",
+          "variable": "images/%e3%83%aa%e3%83%aa%e3%82%b9%e3%83%91%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "RAIL WARS!(RAIL WARS! 国有铁道公安队)",
+          "name.en": "RAIL WARS!(RAIL WARS!)",
+          "name.ja": "RAIL WARS!",
+          "name.ko": "RAIL WARS!(레일 워즈!)",
+          "name.zhtw": "RAIL WARS!(RAIL WARS!)",
+          "variable": "tag/rail_wars%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "レガリア The Three Sacred Stars(圣星机神)",
+          "name.en": "レガリア The Three Sacred Stars(Regalia: The Three Sacred Stars)",
+          "name.ja": "レガリア The Three Sacred Stars",
+          "name.ko": "レガリア The Three Sacred Stars(레가리아 The Three Sacred Stars)",
+          "name.zhtw": "レガリア The Three Sacred Stars(聖星機神)",
+          "variable": "images/%e3%83%ac%e3%82%ac%e3%83%aa%e3%82%a2_the_three_sacred_stars%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Re:CREATORS(レクリエイターズ)(Re：CREATORS)",
+          "name.en": "Re:CREATORS(レクリエイターズ)(Re:CREATORS)",
+          "name.ja": "Re:CREATORS(レクリエイターズ)",
+          "name.ko": "Re:CREATORS(レクリエイターズ)(Re:CREATORS)",
+          "name.zhtw": "Re:CREATORS(レクリエイターズ)(Re：CREATORS)",
+          "variable": "images/%e3%83%ac%e3%82%af%e3%83%aa%e3%82%a8%e3%82%a4%e3%82%bf%e3%83%bc%e3%82%ba%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "恋愛暴君(恋爱暴君)",
+          "name.en": "恋愛暴君(Love Tyrant)",
+          "name.ja": "恋愛暴君",
+          "name.ko": "恋愛暴君(연애폭군)",
+          "name.zhtw": "恋愛暴君(戀愛暴君)",
+          "variable": "images/%e6%81%8b%e6%84%9b%e6%9a%b4%e5%90%9b%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "連盟空軍航空魔法音楽隊ルミナスウィッチーズ(联盟空军航空魔法音乐队 光辉女巫们)",
+          "name.en": "連盟空軍航空魔法音楽隊ルミナスウィッチーズ(Luminous Witches)",
+          "name.ja": "連盟空軍航空魔法音楽隊ルミナスウィッチーズ",
+          "name.ko": "連盟空軍航空魔法音楽隊ルミナスウィッチーズ(연맹공군 항공마법음악대 루미너스 위치즈)",
+          "name.zhtw": "連盟空軍航空魔法音楽隊ルミナスウィッチーズ(聯盟空軍航空魔法音樂隊 光輝女巫們)",
+          "variable": "images/luminous_witches"
+        },
+        {
+          "name": "ロクでなし魔術講師と禁忌教典(无赖魔术讲师与禁忌教典)",
+          "name.en": "ロクでなし魔術講師と禁忌教典(Akashic Records of Bastard Magic Instructor)",
+          "name.ja": "ロクでなし魔術講師と禁忌教典",
+          "name.ko": "ロクでなし魔術講師と禁忌教典(불량 마술 강사와 금기 교전)",
+          "name.zhtw": "ロクでなし魔術講師と禁忌教典(無賴魔術講師與禁忌教典)",
+          "variable": "images/%e3%83%ad%e3%82%af%e3%81%a7%e3%81%aa%e3%81%97%e9%ad%94%e8%a1%93%e8%ac%9b%e5%b8%ab%e3%81%a8%e7%a6%81%e5%bf%8c%e6%95%99%e5%85%b8%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "Lostorage incited WIXOSS(Lostorage incited WIXOSS)",
+          "name.en": "Lostorage incited WIXOSS(Lostorage incited WIXOSS)",
+          "name.ja": "Lostorage incited WIXOSS",
+          "name.ko": "Lostorage incited WIXOSS(Lostorage incited WIXOSS)",
+          "name.zhtw": "Lostorage incited WIXOSS(Lostorage incited WIXOSS)",
+          "variable": "images/lostorage_incited_wixoss%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "WORKING!!(工作!!)",
+          "name.en": "WORKING!!(WORKING!!)",
+          "name.ja": "WORKING!!",
+          "name.ko": "WORKING!!(워킹!!)",
+          "name.zhtw": "WORKING!!(Working!!)",
+          "variable": "category/working%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "WWW.WORKING!!(WWW.WORKING!!)",
+          "name.en": "WWW.WORKING!!(WWW.WORKING!!)",
+          "name.ja": "WWW.WORKING!!",
+          "name.ko": "WWW.WORKING!!(WWW.WORKING!!)",
+          "name.zhtw": "WWW.WORKING!!(WWW.WORKING!!)",
+          "variable": "images/www-working%ef%bc%88web%e7%89%88working%ef%bc%89%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "わかばガール(嫩叶少女)",
+          "name.en": "わかばガール(Wakaba Girl)",
+          "name.ja": "わかばガール",
+          "name.ko": "わかばガール(와카바 걸)",
+          "name.zhtw": "わかばガール(嫩葉少女)",
+          "variable": "images/%E3%82%8F%E3%81%8B%E3%81%B0%E3%82%AC%E3%83%BC%E3%83%AB%E5%A3%81%E7%B4%99"
+        },
+        {
+          "name": "ワガママハイスペック(任性高规格)",
+          "name.en": "ワガママハイスペック(Wagamama High Spec)",
+          "name.ja": "ワガママハイスペック",
+          "name.ko": "ワガママハイスペック(와가마마 하이 스펙)",
+          "name.zhtw": "ワガママハイスペック(任性高規格)",
+          "variable": "images/%e3%83%af%e3%82%ac%e3%83%9e%e3%83%9e%e3%83%8f%e3%82%a4%e3%82%b9%e3%83%9a%e3%83%83%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "私に天使が舞い降りた！(天使降临到我身边！)",
+          "name.en": "私に天使が舞い降りた！(I Shaved. Then I Brought a High School Girl Home. (wrong) / Wataten!)",
+          "name.ja": "私に天使が舞い降りた！",
+          "name.ko": "私に天使が舞い降りた！(나에게 천사가 날아왔다!)",
+          "name.zhtw": "私に天使が舞い降りた！(天使降臨到我身邊！)",
+          "variable": "images/%e3%82%8f%e3%81%9f%e3%81%a6%e3%82%93%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "わたしの幸せな結婚(我的幸福婚姻)",
+          "name.en": "わたしの幸せな結婚(My Happy Marriage)",
+          "name.ja": "わたしの幸せな結婚",
+          "name.ko": "わたしの幸せな結婚(나의 행복한 결혼)",
+          "name.zhtw": "わたしの幸せな結婚(我的幸福婚姻)",
+          "variable": "images/watakon"
+        },
+        {
+          "name": "咲う アルスノトリア(微笑亚尔斯诺托利亚)",
+          "name.en": "咲う アルスノトリア(Warau Arsnotoria the Animation)",
+          "name.ja": "咲う アルスノトリア",
+          "name.ko": "咲う アルスノトリア(웃는 아르스노토리아)",
+          "name.zhtw": "咲う アルスノトリア(微笑亞爾斯諾托利亞)",
+          "variable": "images/warau_arsnotoria"
+        },
+        {
+          "name": "ワンダーエッグ・プライオリティ(奇蛋物语)",
+          "name.en": "ワンダーエッグ・プライオリティ(Wonder Egg Priority)",
+          "name.ja": "ワンダーエッグ・プライオリティ",
+          "name.ko": "ワンダーエッグ・プライオリティ(원더 에그 프라이어리티)",
+          "name.zhtw": "ワンダーエッグ・プライオリティ(奇蛋物語)",
+          "variable": "images/wonder_egg_priority"
+        },
+        {
+          "name": "ワンパンマン(一拳超人)",
+          "name.en": "ワンパンマン(One Punch Man)",
+          "name.ja": "ワンパンマン",
+          "name.ko": "ワンパンマン(원펀맨)",
+          "name.zhtw": "ワンパンマン(一拳超人)",
+          "variable": "category/%e3%83%af%e3%83%b3%e3%83%91%e3%83%b3%e3%83%9e%e3%83%b3%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ワンピース(海贼王)",
+          "name.en": "ワンピース(One Piece)",
+          "name.ja": "ワンピース",
+          "name.ko": "ワンピース(원피스)",
+          "name.zhtw": "ワンピース(航海王)",
+          "variable": "category/%e3%83%af%e3%83%b3%e3%83%94%e3%83%bc%e3%82%b9%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "OneRoom(独处一室)",
+          "name.en": "OneRoom(One Room)",
+          "name.ja": "OneRoom",
+          "name.ko": "OneRoom(원룸)",
+          "name.zhtw": "OneRoom(獨處一室)",
+          "variable": "images/oneroom%e3%82%ab%e3%83%b3%e3%83%88%e3%82%af%e5%a3%81%e7%b4%99"
+        },
+        {
+          "name": "ワンルーム、日当たり普通、天使つき。(一室独居·朝向普通·天使同住。)",
+          "name.en": "ワンルーム、日当たり普通、天使つき。(One Room, Hiatari Futsuu, Tenshi-tsuki.)",
+          "name.ja": "ワンルーム、日当たり普通、天使つき。",
+          "name.ko": "ワンルーム、日当たり普通、天使つき。(원룸, 채광 보통, 천사 딸림.)",
+          "name.zhtw": "ワンルーム、日当たり普通、天使つき。(一室獨居·朝向普通·天使同住。)",
+          "variable": "images/tenshitsuki"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "single_work"
+        ]
+      }
+    },
+    {
+      "key": "theme_search",
+      "type": "string",
+      "name": "主题关键字",
+      "name.en": "Theme keyword",
+      "name.ja": "作品名キーワード",
+      "name.ko": "작품 키워드",
+      "name.zhtw": "主題關鍵字",
+      "descripts": "在作品タイトル一覧页中，匹配链接文案「包含」此字符串的第一个主题（区分大小写与日语原文一致更易命中）",
+      "descripts.en": "First index link whose text contains this substring (case-sensitive)",
+      "descripts.ja": "一覧のリンク文言にこの文字列が含まれる最初の作品へ",
+      "descripts.ko": "목록 링크 텍스트에 부분 문자열이 포함된 첫 작품",
+      "descripts.zhtw": "一覽頁連結文案「包含」此字串的第一個主題",
+      "default": "",
+      "options": null,
+      "min": null,
+      "max": null,
+      "when": {
+        "crawl_mode": [
+          "by_theme"
+        ]
+      }
+    },
+    {
+      "key": "theme_start_page",
+      "type": "int",
+      "name": "主题列表起始页",
+      "name.en": "Theme list start page",
+      "name.ja": "テーマ一覧の開始ページ",
+      "name.ko": "테마 목록 시작 페이지",
+      "name.zhtw": "主題列表起始頁",
+      "descripts": "进入主题后，作品列表从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
+      "descripts.en": "1-based list page to start downloading (earlier pages are skipped)",
+      "descripts.ja": "テーマ内リストの取得開始ページ（1 始まり）",
+      "descripts.ko": "테마 목록에서 수집을 시작할 페이지(1부터)",
+      "descripts.zhtw": "進入主題後從第幾頁開始抓（1 為第一頁）",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "when": {
+        "crawl_mode": [
+          "by_theme"
+        ]
+      }
+    },
+    {
+      "key": "theme_end_page",
+      "type": "int",
+      "name": "主题列表结束页",
+      "name.en": "Theme list end page",
+      "name.ja": "テーマ一覧の終了ページ",
+      "name.ko": "테마 목록 끝 페이지",
+      "name.zhtw": "主題列表結束頁",
+      "descripts": "作品列表抓到第几页为止（含该页）；若站点无下一页则提前结束，进度会补足",
+      "descripts.en": "Last list page to crawl (inclusive); stops early if no next link",
+      "descripts.ja": "テーマ内リストの終了ページ（このページを含む）",
+      "descripts.ko": "테마 목록에서 수집을 끝낼 페이지(포함)",
+      "descripts.zhtw": "列表抓到第幾頁為止（含該頁）",
+      "default": 10,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "when": {
+        "crawl_mode": [
+          "by_theme"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 5,
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面",
+      "descripts.en": "End page to crawl to",
+      "descripts.ja": "取得終了ページ",
+      "descripts.ko": "가져올 끝 페이지",
+      "descripts.zhtw": "要拉取的結束頁面",
+      "default": 5,
+      "options": null,
+      "min": 1,
+      "max": 5,
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "wallpaper_type",
+      "type": "options",
+      "name": "排行榜子类",
+      "name.en": "Ranking category",
+      "name.ja": "ランキング種別",
+      "name.ko": "랭킹 하위 종류",
+      "name.zhtw": "排行榜子類",
+      "descripts": "对应站点路径：综合为 ranking-{周期}，其余为 ranking-{周期}-{子类}（如日榜综合 ranking-daily，手机为 ranking-daily-sp）",
+      "descripts.en": "Combined uses ranking-{period}; others use ranking-{period}-{slug}",
+      "descripts.ja": "総合は ranking-{期間}、それ以外は ranking-{期間}-{種別}",
+      "descripts.ko": "종합은 ranking-{기간}, 나머지는 ranking-{기간}-{하위}",
+      "descripts.zhtw": "綜合為 ranking-{週期}，其餘為 ranking-{週期}-{子類}",
+      "default": "imgpc",
+      "options": [
+        {
+          "name": "综合",
+          "name.en": "All",
+          "name.ja": "総合",
+          "name.ko": "종합",
+          "name.zhtw": "綜合",
+          "variable": "all"
+        },
+        {
+          "name": "手机壁纸 (sp)",
+          "name.en": "Mobile (sp)",
+          "name.ja": "スマホ壁紙 (sp)",
+          "name.ko": "모바일 (sp)",
+          "name.zhtw": "手機壁紙 (sp)",
+          "variable": "sp"
+        },
+        {
+          "name": "高质量图片 (image)",
+          "name.en": "High-quality images (image)",
+          "name.ja": "高品質画像 (image)",
+          "name.ko": "고품질 이미지 (image)",
+          "name.zhtw": "高品質圖片 (image)",
+          "variable": "image"
+        },
+        {
+          "name": "高质量PC壁纸 (imgpc)",
+          "name.en": "High-quality PC (imgpc)",
+          "name.ja": "高品質PC壁紙 (imgpc)",
+          "name.ko": "고품질 PC (imgpc)",
+          "name.zhtw": "高品質PC壁紙 (imgpc)",
+          "variable": "imgpc"
+        },
+        {
+          "name": "PC壁纸 (pc)",
+          "name.en": "PC wallpapers (pc)",
+          "name.ja": "PC壁紙 (pc)",
+          "name.ko": "PC 벽지 (pc)",
+          "name.zhtw": "PC壁紙 (pc)",
+          "variable": "pc"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "doc_root/doc.en.md",
+    "ja": "doc_root/doc.ja.md",
+    "ko": "doc_root/doc.ko.md",
+    "default": "doc_root/doc.md",
+    "zhtw": "doc_root/doc.zhtw.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/every-day-mob.json",
+    "configs/every-day.json",
+    "configs/every-month-mob.json",
+    "configs/every-month.json",
+    "configs/every-week-mob.json",
+    "configs/every-week.json",
+    "configs/every-year-mob.json",
+    "configs/every-year.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_category_provider.json5",
+    "providers/tag_provider.json5"
+  ],
+  "kbMetadataMigrations": [
+    "metadata_migrations/v1.rhai",
+    "metadata_migrations/v2.rhai",
+    "metadata_migrations/v3.rhai"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
+}

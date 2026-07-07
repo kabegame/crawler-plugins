@@ -1,0 +1,288 @@
+{
+  "name": "bilibili",
+  "version": "0.1.2",
+  "private": true,
+  "name.zh": "bilibili专栏",
+  "name.en": "Bilibili Articles",
+  "name.ja": "bilibili コラム",
+  "name.ko": "빌리빌리 칼럼",
+  "name.zhtw": "嗶哩嗶哩專欄",
+  "description": "bilibili 专栏：关键词搜索或单篇 cv/链接，提取正文图片；评论用于详情展示",
+  "description.zh": "bilibili 专栏：关键词搜索或单篇 cv/链接，提取正文图片；评论用于详情展示",
+  "description.en": "Bilibili columns: keyword search or single cv/URL, save images from article body; comments appear in the detail view",
+  "description.ja": "bilibili コラム：キーワードで検索し、本文の画像を取得。コメントは詳細表示に使います",
+  "description.ko": "빌리빌리 칼럼: 키워드로 검색해 본문 이미지를 모읍니다. 댓글은 상세 화면에 표시됩니다",
+  "description.zhtw": "嗶哩嗶哩專欄：依關鍵字搜尋專欄，擷取正文圖片；留言用於詳情展示",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.bilibili.com/read/home",
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "name": "模式",
+      "name.en": "Mode",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "关键词搜索多篇专栏；单篇可填传统专栏链接（如 https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1）或图文帖 https://www.bilibili.com/opus/…",
+      "descripts.en": "Keyword search; single mode: classic column URL (e.g. https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1) or opus https://www.bilibili.com/opus/…",
+      "default": "search",
+      "options": [
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "name.zhtw": "關鍵字搜尋",
+          "variable": "search"
+        },
+        {
+          "name": "单篇专栏",
+          "name.en": "Single article",
+          "name.ja": "単一コラム",
+          "name.ko": "단일 칼럼",
+          "name.zhtw": "單篇專欄",
+          "variable": "single"
+        }
+      ]
+    },
+    {
+      "key": "cv_id_or_url",
+      "type": "string",
+      "name": "专栏 ID 或链接",
+      "name.en": "Article id or URL",
+      "name.ja": "コラム ID または URL",
+      "name.ko": "칼럼 ID 또는 URL",
+      "name.zhtw": "專欄 ID 或連結",
+      "descripts": "传统专栏：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 数字 id）；图文：https://www.bilibili.com/opus/… 或 15 位以上纯数字",
+      "descripts.en": "Column: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (or cv id only); opus: https://www.bilibili.com/opus/… or long numeric id",
+      "default": "",
+      "when": {
+        "mode": [
+          "single"
+        ]
+      }
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "专栏 Tab 搜索关键词（与 search.bilibili.com/article 一致）",
+      "descripts.en": "Article search keyword",
+      "default": "美图 壁纸",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "order",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "搜索列表排序方式（写入 WBI search 请求）",
+      "descripts.en": "Search result sort (WBI search/type)",
+      "default": "totalrank",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "综合排序",
+          "name.en": "Default",
+          "name.ja": "総合",
+          "name.ko": "종합",
+          "name.zhtw": "綜合排序",
+          "variable": "totalrank"
+        },
+        {
+          "name": "最新发布",
+          "name.en": "Newest",
+          "name.ja": "新着",
+          "name.ko": "최신",
+          "name.zhtw": "最新發佈",
+          "variable": "pubdate"
+        },
+        {
+          "name": "最多点击",
+          "name.en": "Most views",
+          "name.ja": "クリック数",
+          "name.ko": "조회수",
+          "name.zhtw": "最多點擊",
+          "variable": "click"
+        },
+        {
+          "name": "最多喜欢",
+          "name.en": "Most likes",
+          "name.ja": "いいね",
+          "name.ko": "좋아요",
+          "name.zhtw": "最多喜歡",
+          "variable": "attention"
+        },
+        {
+          "name": "最多评论",
+          "name.en": "Most comments",
+          "name.ja": "コメント数",
+          "name.ko": "댓글",
+          "name.zhtw": "最多評論",
+          "variable": "scores"
+        }
+      ]
+    },
+    {
+      "key": "category_id",
+      "type": "options",
+      "name": "分区",
+      "name.en": "Category",
+      "name.ja": "カテゴリ",
+      "name.ko": "카테고리",
+      "name.zhtw": "分區",
+      "descripts": "专栏分区筛选（对应搜索接口 category_id）",
+      "descripts.en": "Article category filter (category_id)",
+      "default": "0",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "全部分区",
+          "name.en": "All",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部分區",
+          "variable": "0"
+        },
+        {
+          "name": "动画",
+          "name.en": "Animation",
+          "name.ja": "アニメ",
+          "name.ko": "애니메이션",
+          "name.zhtw": "動畫",
+          "variable": "2"
+        },
+        {
+          "name": "游戏",
+          "name.en": "Games",
+          "name.ja": "ゲーム",
+          "name.ko": "게임",
+          "name.zhtw": "遊戲",
+          "variable": "1"
+        },
+        {
+          "name": "影视",
+          "name.en": "Film & TV",
+          "name.ja": "映画・ドラマ",
+          "name.ko": "영화·TV",
+          "name.zhtw": "影視",
+          "variable": "28"
+        },
+        {
+          "name": "生活",
+          "name.en": "Life",
+          "name.ja": "生活",
+          "name.ko": "일상",
+          "name.zhtw": "生活",
+          "variable": "3"
+        },
+        {
+          "name": "兴趣",
+          "name.en": "Hobby",
+          "name.ja": "趣味",
+          "name.ko": "취미",
+          "name.zhtw": "興趣",
+          "variable": "29"
+        },
+        {
+          "name": "轻小说",
+          "name.en": "Light novel",
+          "name.ja": "ライトノベル",
+          "name.ko": "라이트노벨",
+          "name.zhtw": "輕小說",
+          "variable": "16"
+        },
+        {
+          "name": "科技",
+          "name.en": "Tech",
+          "name.ja": "テクノロジー",
+          "name.ko": "기술",
+          "name.zhtw": "科技",
+          "variable": "17"
+        }
+      ]
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "从第几页开始（含）",
+      "default": 1,
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "到第几页结束（含）",
+      "default": 1,
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "page_size",
+      "type": "int",
+      "name": "每页条数",
+      "name.en": "Page size",
+      "name.ja": "1ページあたり件数",
+      "name.ko": "페이지당 개수",
+      "name.zhtw": "每頁條數",
+      "descripts": "搜索 API 的 page_size（一般 20）",
+      "default": 20,
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs"
+}

@@ -1,6 +1,17 @@
-// bun gen-config.ts  →  overwrites config.json
+// bun gen-config.ts  -> updates package.json kbBaseUrl/kbConfig
 // Reads works-all.json, filters to valid work entries, stores the full URL path as variable.
+import fs from "fs";
 import works from "./works-all.json";
+
+const PACKAGE_JSON = "package.json";
+
+function writePackageConfig(config: { baseUrl: string; var: unknown[] }): void {
+  const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, "utf-8")) as Record<string, unknown>;
+  pkg.kbBaseUrl = config.baseUrl;
+  pkg.kbConfig = config.var;
+  fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+}
+
 // Extract path after "https://anihonetwallpaper.com/" (no leading slash, no fragment/query).
 function urlPath(href: string): string {
   const path = href.replace("https://anihonetwallpaper.com/", "").split("?")[0].split("#")[0];
@@ -246,5 +257,5 @@ const config = {
   ],
 };
 
-await Bun.write("config.json", JSON.stringify(config, null, 2) + "\n");
-console.log(`Done. ${workOptions.length} works written to config.json`);
+writePackageConfig(config);
+console.log(`Done. ${workOptions.length} works written to package.json kbConfig`);

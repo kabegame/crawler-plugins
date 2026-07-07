@@ -1,0 +1,135 @@
+{
+  "name": "heybox",
+  "version": "0.1.9",
+  "private": true,
+  "name.zh": "小黑盒",
+  "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.xiaoheihe.cn/app/bbs/home",
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl Mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "default": "search",
+      "options": [
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword Search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "variable": "search"
+        },
+        {
+          "name": "单帖子 URL",
+          "name.en": "Single Post URL",
+          "name.ja": "単一投稿 URL",
+          "name.ko": "단일 포스트 URL",
+          "variable": "single_post"
+        }
+      ]
+    },
+    {
+      "key": "post_share_url",
+      "type": "string",
+      "name": "帖子分享 URL",
+      "name.en": "Post Share URL",
+      "name.ja": "投稿共有 URL",
+      "name.ko": "포스트 공유 URL",
+      "default": "",
+      "when": {
+        "crawl_mode": [
+          "single_post"
+        ]
+      }
+    },
+    {
+      "key": "search_keyword",
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      },
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search Keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색어",
+      "default": "美图"
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页（从 1 起）",
+      "name.en": "Start Page (1-based)",
+      "name.ja": "開始ページ（1 から）",
+      "name.ko": "시작 페이지(1부터)",
+      "default": 1,
+      "min": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页（含）",
+      "name.en": "End Page (inclusive)",
+      "name.ja": "終了ページ（含む）",
+      "name.ko": "끝 페이지(포함)",
+      "default": 1,
+      "min": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "page_size",
+      "type": "int",
+      "name": "每页条数",
+      "name.en": "Page Size",
+      "name.ja": "1ページあたり件数",
+      "name.ko": "페이지당 개수",
+      "default": 5,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "fetch_comment_images",
+      "type": "boolean",
+      "name": "下载评论区图片",
+      "name.en": "Download Comment Images",
+      "name.ja": "コメント画像をダウンロード",
+      "name.ko": "댓글 이미지 다운로드",
+      "default": true
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  },
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
+}

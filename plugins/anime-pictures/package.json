@@ -1,5 +1,101 @@
 {
-  "name": "kgpg-anime-pictures",
-  "version": "0.1.0",
-  "private": true
+  "name": "anime-pictures",
+  "version": "0.4.0",
+  "private": true,
+  "name.zh": "anime-pictures动漫图库",
+  "name.en": "anime-pictures anime gallery",
+  "name.ja": "anime-picturesアニメ図庫",
+  "name.ko": "anime-pictures 애니메이션 갤러리",
+  "description": "anime-pictures动漫图库收集源插件（可按标签检索）",
+  "description.zh": "anime-pictures动漫图库收集源插件（可按标签检索）",
+  "description.en": "anime-pictures anime gallery crawler (tag search)",
+  "description.ja": "anime-picturesアニメ図庫収集プラグイン（タグ検索可）",
+  "description.ko": "anime-pictures 애니메이션 갤러리 수집 플러그인(태그 검색 가능)",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://anime-pictures.net",
+  "kbConfig": [
+    {
+      "key": "startPage",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 0,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "endPage",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面",
+      "descripts.en": "End page to crawl to",
+      "descripts.ja": "取得終了ページ",
+      "descripts.ko": "가져올 끝 페이지",
+      "descripts.zhtw": "要拉取的結束頁面",
+      "default": 5,
+      "min": 0,
+      "max": null
+    },
+    {
+      "key": "tag",
+      "type": "string",
+      "name": "标签",
+      "name.en": "Tag",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "descripts": "要拉取的标签（默认无标签爬全站）",
+      "descripts.en": "Tag to filter (empty = all)",
+      "descripts.ja": "フィルター用タグ（空欄で全件）",
+      "descripts.ko": "필터 태그 (비우면 전체)",
+      "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）",
+      "default": ""
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "doc_root/doc.en.md",
+    "ja": "doc_root/doc.ja.md",
+    "ko": "doc_root/doc.ko.md",
+    "default": "doc_root/doc.md",
+    "zh": "doc_root/doc.zh.md",
+    "zhtw": "doc_root/doc.zhtw.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/blue-archive.json",
+    "configs/every-day-pictures.json",
+    "configs/girls.json",
+    "configs/oli+o+o.json",
+    "configs/pink-eye.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_provider.json5",
+    "providers/tag_type_provider.json5"
+  ],
+  "kbMetadataMigrations": [
+    "metadata_migrations/v1.rhai"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
 }

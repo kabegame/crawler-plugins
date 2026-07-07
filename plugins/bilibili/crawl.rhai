@@ -737,6 +737,7 @@ fn process_one_opus(opus_id_s, per_total, nav_url, view_api, reply_api, mixin_ta
         download_image(u, #{
             name: name,
             metadata: meta,
+            url: page_url,
         });
         add_progress(per_img);
         k += 1;
@@ -908,9 +909,11 @@ fn process_one_cv(cv_s, img_s, sub_s, view_api, reply_api, mixin_tab, per_cv, se
                 "cv" + cv_s
             }
         };
+        let cv_page_url = "https://www.bilibili.com/read/cv" + cv_s;
         download_image(u, #{
             name: name,
             metadata: meta,
+            url: cv_page_url,
         });
         add_progress(per_img);
         k += 1;

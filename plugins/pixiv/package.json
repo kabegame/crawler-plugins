@@ -1,0 +1,544 @@
+{
+  "name": "pixiv",
+  "version": "1.2.10",
+  "private": true,
+  "name.zh": "Pixiv",
+  "name.en": "Pixiv",
+  "name.ja": "ピクシブ",
+  "name.ko": "픽시브",
+  "description": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
+  "description.zh": "Pixiv 插画爬虫：排行榜、收藏、画师、关键词",
+  "description.en": "Pixiv crawler: rankings, bookmarks, artists, keywords",
+  "description.ja": "Pixiv イラストクローラー：ランキング、お気に入り、作家、キーワード",
+  "description.ko": "Pixiv 일러스트 크롤러: 랭킹, 북마크, 작가, 키워드",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.pixiv.net",
+  "kbConfig": [
+    {
+      "key": "source",
+      "type": "options",
+      "name": "爬取类型",
+      "name.en": "Source type",
+      "name.ja": "取得タイプ",
+      "name.ko": "수집 유형",
+      "name.zhtw": "爬取類型",
+      "default": "ranking",
+      "options": [
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "ranking"
+        },
+        {
+          "name": "个人收藏",
+          "name.en": "Bookmarks",
+          "name.ja": "ブックマーク",
+          "name.ko": "북마크",
+          "name.zhtw": "個人收藏",
+          "variable": "bookmark"
+        },
+        {
+          "name": "画师作品",
+          "name.en": "Artist works",
+          "name.ja": "作家作品",
+          "name.ko": "작가 작품",
+          "name.zhtw": "畫師作品",
+          "variable": "user"
+        },
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "name.zhtw": "關鍵字搜尋",
+          "variable": "keyword"
+        }
+      ]
+    },
+    {
+      "key": "user_id",
+      "type": "string",
+      "name": "用户 UID",
+      "name.en": "User UID",
+      "name.ja": "ユーザー UID",
+      "name.ko": "사용자 UID",
+      "name.zhtw": "用戶 UID",
+      "default": "",
+      "descripts": "何时必填：收藏＝被爬取用户 UID（仅拼 URL，不发 x-user-id）；画师＝你登录账号 UID（x-user-id，必填）；排行榜且年龄向选 R18＝你登录账号 UID（x-user-id，必填，并需在高级设置填 Cookie）。排行榜（全年龄）、关键词可不填。",
+      "descripts.en": "When required: Bookmarks = target user UID (URL only, no x-user-id). Artist = your account UID (x-user-id, required). Ranking + R18 age = your account UID (x-user-id, required; Cookie in Advanced). Safe ranking and keyword: optional.",
+      "descripts.ja": "必須になる場合：ブックマーク＝対象 UID（URL のみ）。作家＝ログイン UID（x-user-id 必須）。ランキング＋R18＝ログイン UID（x-user-id 必須・Cookie 要）。全年齢ランキング・キーワードは任意。",
+      "descripts.ko": "필수 시점: 북마크=대상 UID(URL만). 작가=로그인 UID(x-user-id 필수). 랭킹+R18=로그인 UID(x-user-id·Cookie). 전연령 랭킹·키워드는 선택.",
+      "descripts.zhtw": "何時必填：收藏＝被爬取用戶 UID（僅 URL）；畫師＝登入帳號 UID（x-user-id）；排行榜且 R18＝登入 UID（x-user-id，並需 Cookie）。全齡排行榜、關鍵字可留空。"
+    },
+    {
+      "key": "content_mode",
+      "type": "options",
+      "name": "内容类型",
+      "name.en": "Content type",
+      "name.ja": "コンテンツタイプ",
+      "name.ko": "콘텐츠 유형",
+      "name.zhtw": "內容類型",
+      "default": "all",
+      "options": [
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "插画",
+          "name.en": "Illust",
+          "name.ja": "イラスト",
+          "name.ko": "일러스트",
+          "name.zhtw": "插畫",
+          "variable": "illust"
+        },
+        {
+          "name": "漫画",
+          "name.en": "Manga",
+          "name.ja": "漫画",
+          "name.ko": "만화",
+          "name.zhtw": "漫畫",
+          "variable": "manga"
+        },
+        {
+          "name": "动图",
+          "name.en": "Ugoira",
+          "name.ja": "うごイラ",
+          "name.ko": "움직이는 일러스트",
+          "name.zhtw": "動圖",
+          "variable": "ugoira"
+        }
+      ],
+      "when": {
+        "source": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "ranking_mode",
+      "type": "options",
+      "name": "榜序",
+      "name.en": "Ranking order",
+      "name.ja": "ランキング順",
+      "name.ko": "랭킹 순서",
+      "name.zhtw": "榜序",
+      "default": "daily",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "daily",
+          "when": {
+            "content_mode": [
+              "all",
+              "illust",
+              "manga",
+              "ugoira"
+            ]
+          }
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "weekly",
+          "when": {
+            "content_mode": [
+              "all",
+              "illust",
+              "manga",
+              "ugoira"
+            ]
+          }
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "monthly",
+          "when": {
+            "content_mode": [
+              "all",
+              "illust",
+              "manga"
+            ]
+          }
+        },
+        {
+          "name": "新生榜",
+          "name.en": "Rookie",
+          "name.ja": "ルーキー",
+          "name.ko": "루키",
+          "name.zhtw": "新生榜",
+          "variable": "rookie",
+          "when": {
+            "content_mode": [
+              "all",
+              "illust",
+              "manga"
+            ]
+          }
+        },
+        {
+          "name": "原创榜",
+          "name.en": "Original",
+          "name.ja": "オリジナル",
+          "name.ko": "오리지널",
+          "name.zhtw": "原創榜",
+          "variable": "original",
+          "when": {
+            "content_mode": [
+              "all"
+            ]
+          }
+        },
+        {
+          "name": "AI 日榜",
+          "name.en": "AI Daily",
+          "name.ja": "AI 日間",
+          "name.ko": "AI 일간",
+          "name.zhtw": "AI 日榜",
+          "variable": "daily_ai",
+          "when": {
+            "content_mode": [
+              "all"
+            ]
+          }
+        },
+        {
+          "name": "男性向",
+          "name.en": "Male",
+          "name.ja": "男性向け",
+          "name.ko": "남성향",
+          "name.zhtw": "男性向",
+          "variable": "male",
+          "when": {
+            "content_mode": [
+              "all"
+            ]
+          }
+        },
+        {
+          "name": "女性向",
+          "name.en": "Female",
+          "name.ja": "女性向け",
+          "name.ko": "여성향",
+          "name.zhtw": "女性向",
+          "variable": "female",
+          "when": {
+            "content_mode": [
+              "all"
+            ]
+          }
+        }
+      ],
+      "when": {
+        "source": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "age_mode",
+      "type": "options",
+      "name": "年龄向",
+      "name.en": "Age rating",
+      "name.ja": "年齢区分",
+      "name.ko": "연령",
+      "name.zhtw": "年齡向",
+      "default": "safe",
+      "descripts": "R18 需在「高级设置 → HTTP 头」填写有效 Cookie（含年龄认证），并在「用户 UID」填写登录账号 UID（x-user-id）。",
+      "descripts.en": "R18 needs Cookie in Advanced → HTTP headers and your account UID in User UID (x-user-id).",
+      "descripts.ja": "R18 は「詳細設定→HTTP ヘッダ」の Cookie と「ユーザー UID」にログイン UID（x-user-id）が必要です。",
+      "descripts.ko": "R18은 고급→HTTP 헤더 Cookie와「사용자 UID」에 로그인 UID(x-user-id)가 필요합니다.",
+      "descripts.zhtw": "R18 須在「進階設定→HTTP 標頭」填 Cookie，並在「用戶 UID」填登入帳號（x-user-id）。",
+      "options": [
+        {
+          "name": "全年龄",
+          "name.en": "General",
+          "name.ja": "全年齢",
+          "name.ko": "전연령",
+          "name.zhtw": "全年齡",
+          "variable": "safe"
+        },
+        {
+          "name": "R18",
+          "name.en": "R18",
+          "name.ja": "R18",
+          "name.ko": "R18",
+          "name.zhtw": "R18",
+          "variable": "r18"
+        }
+      ],
+      "when": {
+        "source": [
+          "ranking"
+        ],
+        "ranking_mode": [
+          "daily",
+          "weekly",
+          "daily_ai",
+          "male",
+          "female"
+        ]
+      }
+    },
+    {
+      "key": "ranking_date",
+      "type": "date",
+      "format": "YYYYMMDD",
+      "dateMin": "2007-01-01",
+      "dateMax": "yesterday",
+      "name": "排行榜日期",
+      "name.en": "Ranking date",
+      "name.ja": "ランキング日付",
+      "name.ko": "랭킹 날짜",
+      "name.zhtw": "排行榜日期",
+      "descripts": "留空则使用 Pixiv 当前最新一期；填写为 YYYYMMDD。日榜为当日；周榜、月榜以该日为基准向前一周或一月（与官网一致）。",
+      "descripts.en": "Empty = latest period from Pixiv. YYYYMMDD: daily = that day; weekly/monthly = period ending on that day.",
+      "descripts.ja": "空欄は最新期。YYYYMMDD：日間はその日、週間・月間はその日を含む期間。",
+      "descripts.ko": "비우면 최신 기간. YYYYMMDD: 일간은 해당일, 주간·월간은 해당일 기준 기간.",
+      "descripts.zhtw": "留空為最新一期；填寫為 YYYYMMDD。日榜為當日；週榜、月榜以該日為基準向前一週或一月。",
+      "default": "",
+      "when": {
+        "source": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "artist_id",
+      "type": "string",
+      "name": "画师 UID",
+      "name.en": "Artist UID",
+      "name.ja": "作家 UID",
+      "name.ko": "작가 UID",
+      "name.zhtw": "畫師 UID",
+      "descripts": "要爬取的画师的 Pixiv UID",
+      "descripts.en": "Pixiv artist UID to crawl",
+      "descripts.ja": "取得する作家の Pixiv UID",
+      "descripts.ko": "수집할 작가의 Pixiv UID",
+      "descripts.zhtw": "要爬取的畫師 Pixiv UID",
+      "when": {
+        "source": [
+          "user"
+        ]
+      }
+    },
+    {
+      "key": "artist_start_page",
+      "type": "int",
+      "name": "画师起始页",
+      "name.en": "Artist start page",
+      "name.ja": "作家開始ページ",
+      "name.ko": "작가 시작 페이지",
+      "name.zhtw": "畫師起始頁",
+      "descripts": "画师作品从第几页开始爬取。按 Pixiv 画师页顺序计算，每页 48 个作品。",
+      "descripts.en": "Start crawling artist works from this page. Uses Pixiv artist page order, 48 artworks per page.",
+      "descripts.ja": "作家作品を取得し始めるページ。Pixiv の作家ページ順で、1 ページ 48 作品です。",
+      "descripts.ko": "작가 작품 수집을 시작할 페이지입니다. Pixiv 작가 페이지 순서 기준이며 페이지당 48개 작품입니다.",
+      "descripts.zhtw": "畫師作品從第幾頁開始爬取。依 Pixiv 畫師頁順序計算，每頁 48 個作品。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": {
+        "source": [
+          "user"
+        ]
+      }
+    },
+    {
+      "key": "artist_end_page",
+      "type": "int",
+      "name": "画师结束页",
+      "name.en": "Artist end page",
+      "name.ja": "作家終了ページ",
+      "name.ko": "작가 종료 페이지",
+      "name.zhtw": "畫師結束頁",
+      "descripts": "画师作品爬取到第几页，包含该页。填 0 表示一直爬到最后一页。",
+      "descripts.en": "Last artist works page to crawl, inclusive. Use 0 to crawl through the final page.",
+      "descripts.ja": "取得する最後の作家作品ページ（このページを含む）。0 なら最後のページまで取得します。",
+      "descripts.ko": "수집할 마지막 작가 작품 페이지입니다(해당 페이지 포함). 0이면 마지막 페이지까지 수집합니다.",
+      "descripts.zhtw": "畫師作品爬取到第幾頁，包含該頁。填 0 表示一直爬到最後一頁。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": {
+        "source": [
+          "user"
+        ]
+      }
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "支持高级搜索语法，如 (Lucy OR 边缘行者) AND 5000users",
+      "descripts.en": "Supports advanced syntax, e.g. (Lucy OR 边缘行者) AND 5000users",
+      "descripts.ja": "高度な検索構文対応（例：(Lucy OR 边缘行者) AND 5000users）",
+      "descripts.ko": "고급 검색 문법 지원 (예: (Lucy OR 边缘行者) AND 5000users)",
+      "descripts.zhtw": "支援進階搜尋語法，如 (Lucy OR 邊緣行者) AND 5000users",
+      "when": {
+        "source": [
+          "keyword"
+        ]
+      }
+    },
+    {
+      "key": "search_mode",
+      "type": "options",
+      "name": "搜索模式",
+      "name.en": "Search mode",
+      "name.ja": "検索モード",
+      "name.ko": "검색 모드",
+      "name.zhtw": "搜尋模式",
+      "default": "safe",
+      "options": [
+        {
+          "name": "安全",
+          "name.en": "Safe",
+          "name.ja": "全年齢",
+          "name.ko": "안전",
+          "name.zhtw": "安全",
+          "variable": "safe"
+        },
+        {
+          "name": "R18",
+          "name.en": "R18",
+          "name.ja": "R18",
+          "name.ko": "R18",
+          "name.zhtw": "R18",
+          "variable": "r18"
+        },
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        }
+      ],
+      "when": {
+        "source": [
+          "keyword"
+        ]
+      }
+    },
+    {
+      "key": "keyword_order",
+      "type": "options",
+      "name": "排序方式",
+      "name.en": "Sort order",
+      "name.ja": "並び順",
+      "name.ko": "정렬 순서",
+      "name.zhtw": "排序方式",
+      "default": "date",
+      "descripts": "按人气排序需要 Pixiv Premium 账户",
+      "descripts.en": "Popular sort requires Pixiv Premium",
+      "descripts.ja": "人気順は Pixiv Premium が必要です",
+      "descripts.ko": "인기순 정렬은 Pixiv Premium이 필요합니다",
+      "descripts.zhtw": "依人氣排序需 Pixiv Premium 帳戶",
+      "options": [
+        {
+          "name": "按日期",
+          "name.en": "By date",
+          "name.ja": "日付順",
+          "name.ko": "날짜순",
+          "name.zhtw": "按日期",
+          "variable": "date"
+        },
+        {
+          "name": "按人气",
+          "name.en": "By popularity",
+          "name.ja": "人気順",
+          "name.ko": "인기순",
+          "name.zhtw": "按人氣",
+          "variable": "popular"
+        }
+      ],
+      "when": {
+        "source": [
+          "keyword"
+        ]
+      }
+    },
+    {
+      "key": "num_artworks",
+      "type": "int",
+      "name": "最大作品数",
+      "name.en": "Max artworks",
+      "name.ja": "最大作品数",
+      "name.ko": "최대 작품 수",
+      "name.zhtw": "最大作品數",
+      "descripts": "按「作品」计数（非单张图片）。脚本流式拉列表并边下边停；漫画/多页作品仍会下多张图，落盘文件数可能大于本值。细则见文档。",
+      "descripts.en": "Counts artworks (illustrations), not individual image files. Script streams the list and downloads as it goes. Multi-page works still yield multiple files. See docs.",
+      "descripts.ja": "「作品」単位の上限（枚数ではない）。リストを逐次取得しながらダウンロード。漫画など複数ページは複数ファイルになり得ます。詳細は説明へ。",
+      "descripts.ko": "「작품」 개수 기준(이미지 장수 아님). 목록을 순차로 받으며 받는 대로 다운로드. 만화 등 다페이지는 파일 수가 더 많을 수 있음. 자세한 내용은 문서 참고.",
+      "descripts.zhtw": "以「作品」計數（非單張圖）。腳本邊拉列表邊下載；漫畫多頁仍可能多檔，落盤檔數可能大於本值。詳見說明。",
+      "default": 50,
+      "min": 1,
+      "max": 1000,
+      "when": {
+        "source": [
+          "ranking",
+          "bookmark",
+          "keyword"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "doc_root/doc.en.md",
+    "ja": "doc_root/doc.ja.md",
+    "ko": "doc_root/doc.ko.md",
+    "default": "doc_root/doc.md",
+    "zh": "doc_root/doc.zh.md",
+    "zhtw": "doc_root/doc.zhtw.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/every-day-ranking-daily.json",
+    "configs/keyword-landscape-safe.json",
+    "configs/ranking-daily-ai-r18.json",
+    "configs/ranking-daily-ai.json",
+    "configs/ranking-daily-illust.json",
+    "configs/ranking-daily-r18.json",
+    "configs/ranking-weekly-all.json",
+    "configs/ranking-weekly-r18.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_page_provider.json5",
+    "providers/tag_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs"
+}
