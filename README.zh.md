@@ -135,11 +135,11 @@ node package-plugin.js
 
 **指定输出目录（可选）**：
 
-默认输出到 `crawler-plugins/packed/`。如果你希望把 `.kgpg` 直接输出到其它目录（例如主仓库开发模式的 `data/plugins-directory/`），可以使用 `--outDir`：
+默认输出到 `crawler-plugins/packed/`。如果你希望把 `.kgpg` 直接输出到其它目录（例如主仓库开发模式的 `.kabegame/debug/data/plugins-directory/`），可以使用 `--outDir`：
 
 ```bash
-# 输出到 <repo>/data/plugins-directory
-node package-plugin.js --outDir ../data/plugins-directory
+# 输出到 <repo>/.kabegame/debug/data/plugins-directory
+node package-plugin.js --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 **打包单个插件**：
@@ -153,7 +153,7 @@ node package-plugin.js anihonet-wallpaper
 **打包单个插件并指定输出目录（可选）**：
 
 ```bash
-node package-plugin.js anihonet-wallpaper --outDir ../data/plugins-directory
+node package-plugin.js anihonet-wallpaper --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 **仅打包指定插件（多选，用于开发提速）**：
@@ -169,7 +169,7 @@ node package-plugin.js --only single-file-import,local-folder-import
 **仅打包指定插件并指定输出目录（可选）**：
 
 ```bash
-node package-plugin.js --only single-file-import local-folder-import --outDir ../data/plugins-directory
+node package-plugin.js --only single-file-import local-folder-import --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 打包后的文件将生成在 `packed/<插件名称>.kgpg` 目录中。
@@ -291,4 +291,3 @@ pnpm run package-plugin crawler-plugins/plugins/<插件名称>
 4. 包含用户文档（doc_root/doc.md）
 
 开发新插件前，请先阅读kabegame仓库的 [插件开发指南](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) 和 [Rhai API 文档](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md)。
-

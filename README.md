@@ -188,10 +188,10 @@ node package-plugin.js
 
 **Custom output directory** (optional):
 
-Default output: `crawler-plugins/packed/`. To output elsewhere (e.g. `data/plugins-directory/`):
+Default output: `crawler-plugins/packed/`. To output elsewhere (e.g. `.kabegame/debug/data/plugins-directory/`):
 
 ```bash
-node package-plugin.js --outDir ../data/plugins-directory
+node package-plugin.js --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 **Package a single plugin**:

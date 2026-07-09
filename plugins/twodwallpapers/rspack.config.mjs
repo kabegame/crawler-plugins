@@ -1,4 +1,5 @@
 import { defineConfig } from "@rspack/cli";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
   entry: { main: "./src/index.ts" },
@@ -6,7 +7,7 @@ export default defineConfig({
   devtool: false,
   output: {
     filename: "[name].js",
-    path: new URL("./dist", import.meta.url).pathname,
+    path: fileURLToPath(new URL("./dist", import.meta.url)),
     library: { type: "module" },
   },
   experiments: { outputModule: true },

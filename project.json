@@ -28,12 +28,22 @@
     "package-to-dev-data": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "bun package-plugin.ts --out-dir ../data/plugins-directory",
+        "command": "bun package-plugin.ts --out-dir ../.kabegame/debug/data/plugins-directory",
         "cwd": "{projectRoot}"
       },
       "cache": true,
       "inputs": ["normalInputs"],
-      "outputs": ["{workspaceRoot}/data/plugins-directory/**/*"]
+      "outputs": ["{workspaceRoot}/.kabegame/debug/data/plugins-directory/**/*"]
+    },
+    "package-to-resources": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bun package-plugin.ts --out-dir ../src-tauri/kabegame/resources/plugins",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "inputs": ["normalInputs"],
+      "outputs": ["{workspaceRoot}/src-tauri/kabegame/resources/plugins/**/*"]
     }
   }
 }

@@ -136,7 +136,7 @@ node package-plugin.js
 기본값: `crawler-plugins/packed/`. 다른 경로로 출력하려면:
 
 ```bash
-node package-plugin.js --outDir ../data/plugins-directory
+node package-plugin.js --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 **단일 플러그인 패키징**:

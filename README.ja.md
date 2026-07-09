@@ -136,7 +136,7 @@ node package-plugin.js
 デフォルトは `crawler-plugins/packed/`。別ディレクトリへ出力する場合：
 
 ```bash
-node package-plugin.js --outDir ../data/plugins-directory
+node package-plugin.js --outDir ../.kabegame/debug/data/plugins-directory
 ```
 
 **単一プラグインのパッケージ**:
