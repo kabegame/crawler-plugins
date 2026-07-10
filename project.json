@@ -1,18 +1,32 @@
 {
   "name": "crawler-plugins",
   "namedInputs": {
-    "pluginFiles": ["{projectRoot}/plugins/**/*"],
-    "packageScript": ["{projectRoot}/package-plugin.ts"],
+    "pluginFiles": ["{projectRoot}/plugins/**/*", "!{projectRoot}/plugins/*/dist/**/*"],
+    "packageScript": [
+      "{projectRoot}/package-plugin.ts",
+      "{projectRoot}/project.json"
+    ],
     "packageConfig": [
-      "{projectRoot}/package.tson",
-      "{projectRoot}/pnpm-lock.yaml",
-      "{projectRoot}/project.tson"
+      "{projectRoot}/package.json",
+      "{projectRoot}/bun.lock",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/bun.lock"
+    ],
+    "pluginPackages": [
+      "{workspaceRoot}/packages/kabegame-plugin-sdk/**/*",
+      "{workspaceRoot}/packages/kabegame-types/**/*"
     ],
     "cliBinary": [
       "{workspaceRoot}/target/release/kabegame-cli",
       "{workspaceRoot}/target/release/kabegame-cli.exe"
     ],
-    "normalInputs": ["pluginFiles", "packageScript", "packageConfig", "cliBinary"]
+    "normalInputs": [
+      "pluginFiles",
+      "packageScript",
+      "packageConfig",
+      "pluginPackages",
+      "cliBinary"
+    ]
   },
   "targets": {
     "package": {
