@@ -1,6 +1,6 @@
 // @ts-nocheck
 // anime-pictures V8 crawler: parse host HTML with DOMParser and store schema 1 metadata.
-import { resolveUrl as resolveSdkUrl, urlEncode, sleep } from "@kabegame/plugin-sdk";
+import { resolveUrl as resolveSdkUrl, sleep } from "@kabegame/plugin-sdk";
 
 const {
   addProgress,
@@ -366,8 +366,8 @@ async function crawlDetail(url, pageWeight) {
 }
 
 function pageUrl(baseUrl, page, tag) {
-  const query = [`page=${urlEncode(String(page))}`];
-  if (tag) query.push(`search_tag=${urlEncode(tag)}`);
+  const query = [`page=${encodeURIComponent(String(page))}`];
+  if (tag) query.push(`search_tag=${encodeURIComponent(tag)}`);
   return `${resolveUrl("/posts", baseUrl)}?${query.join("&")}`;
 }
 
