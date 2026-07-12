@@ -193,7 +193,6 @@ function getInputPatterns(): string[] {
 function getDefaultPatterns(): string[] {
   return [
     "{projectRoot}/plugins/**/package.json",
-    "{projectRoot}/plugins/**/crawl.rhai",
     "{projectRoot}/plugins/**/crawl.js",
     "{projectRoot}/plugins/**/icon.png",
     "{projectRoot}/plugins/**/doc_root/doc.md",
@@ -404,18 +403,12 @@ async function packagePlugin(
           return;
         }
       } else {
-        const manifestPath = path.join(pluginDir, "manifest.json");
-        if (!fs.existsSync(manifestPath)) {
-          reject(new Error(`manifest.json 不存在: ${manifestPath}`));
-          return;
-        }
-
-        const crawlRhaiPath = path.join(pluginDir, "crawl.rhai");
-        const crawlJsPath = path.join(pluginDir, "crawl.js");
-        if (!fs.existsSync(crawlRhaiPath) && !fs.existsSync(crawlJsPath)) {
-          reject(new Error(`缺少必需文件: crawl.rhai 或 crawl.js`));
-          return;
-        }
+        reject(
+          new Error(
+            `只支持 package.json (v3) 插件；旧版 manifest.json (v2) 已停止支持`,
+          ),
+        );
+        return;
       }
 
       if (!fs.existsSync(path.dirname(outputFile))) {

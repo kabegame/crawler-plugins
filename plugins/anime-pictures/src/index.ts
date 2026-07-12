@@ -360,7 +360,6 @@ async function crawlDetail(url, pageWeight) {
   };
   if (displayName) opts.name = displayName;
   if (metadata) opts.metadata = metadata;
-  if (metadata) opts.metadata_version = 1;
   await downloadImage(downloadUrl, opts);
   addProgress(pageWeight);
 }

@@ -94,8 +94,6 @@
     "providers/tag_provider.json5",
     "providers/tag_type_provider.json5"
   ],
-  "kbMetadataMigrations": [
-    "metadata_migrations/v1.rhai"
-  ],
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
   "kbDescriptionTemplate": "templates/description.ejs"
 }

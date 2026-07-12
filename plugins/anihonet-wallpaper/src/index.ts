@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { WORKS } from "./works";
 
 const {
   addProgress,
@@ -51,6 +52,14 @@ function tagCopy(anchor, baseUrl) {
   };
 }
 
+function isWorkLabel(label) {
+  if (!label.includes("壁紙")) return false;
+  return WORKS.some((work) => label.includes(work));
+}
+
+// 与 metadata_migrations/migrate.js 的分类规则保持一致（schema 4）：
+// 作品(命中作品列表且含壁紙) → work；PC壁紙/Android/iPhone/スマホ → type；
+// 高品質画像・アニメの高画質壁紙 → quality；其余含壁紙 → type；其他 → character。
 function classifyTags(tags) {
   const qualityTags = [];
   const workTags = [];
@@ -59,9 +68,10 @@ function classifyTags(tags) {
   for (const tag of tags) {
     const label = coerceStr(tag.name || tag.href).trim();
     if (!label) continue;
-    if (/PC壁紙|Android|iPhone|スマホ/.test(label)) typeTags.push(tag);
-    else if (/高画質/.test(label)) qualityTags.push(tag);
-    else if (/壁紙/.test(label)) workTags.push(tag);
+    if (isWorkLabel(label)) workTags.push(tag);
+    else if (/PC壁紙|Android|iPhone|スマホ/.test(label)) typeTags.push(tag);
+    else if (label.includes("高品質画像") || label.includes("アニメの高画質壁紙")) qualityTags.push(tag);
+    else if (label.includes("壁紙")) typeTags.push(tag);
     else characterTags.push(tag);
   }
   return { qualityTags, workTags, characterTags, typeTags };
@@ -72,7 +82,7 @@ function parseMetadata(document, detailUrl) {
     .map((a) => tagCopy(a, detailUrl));
   const groups = classifyTags(tags);
   return {
-    schema: 2,
+    schema: 4,
     post_id: sourcePostId(detailUrl),
     date: coerceStr(document.querySelector("time.entry-date")?.getAttribute("datetime")),
     tags,
@@ -161,7 +171,7 @@ async function processDetailPage(href, workPctBudget, workIdx, workTotal, baseUr
   console.log(`[anihonet]   进入详情页 ${workIdx}/${workTotal}: ${full}`);
   const { document, finalUrl } = await openDocument(full);
   const metadata = parseMetadata(document, finalUrl);
-  const metadataId = Number(createImageMetadata(metadata, { version: 2 }));
+  const metadataId = Number(createImageMetadata(metadata));
   let downloadHrefs = Array.from(document.querySelectorAll("a.button.add-dl"))
     .map((a) => a.getAttribute("href") || "")
     .filter(Boolean);
