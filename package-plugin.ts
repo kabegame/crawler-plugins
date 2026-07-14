@@ -27,9 +27,16 @@ const PLUGIN_ICON_PACKED_SUFFIX = ".icon.png";
 // 统一实现：改为调用 Rust sidecar `kabegame-cli plugin pack`
 const WORKSPACE_ROOT = path.resolve(__dirname, "..");
 const TAURI_DIR = path.join(WORKSPACE_ROOT, "src-tauri");
+// 与 scripts/utils.ts 的 TARGET_DIR 语义一致:优先 CARGO_TARGET_DIR(相对值按仓库根解析),
+// 否则默认 <root>/target。保证隔离构建(如 CARGO_TARGET_DIR=target-22,在 22.04 VM 内降 glibc
+// 地板)时,打包 .kgpg 用的 cli 与主构建同处一个 target,而不是误用旧的 target/release 产物。
+const TARGET_DIR = process.env.CARGO_TARGET_DIR
+  ? path.isAbsolute(process.env.CARGO_TARGET_DIR)
+    ? process.env.CARGO_TARGET_DIR
+    : path.join(WORKSPACE_ROOT, process.env.CARGO_TARGET_DIR)
+  : path.join(WORKSPACE_ROOT, "target");
 const CLI_EXE = path.join(
-  WORKSPACE_ROOT,
-  "target",
+  TARGET_DIR,
   "release",
   process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli",
 );
