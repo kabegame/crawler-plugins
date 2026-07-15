@@ -1,8 +1,8 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S deno run -A
 
 /**
  * 打包插件为 .kgpg 格式
- * 根据 project.json 中的 inputs 字段路径模式计算需要打包的文件
+ * 按内置路径模式（getDefaultPatterns）计算需要打包的文件
  */
 
 import fs from "fs";
@@ -20,7 +20,6 @@ const __dirname = dirname(__filename);
 // 插件目录和输出目录（默认输出到 packed，可通过参数覆盖）
 const PLUGIN_DIR = path.join(__dirname, "plugins");
 const DEFAULT_OUTPUT_DIR = path.join(__dirname, "packed");
-const PROJECT_JSON = path.join(__dirname, "project.json");
 
 const PLUGIN_ICON_PACKED_SUFFIX = ".icon.png";
 
@@ -50,14 +49,6 @@ interface PluginResult {
   name: string;
   success: boolean;
   error?: string;
-}
-
-interface ProjectJson {
-  targets?: {
-    package?: {
-      inputs?: string[];
-    };
-  };
 }
 
 interface PluginPackageJson {
@@ -109,12 +100,19 @@ function runPluginBuild(pluginDir: string, pkg: PluginPackageJson): void {
     return;
   }
 
-  const runner = commandExists("bun") ? "bun" : commandExists("npm") ? "npm" : null;
+  const runner = commandExists("deno")
+    ? "deno"
+    : commandExists("npm")
+      ? "npm"
+      : commandExists("bun")
+        ? "bun"
+        : null;
   if (!runner) {
-    throw new Error("未找到可用的包管理器（bun/npm），无法执行插件构建");
+    throw new Error("未找到可用的运行器（deno/npm/bun），无法执行插件构建");
   }
 
-  const r = spawnSync(runner, ["run", "build"], {
+  const args = runner === "deno" ? ["task", "build"] : ["run", "build"];
+  const r = spawnSync(runner, args, {
     cwd: pluginDir,
     stdio: "inherit",
     env: { ...process.env },
@@ -163,35 +161,10 @@ function cleanupPackedPluginIconFiles(
 }
 
 /**
- * 从 project.json 读取 inputs 字段，解析文件路径模式
+ * 打包文件路径模式（nx/project.json 已移除，内置模式即唯一来源）
  */
 function getInputPatterns(): string[] {
-  try {
-    const projectJson: ProjectJson = JSON.parse(
-      fs.readFileSync(PROJECT_JSON, "utf-8"),
-    );
-    const packageTarget = projectJson.targets?.package;
-    if (!packageTarget || !packageTarget.inputs) {
-      console.warn(
-        chalk.yellow("⚠️  无法从 project.json 读取 inputs，使用默认模式"),
-      );
-      return getDefaultPatterns();
-    }
-
-    // 过滤出路径模式（排除 "default" 和 "^default"）
-    const patterns = packageTarget.inputs.filter(
-      (input) => typeof input === "string" && input.includes("{projectRoot}"),
-    );
-
-    return patterns;
-  } catch (error) {
-    console.warn(
-      chalk.yellow(
-        `⚠️  读取 project.json 失败: ${(error as Error).message}，使用默认模式`,
-      ),
-    );
-    return getDefaultPatterns();
-  }
+  return getDefaultPatterns();
 }
 
 /**
