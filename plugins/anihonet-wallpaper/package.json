@@ -1,6 +1,6 @@
 {
   "name": "anihonet-wallpaper",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "private": true,
   "name.zh": "anihonet动漫壁纸",
   "name.en": "anihonet anime wallpapers",
@@ -22,6 +22,10 @@
     "build": "rspack build"
   },
   "kbBaseUrl": "https://anihonetwallpaper.com",
+  "kbLabels": [
+    { "id": "content.res.mobile" },
+    { "id": "content.res.desktop" }
+  ],
   "kbConfig": [
     {
       "key": "crawl_mode",

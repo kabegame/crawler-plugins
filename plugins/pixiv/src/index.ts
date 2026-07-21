@@ -3,12 +3,29 @@ const {
   addProgress,
   createImageMetadata,
   downloadImage,
+  requireCookie,
   setHeader,
   warn,
 } = Kabegame;
 
 function coerceStr(value) {
   return value == null ? "" : String(value);
+}
+
+// 需要登录态的分支：从畅游注入 pixiv 的 Cookie（脚本拿不到明文）。
+// 取不到（畅游无该站 Cookie）直接抛错终止任务，提示用户先去畅游登录 pixiv。
+function ensurePixivCookie(reason) {
+  if (!requireCookie()) {
+    throw new Error(`${reason}需要登录：未从畅游获取到 Cookie，请先在畅游登录 pixiv 后重试`);
+  }
+}
+
+// 需登录分支中，列表请求得到 403 视为登录态失效 → 抛错终止（提示重新登录）。
+// 其它错误交回调用方按原逻辑处理（通常是到底/瞬时错误后 break）。
+function rethrowIfLoginFailed(error, reason, loginRequired) {
+  if (loginRequired && error?.status === 403) {
+    throw new Error(`${reason}失败：pixiv 登录态失效（403），请在畅游重新登录 pixiv 后重试`);
+  }
 }
 
 function setPixivHeaders() {
@@ -21,7 +38,11 @@ function setPixivHeaders() {
 
 async function fetchJson(url) {
   const response = await fetch(url);
-  if (!response.ok) throw new Error(`HTTP ${response.status}: ${url}`);
+  if (!response.ok) {
+    const err = new Error(`HTTP ${response.status}: ${url}`);
+    err.status = response.status;
+    throw err;
+  }
   return response.json();
 }
 
@@ -115,6 +136,7 @@ async function runRanking(vars) {
   if (vars.age_mode === "r18") {
     if (!coerceStr(vars.user_id)) throw new Error("R18 排行榜请在「用户 UID」填写登录账号 UID（x-user-id）");
     setHeader("x-user-id", coerceStr(vars.user_id));
+    ensurePixivCookie("R18 排行榜");
   }
 
   let done = 0;
@@ -127,7 +149,8 @@ async function runRanking(vars) {
     let json;
     try {
       json = await fetchJson(`${refBase}&p=${page}&format=json`);
-    } catch {
+    } catch (e) {
+      rethrowIfLoginFailed(e, "R18 排行榜", vars.age_mode === "r18");
       break;
     }
     const contents = Array.isArray(json?.contents) ? json.contents : [];
@@ -151,6 +174,7 @@ async function runRanking(vars) {
 async function runBookmark(vars) {
   const userId = coerceStr(vars.user_id);
   if (!userId) throw new Error("收藏模式请填写用户 UID");
+  ensurePixivCookie("收藏抓取");
   const target = Number(vars.num_artworks ?? 0);
   const limit = 48;
   let offset = 0;
@@ -159,7 +183,8 @@ async function runBookmark(vars) {
     let json;
     try {
       json = await fetchJson(`https://www.pixiv.net/ajax/user/${userId}/illusts/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=zh`);
-    } catch {
+    } catch (e) {
+      rethrowIfLoginFailed(e, "收藏抓取", true);
       break;
     }
     const works = Array.isArray(json?.body?.works) ? json.body.works : [];
@@ -182,8 +207,15 @@ async function runUser(vars) {
   if (!artistId) throw new Error("画师模式请填写画师 UID");
   if (!userId) throw new Error("画师模式请填写登录用户 UID（x-user-id，与 PixivCrawler 一致）");
   setHeader("x-user-id", userId);
+  ensurePixivCookie("画师作品抓取");
 
-  const json = await fetchJson(`https://www.pixiv.net/ajax/user/${artistId}/profile/all?lang=zh`);
+  let json;
+  try {
+    json = await fetchJson(`https://www.pixiv.net/ajax/user/${artistId}/profile/all?lang=zh`);
+  } catch (e) {
+    rethrowIfLoginFailed(e, "画师作品抓取", true);
+    throw e;
+  }
   const illusts = json?.body?.illusts || {};
   const ids = Object.keys(illusts)
     .map((key) => Number(key))
@@ -217,6 +249,9 @@ async function runUser(vars) {
 async function runKeyword(vars) {
   const keyword = coerceStr(vars.keyword);
   if (!keyword) throw new Error("关键词模式请填写搜索关键词");
+  // 热门排序需 Premium 登录；r18/all 搜索会出 R18 结果需登录
+  const needLogin = vars.keyword_order === "popular" || vars.search_mode !== "safe";
+  if (needLogin) ensurePixivCookie("热门排序 / R18 搜索");
   const kwEnc = encodeURIComponent(keyword);
   const orderParam = vars.keyword_order === "popular" ? "popular_d" : "date_d";
   const target = Number(vars.num_artworks ?? 0);
@@ -228,7 +263,8 @@ async function runKeyword(vars) {
     let json;
     try {
       json = await fetchJson(`https://www.pixiv.net/ajax/search/artworks/${kwEnc}?word=${kwEnc}&order=${orderParam}&mode=${vars.search_mode}&p=${page}&s_mode=s_tag_full&type=all&lang=zh`);
-    } catch {
+    } catch (e) {
+      rethrowIfLoginFailed(e, "关键词搜索", needLogin);
       break;
     }
     const data = Array.isArray(json?.body?.illustManga?.data) ? json.body.illustManga.data : [];

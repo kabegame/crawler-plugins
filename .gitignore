@@ -2,7 +2,7 @@
 node_modules/
 
 # Packed plugins
-# - KGPG v2：`packed/` 可直接提交到仓库，用于 GitHub 发布时直接上传/引用
+# - KGPG v3：`packed/` 可直接提交到仓库，用于 GitHub 发布时直接上传/引用
 # - 若你不想提交产物，可自行改回忽略
 
 # OS files

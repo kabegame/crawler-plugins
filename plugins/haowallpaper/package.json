@@ -1,0 +1,154 @@
+{
+  "name": "haowallpaper",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "哲风壁纸",
+  "name.en": "Haowallpaper",
+  "name.ja": "哲風壁紙",
+  "name.ko": "저펑 벽지",
+  "name.zhtw": "哲風壁紙",
+  "description": "哲风壁纸收集源插件",
+  "description.zh": "哲风壁纸收集源插件",
+  "description.en": "Haowallpaper collection source plugin",
+  "description.ja": "哲風壁紙コレクションソースプラグイン",
+  "description.ko": "저펑 벽지 수집 소스 플러그인",
+  "description.zhtw": "哲風壁紙收集源插件",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://haowallpaper.com",
+  "kbLabels": [
+    { "id": "content.res.mobile" },
+    { "id": "content.res.desktop" },
+    { "id": "content.type.video" }
+  ],
+  "kbConfig": [
+    {
+      "key": "startPage",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "The first page to crawl",
+      "descripts.ja": "取得を開始するページ",
+      "descripts.ko": "수집을 시작할 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 1,
+      "min": 1,
+      "max": null
+    },
+    {
+      "key": "endPage",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "종료 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面",
+      "descripts.en": "The last page to crawl",
+      "descripts.ja": "取得を終了するページ",
+      "descripts.ko": "수집을 종료할 페이지",
+      "descripts.zhtw": "要拉取的結束頁面",
+      "default": 5,
+      "min": 1,
+      "max": null
+    },
+    {
+      "key": "wallpaperType",
+      "type": "options",
+      "name": "壁纸类型",
+      "name.en": "Wallpaper type",
+      "name.ja": "壁紙タイプ",
+      "name.ko": "벽지 유형",
+      "name.zhtw": "壁紙類型",
+      "descripts": "选择要爬取的壁纸类型：桌面壁纸或手机壁纸",
+      "descripts.en": "Choose which wallpapers to crawl: desktop or mobile",
+      "descripts.ja": "取得する壁紙の種類を選択：デスクトップまたはモバイル",
+      "descripts.ko": "수집할 벽지 유형 선택: 데스크톱 또는 모바일",
+      "descripts.zhtw": "選擇要爬取的壁紙類型：桌面壁紙或手機壁紙",
+      "default": "homeView",
+      "options": [
+        {
+          "name": "桌面壁纸",
+          "name.en": "Desktop",
+          "name.ja": "デスクトップ",
+          "name.ko": "데스크톱",
+          "name.zhtw": "桌面壁紙",
+          "variable": "homeView"
+        },
+        {
+          "name": "手机壁纸",
+          "name.en": "Mobile",
+          "name.ja": "モバイル",
+          "name.ko": "모바일",
+          "name.zhtw": "手機壁紙",
+          "variable": "mobileView"
+        }
+      ]
+    },
+    {
+      "key": "formats",
+      "type": "checkbox",
+      "name": "壁纸格式",
+      "name.en": "Formats",
+      "name.ja": "壁紙フォーマット",
+      "name.ko": "벽지 형식",
+      "name.zhtw": "壁紙格式",
+      "descripts": "勾选要爬取的壁纸格式",
+      "descripts.en": "Select which formats to crawl",
+      "descripts.ja": "取得する壁紙フォーマットを選択",
+      "descripts.ko": "수집할 벽지 형식 선택",
+      "descripts.zhtw": "勾選要爬取的壁紙格式",
+      "default": ["image", "video"],
+      "options": [
+        {
+          "name": "图片",
+          "name.en": "Image",
+          "name.ja": "画像",
+          "name.ko": "이미지",
+          "name.zhtw": "圖片",
+          "variable": "image"
+        },
+        {
+          "name": "视频",
+          "name.en": "Video",
+          "name.ja": "動画",
+          "name.ko": "동영상",
+          "name.zhtw": "影片",
+          "variable": "video"
+        }
+      ]
+    },
+    {
+      "key": "tags",
+      "type": "list",
+      "name": "标签集合",
+      "name.en": "Tags",
+      "name.ja": "タグ集合",
+      "name.ko": "태그 모음",
+      "name.zhtw": "標籤集合",
+      "descripts": "只要图片标签列表中包含任意一个标签（包括子字符串）就下载该图片；留空则不过滤",
+      "descripts.en": "Download an image if its tags contain any of these (substring match); empty means no filter",
+      "descripts.ja": "画像のタグにいずれかが含まれる（部分一致）場合にダウンロード。空欄なら絞り込みなし",
+      "descripts.ko": "이미지 태그에 이 중 하나라도 포함되면(부분 일치) 다운로드; 비우면 필터 없음",
+      "descripts.zhtw": "只要圖片標籤列表中包含任意一個標籤（包括子字串）就下載該圖片；留空則不過濾",
+      "default": [],
+      "options": ["二次元", "少女", "动漫"]
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}

@@ -1,0 +1,427 @@
+{
+  "name": "kemono",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "Kemono创作者内容",
+  "name.en": "Kemonocreator content",
+  "name.ja": "Kemonoクリエイターコンテンツ",
+  "name.ko": "Kemono크리에이터 콘텐츠",
+  "name.zhtw": "Kemono創作者內容",
+  "description": "从 kemono.cr 抓取作者帖子及附件",
+  "description.zh": "从 kemono.cr 抓取作者帖子及附件",
+  "description.en": "Crawl creator posts and attachments from kemono.cr",
+  "description.ja": "kemono.cr から投稿と添付ファイルを取得します",
+  "description.ko": "kemono.cr에서 게시물과 첨부 파일을 수집합니다",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://kemono.cr",
+  "kbLabels": [
+    {
+      "id": "content.nsfw"
+    },
+    {
+      "id": "auth.needCookie"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "source",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Source mode",
+      "name.ja": "取得モード",
+      "name.ko": "수집 모드",
+      "name.zhtw": "爬取模式",
+      "default": "link",
+      "options": [
+        {
+          "name": "链接",
+          "name.en": "Link",
+          "name.ja": "リンク",
+          "name.ko": "링크",
+          "name.zhtw": "連結",
+          "variable": "link"
+        },
+        {
+          "name": "作者",
+          "name.en": "Creator",
+          "name.ja": "クリエイター",
+          "name.ko": "크리에이터",
+          "name.zhtw": "作者",
+          "variable": "creator"
+        },
+        {
+          "name": "收藏的作者",
+          "name.en": "Favorite creators",
+          "name.ja": "お気に入りのクリエイター",
+          "name.ko": "즐겨찾기 크리에이터",
+          "name.zhtw": "收藏的作者",
+          "variable": "fav_creator"
+        },
+        {
+          "name": "收藏的帖子",
+          "name.en": "Favorite posts",
+          "name.ja": "お気に入りの投稿",
+          "name.ko": "즐겨찾기 게시물",
+          "name.zhtw": "收藏的貼文",
+          "variable": "fav_post"
+        },
+        {
+          "name": "标签",
+          "name.en": "Tag",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tag"
+        }
+      ]
+    },
+    {
+      "key": "link",
+      "type": "string",
+      "name": "作者或帖子链接",
+      "name.en": "Creator or post URL",
+      "name.ja": "クリエイターまたは投稿 URL",
+      "name.ko": "크리에이터 또는 게시물 URL",
+      "name.zhtw": "作者或貼文連結",
+      "descripts": "支持 https://kemono.cr/<service>/user/<uid> 及其 /post/<pid> 形式；旧域名 kemono.su / kemono.party 的链接也可识别。",
+      "descripts.en": "Supports https://kemono.cr/<service>/user/<uid> and its /post/<pid> form; legacy kemono.su / kemono.party links are also recognized.",
+      "descripts.ja": "https://kemono.cr/<service>/user/<uid> とその /post/<pid> 形式に対応。旧ドメイン kemono.su / kemono.party のリンクも認識します。",
+      "descripts.ko": "https://kemono.cr/<service>/user/<uid> 및 /post/<pid> 형식을 지원하며, 구 도메인 kemono.su / kemono.party 링크도 인식합니다.",
+      "descripts.zhtw": "支援 https://kemono.cr/<service>/user/<uid> 及其 /post/<pid> 形式；舊網域 kemono.su / kemono.party 的連結也可辨識。",
+      "default": "",
+      "when": {
+        "source": [
+          "link"
+        ]
+      }
+    },
+    {
+      "key": "service",
+      "type": "options",
+      "name": "作者服务",
+      "name.en": "Creator service",
+      "name.ja": "クリエイターサービス",
+      "name.ko": "크리에이터 서비스",
+      "name.zhtw": "作者服務",
+      "default": "patreon",
+      "options": [
+        {
+          "name": "Patreon",
+          "name.en": "Patreon",
+          "name.ja": "Patreon",
+          "name.ko": "Patreon",
+          "name.zhtw": "Patreon",
+          "variable": "patreon"
+        },
+        {
+          "name": "Fanbox",
+          "name.en": "Fanbox",
+          "name.ja": "Fanbox",
+          "name.ko": "Fanbox",
+          "name.zhtw": "Fanbox",
+          "variable": "fanbox"
+        },
+        {
+          "name": "Gumroad",
+          "name.en": "Gumroad",
+          "name.ja": "Gumroad",
+          "name.ko": "Gumroad",
+          "name.zhtw": "Gumroad",
+          "variable": "gumroad"
+        },
+        {
+          "name": "SubscribeStar",
+          "name.en": "SubscribeStar",
+          "name.ja": "SubscribeStar",
+          "name.ko": "SubscribeStar",
+          "name.zhtw": "SubscribeStar",
+          "variable": "subscribestar"
+        },
+        {
+          "name": "DLsite",
+          "name.en": "DLsite",
+          "name.ja": "DLsite",
+          "name.ko": "DLsite",
+          "name.zhtw": "DLsite",
+          "variable": "dlsite"
+        },
+        {
+          "name": "Discord",
+          "name.en": "Discord",
+          "name.ja": "Discord",
+          "name.ko": "Discord",
+          "name.zhtw": "Discord",
+          "variable": "discord"
+        },
+        {
+          "name": "Fantia",
+          "name.en": "Fantia",
+          "name.ja": "Fantia",
+          "name.ko": "Fantia",
+          "name.zhtw": "Fantia",
+          "variable": "fantia"
+        },
+        {
+          "name": "Boosty",
+          "name.en": "Boosty",
+          "name.ja": "Boosty",
+          "name.ko": "Boosty",
+          "name.zhtw": "Boosty",
+          "variable": "boosty"
+        },
+        {
+          "name": "Afdian",
+          "name.en": "Afdian",
+          "name.ja": "Afdian",
+          "name.ko": "Afdian",
+          "name.zhtw": "Afdian",
+          "variable": "afdian"
+        }
+      ],
+      "when": {
+        "source": [
+          "creator"
+        ]
+      }
+    },
+    {
+      "key": "creator_id",
+      "type": "string",
+      "name": "作者 ID",
+      "name.en": "Creator ID",
+      "name.ja": "クリエイター ID",
+      "name.ko": "크리에이터 ID",
+      "name.zhtw": "作者 ID",
+      "descripts": "填写所选服务中的作者 ID。",
+      "descripts.en": "Enter the creator ID for the selected service.",
+      "descripts.ja": "選択したサービスのクリエイター ID を入力します。",
+      "descripts.ko": "선택한 서비스의 크리에이터 ID를 입력합니다.",
+      "descripts.zhtw": "填寫所選服務中的作者 ID。",
+      "default": "",
+      "when": {
+        "source": [
+          "creator"
+        ]
+      }
+    },
+    {
+      "key": "creator_page_start",
+      "type": "int",
+      "name": "作者起始页",
+      "name.en": "Creator start page",
+      "name.ja": "作者開始ページ",
+      "name.ko": "작가 시작 페이지",
+      "name.zhtw": "作者起始頁",
+      "descripts": "从作者帖子列表的第几页开始，每页 50 个帖子。收藏的作者模式下，此范围作用于每一位收藏作者。",
+      "descripts.en": "First page of the creator's post list, 50 posts per page. In Favorite creators mode this applies to each favorited creator.",
+      "descripts.ja": "作者の投稿一覧の開始ページ。1 ページ 50 投稿。お気に入り作者モードでは各作者に適用されます。",
+      "descripts.ko": "작가 게시물 목록의 시작 페이지입니다. 페이지당 50개. 즐겨찾기 작가 모드에서는 각 작가에 적용됩니다.",
+      "descripts.zhtw": "從作者貼文列表的第幾頁開始，每頁 50 篇。收藏作者模式下，此範圍套用於每一位收藏作者。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": {
+        "source": [
+          "creator",
+          "link",
+          "fav_creator"
+        ]
+      }
+    },
+    {
+      "key": "creator_page_end",
+      "type": "int",
+      "name": "作者结束页",
+      "name.en": "Creator end page",
+      "name.ja": "作者終了ページ",
+      "name.ko": "작가 종료 페이지",
+      "name.zhtw": "作者結束頁",
+      "descripts": "爬取到作者帖子列表第几页（含该页）。填 0 表示一直爬到最后一页。",
+      "descripts.en": "Last 作者帖子列表 page to crawl, inclusive. Use 0 to crawl through the final page.",
+      "descripts.ja": "取得する最後の作者帖子列表ページ（このページを含む）。0 なら最後のページまで。",
+      "descripts.ko": "수집할 마지막 作者帖子列表 페이지(해당 페이지 포함). 0이면 마지막 페이지까지.",
+      "descripts.zhtw": "爬取到作者帖子列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
+      "default": 1,
+      "min": 0,
+      "max": 100000,
+      "when": {
+        "source": [
+          "creator",
+          "link",
+          "fav_creator"
+        ]
+      }
+    },
+    {
+      "key": "fav_creator_page_start",
+      "type": "int",
+      "name": "收藏作者起始页",
+      "name.en": "Favorite creators start page",
+      "name.ja": "お気に入り作者の開始ページ",
+      "name.ko": "즐겨찾기 작가 시작 페이지",
+      "name.zhtw": "收藏作者起始頁",
+      "descripts": "从收藏的作者列表的第几页开始，每页 50 位作者。与「作者页数范围」叠加生效。",
+      "descripts.en": "First page of your favorited-creator list, 50 creators per page. Combines with the creator page range.",
+      "descripts.ja": "お気に入り作者一覧の開始ページ。1 ページ 50 人。作者ページ範囲と併用されます。",
+      "descripts.ko": "즐겨찾기 작가 목록의 시작 페이지입니다. 페이지당 50명. 작가 페이지 범위와 함께 적용됩니다.",
+      "descripts.zhtw": "從收藏作者列表的第幾頁開始，每頁 50 位作者。與「作者頁數範圍」疊加生效。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": {
+        "source": [
+          "fav_creator"
+        ]
+      }
+    },
+    {
+      "key": "fav_creator_page_end",
+      "type": "int",
+      "name": "收藏作者结束页",
+      "name.en": "Favorite creators end page",
+      "name.ja": "お気に入り作者の終了ページ",
+      "name.ko": "즐겨찾기 작가 종료 페이지",
+      "name.zhtw": "收藏作者結束頁",
+      "descripts": "爬取到收藏作者列表第几页（含该页）。填 0 表示一直爬到最后一页。",
+      "descripts.en": "Last 收藏作者列表 page to crawl, inclusive. Use 0 to crawl through the final page.",
+      "descripts.ja": "取得する最後の收藏作者列表ページ（このページを含む）。0 なら最後のページまで。",
+      "descripts.ko": "수집할 마지막 收藏作者列表 페이지(해당 페이지 포함). 0이면 마지막 페이지까지.",
+      "descripts.zhtw": "爬取到收藏作者列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
+      "default": 1,
+      "min": 0,
+      "max": 100000,
+      "when": {
+        "source": [
+          "fav_creator"
+        ]
+      }
+    },
+    {
+      "key": "tag",
+      "type": "string",
+      "name": "标签",
+      "name.en": "Tag",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "default": "",
+      "descripts": "按站点标签爬取全站帖子，例如 nsfw、wip、comic、nude。标签区分大小写，需与站点上的写法一致；填错会提示该标签没有帖子。可在 kemono.cr/posts/tags 查看全部标签。",
+      "descripts.en": "Crawl site-wide posts by tag, e.g. nsfw, wip, comic, nude. Tags are case-sensitive and must match the site. See kemono.cr/posts/tags for the full list.",
+      "descripts.ja": "サイト全体のタグで取得します（例：nsfw、wip、comic、nude）。タグは大文字小文字を区別します。一覧は kemono.cr/posts/tags を参照。",
+      "descripts.ko": "사이트 전체 태그로 수집합니다(예: nsfw, wip, comic, nude). 태그는 대소문자를 구분합니다. 전체 목록은 kemono.cr/posts/tags 참고.",
+      "descripts.zhtw": "依站點標籤爬取全站貼文，例如 nsfw、wip、comic、nude。標籤區分大小寫。可在 kemono.cr/posts/tags 查看全部標籤。",
+      "when": {
+        "source": [
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "list_page_start",
+      "type": "int",
+      "name": "起始页",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "从收藏／标签的帖子列表的第几页开始，每页 50 个作品。",
+      "descripts.en": "First page of your favorited-post or tag result list, 50 posts per page.",
+      "descripts.ja": "お気に入り・タグの一覧の開始ページ。1 ページ 50 件。",
+      "descripts.ko": "즐겨찾기·태그 목록의 시작 페이지입니다. 페이지당 50개.",
+      "descripts.zhtw": "從收藏／標籤的貼文列表的第幾頁開始，每頁 50 件。",
+      "default": 1,
+      "min": 1,
+      "max": 100000,
+      "when": {
+        "source": [
+          "fav_post",
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "list_page_end",
+      "type": "int",
+      "name": "结束页",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "종료 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "爬取到收藏／標籤的貼文列表第几页（含该页）。填 0 表示一直爬到最后一页。",
+      "descripts.en": "Last 收藏／標籤的貼文列表 page to crawl, inclusive. Use 0 to crawl through the final page.",
+      "descripts.ja": "取得する最後の收藏／標籤的貼文列表ページ（このページを含む）。0 なら最後のページまで。",
+      "descripts.ko": "수집할 마지막 收藏／標籤的貼文列表 페이지(해당 페이지 포함). 0이면 마지막 페이지까지.",
+      "descripts.zhtw": "爬取到收藏／標籤的貼文列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
+      "default": 1,
+      "min": 0,
+      "max": 100000,
+      "when": {
+        "source": [
+          "fav_post",
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "image_source",
+      "type": "options",
+      "name": "图片来源",
+      "name.en": "Image source",
+      "name.ja": "画像ソース",
+      "name.ko": "이미지 소스",
+      "name.zhtw": "圖片來源",
+      "default": "thumbnail",
+      "descripts": "缩略图长边上限 800px，来自 img.kemono.cr。原图来自 n1~n5 等节点，很多网络环境下无法连接（实测 TCP 不通），选原图可能全部下载失败。缩略图模式会跳过压缩包、视频等没有缩略图的附件。",
+      "descripts.en": "Thumbnails are capped at 800px on the long edge and served from img.kemono.cr. Originals come from n1-n5 nodes that are unreachable on many networks, so Original may fail entirely. Thumbnail mode skips archives and videos, which have no thumbnail.",
+      "descripts.ja": "サムネイルは長辺 800px 上限で img.kemono.cr から配信されます。オリジナルは n1〜n5 ノード配信で、多くの回線から接続できません（実測）。サムネイルモードでは圧縮ファイルや動画など、サムネイルが無い添付は除外されます。",
+      "descripts.ko": "썸네일은 긴 변 800px 상한이며 img.kemono.cr에서 제공됩니다. 원본은 n1~n5 노드에서 오는데 많은 네트워크에서 연결되지 않습니다. 썸네일 모드는 썸네일이 없는 압축파일·동영상을 건너뜁니다.",
+      "descripts.zhtw": "縮圖長邊上限 800px，來自 img.kemono.cr。原圖來自 n1~n5 節點，許多網路環境無法連線，選原圖可能全部失敗。縮圖模式會跳過壓縮檔、影片等沒有縮圖的附件。",
+      "options": [
+        {
+          "name": "缩略图（800px，推荐）",
+          "name.en": "Thumbnail (800px, recommended)",
+          "name.ja": "サムネイル（800px・推奨）",
+          "name.ko": "썸네일 (800px, 권장)",
+          "name.zhtw": "縮圖（800px，推薦）",
+          "variable": "thumbnail"
+        },
+        {
+          "name": "原图（多数网络不可达）",
+          "name.en": "Original (unreachable on most networks)",
+          "name.ja": "オリジナル（多くの回線で接続不可）",
+          "name.ko": "원본 (대부분 네트워크에서 연결 불가)",
+          "name.zhtw": "原圖（多數網路不可達）",
+          "variable": "original"
+        }
+      ]
+    },
+    {
+      "key": "banner",
+      "type": "boolean",
+      "name": "包含 Banner／主文件",
+      "name.en": "Include banner / primary file",
+      "name.ja": "バナー／メインファイルを含める",
+      "name.ko": "배너/기본 파일 포함",
+      "name.zhtw": "包含 Banner／主檔案",
+      "descripts": "对应原下载器的 --banner：把帖子的 file 主文件也加入附件。非图片主文件即使关闭也会保留。",
+      "descripts.en": "Matches the original --banner: also includes the post's primary file field. Non-image primary files are kept even when disabled.",
+      "descripts.ja": "元の --banner に対応します。投稿の file メインファイルも添付に含めます。画像以外のメインファイルは無効時も保持されます。",
+      "descripts.ko": "원본 --banner에 대응합니다. 게시물의 file 기본 파일도 첨부에 포함합니다. 이미지가 아닌 기본 파일은 꺼도 유지됩니다.",
+      "descripts.zhtw": "對應原下載器的 --banner：把貼文的 file 主檔案也加入附件。非圖片主檔案即使關閉也會保留。",
+      "default": false
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}

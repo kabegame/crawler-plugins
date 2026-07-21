@@ -1,6 +1,6 @@
 {
   "name": "heybox",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": true,
   "name.zh": "小黑盒",
   "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
@@ -15,6 +15,9 @@
     "build": "rspack build"
   },
   "kbBaseUrl": "https://www.xiaoheihe.cn/app/bbs/home",
+  "kbLabels": [
+    { "id": "auth.needCookie" }
+  ],
   "kbConfig": [
     {
       "key": "crawl_mode",

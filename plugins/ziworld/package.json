@@ -1,6 +1,6 @@
 {
   "name": "ziworld",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "name.zh": "ziworld高质量壁纸",
   "name.en": "ziworld high-quality wallpapers",
@@ -22,6 +22,11 @@
     "build": "rspack build"
   },
   "kbBaseUrl": "https://t.ziworld.top",
+  "kbLabels": [
+    { "id": "content.type.video" },
+    { "id": "content.res.mobile" },
+    { "id": "content.res.desktop" }
+  ],
   "kbConfig": [
     {
       "key": "category",

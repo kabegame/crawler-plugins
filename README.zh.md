@@ -191,7 +191,7 @@ node generate-index.js kabegame crawler-plugins
 - 使用 camelCase 字段名（`downloadUrl`, `sizeBytes`）
 - 包含 SHA256 校验和
 - 下载 URL 指向 GitHub Release：`https://github.com/kabegame/crawler-plugins/releases/download/{tag}/{plugin}.kgpg`
-- 图标：KGPG v2 已将列表图标写入 `.kgpg` 固定头部，可通过 HTTP Range 直接读取；`index.json` 不再需要 `iconUrl`，也不再生成 `packed/<plugin>.icon.png`
+- 图标：KGPG v3 已将列表图标写入 `.kgpg` 固定头部，可通过 HTTP Range 直接读取；`index.json` 不再需要 `iconUrl`，也不再生成 `packed/<plugin>.icon.png`
 
 **一键打包并生成索引**：
 

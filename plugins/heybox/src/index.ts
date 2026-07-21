@@ -5,6 +5,7 @@ const {
   addProgress,
   createImageMetadata: createImageMetadataRow,
   downloadImage,
+  requireCookie,
   setHeader,
   warn,
 } = Kabegame;
@@ -27,6 +28,9 @@ const REQUEST_HEADERS = {
   "x-os-type": "Windows",
   "device-info": "Chrome",
 };
+
+// 本次任务是否成功从畅游注入了 Cookie（用于失败时给出登录提示）
+let cookieAvailable = false;
 
 function setRequestHeaders() {
   for (const [key, value] of Object.entries(REQUEST_HEADERS)) {
@@ -551,7 +555,10 @@ async function runSearch(commonParams, vars) {
 
     if (isChallenge(response?.status)) challengeError("搜索接口", response?.status);
     if (response?.status !== "ok") {
-      log(`搜索请求失败: ${coerceStr(response?.status)}`, "warn");
+      log(
+        `搜索请求失败: ${coerceStr(response?.status)}${cookieAvailable ? "" : "（当前未登录，请先在畅游登录小黑盒后重试）"}`,
+        "warn",
+      );
       break;
     }
 
@@ -589,6 +596,13 @@ export async function crawl(_common, custom) {
   const vars = custom || {};
   setRequestHeaders();
   const commonParams = `${COMMON_PARAMS_BASE}&device_id=${xhhFakeDeviceId()}`;
+
+  // 机会注入：从畅游取小黑盒 Cookie（脚本拿不到明文）。取不到不阻断，
+  // 但小黑盒多数接口需要登录态，失败时在告警里提示去畅游登录。
+  cookieAvailable = requireCookie();
+  if (!cookieAvailable) {
+    warn("未从畅游获取到小黑盒 Cookie，将以未登录状态抓取；小黑盒多数接口需要登录，可能无结果。请先在畅游登录小黑盒后重试。");
+  }
 
   if (vars?.crawl_mode === "single_post") {
     await runSinglePost(commonParams, vars);

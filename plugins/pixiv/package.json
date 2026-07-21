@@ -1,7 +1,6 @@
 {
   "name": "pixiv",
-  "version": "1.2.10",
-  "private": true,
+  "version": "1.2.11",
   "name.zh": "Pixiv",
   "name.en": "Pixiv",
   "name.ja": "ピクシブ",
@@ -22,6 +21,11 @@
     "build": "rspack build"
   },
   "kbBaseUrl": "https://www.pixiv.net",
+  "kbLabels": [
+    { "id": "auth.needCookie" },
+    { "id": "auth.needProxy" },
+    { "id": "content.nsfw" }
+  ],
   "kbConfig": [
     {
       "key": "source",

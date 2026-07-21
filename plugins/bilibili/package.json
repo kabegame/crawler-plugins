@@ -1,6 +1,6 @@
 {
   "name": "bilibili",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",
@@ -24,6 +24,9 @@
     "build": "rspack build"
   },
   "kbBaseUrl": "https://www.bilibili.com/read/home",
+  "kbLabels": [
+    { "id": "auth.needCookie" }
+  ],
   "kbConfig": [
     {
       "key": "mode",

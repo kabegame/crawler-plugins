@@ -16,6 +16,20 @@
       "type": "string",
       "description": "运行本插件所需的最低 Kabegame 应用版本（major.minor.patch，如 3.3.1）"
     },
+    "kbLabels": {
+      "type": "array",
+      "description": "插件声明的标签数组；预定义标签只需填写 id，未知标签可用 name/desc 提供回落文案",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "desc": { "type": "string" }
+        }
+      }
+    },
     "description": {
       "type": "string",
       "description": "插件描述（默认值）。多语言用 description.zh、description.ja 等键"

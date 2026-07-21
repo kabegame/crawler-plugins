@@ -5,6 +5,7 @@ const {
   addProgress,
   delHeader,
   downloadImage,
+  requireCookie,
   setHeader,
   warn,
 } = Kabegame;
@@ -25,9 +26,14 @@ function coerceStr(value) {
   return value == null ? "" : String(value);
 }
 
-function warnIfBilibiliRisk(code) {
-  if (code === -101 || code === -352) {
-    warn("B 站接口可能要求登录或触发风控，请在爬虫任务的高级设置中为请求添加 Cookie 请求头（浏览器复制 SESSDATA、bili_jct 等）后重试。");
+// 未登录（-101）：登录态缺失或已失效 → 硬失败终止，提示去畅游登录。
+// 风控（-352）：不一定与登录有关，保持告警不中断。
+function checkBilibiliRisk(code) {
+  if (code === -101) {
+    throw new Error("B 站接口返回未登录（-101）：未获取到有效登录态，请先在畅游登录 bilibili 后重试。");
+  }
+  if (code === -352) {
+    warn("B 站接口触发风控（-352），可稍后重试或更换网络；若持续失败请在畅游重新登录 bilibili。");
   }
 }
 
@@ -159,7 +165,7 @@ async function fetchArticleReplies(cvId, img, sub) {
       `cv ${cvId} 评论接口`,
     );
     if (reply?.code !== 0) {
-      warnIfBilibiliRisk(reply?.code);
+      checkBilibiliRisk(reply?.code);
       warn(`评论 API 拉取失败 (cv ${cvId}): ${coerceStr(reply?.message)}`);
       break;
     }
@@ -276,7 +282,7 @@ async function getWbiKeys() {
   const nav = await fetchJson(NAV_URL);
   delHeader("Referer");
   if (nav?.code !== 0) {
-    warnIfBilibiliRisk(nav?.code);
+    checkBilibiliRisk(nav?.code);
     throw new Error(`nav 接口异常: ${coerceStr(nav?.message)}`);
   }
   const keys = wbiKeysFromNav(nav);
@@ -290,7 +296,7 @@ async function processOneCv(cvId, img, sub, perCv, searchDesc) {
     `cv ${cvId} view`,
   );
   if (view?.code !== 0) {
-    warnIfBilibiliRisk(view?.code);
+    checkBilibiliRisk(view?.code);
     warn(`cv ${cvId} view 失败: ${coerceStr(view?.message)}`);
     addProgress(perCv);
     return;
@@ -322,7 +328,7 @@ async function processOneOpus(opusId, perTotal, img, sub) {
   const html = await (await fetch(pageUrl)).text();
   const imgs = collectImageUrlsFromContent(html);
   if (imgs.length === 0) {
-    warn("opus 页面未解析到 bfs 图片链接，可能为壳页或结构变化；可尝试在高级设置中加 Cookie 后重试。");
+    warn("opus 页面未解析到 bfs 图片链接，可能为壳页或结构变化；可尝试先在畅游登录 bilibili 后重试。");
     addProgress(perTotal);
     return;
   }
@@ -334,7 +340,7 @@ async function processOneOpus(opusId, perTotal, img, sub) {
     const view = await fetchWith509Retry(() => signViewUrl(cvId, img, sub), `opus ${opusId} cv ${cvId} view`);
     if (view?.code === 0) vd = view.data;
     else {
-      warnIfBilibiliRisk(view?.code);
+      checkBilibiliRisk(view?.code);
       warn(`opus ${opusId} 关联 cv ${cvId} view 失败: ${coerceStr(view?.message)}，仍尝试拉取评论`);
     }
     repliesData = await fetchArticleReplies(cvId, img, sub);
@@ -357,6 +363,12 @@ export async function crawl(_common, custom) {
   setHeader("User-Agent", UA);
   setHeader("Referer", "https://www.bilibili.com/");
   setHeader("Origin", "https://www.bilibili.com");
+
+  // 机会注入：从畅游取 B 站 Cookie（脚本拿不到明文）。取不到不阻断——
+  // 公开专栏搜索等路径仍可跑；真正需要登录时会在接口返回 -101 处硬失败。
+  if (!requireCookie()) {
+    warn("未从畅游获取到 B 站 Cookie，将以未登录状态抓取；部分内容可能失败。如需完整结果请先在畅游登录 bilibili。");
+  }
 
   if (vars.mode === "single") {
     const opusId = parseOpusIdFromInput(vars.cv_id_or_url);
@@ -389,7 +401,7 @@ export async function crawl(_common, custom) {
         "搜索接口",
       );
       if (search?.code !== 0) {
-        warnIfBilibiliRisk(search?.code);
+        checkBilibiliRisk(search?.code);
         warn(`搜索第 ${page} 页失败: ${coerceStr(search?.message)}`);
       } else {
         allIds.push(...collectArticleIds(search.data));
@@ -398,7 +410,7 @@ export async function crawl(_common, custom) {
   }
 
   if (allIds.length === 0) {
-    warn("未找到专栏 id，请检查关键词；若遇风控或接口异常，请在爬虫任务高级设置中为请求添加 Cookie 请求头后重试。");
+    warn("未找到专栏 id，请检查关键词；若遇风控或接口异常，可先在畅游登录 bilibili 后重试。");
     addProgress(100.0);
     return;
   }

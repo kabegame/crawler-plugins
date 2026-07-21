@@ -23,7 +23,7 @@ const INDEX_FILE = path.join(OUTPUT_DIR, "index.json");
 const PACKAGE_JSON = path.join(__dirname, "package.json");
 const BUILTIN_JSON = path.join(__dirname, "builtin.json");
 
-// 注意：KGPG v2 已将"列表 icon + 基础 manifest"写入 .kgpg 固定头部，可通过 HTTP Range 直接读取。
+// KGPG v3 将列表 icon 写入 .kgpg 固定头部，可通过 HTTP Range 直接读取；商店元数据来自 index.json。
 // 因此不再生成/引用 packed/<id>.icon.png 这类额外图标文件。
 
 interface PackageJson {
@@ -282,6 +282,9 @@ function generateIndex(options: GenerateIndexOptions): string {
       }
       copyFlatI18nKeys(manifestRaw, pluginInfo, "name");
       copyFlatI18nKeys(manifestRaw, pluginInfo, "description");
+      if (Array.isArray(manifestRaw.kbLabels)) {
+        pluginInfo.kbLabels = manifestRaw.kbLabels;
+      }
 
       plugins.push(pluginInfo);
       const displayName =

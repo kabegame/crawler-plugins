@@ -109,12 +109,20 @@ function runPluginBuild(pluginDir: string, pkg: PluginPackageJson): void {
     return;
   }
 
-  const runner = commandExists("bun") ? "bun" : commandExists("npm") ? "npm" : null;
+  // deno 优先（项目工具链），npm 次之，bun 兜底。构建职责集中在这里：
+  // kabegame-cli plugin pack 只打包已构建好的目录，不再自己跑 build。
+  const [runner, args] = commandExists("deno")
+    ? ["deno", ["task", "build"]]
+    : commandExists("npm")
+      ? ["npm", ["run", "build"]]
+      : commandExists("bun")
+        ? ["bun", ["run", "build"]]
+        : [null, []];
   if (!runner) {
-    throw new Error("未找到可用的包管理器（bun/npm），无法执行插件构建");
+    throw new Error("未找到可用的运行器（deno/npm/bun），无法执行插件构建");
   }
 
-  const r = spawnSync(runner, ["run", "build"], {
+  const r = spawnSync(runner as string, args as string[], {
     cwd: pluginDir,
     stdio: "inherit",
     env: { ...process.env },
@@ -412,7 +420,7 @@ async function packagePlugin(
       } else {
         reject(
           new Error(
-            `只支持 package.json (v3) 插件；旧版 manifest.json (v2) 已停止支持`,
+            `只支持 package.json (v3) 插件；旧清单格式不受支持`,
           ),
         );
         return;
@@ -476,7 +484,7 @@ async function packageAllPlugins(outputDir: string): Promise<void> {
 
     try {
       await packagePlugin(pluginDir, outputFile);
-      // v2：不再输出 <id>.icon.png（图标在 .kgpg 固定头部）
+      // v3：不再输出 <id>.icon.png（图标在 .kgpg 固定头部）
       return { name: pluginName, success: true };
     } catch (error) {
       console.error(chalk.red(`❌ ${pluginName}: ${(error as Error).message}`));
