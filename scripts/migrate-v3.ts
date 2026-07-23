@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S deno run -A
 
 import fs from "fs";
 import path from "path";

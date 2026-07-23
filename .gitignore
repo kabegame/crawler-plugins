@@ -1,5 +1,5 @@
 # Dependencies
-node_modules/
+node_modules*/
 
 # Packed plugins
 # - KGPG v3：`packed/` 可直接提交到仓库，用于 GitHub 发布时直接上传/引用

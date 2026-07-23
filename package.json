@@ -8,10 +8,10 @@
     "plugins/*"
   ],
   "scripts": {
-    "package": "bun package-plugin.ts",
-    "package:single": "bun package-plugin.ts",
-    "generate-index": "bun generate-index.ts",
-    "release": "bun package && bun generate-index",
+    "package": "deno run -A package-plugin.ts",
+    "package:single": "deno run -A package-plugin.ts",
+    "generate-index": "deno run -A generate-index.ts",
+    "release": "deno task package && deno task generate-index",
     "prepare": "husky"
   },
   "devDependencies": {

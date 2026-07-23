@@ -6,7 +6,7 @@ cd "$ROOT" || exit 0
 
 echo "[pre-push] ensure local release tag..."
 # ensure-tag：stderr 为人读日志；若新建了 tag，stdout 仅一行 tag 名
-NEW_TAG=$(bun scripts/git/ensure-tag.mjs || true)
+NEW_TAG=$(deno run -A scripts/git/ensure-tag.mjs || true)
 NEW_TAG=$(printf '%s' "$NEW_TAG" | tr -d '\r' | tail -n1)
 
 if [ -n "$NEW_TAG" ]; then

@@ -13,10 +13,10 @@ strip_v() {
 PKG_VER=""
 IDX_VER=""
 if [ -f package.json ]; then
-  PKG_VER=$(bun -e 'console.log(JSON.parse(require("fs").readFileSync("package.json","utf8")).version)' 2>/dev/null) || true
+  PKG_VER=$(deno eval 'console.log(JSON.parse(Deno.readTextFileSync("package.json")).version)' 2>/dev/null) || true
 fi
 if [ -f "$INDEX_JSON" ]; then
-  IDX_VER=$(bun -e 'console.log(JSON.parse(require("fs").readFileSync("packed/index.json","utf8")).version)' 2>/dev/null) || true
+  IDX_VER=$(deno eval 'console.log(JSON.parse(Deno.readTextFileSync("packed/index.json")).version)' 2>/dev/null) || true
 fi
 
 SKIP=false
@@ -30,7 +30,7 @@ if [ "$SKIP" = true ]; then
   echo "[pre-commit] $INDEX_JSON version matches package.json ($PKG_VER); skip release."
 else
   echo "[pre-commit] Building plugins and generating index.json..."
-  bun run release || true
+  deno task release || true
 fi
 
 if git diff --quiet packed/ 2>/dev/null && git diff --cached --quiet packed/ 2>/dev/null; then
