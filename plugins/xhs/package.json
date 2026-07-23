@@ -1,0 +1,219 @@
+{
+  "name": "xhs",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "小红书",
+  "name.en": "XiaoHongShu",
+  "name.ja": "小紅書（RED）",
+  "name.ko": "샤오훙수",
+  "name.zhtw": "小紅書",
+  "description": "抓取小红书作品图片与视频（单作品链接 / 首页推荐）",
+  "description.zh": "抓取小红书作品图片与视频（单作品链接 / 首页推荐）",
+  "description.en": "Crawl images and videos from XiaoHongShu notes (single note links / homepage recommendations)",
+  "description.ja": "小紅書のノートから画像・動画を取得（単一ノートリンク／ホームおすすめ）",
+  "description.ko": "샤오훙수 노트의 이미지와 동영상 수집 (단일 노트 링크 / 홈 추천)",
+  "description.zhtw": "抓取小紅書作品圖片與影片（單作品連結／首頁推薦）",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.4.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.xiaohongshu.com",
+  "kbLabels": [
+    { "id": "auth.needCookie" },
+    { "id": "content.type.video" },
+    { "id": "content.res.mobile" }
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "取得モード",
+      "name.ko": "수집 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "选择按作品链接抓取，还是抓取首页推荐流",
+      "descripts.en": "Crawl by note links, or from the homepage recommendation feed",
+      "descripts.ja": "ノートリンク指定か、ホームおすすめフィードかを選択",
+      "descripts.ko": "노트 링크로 수집할지, 홈 추천 피드에서 수집할지 선택",
+      "descripts.zhtw": "選擇按作品連結抓取，或抓取首頁推薦流",
+      "default": "note",
+      "options": [
+        {
+          "name": "作品链接",
+          "name.en": "Note links",
+          "name.ja": "ノートリンク",
+          "name.ko": "노트 링크",
+          "name.zhtw": "作品連結",
+          "variable": "note"
+        },
+        {
+          "name": "首页推荐",
+          "name.en": "Homepage feed",
+          "name.ja": "ホームおすすめ",
+          "name.ko": "홈 추천",
+          "name.zhtw": "首頁推薦",
+          "variable": "recommend"
+        }
+      ]
+    },
+    {
+      "key": "note_urls",
+      "type": "string",
+      "name": "作品链接",
+      "name.en": "Note links",
+      "name.ja": "ノートリンク",
+      "name.ko": "노트 링크",
+      "name.zhtw": "作品連結",
+      "descripts": "支持 explore / discovery/item / user/profile 作品链接与 xhslink.com 短链；多个链接用空格或换行分隔",
+      "descripts.en": "Supports explore / discovery/item / user/profile note links and xhslink.com short links; separate multiple links with spaces or newlines",
+      "descripts.ja": "explore / discovery/item / user/profile のノートリンクと xhslink.com 短縮リンクに対応。複数はスペースか改行で区切ります",
+      "descripts.ko": "explore / discovery/item / user/profile 노트 링크와 xhslink.com 단축 링크 지원; 여러 개는 공백 또는 줄바꿈으로 구분",
+      "descripts.zhtw": "支援 explore / discovery/item / user/profile 作品連結與 xhslink.com 短連結；多個連結用空格或換行分隔",
+      "default": "",
+      "when": { "crawl_mode": ["note"] }
+    },
+    {
+      "key": "refresh_rounds",
+      "type": "int",
+      "name": "刷新轮数",
+      "name.en": "Refresh rounds",
+      "name.ja": "更新回数",
+      "name.ko": "새로고침 횟수",
+      "name.zhtw": "重新整理輪數",
+      "descripts": "推荐流每次刷新约返回 25 条且互不重复；轮数越多抓得越多",
+      "descripts.en": "Each refresh returns about 25 distinct notes; more rounds means more notes",
+      "descripts.ja": "おすすめは1回の更新で約25件、重複しません。回数を増やすほど多く取得できます",
+      "descripts.ko": "추천 피드는 새로고침마다 약 25개를 반환하며 중복되지 않습니다; 횟수가 많을수록 더 많이 수집",
+      "descripts.zhtw": "推薦流每次重新整理約返回 25 條且互不重複；輪數越多抓得越多",
+      "default": 5,
+      "min": 1,
+      "max": 200,
+      "when": { "crawl_mode": ["recommend"] }
+    },
+    {
+      "key": "max_items",
+      "type": "int",
+      "name": "最多抓取作品数",
+      "name.en": "Max notes",
+      "name.ja": "最大取得件数",
+      "name.ko": "최대 수집 개수",
+      "name.zhtw": "最多抓取作品數",
+      "descripts": "本次任务最多处理多少个作品，0 表示不限制",
+      "descripts.en": "Maximum number of notes to process in this task; 0 means unlimited",
+      "descripts.ja": "このタスクで処理するノートの上限。0 は無制限",
+      "descripts.ko": "이번 작업에서 처리할 최대 노트 수; 0은 무제한",
+      "descripts.zhtw": "本次任務最多處理多少個作品，0 表示不限制",
+      "default": 100,
+      "min": 0,
+      "max": 100000,
+      "when": { "crawl_mode": ["recommend"] }
+    },
+    {
+      "key": "image_format",
+      "type": "options",
+      "name": "图片格式",
+      "name.en": "Image format",
+      "name.ja": "画像フォーマット",
+      "name.ko": "이미지 형식",
+      "name.zhtw": "圖片格式",
+      "descripts": "自动为站点原图（体积适中）；PNG 为无损但体积最大",
+      "descripts.en": "Auto uses the site's original image (moderate size); PNG is lossless but largest",
+      "descripts.ja": "自動はサイトのオリジナル画像（中程度のサイズ）、PNG は可逆だが最大サイズ",
+      "descripts.ko": "자동은 사이트 원본 이미지(적당한 크기); PNG는 무손실이지만 가장 큼",
+      "descripts.zhtw": "自動為站點原圖（體積適中）；PNG 為無損但體積最大",
+      "default": "auto",
+      "options": [
+        {
+          "name": "自动（原图）",
+          "name.en": "Auto (original)",
+          "name.ja": "自動（オリジナル）",
+          "name.ko": "자동 (원본)",
+          "name.zhtw": "自動（原圖）",
+          "variable": "auto"
+        },
+        {
+          "name": "JPEG",
+          "name.en": "JPEG",
+          "name.ja": "JPEG",
+          "name.ko": "JPEG",
+          "name.zhtw": "JPEG",
+          "variable": "jpg"
+        },
+        {
+          "name": "PNG（无损）",
+          "name.en": "PNG (lossless)",
+          "name.ja": "PNG（可逆）",
+          "name.ko": "PNG (무손실)",
+          "name.zhtw": "PNG（無損）",
+          "variable": "png"
+        },
+        {
+          "name": "WebP",
+          "name.en": "WebP",
+          "name.ja": "WebP",
+          "name.ko": "WebP",
+          "name.zhtw": "WebP",
+          "variable": "webp"
+        }
+      ]
+    },
+    {
+      "key": "download_video",
+      "type": "boolean",
+      "name": "下载视频",
+      "name.en": "Download videos",
+      "name.ja": "動画をダウンロード",
+      "name.ko": "동영상 다운로드",
+      "name.zhtw": "下載影片",
+      "descripts": "视频作品下载视频本体；关闭则只下封面图",
+      "descripts.en": "Download the video itself for video notes; when off, only the cover image is saved",
+      "descripts.ja": "動画ノートは動画本体を取得。オフの場合はカバー画像のみ",
+      "descripts.ko": "동영상 노트의 동영상 본체를 다운로드; 끄면 커버 이미지만 저장",
+      "descripts.zhtw": "影片作品下載影片本體；關閉則只下封面圖",
+      "default": true
+    },
+    {
+      "key": "download_live_photo",
+      "type": "boolean",
+      "name": "下载 Live 图动态视频",
+      "name.en": "Download Live Photo videos",
+      "name.ja": "Live フォトの動画を取得",
+      "name.ko": "라이브 포토 동영상 다운로드",
+      "name.zhtw": "下載 Live 圖動態影片",
+      "descripts": "Live 图除静态图外额外下载其动态 mp4",
+      "descripts.en": "For Live Photos, also download the accompanying mp4 in addition to the still image",
+      "descripts.ja": "Live フォトは静止画に加えて動画 mp4 も取得します",
+      "descripts.ko": "라이브 포토는 정지 이미지 외에 동영상 mp4도 다운로드",
+      "descripts.zhtw": "Live 圖除靜態圖外額外下載其動態 mp4",
+      "default": false
+    },
+    {
+      "key": "request_delay_ms",
+      "type": "int",
+      "name": "请求间隔（毫秒）",
+      "name.en": "Request delay (ms)",
+      "name.ja": "リクエスト間隔（ミリ秒）",
+      "name.ko": "요청 간격 (밀리초)",
+      "name.zhtw": "請求間隔（毫秒）",
+      "descripts": "每次请求之间的基础等待时间，实际会在此基础上随机浮动，避免触发风控",
+      "descripts.en": "Base wait between requests; the actual delay jitters around it to avoid rate limiting",
+      "descripts.ja": "リクエスト間の基本待機時間。実際はこれを基準にランダムに変動し、規制を回避します",
+      "descripts.ko": "요청 사이의 기본 대기 시간; 실제로는 이를 기준으로 무작위 변동하여 제한을 회피",
+      "descripts.zhtw": "每次請求之間的基礎等待時間，實際會在此基礎上隨機浮動，避免觸發風控",
+      "default": 2500,
+      "min": 0,
+      "max": 60000
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}

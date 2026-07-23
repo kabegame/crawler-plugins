@@ -35,11 +35,22 @@ const TARGET_DIR = process.env.CARGO_TARGET_DIR
     ? process.env.CARGO_TARGET_DIR
     : path.join(WORKSPACE_ROOT, process.env.CARGO_TARGET_DIR)
   : path.join(WORKSPACE_ROOT, "target");
-const CLI_EXE = path.join(
-  TARGET_DIR,
-  "release",
-  process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli",
-);
+const CLI_NAME =
+  process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli";
+// .kgpg 是纯数据产物,与架构无关,所以**优先用宿主原生 CLI**:macOS 跨编
+// (`deno task b --target x86_64`)时 target/<triple>/release 下的 CLI 是另一架构的,
+// 能跑但要过 Rosetta,白白拖慢每个插件的打包。宿主产物不存在时才回退到跨编产物
+// (KB_ARTIFACT_DIR 由 scripts/utils.ts 注入)。
+const CLI_EXE = (() => {
+  const hostCli = path.join(TARGET_DIR, "release", CLI_NAME);
+  if (fs.existsSync(hostCli)) return hostCli;
+  const artifactDir = process.env.KB_ARTIFACT_DIR;
+  if (artifactDir) {
+    const crossCli = path.join(artifactDir, "release", CLI_NAME);
+    if (fs.existsSync(crossCli)) return crossCli;
+  }
+  return hostCli; // 都没有:保留宿主路径,由 ensureCli() 报出可读错误
+})();
 
 interface PluginFile {
   relativePath: string;

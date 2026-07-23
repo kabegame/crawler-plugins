@@ -15,7 +15,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.4.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

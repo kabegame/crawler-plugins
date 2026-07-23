@@ -1,0 +1,362 @@
+{
+  "name": "xhs-webview",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "小红书（WebView）",
+  "name.en": "Xiaohongshu (WebView)",
+  "name.ja": "小紅書（WebView）",
+  "name.ko": "샤오홍슈 (WebView)",
+  "name.zhtw": "小紅書（WebView）",
+  "description": "通过真实浏览器页面抓取小红书作品、图片、视频与实况照片",
+  "description.zh": "通过真实浏览器页面抓取小红书作品、图片、视频与实况照片",
+  "description.en": "Crawl Xiaohongshu notes, images, videos, and live photos through a real browser page",
+  "description.ja": "実ブラウザページから小紅書の投稿、画像、動画、Live Photo を取得します",
+  "description.ko": "실제 브라우저 페이지에서 샤오홍슈 게시물, 이미지, 동영상 및 라이브 포토를 수집합니다",
+  "description.zhtw": "透過真實瀏覽器頁面抓取小紅書作品、圖片、影片與原況照片",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "crawl.js",
+  "kbBackend": "webview",
+  "kbBaseUrl": "https://www.xiaohongshu.com",
+  "kbLabels": [
+    {
+      "id": "auth.needCookie"
+    },
+    {
+      "id": "content.type.video"
+    },
+    {
+      "id": "content.res.mobile"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "取得モード",
+      "name.ko": "수집 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "选择要读取的小红书页面维度。收藏与点赞需要登录。",
+      "descripts.en": "Choose which Xiaohongshu page dimension to read. Collections and likes require login.",
+      "descripts.ja": "取得する小紅書ページの種類を選びます。コレクションと「いいね」にはログインが必要です。",
+      "descripts.ko": "읽을 샤오홍슈 페이지 유형을 선택합니다. 컬렉션과 좋아요는 로그인이 필요합니다.",
+      "descripts.zhtw": "選擇要讀取的小紅書頁面維度。收藏與按讚需要登入。",
+      "default": "recommend",
+      "options": [
+        {
+          "name": "首页推荐",
+          "name.en": "Home recommendations",
+          "name.ja": "ホームのおすすめ",
+          "name.ko": "홈 추천",
+          "name.zhtw": "首頁推薦",
+          "variable": "recommend"
+        },
+        {
+          "name": "作者－已发布",
+          "name.en": "Author - published",
+          "name.ja": "作者－投稿済み",
+          "name.ko": "작성자 - 게시됨",
+          "name.zhtw": "作者－已發布",
+          "variable": "author_post"
+        },
+        {
+          "name": "作者－收藏",
+          "name.en": "Author - collections",
+          "name.ja": "作者－コレクション",
+          "name.ko": "작성자 - 컬렉션",
+          "name.zhtw": "作者－收藏",
+          "variable": "author_collect"
+        },
+        {
+          "name": "作者－点赞",
+          "name.en": "Author - likes",
+          "name.ja": "作者－いいね",
+          "name.ko": "작성자 - 좋아요",
+          "name.zhtw": "作者－按讚",
+          "variable": "author_like"
+        },
+        {
+          "name": "专辑／画板",
+          "name.en": "Board",
+          "name.ja": "アルバム／ボード",
+          "name.ko": "앨범/보드",
+          "name.zhtw": "專輯／畫板",
+          "variable": "board"
+        },
+        {
+          "name": "搜索笔记",
+          "name.en": "Search notes",
+          "name.ja": "投稿を検索",
+          "name.ko": "게시물 검색",
+          "name.zhtw": "搜尋筆記",
+          "variable": "search"
+        },
+        {
+          "name": "单作品链接",
+          "name.en": "Note URLs",
+          "name.ja": "投稿 URL",
+          "name.ko": "게시물 URL",
+          "name.zhtw": "單作品連結",
+          "variable": "note"
+        }
+      ]
+    },
+    {
+      "key": "author_url",
+      "type": "string",
+      "name": "作者主页 URL 或 userId",
+      "name.en": "Author profile URL or userId",
+      "name.ja": "作者プロフィール URL または userId",
+      "name.ko": "작성자 프로필 URL 또는 userId",
+      "name.zhtw": "作者主頁 URL 或 userId",
+      "descripts": "填写完整作者主页链接，或只填写链接中的 userId。收藏和点赞模式需要先在爬虫窗口登录。",
+      "descripts.en": "Enter the full author profile URL or only its userId. Collection and like modes require login in the crawler window.",
+      "descripts.ja": "作者プロフィールの完全な URL、または URL 内の userId を入力します。コレクションと「いいね」ではクローラーウィンドウ内でのログインが必要です。",
+      "descripts.ko": "전체 작성자 프로필 URL 또는 URL의 userId를 입력합니다. 컬렉션과 좋아요 모드는 크롤러 창에서 로그인해야 합니다.",
+      "descripts.zhtw": "填寫完整作者主頁連結，或只填寫連結中的 userId。收藏和按讚模式需要先在爬蟲視窗登入。",
+      "default": "",
+      "when": {
+        "crawl_mode": [
+          "author_post",
+          "author_collect",
+          "author_like"
+        ]
+      }
+    },
+    {
+      "key": "board_url",
+      "type": "string",
+      "name": "专辑 URL 或 id",
+      "name.en": "Board URL or id",
+      "name.ja": "ボード URL または id",
+      "name.ko": "보드 URL 또는 id",
+      "name.zhtw": "專輯 URL 或 id",
+      "descripts": "填写完整的 /board/ 链接，或只填写专辑 id。",
+      "descripts.en": "Enter the full /board/ URL or only the board id.",
+      "descripts.ja": "完全な /board/ URL、またはボード id のみを入力します。",
+      "descripts.ko": "전체 /board/ URL 또는 보드 id만 입력합니다.",
+      "descripts.zhtw": "填寫完整的 /board/ 連結，或只填寫專輯 id。",
+      "default": "",
+      "when": {
+        "crawl_mode": [
+          "board"
+        ]
+      }
+    },
+    {
+      "key": "search_keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "在小红书搜索结果页中抓取笔记类型结果。",
+      "descripts.en": "Crawl note-type results from the Xiaohongshu search results page.",
+      "descripts.ja": "小紅書の検索結果ページから投稿タイプの結果を取得します。",
+      "descripts.ko": "샤오홍슈 검색 결과 페이지에서 게시물 유형 결과를 수집합니다.",
+      "descripts.zhtw": "在小紅書搜尋結果頁中抓取筆記類型結果。",
+      "default": "",
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "note_urls",
+      "type": "string",
+      "name": "作品链接",
+      "name.en": "Note URLs",
+      "name.ja": "投稿 URL",
+      "name.ko": "게시물 URL",
+      "name.zhtw": "作品連結",
+      "descripts": "可填写多个作品链接，使用空格或换行分隔；支持小红书详情页与 xhslink.com 短链接。",
+      "descripts.en": "Enter multiple note URLs separated by spaces or newlines. Xiaohongshu detail pages and xhslink.com short links are supported.",
+      "descripts.ja": "複数の投稿 URL を空白または改行で区切って入力します。小紅書の詳細ページと xhslink.com 短縮 URL に対応します。",
+      "descripts.ko": "여러 게시물 URL을 공백이나 줄바꿈으로 구분해 입력합니다. 샤오홍슈 상세 페이지와 xhslink.com 단축 URL을 지원합니다.",
+      "descripts.zhtw": "可填寫多個作品連結，使用空格或換行分隔；支援小紅書詳情頁與 xhslink.com 短連結。",
+      "default": "",
+      "when": {
+        "crawl_mode": [
+          "note"
+        ]
+      }
+    },
+    {
+      "key": "max_items",
+      "type": "int",
+      "name": "最多抓取条数",
+      "name.en": "Maximum items",
+      "name.ja": "最大取得件数",
+      "name.ko": "최대 수집 개수",
+      "name.zhtw": "最多抓取筆數",
+      "descripts": "限制本次列表任务进入详情页的作品数，避免无限滚动。最多 500 条。",
+      "descripts.en": "Limit how many list items open their detail pages in this task to prevent endless scrolling. Maximum 500.",
+      "descripts.ja": "無限スクロールを防ぐため、このタスクで詳細ページを開く一覧項目数を制限します。最大 500 件です。",
+      "descripts.ko": "무한 스크롤을 방지하기 위해 이 작업에서 상세 페이지를 열 목록 항목 수를 제한합니다. 최대 500개입니다.",
+      "descripts.zhtw": "限制本次清單任務進入詳情頁的作品數，避免無限捲動。最多 500 筆。",
+      "default": 50,
+      "min": 1,
+      "max": 500,
+      "when": {
+        "crawl_mode": [
+          "recommend",
+          "author_post",
+          "author_collect",
+          "author_like",
+          "board",
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "scroll_rounds",
+      "type": "int",
+      "name": "滚动加载轮数",
+      "name.en": "Scroll rounds",
+      "name.ja": "スクロール回数",
+      "name.ko": "스크롤 로드 횟수",
+      "name.zhtw": "捲動載入輪數",
+      "descripts": "列表页向底部滚动以触发客户端懒加载的次数。达到最多条数后会提前停止。",
+      "descripts.en": "Number of times to scroll the list page to the bottom to trigger client-side lazy loading. Stops early at the item limit.",
+      "descripts.ja": "クライアント側の遅延読み込みを発生させるため、一覧ページを最下部へスクロールする回数です。上限件数に達すると早期終了します。",
+      "descripts.ko": "클라이언트 지연 로딩을 유도하기 위해 목록 페이지를 하단으로 스크롤하는 횟수입니다. 최대 개수에 도달하면 일찍 중지합니다.",
+      "descripts.zhtw": "清單頁向底部捲動以觸發用戶端延遲載入的次數。達到最多筆數後會提前停止。",
+      "default": 5,
+      "min": 0,
+      "max": 100,
+      "when": {
+        "crawl_mode": [
+          "recommend",
+          "author_post",
+          "author_collect",
+          "author_like",
+          "board",
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "download_video",
+      "type": "boolean",
+      "name": "下载视频",
+      "name.en": "Download videos",
+      "name.ja": "動画をダウンロード",
+      "name.ko": "동영상 다운로드",
+      "name.zhtw": "下載影片",
+      "descripts": "下载视频作品的媒体流；优先使用无签名备用 URL，找不到时回退到主 URL。",
+      "descripts.en": "Download video-note media streams, preferring unsigned backup URLs and falling back to the master URL.",
+      "descripts.ja": "動画投稿のメディアストリームを取得します。署名なしの予備 URL を優先し、無い場合はメイン URL を使用します。",
+      "descripts.ko": "동영상 게시물의 미디어 스트림을 다운로드합니다. 서명 없는 백업 URL을 우선하고 없으면 기본 URL을 사용합니다.",
+      "descripts.zhtw": "下載影片作品的媒體串流；優先使用無簽名備用 URL，找不到時回退到主 URL。",
+      "default": true,
+      "when": {
+        "crawl_mode": [
+          "recommend",
+          "author_post",
+          "author_collect",
+          "author_like",
+          "board",
+          "search",
+          "note"
+        ]
+      }
+    },
+    {
+      "key": "download_live_photo",
+      "type": "boolean",
+      "name": "下载实况照片视频",
+      "name.en": "Download live-photo videos",
+      "name.ja": "Live Photo 動画をダウンロード",
+      "name.ko": "라이브 포토 동영상 다운로드",
+      "name.zhtw": "下載原況照片影片",
+      "descripts": "若图片带实况照片流，同时下载同名 MP4。普通图片不会额外下载。",
+      "descripts.en": "When an image has a live-photo stream, also download a same-named MP4. Regular images add nothing.",
+      "descripts.ja": "画像に Live Photo ストリームがある場合、同名の MP4 も取得します。通常画像では追加されません。",
+      "descripts.ko": "이미지에 라이브 포토 스트림이 있으면 같은 이름의 MP4도 다운로드합니다. 일반 이미지는 추가 다운로드하지 않습니다.",
+      "descripts.zhtw": "若圖片帶原況照片串流，同時下載同名 MP4。一般圖片不會額外下載。",
+      "default": false,
+      "when": {
+        "crawl_mode": [
+          "recommend",
+          "author_post",
+          "author_collect",
+          "author_like",
+          "board",
+          "search",
+          "note"
+        ]
+      }
+    },
+    {
+      "key": "image_format",
+      "type": "options",
+      "name": "图片格式",
+      "name.en": "Image format",
+      "name.ja": "画像形式",
+      "name.ko": "이미지 형식",
+      "name.zhtw": "圖片格式",
+      "descripts": "自动模式下载 sns-img-bd 原图；指定格式时使用小红书图片转换服务。",
+      "descripts.en": "Auto downloads the sns-img-bd original; an explicit format uses Xiaohongshu's image conversion service.",
+      "descripts.ja": "自動では sns-img-bd のオリジナルを取得し、形式指定時は小紅書の画像変換サービスを使用します。",
+      "descripts.ko": "자동은 sns-img-bd 원본을 다운로드하고, 형식을 지정하면 샤오홍슈 이미지 변환 서비스를 사용합니다.",
+      "descripts.zhtw": "自動模式下載 sns-img-bd 原圖；指定格式時使用小紅書圖片轉換服務。",
+      "default": "auto",
+      "options": [
+        {
+          "name": "自动（原图）",
+          "name.en": "Auto (original)",
+          "name.ja": "自動（オリジナル）",
+          "name.ko": "자동 (원본)",
+          "name.zhtw": "自動（原圖）",
+          "variable": "auto"
+        },
+        {
+          "name": "JPG",
+          "name.en": "JPG",
+          "name.ja": "JPG",
+          "name.ko": "JPG",
+          "name.zhtw": "JPG",
+          "variable": "jpg"
+        },
+        {
+          "name": "PNG",
+          "name.en": "PNG",
+          "name.ja": "PNG",
+          "name.ko": "PNG",
+          "name.zhtw": "PNG",
+          "variable": "png"
+        },
+        {
+          "name": "WebP",
+          "name.en": "WebP",
+          "name.ja": "WebP",
+          "name.ko": "WebP",
+          "name.zhtw": "WebP",
+          "variable": "webp"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "recommend",
+          "author_post",
+          "author_collect",
+          "author_like",
+          "board",
+          "search",
+          "note"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}

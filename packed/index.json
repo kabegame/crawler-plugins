@@ -1,6 +1,6 @@
 {
   "version": "v4.1.0",
-  "generated_at": "2026-07-21T00:09:18.473Z",
+  "generated_at": "2026-07-23T14:26:16.153Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -15,7 +15,7 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/anihonet-wallpaper.kgpg",
       "sizeBytes": 459343,
-      "sha256": "09f8824a76f1bba586e6159f81fa486ece295390734e304db3be019fd89d5cba",
+      "sha256": "f9ecd93366e281ee76f8790b7804ffa6731f5ea37a125d797be406d8ea706640",
       "minAppVersion": "4.3.0",
       "name": "anihonet-wallpaper",
       "name.zh": "anihonet动漫壁纸",
@@ -43,7 +43,7 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/anime-pictures.kgpg",
       "sizeBytes": 3414734,
-      "sha256": "0a40c39492cb9be1880135305b1d5cccbfaf6f1b52bd70961907997235d4c9e0",
+      "sha256": "c49bde70a64a02da44c3f61a6432def1d04344d44f26daef77d71ce6b8fda71f",
       "minAppVersion": "4.3.0",
       "name": "anime-pictures",
       "name.zh": "anime-pictures动漫图库",
@@ -67,9 +67,9 @@
       "author": "Kabegame",
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/bilibili.kgpg",
-      "sizeBytes": 2232237,
-      "sha256": "8bc52118a24170b4643ab9bd348128804b74330584d2976d148a9c058b590734",
-      "minAppVersion": "4.3.0",
+      "sizeBytes": 2232238,
+      "sha256": "711ae1c372f7a9da012b7749dbe3968aa0bcebdffe88ced73704563f98de6b22",
+      "minAppVersion": "4.4.0",
       "name": "bilibili",
       "name.zh": "bilibili专栏",
       "name.en": "Bilibili Articles",
@@ -128,8 +128,8 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/heybox.kgpg",
       "sizeBytes": 1581658,
-      "sha256": "99721e28975ae22925daeb53b8d68e6accf17c221fb0049e31a33cbdd46e6cec",
-      "minAppVersion": "4.3.0",
+      "sha256": "2f9dedf49b69c43380d097d9a47060e3a3bc6d6b338395b8f02cce2d6811a703",
+      "minAppVersion": "4.4.0",
       "name": "heybox",
       "name.zh": "小黑盒",
       "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
@@ -146,8 +146,8 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/kemono.kgpg",
       "sizeBytes": 68522,
-      "sha256": "679878fcbe1953960dea58070229743dd9f10833cb686651d6678c1737e5c113",
-      "minAppVersion": "4.3.0",
+      "sha256": "5f4580ab026c15a19a0a732f4846031daf195d74330cbba5d50b8820d581d81b",
+      "minAppVersion": "4.4.0",
       "name": "kemono",
       "name.zh": "Kemono创作者内容",
       "name.en": "Kemonocreator content",
@@ -170,12 +170,12 @@
     },
     {
       "id": "konachan",
-      "version": "1.2.7",
+      "version": "1.2.8",
       "author": "Kabegame",
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/konachan.kgpg",
-      "sizeBytes": 365420,
-      "sha256": "7e3ce0a4c5845e68a698b724eb6cdb6c917034f485549748c7edc0e0d98d0b31",
+      "sizeBytes": 365846,
+      "sha256": "f7316c5cb95c18432724dd1b305c464d6351e3b7e0547230816e5d6c7a84ec59",
       "minAppVersion": "4.3.0",
       "name": "konachan",
       "name.zh": "konachan动漫壁纸",
@@ -193,6 +193,9 @@
         },
         {
           "id": "content.res.desktop"
+        },
+        {
+          "id": "content.nsfw"
         }
       ]
     },
@@ -251,8 +254,8 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/pixiv.kgpg",
       "sizeBytes": 13287524,
-      "sha256": "3e85bd6b810c4a30a430123b984398c34c832714a120a29cab5f9fe7873ce106",
-      "minAppVersion": "4.3.0",
+      "sha256": "4a8a2306a7378567b8e948164eb48ef47f384ffda8173cc6059844001c9be0e8",
+      "minAppVersion": "4.4.0",
       "name": "pixiv",
       "name.zh": "Pixiv",
       "name.en": "Pixiv",
@@ -282,7 +285,7 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/twodwallpapers.kgpg",
       "sizeBytes": 8802533,
-      "sha256": "d55fba3a1c603e7da38ec05da9e364209a7c9e498965e96e9a694c20b814e6b3",
+      "sha256": "959bbe5cea5b6597768e8bbb6f7f8994b0ef79cbce4a47568d5e136d41a7d01a",
       "minAppVersion": "4.3.0",
       "name": "twodwallpapers",
       "name.zh": "2dwallpapers二次元壁纸",
@@ -302,7 +305,7 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/wallpapers-craft.kgpg",
       "sizeBytes": 72190,
-      "sha256": "ae9f8121b999de18ca57b2f39129702e5c910a5e1f3f1313944162f65a7b8c34",
+      "sha256": "a06268a06f62edd36d9f2a707c402d36b9e36873a221dd2d31588ea4b804cf16",
       "minAppVersion": "4.3.0",
       "name": "wallpapers-craft",
       "name.zh": "wallpapers-craft 壁纸",
@@ -322,7 +325,7 @@
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/wallspic.kgpg",
       "sizeBytes": 79980,
-      "sha256": "ac9676a2de291b1bbb91b4f7eff4973ee194c189ce4d478a30d40b33eb3f51a3",
+      "sha256": "5bdcebdf162d5431522448d38c2c198538ab9eee4b7f9b8233568adacbe2aa23",
       "minAppVersion": "4.3.0",
       "name": "wallspic",
       "name.zh": "wallspic 壁纸",
@@ -336,13 +339,79 @@
       "description.ko": "wallspic 배경화면 사이트 크롤러"
     },
     {
+      "id": "xhs",
+      "version": "0.1.0",
+      "author": "Kabegame",
+      "packageVersion": 3,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/xhs.kgpg",
+      "sizeBytes": 67668,
+      "sha256": "ea1e40183f5d06cc2da4b60b71da70e6041d22f8f1b6a354a446c6deb44fd439",
+      "minAppVersion": "4.4.0",
+      "name": "xhs",
+      "name.zh": "小红书",
+      "name.en": "XiaoHongShu",
+      "name.ja": "小紅書（RED）",
+      "name.ko": "샤오훙수",
+      "name.zhtw": "小紅書",
+      "description": "抓取小红书作品图片与视频（单作品链接 / 首页推荐）",
+      "description.zh": "抓取小红书作品图片与视频（单作品链接 / 首页推荐）",
+      "description.en": "Crawl images and videos from XiaoHongShu notes (single note links / homepage recommendations)",
+      "description.ja": "小紅書のノートから画像・動画を取得（単一ノートリンク／ホームおすすめ）",
+      "description.ko": "샤오훙수 노트의 이미지와 동영상 수집 (단일 노트 링크 / 홈 추천)",
+      "description.zhtw": "抓取小紅書作品圖片與影片（單作品連結／首頁推薦）",
+      "kbLabels": [
+        {
+          "id": "auth.needCookie"
+        },
+        {
+          "id": "content.type.video"
+        },
+        {
+          "id": "content.res.mobile"
+        }
+      ]
+    },
+    {
+      "id": "xhs-webview",
+      "version": "0.1.0",
+      "author": "Kabegame",
+      "packageVersion": 3,
+      "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/xhs-webview.kgpg",
+      "sizeBytes": 69032,
+      "sha256": "4750d735599d43436918ef2601e79ba9911290edfa3089a3a1b825ac94d1fbb1",
+      "minAppVersion": "4.3.0",
+      "name": "xhs-webview",
+      "name.zh": "小红书（WebView）",
+      "name.en": "Xiaohongshu (WebView)",
+      "name.ja": "小紅書（WebView）",
+      "name.ko": "샤오홍슈 (WebView)",
+      "name.zhtw": "小紅書（WebView）",
+      "description": "通过真实浏览器页面抓取小红书作品、图片、视频与实况照片",
+      "description.zh": "通过真实浏览器页面抓取小红书作品、图片、视频与实况照片",
+      "description.en": "Crawl Xiaohongshu notes, images, videos, and live photos through a real browser page",
+      "description.ja": "実ブラウザページから小紅書の投稿、画像、動画、Live Photo を取得します",
+      "description.ko": "실제 브라우저 페이지에서 샤오홍슈 게시물, 이미지, 동영상 및 라이브 포토를 수집합니다",
+      "description.zhtw": "透過真實瀏覽器頁面抓取小紅書作品、圖片、影片與原況照片",
+      "kbLabels": [
+        {
+          "id": "auth.needCookie"
+        },
+        {
+          "id": "content.type.video"
+        },
+        {
+          "id": "content.res.mobile"
+        }
+      ]
+    },
+    {
       "id": "ziworld",
       "version": "0.3.5",
       "author": "Kabegame",
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.1.0/ziworld.kgpg",
       "sizeBytes": 57791,
-      "sha256": "d8863b525f7812b737728ce7ff283449ddfc1d3866de47ebeeb14f28e3eeeb8d",
+      "sha256": "88452929fdc934f67b14aa02c5ce16cace377ebfd97bda90a38b86110b5cec5b",
       "minAppVersion": "4.3.0",
       "name": "ziworld",
       "name.zh": "ziworld高质量壁纸",

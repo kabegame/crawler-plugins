@@ -5,6 +5,14 @@ const { addProgress, currentHtml, downloadImage, to } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://konachan.net";
 
+// 根据源站选项解析基础 URL：net = konachan.net，com = konachan.com
+function resolveBaseUrl(source, fallback) {
+  const site = coerceStr(source).trim().toLowerCase();
+  if (site === "com") return "https://konachan.com";
+  if (site === "net") return "https://konachan.net";
+  return coerceStr(fallback) || DEFAULT_BASE_URL;
+}
+
 function coerceStr(value) {
   return value == null ? "" : String(value);
 }
@@ -272,7 +280,7 @@ async function crawlByTags(baseUrl, quality, vars) {
 
 export async function crawl(common, custom) {
   const vars = custom || {};
-  const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
+  const baseUrl = resolveBaseUrl(vars.source_site, common?.baseUrl);
   const quality = coerceStr(vars.quality || "high");
   if (vars.crawl_mode === "all") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));

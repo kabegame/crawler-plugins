@@ -1,6 +1,6 @@
 {
   "name": "konachan",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
@@ -24,9 +24,43 @@
   "kbBaseUrl": "https://konachan.net",
   "kbLabels": [
     { "id": "auth.needProxy" },
-    { "id": "content.res.desktop" }
+    { "id": "content.res.desktop" },
+    { "id": "content.nsfw" }
   ],
   "kbConfig": [
+    {
+      "key": "source_site",
+      "type": "options",
+      "name": "源站",
+      "name.en": "Source site",
+      "name.ja": "ソースサイト",
+      "name.ko": "소스 사이트",
+      "name.zhtw": "來源站",
+      "descripts": "选择爬取来源站点：konachan.net 或 konachan.com",
+      "descripts.en": "Choose the source site to crawl: konachan.net or konachan.com",
+      "descripts.ja": "クロール元のサイトを選択：konachan.net または konachan.com",
+      "descripts.ko": "크롤 소스 사이트 선택: konachan.net 또는 konachan.com",
+      "descripts.zhtw": "選擇爬取來源站點：konachan.net 或 konachan.com",
+      "default": "net",
+      "options": [
+        {
+          "name": "大众站(konachan.net)",
+          "name.en": "Safe (konachan.net)",
+          "name.ja": "全年齢 (konachan.net)",
+          "name.ko": "전체 이용가 (konachan.net)",
+          "name.zhtw": "大眾站(konachan.net)",
+          "variable": "net"
+        },
+        {
+          "name": "R18站(konachan.com)",
+          "name.en": "R18 (konachan.com)",
+          "name.ja": "R18 (konachan.com)",
+          "name.ko": "R18 (konachan.com)",
+          "name.zhtw": "R18站(konachan.com)",
+          "variable": "com"
+        }
+      ]
+    },
     {
       "key": "crawl_mode",
       "type": "options",

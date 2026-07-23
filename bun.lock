@@ -20,23 +20,31 @@
     },
     "plugins/anihonet-wallpaper": {
       "name": "anihonet-wallpaper",
-      "version": "1.6.3",
+      "version": "1.6.4",
     },
     "plugins/anime-pictures": {
       "name": "anime-pictures",
-      "version": "0.4.0",
+      "version": "0.4.1",
     },
     "plugins/bilibili": {
       "name": "bilibili",
-      "version": "0.1.2",
+      "version": "0.1.3",
+    },
+    "plugins/haowallpaper": {
+      "name": "haowallpaper",
+      "version": "0.1.0",
     },
     "plugins/heybox": {
       "name": "heybox",
-      "version": "0.1.9",
+      "version": "0.1.10",
+    },
+    "plugins/kemono": {
+      "name": "kemono",
+      "version": "0.1.0",
     },
     "plugins/konachan": {
       "name": "konachan",
-      "version": "1.2.6",
+      "version": "1.2.7",
     },
     "plugins/miyoushe": {
       "name": "miyoushe",
@@ -44,11 +52,11 @@
     },
     "plugins/pixai": {
       "name": "pixai",
-      "version": "0.4.1",
+      "version": "0.4.2",
     },
     "plugins/pixiv": {
       "name": "pixiv",
-      "version": "1.2.10",
+      "version": "1.2.11",
     },
     "plugins/twodwallpapers": {
       "name": "twodwallpapers",
@@ -62,9 +70,13 @@
       "name": "wallspic",
       "version": "0.1.2",
     },
+    "plugins/xhs": {
+      "name": "xhs",
+      "version": "0.1.0",
+    },
     "plugins/ziworld": {
       "name": "ziworld",
-      "version": "0.3.4",
+      "version": "0.3.5",
     },
   },
   "packages": {
@@ -402,6 +414,8 @@
 
     "handle-thing": ["handle-thing@2.0.1", "", {}, "sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg=="],
 
+    "haowallpaper": ["haowallpaper@workspace:plugins/haowallpaper"],
+
     "has-symbols": ["has-symbols@1.1.0", "", {}, "sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ=="],
 
     "hasown": ["hasown@2.0.4", "", { "dependencies": { "function-bind": "^1.1.2" } }, "sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A=="],
@@ -463,6 +477,8 @@
     "jackspeak": ["jackspeak@3.4.3", "", { "dependencies": { "@isaacs/cliui": "8.0.2" }, "optionalDependencies": { "@pkgjs/parseargs": "0.11.0" } }, "sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw=="],
 
     "json-schema-traverse": ["json-schema-traverse@1.0.0", "", {}, "sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug=="],
+
+    "kemono": ["kemono@workspace:plugins/kemono"],
 
     "konachan": ["konachan@workspace:plugins/konachan"],
 
@@ -687,6 +703,8 @@
     "ws": ["ws@8.21.0", "", { "peerDependencies": { "bufferutil": "^4.0.1", "utf-8-validate": ">=5.0.2" }, "optionalPeers": ["bufferutil", "utf-8-validate"] }, "sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g=="],
 
     "wsl-utils": ["wsl-utils@0.1.0", "", { "dependencies": { "is-wsl": "^3.1.0" } }, "sha512-h3Fbisa2nKGPxCpm89Hk33lBLsnaGBvctQopaBSOW/uIs6FTe1ATyAnKFJrzVs9vpGdsTe73WF3V4lIsk4Gacw=="],
+
+    "xhs": ["xhs@workspace:plugins/xhs"],
 
     "zip-stream": ["zip-stream@6.0.1", "", { "dependencies": { "archiver-utils": "5.0.2", "compress-commons": "6.0.2", "readable-stream": "4.7.0" } }, "sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA=="],
 
