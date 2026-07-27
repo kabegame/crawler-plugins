@@ -353,8 +353,10 @@ async function downloadMedia(url, options) {
 }
 
 // 下载一个作品的全部媒体。sourceUrl 作为 metadata 里的来源地址；
-// fallbackId 用于 note 缺 noteId 时的文件命名兜底。
-async function downloadNote(note, sourceUrl, fallbackId) {
+// fallbackId 用于 note 缺 noteId 时的文件命名兜底；
+// progressBudget 是该作品在总进度里占的百分比预算，按媒体条目均分逐个推进，
+// 使进度条以图片（媒体）为粒度增长，而非整个作品一次跳完。
+async function downloadNote(note, sourceUrl, fallbackId, progressBudget = 0) {
   const metadata = noteMetadata(note);
   const noteId = metadata.noteId || String(fallbackId || "unknown");
   const title = sanitizeName(metadata.title);
@@ -367,39 +369,50 @@ async function downloadNote(note, sourceUrl, fallbackId) {
   const hasVideo = String(note?.type ?? "") === "video" &&
     Kabegame.vars?.download_video !== false &&
     Boolean(videoDownloadUrl(note));
+
+  // 先把该作品要下载的媒体条目全部收集出来，以便按条目均分进度预算。
+  const mediaTasks = [];
+  for (let index = 0; index < images.length; index += 1) {
+    const image = images[index];
+    const baseName = `${title}_${noteId}_${String(index + 1).padStart(2, "0")}`;
+    mediaTasks.push({
+      url: imageDownloadUrl(image?.urlDefault, format),
+      name: `${baseName}.${imageExtension}`,
+    });
+    if (Kabegame.vars?.download_live_photo === true) {
+      mediaTasks.push({
+        url: unwrap(image?.stream?.h264)?.[0]?.masterUrl ?? "",
+        name: `${baseName}.mp4`,
+      });
+    }
+  }
+  if (Kabegame.vars?.download_video !== false) {
+    mediaTasks.push({
+      url: videoDownloadUrl(note),
+      name: `${title}_${noteId}.mp4`,
+    });
+  }
+
   await log(
     `下载作品「${title}」(${noteId}) · ${images.length} 图${
       hasVideo ? " + 视频" : ""
     }`,
   );
 
-  for (let index = 0; index < images.length; index += 1) {
-    const image = images[index];
-    const baseName = `${title}_${noteId}_${String(index + 1).padStart(2, "0")}`;
-    const url = imageDownloadUrl(image?.urlDefault, format);
-    await downloadMedia(url, {
-      name: `${baseName}.${imageExtension}`,
-      url: sourceUrl,
-      metadata,
-    });
-
-    if (Kabegame.vars?.download_live_photo === true) {
-      const liveUrl = unwrap(image?.stream?.h264)?.[0]?.masterUrl ?? "";
-      await downloadMedia(liveUrl, {
-        name: `${baseName}.mp4`,
-        url: sourceUrl,
-        metadata,
-      });
-    }
+  // 空作品也要把预算加满，保证总进度最终到 100%。
+  if (mediaTasks.length === 0) {
+    if (progressBudget > 0) await Kabegame.addProgress(progressBudget);
+    return;
   }
 
-  if (Kabegame.vars?.download_video !== false) {
-    const videoUrl = videoDownloadUrl(note);
-    await downloadMedia(videoUrl, {
-      name: `${title}_${noteId}.mp4`,
+  const perMedia = progressBudget / mediaTasks.length;
+  for (const task of mediaTasks) {
+    await downloadMedia(task.url, {
+      name: task.name,
       url: sourceUrl,
       metadata,
     });
+    if (perMedia > 0) await Kabegame.addProgress(perMedia);
   }
 
   Kabegame.sleep(5000);
@@ -419,15 +432,17 @@ async function processQueue(queue) {
     try {
       const note = await fetchNote(entry);
       if (note) {
-        await downloadNote(note, source, entry.id);
+        // 进度在 downloadNote 内按图片（媒体条目）粒度均分推进这 perItem 预算。
+        await downloadNote(note, source, entry.id, perItem);
         done += 1;
       } else {
         await warn(`未解析到作品数据，跳过 · ${source}`);
+        await Kabegame.addProgress(perItem);
       }
     } catch (error) {
       await warn(`抓取详情失败，跳过 · ${source} · ${errorMessage(error)}`);
+      await Kabegame.addProgress(perItem);
     }
-    await Kabegame.addProgress(perItem);
     if (i < total - 1) await politeDelay();
   }
 

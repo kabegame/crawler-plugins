@@ -55,6 +55,51 @@ function buildTagsValueFromList(tagList) {
     .join("+");
 }
 
+// 站点新结构中标签类型只体现在 li 的 tag-type-* class 上
+const TAG_TYPE_CLASS_RE = /(?:^|\s)tag-type-([\w-]+)(?:\s|$)/;
+
+// 从 /post?tags=xxx、/wiki/show?title=xxx、/artist/show?name=xxx 中取出标签标识
+function tagNameFromHref(href) {
+  const matched = /[?&](?:tags|title|name)=([^&#]+)/.exec(coerceStr(href));
+  if (!matched) return "";
+  let raw = matched[1];
+  try {
+    raw = decodeURIComponent(raw);
+  } catch {
+    // 非法转义序列时保留原串
+  }
+  return normalizeTagToken(raw);
+}
+
+function parseSidebarTags(document, pageUrl) {
+  return Array.from(document.querySelectorAll("#tag-sidebar li"))
+    .map((li) => {
+      const anchors = Array.from(li.querySelectorAll("a[href]"));
+      // 两个链接靠 href 区分：带 tags= 的是列表链接，另一个是 wiki / artist 链接
+      const postAnchor =
+        anchors.find((a) => /[?&]tags=/.test(coerceStr(a.getAttribute("href")))) ||
+        anchors[anchors.length - 1] ||
+        null;
+      const wikiAnchor = anchors.find((a) => a !== postAnchor) || null;
+      const classType = TAG_TYPE_CLASS_RE.exec(coerceStr(li.getAttribute("class")));
+      const display = textOf(postAnchor);
+      return {
+        // data-* 是旧结构，保留读取以兼容仍输出该属性的镜像站
+        name:
+          trimText(li.getAttribute("data-name")) ||
+          tagNameFromHref(postAnchor?.getAttribute("href")) ||
+          tagNameFromHref(wikiAnchor?.getAttribute("href")) ||
+          normalizeTagToken(display),
+        type: trimText(li.getAttribute("data-type")) || (classType ? classType[1] : ""),
+        wiki_href: resolveUrl(wikiAnchor?.getAttribute("href"), pageUrl),
+        post_href: resolveUrl(postAnchor?.getAttribute("href"), pageUrl),
+        display,
+        count: textOf(li.querySelector("span.post-count")),
+      };
+    })
+    .filter((tag) => tag.name || tag.display);
+}
+
 function parseRelatedPosts(document, pageUrl) {
   const heading = Array.from(document.querySelectorAll("h5")).find((el) =>
     /Related Posts/i.test(textOf(el)),
@@ -91,17 +136,7 @@ function buildKonachanMetadata(document, pageUrl) {
     name: textOf(a),
   })).filter((item) => item.name);
 
-  const tags = Array.from(document.querySelectorAll("#tag-sidebar li.tag-link")).map((li) => {
-    const anchors = Array.from(li.querySelectorAll("a[href]"));
-    return {
-      name: trimText(li.getAttribute("data-name")),
-      type: trimText(li.getAttribute("data-type")),
-      wiki_href: resolveUrl(anchors[0]?.getAttribute("href"), pageUrl),
-      post_href: resolveUrl(anchors[1]?.getAttribute("href"), pageUrl),
-      display: textOf(anchors[1]),
-      count: textOf(li.querySelector("span.post-count")),
-    };
-  }).filter((tag) => tag.name || tag.display);
+  const tags = parseSidebarTags(document, pageUrl);
 
   return {
     posted_by_name: textOf(postedBy),
