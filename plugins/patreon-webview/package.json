@@ -1,0 +1,132 @@
+{
+  "name": "patreon-webview",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "Patreon创作者内容（WebView）",
+  "name.en": "Patreon creator content (WebView)",
+  "name.ja": "Patreonクリエイターコンテンツ（WebView）",
+  "name.ko": "Patreon크리에이터 콘텐츠 (WebView)",
+  "name.zhtw": "Patreon創作者內容（WebView）",
+  "description": "从 patreon.com 抓取创作者帖子的图片与压缩包附件，压缩包由宿主解压后逐图入库",
+  "description.zh": "从 patreon.com 抓取创作者帖子的图片与压缩包附件，压缩包由宿主解压后逐图入库",
+  "description.en": "Crawl images and archive attachments from patreon.com creator posts; archives are extracted host-side and imported per file",
+  "description.ja": "patreon.com のクリエイター投稿から画像と圧縮ファイルを取得し、圧縮ファイルはホスト側で展開して 1 枚ずつ取り込みます",
+  "description.ko": "patreon.com 크리에이터 게시물의 이미지와 압축 첨부를 수집하며, 압축 파일은 호스트에서 풀어 한 장씩 가져옵니다",
+  "description.zhtw": "從 patreon.com 抓取創作者貼文的圖片與壓縮檔附件，壓縮檔由宿主解壓後逐圖入庫",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.4.0"
+  },
+  "main": "crawl.js",
+  "kbBackend": "webview",
+  "kbBaseUrl": "https://www.patreon.com",
+  "kbLabels": [
+    {
+      "id": "content.nsfw"
+    },
+    {
+      "id": "auth.needCookie"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "creator",
+      "type": "string",
+      "name": "创作者",
+      "name.en": "Creator",
+      "name.ja": "クリエイター",
+      "name.ko": "크리에이터",
+      "name.zhtw": "創作者",
+      "descripts": "创作者主页地址里的名字，例如 https://www.patreon.com/c/prprbecause31 填 prprbecause31。也可直接粘贴完整主页链接，或填 id:<campaign_id> 跳过主页解析。",
+      "descripts.en": "The vanity name in the creator URL, e.g. enter prprbecause31 for https://www.patreon.com/c/prprbecause31. A full profile URL also works, or use id:<campaign_id> to skip page parsing.",
+      "descripts.ja": "クリエイター URL の名前部分。例：https://www.patreon.com/c/prprbecause31 なら prprbecause31。完全な URL、または id:<campaign_id> も指定できます。",
+      "descripts.ko": "크리에이터 URL의 이름 부분입니다. 예: https://www.patreon.com/c/prprbecause31 이면 prprbecause31. 전체 URL 또는 id:<campaign_id>도 됩니다.",
+      "descripts.zhtw": "創作者主頁網址裡的名字，例如 https://www.patreon.com/c/prprbecause31 填 prprbecause31。也可直接貼上完整連結，或填 id:<campaign_id>。",
+      "default": "prprbecause31"
+    },
+    {
+      "key": "page_start",
+      "type": "int",
+      "name": "起始页",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "从帖子列表的第几页开始下载，每页约 10~20 个帖子，第 1 页是最新的。注意：Patreon 是游标分页，跳过的页仍需请求一次来推进游标（只是不下载），所以起始页填得越大，前置请求越多。",
+      "descripts.en": "First page of the post list to download; roughly 10-20 posts per page, page 1 being the newest. Note: Patreon uses cursor pagination, so skipped pages still cost one request each to advance the cursor (nothing is downloaded from them).",
+      "descripts.ja": "取得を開始する投稿一覧のページ。1 ページ約 10〜20 件で、1 ページ目が最新です。注意：Patreon はカーソル方式のため、スキップするページもカーソルを進める分のリクエストが発生します（ダウンロードはされません）。",
+      "descripts.ko": "다운로드를 시작할 게시물 목록 페이지입니다. 페이지당 약 10~20개이며 1페이지가 최신입니다. 참고: Patreon은 커서 페이지네이션이라 건너뛰는 페이지도 커서를 진행하기 위한 요청이 필요합니다(다운로드는 하지 않음).",
+      "descripts.zhtw": "從貼文列表的第幾頁開始下載，每頁約 10~20 篇，第 1 頁是最新的。注意：Patreon 是游標分頁，跳過的頁仍需請求一次來推進游標（只是不下載）。",
+      "default": 1,
+      "min": 1,
+      "max": 100000
+    },
+    {
+      "key": "page_end",
+      "type": "int",
+      "name": "结束页",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "종료 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "下载到第几页（含该页）。填 0 表示一直下载到最后一页。",
+      "descripts.en": "Last page to download, inclusive. Use 0 to keep going through the final page.",
+      "descripts.ja": "取得する最後のページ（このページを含む）。0 なら最後のページまで。",
+      "descripts.ko": "다운로드할 마지막 페이지(해당 페이지 포함). 0이면 마지막 페이지까지.",
+      "descripts.zhtw": "下載到第幾頁（含該頁）。填 0 表示一直下載到最後一頁。",
+      "default": 1,
+      "min": 0,
+      "max": 100000
+    },
+    {
+      "key": "archive_include",
+      "type": "string",
+      "name": "压缩包内提取规则",
+      "name.en": "Archive include pattern",
+      "name.ja": "圧縮ファイル内の抽出パターン",
+      "name.ko": "압축 파일 내 추출 패턴",
+      "name.zhtw": "壓縮檔內提取規則",
+      "descripts": "glob 模式，决定压缩包里哪些文件被提取入库。留空表示全部提取（不推荐：Patreon 的包里常混着 PSD、字体、说明文本，这些进不了图库还会刷失败计数）。",
+      "descripts.en": "Glob pattern deciding which files inside an archive get imported. Empty means extract everything (not recommended: Patreon archives often bundle PSD, fonts and readme files that cannot be imported).",
+      "descripts.ja": "圧縮ファイル内のどのファイルを取り込むかを決める glob パターン。空にすると全件展開します（非推奨：PSD やフォント、説明書きが混在しがちです）。",
+      "descripts.ko": "압축 파일 안에서 어떤 파일을 가져올지 정하는 glob 패턴입니다. 비우면 전부 추출합니다(권장하지 않음: PSD·폰트·설명 파일이 섞여 있는 경우가 많습니다).",
+      "descripts.zhtw": "glob 模式，決定壓縮檔裡哪些檔案被提取入庫。留空表示全部提取（不推薦：包裡常混著 PSD、字型、說明文字）。",
+      "default": "**/*.{png,jpg,jpeg,webp,gif,avif,bmp}"
+    },
+    {
+      "key": "archive_password",
+      "type": "string",
+      "name": "压缩包密码",
+      "name.en": "Archive password",
+      "name.ja": "圧縮ファイルのパスワード",
+      "name.ko": "압축 파일 비밀번호",
+      "name.zhtw": "壓縮檔密碼",
+      "descripts": "部分创作者会给附件加密并把密码写在帖子正文里。留空表示不加密。",
+      "descripts.en": "Some creators encrypt attachments and put the password in the post body. Leave empty for unencrypted archives.",
+      "descripts.ja": "添付ファイルを暗号化し、本文にパスワードを書くクリエイターがいます。暗号化されていない場合は空のままに。",
+      "descripts.ko": "일부 크리에이터는 첨부를 암호화하고 본문에 비밀번호를 적습니다. 암호화되지 않았다면 비워 두세요.",
+      "descripts.zhtw": "部分創作者會為附件加密並把密碼寫在貼文內文裡。留空表示不加密。",
+      "default": ""
+    },
+    {
+      "key": "include_post_images",
+      "type": "boolean",
+      "name": "同时下载帖子正文图片",
+      "name.en": "Also download post images",
+      "name.ja": "投稿本文の画像も取得",
+      "name.ko": "게시물 본문 이미지도 다운로드",
+      "name.zhtw": "同時下載貼文內文圖片",
+      "descripts": "关闭则只处理压缩包附件，帖子自带的图片会被跳过。",
+      "descripts.en": "When off, only archive attachments are processed and the post's own images are skipped.",
+      "descripts.ja": "オフにすると圧縮ファイルの添付のみを処理し、投稿自体の画像は取得しません。",
+      "descripts.ko": "끄면 압축 첨부만 처리하고 게시물 자체 이미지는 건너뜁니다.",
+      "descripts.zhtw": "關閉則只處理壓縮檔附件，貼文自帶的圖片會被跳過。",
+      "default": true
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}

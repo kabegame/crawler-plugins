@@ -1,0 +1,465 @@
+{
+  "name": "bilibili-video",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "bilibili视频",
+  "name.en": "Bilibili Videos",
+  "name.ja": "bilibili 動画",
+  "name.ko": "빌리빌리 동영상",
+  "name.zhtw": "嗶哩嗶哩影片",
+  "description": "bilibili 视频：按 BV/av 号或链接下载 DASH 音视频流并合流入库",
+  "description.zh": "bilibili 视频：按 BV/av 号或链接下载 DASH 音视频流并合流入库",
+  "description.en": "Bilibili videos: download DASH video/audio streams by BV/av id or URL and mux them into the library",
+  "description.ja": "bilibili 動画：BV/av 番号または URL から DASH 映像・音声を取得し、結合して保存します",
+  "description.ko": "빌리빌리 동영상: BV/av 번호나 URL로 DASH 영상·음성 스트림을 받아 합쳐서 저장합니다",
+  "description.zhtw": "嗶哩嗶哩影片：依 BV/av 號或連結下載 DASH 影音串流並合流入庫",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.4.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.bilibili.com",
+  "kbLabels": [
+    {
+      "id": "auth.needCookie"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "name": "模式",
+      "name.en": "Mode",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "单个视频，或按 UP 主 / 合集 / 收藏夹 / 关键词批量下载",
+      "descripts.en": "A single video, or bulk-download by uploader / collection / favorites / search",
+      "default": "single",
+      "options": [
+        {
+          "name": "单个视频",
+          "name.en": "Single video",
+          "name.ja": "単一動画",
+          "name.ko": "단일 동영상",
+          "name.zhtw": "單個影片",
+          "variable": "single"
+        },
+        {
+          "name": "UP 主投稿",
+          "name.en": "Uploader's videos",
+          "name.ja": "投稿者の動画",
+          "name.ko": "업로더 영상",
+          "name.zhtw": "UP 主投稿",
+          "variable": "space"
+        },
+        {
+          "name": "合集 / 系列 / 收藏夹",
+          "name.en": "Collection / series / favorites",
+          "name.ja": "シリーズ / お気に入り",
+          "name.ko": "컬렉션 / 시리즈 / 즐겨찾기",
+          "name.zhtw": "合集 / 系列 / 收藏夾",
+          "variable": "list"
+        },
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "name.zhtw": "關鍵字搜尋",
+          "variable": "search"
+        }
+      ]
+    },
+    {
+      "key": "video",
+      "type": "string",
+      "name": "视频 ID 或链接",
+      "name.en": "Video id or URL",
+      "name.ja": "動画 ID または URL",
+      "name.ko": "동영상 ID 또는 URL",
+      "name.zhtw": "影片 ID 或連結",
+      "descripts": "BV 号（BV13x41117TL）、av 号（av1074402）或完整链接（https://www.bilibili.com/video/BV13x41117TL）",
+      "descripts.en": "BV id (BV13x41117TL), av id (av1074402) or full URL",
+      "default": "",
+      "when": {
+        "mode": [
+          "single"
+        ]
+      }
+    },
+    {
+      "key": "mid",
+      "type": "string",
+      "name": "UP 主 UID 或主页链接",
+      "name.en": "Uploader UID or space URL",
+      "name.ja": "投稿者 UID またはマイページ URL",
+      "name.ko": "업로더 UID 또는 홈 URL",
+      "name.zhtw": "UP 主 UID 或主頁連結",
+      "descripts": "纯数字 UID（3985676）或主页链接（https://space.bilibili.com/3985676）",
+      "descripts.en": "Numeric UID (3985676) or space URL",
+      "default": "",
+      "when": {
+        "mode": [
+          "space"
+        ]
+      }
+    },
+    {
+      "key": "list_url",
+      "type": "string",
+      "name": "列表页链接",
+      "name.en": "List page URL",
+      "name.ja": "リストページ URL",
+      "name.ko": "목록 페이지 URL",
+      "name.zhtw": "列表頁連結",
+      "descripts": "粘贴完整链接，自动识别类型：合集 space.bilibili.com/<UID>/lists/<ID>；系列 同址加 ?type=series；收藏夹 space.bilibili.com/<UID>/favlist?fid=<ID> 或 bilibili.com/medialist/detail/ml<ID>",
+      "descripts.en": "Paste the full URL; the type is detected automatically (collection / series / favorites)",
+      "default": "",
+      "when": {
+        "mode": [
+          "list"
+        ]
+      }
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "与 search.bilibili.com 的视频 Tab 一致",
+      "descripts.en": "Same as the video tab on search.bilibili.com",
+      "default": "",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "search_order",
+      "type": "options",
+      "name": "搜索排序",
+      "name.en": "Search sort",
+      "name.ja": "検索並び順",
+      "name.ko": "검색 정렬",
+      "name.zhtw": "搜尋排序",
+      "descripts": "搜索结果的排序方式",
+      "descripts.en": "Order of search results",
+      "default": "totalrank",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "综合排序",
+          "name.en": "Default",
+          "name.ja": "総合",
+          "name.ko": "종합",
+          "name.zhtw": "綜合排序",
+          "variable": "totalrank"
+        },
+        {
+          "name": "最多播放",
+          "name.en": "Most played",
+          "name.ja": "再生数",
+          "name.ko": "조회수",
+          "name.zhtw": "最多播放",
+          "variable": "click"
+        },
+        {
+          "name": "最新发布",
+          "name.en": "Newest",
+          "name.ja": "新着",
+          "name.ko": "최신",
+          "name.zhtw": "最新發佈",
+          "variable": "pubdate"
+        },
+        {
+          "name": "最多弹幕",
+          "name.en": "Most danmaku",
+          "name.ja": "コメント数",
+          "name.ko": "댓글수",
+          "name.zhtw": "最多彈幕",
+          "variable": "dm"
+        },
+        {
+          "name": "最多收藏",
+          "name.en": "Most favorited",
+          "name.ja": "お気に入り数",
+          "name.ko": "즐겨찾기",
+          "name.zhtw": "最多收藏",
+          "variable": "stow"
+        }
+      ]
+    },
+    {
+      "key": "duration",
+      "type": "options",
+      "name": "时长筛选",
+      "name.en": "Duration filter",
+      "name.ja": "再生時間",
+      "name.ko": "길이 필터",
+      "name.zhtw": "時長篩選",
+      "descripts": "长视频体积很大（1080P 每小时 1GB 起），建议按需筛选",
+      "descripts.en": "Long videos are huge (1GB+ per hour at 1080P); filter as needed",
+      "default": "0",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "全部时长",
+          "name.en": "Any",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部時長",
+          "variable": "0"
+        },
+        {
+          "name": "10 分钟以下",
+          "name.en": "Under 10 min",
+          "name.ja": "10分未満",
+          "name.ko": "10분 미만",
+          "name.zhtw": "10 分鐘以下",
+          "variable": "1"
+        },
+        {
+          "name": "10-30 分钟",
+          "name.en": "10-30 min",
+          "name.ja": "10〜30分",
+          "name.ko": "10-30분",
+          "name.zhtw": "10-30 分鐘",
+          "variable": "2"
+        },
+        {
+          "name": "30-60 分钟",
+          "name.en": "30-60 min",
+          "name.ja": "30〜60分",
+          "name.ko": "30-60분",
+          "name.zhtw": "30-60 分鐘",
+          "variable": "3"
+        },
+        {
+          "name": "60 分钟以上",
+          "name.en": "Over 60 min",
+          "name.ja": "60分以上",
+          "name.ko": "60분 초과",
+          "name.zhtw": "60 分鐘以上",
+          "variable": "4"
+        }
+      ]
+    },
+    {
+      "key": "order",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "投稿列表的排序方式",
+      "descripts.en": "Order of the uploader's video list",
+      "default": "pubdate",
+      "when": {
+        "mode": [
+          "space"
+        ]
+      },
+      "options": [
+        {
+          "name": "最新发布",
+          "name.en": "Newest",
+          "name.ja": "新着",
+          "name.ko": "최신",
+          "name.zhtw": "最新發佈",
+          "variable": "pubdate"
+        },
+        {
+          "name": "最多播放",
+          "name.en": "Most played",
+          "name.ja": "再生数",
+          "name.ko": "조회수",
+          "name.zhtw": "最多播放",
+          "variable": "click"
+        },
+        {
+          "name": "最多收藏",
+          "name.en": "Most favorited",
+          "name.ja": "お気に入り数",
+          "name.ko": "즐겨찾기",
+          "name.zhtw": "最多收藏",
+          "variable": "stow"
+        }
+      ]
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "从第几页开始（含）。UP 主 / 合集每页 30 个，搜索每页 20 个",
+      "descripts.en": "First page (inclusive); 30 per page for uploader/collection, 20 for search",
+      "default": 1,
+      "when": {
+        "mode": [
+          "space",
+          "list",
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "到第几页结束（含）",
+      "descripts.en": "Last page (inclusive)",
+      "default": 1,
+      "when": {
+        "mode": [
+          "space",
+          "list",
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "max_videos",
+      "type": "int",
+      "name": "最多下载数",
+      "name.en": "Max videos",
+      "name.ja": "最大本数",
+      "name.ko": "최대 개수",
+      "name.zhtw": "最多下載數",
+      "descripts": "本次最多下几个视频。视频动辄上百 MB，默认保守取 5",
+      "descripts.en": "Cap on videos downloaded this run. Videos are hundreds of MB each; defaults to a conservative 5",
+      "default": 5,
+      "when": {
+        "mode": [
+          "space",
+          "list",
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "max_quality",
+      "type": "options",
+      "name": "画质上限",
+      "name.en": "Max quality",
+      "name.ja": "画質上限",
+      "name.ko": "최대 화질",
+      "name.zhtw": "畫質上限",
+      "descripts": "取不超过该档的最高画质。高于 480P 的档位需要登录，4K/HDR 还需大会员",
+      "descripts.en": "Highest quality not exceeding this cap. Above 480P requires login; 4K/HDR also requires premium",
+      "default": "80",
+      "options": [
+        {
+          "name": "最高可用",
+          "name.en": "Best available",
+          "name.ja": "最高画質",
+          "name.ko": "최고 화질",
+          "name.zhtw": "最高可用",
+          "variable": "0"
+        },
+        {
+          "name": "1080P",
+          "name.en": "1080P",
+          "variable": "80"
+        },
+        {
+          "name": "720P",
+          "name.en": "720P",
+          "variable": "64"
+        },
+        {
+          "name": "480P",
+          "name.en": "480P",
+          "variable": "32"
+        },
+        {
+          "name": "360P",
+          "name.en": "360P",
+          "variable": "16"
+        }
+      ]
+    },
+    {
+      "key": "prefer_avc",
+      "type": "boolean",
+      "name": "优先 H.264",
+      "name.en": "Prefer H.264",
+      "name.ja": "H.264 を優先",
+      "name.ko": "H.264 우선",
+      "name.zhtw": "優先 H.264",
+      "descripts": "优先选择 avc1 编码，兼容性最好；关闭则按画质选，可能得到 HEVC/AV1",
+      "descripts.en": "Prefer avc1 for best compatibility; when off, pick purely by quality (may yield HEVC/AV1)",
+      "default": true
+    },
+    {
+      "key": "page_index",
+      "type": "int",
+      "name": "分 P 序号",
+      "name.en": "Part index",
+      "name.ja": "パート番号",
+      "name.ko": "파트 번호",
+      "name.zhtw": "分 P 序號",
+      "descripts": "从 1 开始；填 0 下载全部分 P。UP 主投稿模式固定只取 P1",
+      "descripts.en": "1-based; use 0 to download every part. The uploader mode always takes P1 only",
+      "default": 1,
+      "when": {
+        "mode": [
+          "single"
+        ]
+      }
+    },
+    {
+      "key": "interval",
+      "type": "int",
+      "name": "间隔秒数",
+      "name.en": "Interval (seconds)",
+      "name.ja": "待機秒数",
+      "name.ko": "간격(초)",
+      "name.zhtw": "間隔秒數",
+      "descripts": "视频之间、翻页之间以及失败重试前的等待秒数。调小容易触发风控",
+      "descripts.en": "Wait between videos, between list pages, and before a retry. Lower values invite rate limiting",
+      "default": 10
+    },
+    {
+      "key": "retries",
+      "type": "int",
+      "name": "重试次数",
+      "name.en": "Retries",
+      "name.ja": "リトライ回数",
+      "name.ko": "재시도 횟수",
+      "name.zhtw": "重試次數",
+      "descripts": "单个视频失败后的重试次数，0 表示不重试",
+      "descripts.en": "Retries per video after a failure; 0 disables retrying",
+      "default": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "doc_root/doc.md"
+  }
+}
