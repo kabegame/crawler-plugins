@@ -529,6 +529,16 @@
     "zh": "doc_root/doc.zh.md",
     "zhtw": "doc_root/doc.zhtw.md"
   },
+  "kbDocAssets": {
+    "./images/home.png": "doc_root/images/home.png",
+    "./images/console.png": "doc_root/images/console.png",
+    "./images/cookie.png": "doc_root/images/cookie.png",
+    "./images/header-config.png": "doc_root/images/header-config.png",
+    "./images/kabegame-surf.png": "doc_root/images/kabegame-surf.png",
+    "./images/surf-pixiv.png": "doc_root/images/surf-pixiv.png",
+    "./images/cookie-dialog.png": "doc_root/images/cookie-dialog.png",
+    "./images/user.png": "doc_root/images/user.png"
+  },
   "kbRecommendedConfigs": [
     "configs/every-day-ranking-daily.json",
     "configs/keyword-landscape-safe.json",

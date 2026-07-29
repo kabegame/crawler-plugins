@@ -287,5 +287,12 @@
   "kbDoc": {
     "default": "doc_root/doc.md"
   },
+  "kbDocAssets": {
+    "./b-posts.png": "doc_root/b-posts.png",
+    "./src-bilibili.png": "doc_root/src-bilibili.png",
+    "./images.png": "doc_root/images.png",
+    "./article-url.jpg": "doc_root/article-url.jpg",
+    "./post-url.jpg": "doc_root/post-url.jpg"
+  },
   "kbDescriptionTemplate": "templates/description.ejs"
 }

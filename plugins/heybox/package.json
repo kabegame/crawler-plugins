@@ -130,6 +130,19 @@
   "kbDoc": {
     "default": "doc_root/doc.md"
   },
+  "kbDocAssets": {
+    "./src-xhh.png": "doc_root/src-xhh.png",
+    "./mode-keyword.png": "doc_root/mode-keyword.png",
+    "./fufu.png": "doc_root/fufu.png",
+    "./downloading.png": "doc_root/downloading.png",
+    "./images.png": "doc_root/images.png",
+    "./image-preview.png": "doc_root/image-preview.png",
+    "./share-btn.png": "doc_root/share-btn.png",
+    "./url-paste.png": "doc_root/url-paste.png",
+    "./url-images.png": "doc_root/url-images.png",
+    "./url-image-preview.png": "doc_root/url-image-preview.png",
+    "./captcha.png": "doc_root/captcha.png"
+  },
   "kbPathQLProviders": [
     "providers/entry_provider.json5",
     "providers/tag_provider.json5"

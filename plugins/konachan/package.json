@@ -384,6 +384,9 @@
     "zh": "doc_root/doc.zh.md",
     "zhtw": "doc_root/doc.zhtw.md"
   },
+  "kbDocAssets": {
+    "./image.jpg": "doc_root/image.jpg"
+  },
   "kbRecommendedConfigs": [
     "configs/bikini.json",
     "configs/every-day-5page.json",

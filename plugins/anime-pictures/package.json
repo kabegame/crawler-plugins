@@ -85,6 +85,11 @@
     "zh": "doc_root/doc.zh.md",
     "zhtw": "doc_root/doc.zhtw.md"
   },
+  "kbDocAssets": {
+    "./scsho.png": "doc_root/scsho.png",
+    "./hutao.png": "doc_root/hutao.png",
+    "./icon.png": "doc_root/icon.png"
+  },
   "kbRecommendedConfigs": [
     "configs/blue-archive.json",
     "configs/every-day-pictures.json",
