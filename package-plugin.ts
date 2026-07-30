@@ -187,8 +187,8 @@ function getDefaultPatterns(): string[] {
     "{projectRoot}/plugins/**/package.json",
     "{projectRoot}/plugins/**/crawl.js",
     "{projectRoot}/plugins/**/icon.png",
-    "{projectRoot}/plugins/**/doc_root/doc.md",
-    "{projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
+    "{projectRoot}/plugins/**/README*.md",
+    "{projectRoot}/plugins/**/**/*.{jpg,jpeg,png,gif,webp,bmp,svg,ico}",
   ];
 }
 
@@ -204,7 +204,7 @@ async function collectPluginFiles(pluginDir: string): Promise<PluginFile[]> {
   for (const pattern of patterns) {
     // 将 {projectRoot}/plugins/**/ 替换为空字符串，得到相对于插件目录的模式
     // 例如: {projectRoot}/plugins/**/manifest.json -> manifest.json
-    //      {projectRoot}/plugins/**/doc_root/*.{jpg,jpeg,...} -> doc_root/*.{jpg,jpeg,...}
+    //      {projectRoot}/plugins/**/README*.md -> README*.md
     let resolvedPattern = pattern.replace("{projectRoot}/plugins/**/", "");
 
     // 将模式中的路径分隔符统一为正斜杠（glob 库期望的格式）
@@ -260,11 +260,11 @@ async function collectPluginFiles(pluginDir: string): Promise<PluginFile[]> {
 }
 
 /**
- * 解析 doc.md 文件，提取引用的图片路径
+ * 解析 README 文件，提取引用的图片路径
  */
 function extractReferencedImages(
   docPath: string,
-  docRootDir: string,
+  docDir: string,
 ): string[] {
   if (!fs.existsSync(docPath)) {
     return [];
@@ -291,25 +291,25 @@ function extractReferencedImages(
       continue;
     }
 
-    // 处理相对路径（相对于 doc.md 所在目录）
+    // 处理相对路径（相对于 README 所在目录）
     let fullPath: string;
     if (path.isAbsolute(imagePath)) {
       fullPath = imagePath;
     } else {
-      fullPath = path.resolve(docRootDir, imagePath);
+      fullPath = path.resolve(docDir, imagePath);
     }
 
     // 检查文件是否存在
     if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-      // 确保文件在 doc_root 目录内
-      const relativePath = path.relative(docRootDir, fullPath);
+      // 确保文件在 README 所在目录内
+      const relativePath = path.relative(docDir, fullPath);
       if (!relativePath.startsWith("..")) {
         referencedImages.add(relativePath);
       }
     } else {
       // 如果相对路径不存在，尝试直接使用文件名
       const fileName = path.basename(imagePath);
-      const filePath = path.join(docRootDir, fileName);
+      const filePath = path.join(docDir, fileName);
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         referencedImages.add(fileName);
       }
@@ -338,18 +338,18 @@ function extractReferencedImages(
     if (path.isAbsolute(imagePath)) {
       fullPath = imagePath;
     } else {
-      fullPath = path.resolve(docRootDir, imagePath);
+      fullPath = path.resolve(docDir, imagePath);
     }
 
     // 检查文件是否存在
     if (fs.existsSync(fullPath) && fs.statSync(fullPath).isFile()) {
-      const relativePath = path.relative(docRootDir, fullPath);
+      const relativePath = path.relative(docDir, fullPath);
       if (!relativePath.startsWith("..")) {
         referencedImages.add(relativePath);
       }
     } else {
       const fileName = path.basename(imagePath);
-      const filePath = path.join(docRootDir, fileName);
+      const filePath = path.join(docDir, fileName);
       if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
         referencedImages.add(fileName);
       }

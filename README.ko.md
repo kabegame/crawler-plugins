@@ -37,7 +37,7 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **제작**: Kabegame
 
 **경로**: `plugins/anime-pictures/`  
-**사용자 문서**: [plugins/anime-pictures/doc_root/doc.md](plugins/anime-pictures/doc_root/doc.md)
+**사용자 문서**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
 
 **기능**:
 - [anime-pictures.net](https://anime-pictures.net)에서 태그·페이지 범위로 벽지 일괄 다운로드
@@ -83,7 +83,7 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **제작**: Kabegame
 
 **경로**: `plugins/ziworld/`  
-**사용자 문서**: [plugins/ziworld/doc_root/doc.md](plugins/ziworld/doc_root/doc.md)
+**사용자 문서**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
 
 **기능**:
 - [ziworld](https://t.ziworld.top/date.json)에서 벽지 수집
@@ -232,7 +232,7 @@ pnpm run package-plugin crawler-plugins/plugins/<플러그인명>
 
 1. 표준 플러그인 파일 구조 준수
 2. 완전한 manifest.json 제공
-3. 명확한 README.md 및 사용자 문서(doc_root/doc.md) 작성
+3. 명확한 README.md 및 사용자 문서(README.md) 작성
 
 개발 전 메인 저장소의 [플러그인 개발 가이드](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md)와 [Rhai API](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md)를 참고하세요.
 

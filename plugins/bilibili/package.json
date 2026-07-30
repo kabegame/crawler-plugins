@@ -285,14 +285,14 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "doc_root/doc.md"
+    "default": "README.md"
   },
-  "kbDocAssets": {
-    "./b-posts.png": "doc_root/b-posts.png",
-    "./src-bilibili.png": "doc_root/src-bilibili.png",
-    "./images.png": "doc_root/images.png",
-    "./article-url.jpg": "doc_root/article-url.jpg",
-    "./post-url.jpg": "doc_root/post-url.jpg"
-  },
+  "kbAssets": [
+    "article-url.jpg",
+    "b-posts.png",
+    "images.png",
+    "post-url.jpg",
+    "src-bilibili.png"
+  ],
   "kbDescriptionTemplate": "templates/description.ejs"
 }

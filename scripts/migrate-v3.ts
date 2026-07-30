@@ -51,18 +51,22 @@ function listFiles(dir: string, predicate?: (rel: string) => boolean): string[] 
 }
 
 function collectDoc(pluginDir: string): JsonObject | undefined {
-  const docRoot = path.join(pluginDir, "doc_root");
-  const docs = listFiles(docRoot, (rel) => {
-    const base = path.basename(rel);
-    return !rel.includes("/") && (base === "doc.md" || /^doc\.[^.]+\.md$/.test(base));
-  });
+  const docs = fs.readdirSync(pluginDir, { withFileTypes: true })
+    .filter((entry) =>
+      entry.isFile() &&
+      (entry.name === "README.md" || /^README\.[^.]+\.md$/.test(entry.name))
+    )
+    .map((entry) => entry.name)
+    .sort((a, b) => a.localeCompare(b));
   if (docs.length === 0) return undefined;
 
   const docMap: JsonObject = {};
   for (const rel of docs) {
     const base = path.basename(rel);
-    const key = base === "doc.md" ? "default" : base.slice("doc.".length, -".md".length);
-    docMap[key] = `doc_root/${rel}`;
+    const key = base === "README.md"
+      ? "default"
+      : base.slice("README.".length, -".md".length);
+    docMap[key] = rel;
   }
   return docMap;
 }

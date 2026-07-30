@@ -38,7 +38,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 
 它会下载作品原图，多页插画和漫画也能逐页保存；排行榜还覆盖原创、AI、新人、男性向与女性向等维度。部分模式可匿名使用，个人收藏和 R18 内容需要登录，通常也需要可访问 Pixiv 的网络环境。
 
-[查看插件目录](plugins/pixiv/) · [使用说明](plugins/pixiv/doc_root/doc.md)
+[查看插件目录](plugins/pixiv/) · [使用说明](plugins/pixiv/README.md)
 
 #### PixAI
 
@@ -54,7 +54,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 
 anime-pictures 的标签体系很细，特别适合批量收某个角色、IP 或题材的高清动漫图。给它一个站内标签和页码范围，它就会进入详情页取大图；通常需要代理网络。
 
-[查看插件目录](plugins/anime-pictures/) · [使用说明](plugins/anime-pictures/doc_root/doc.md)
+[查看插件目录](plugins/anime-pictures/) · [使用说明](plugins/anime-pictures/README.md)
 
 #### Konachan
 
@@ -62,7 +62,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 既可以直接抓图片，也可以先浏览热门标签，再组合标签缩小范围；同时提供大众站与 R18 站入口，并可选择图片质量。站内可能出现成人内容，通常需要代理网络，请按自身需求和所在地规则使用。
 
-[查看插件目录](plugins/konachan/) · [使用说明](plugins/konachan/doc_root/doc.md)
+[查看插件目录](plugins/konachan/) · [使用说明](plugins/konachan/README.md)
 
 #### anihonet-wallpaper
 
@@ -70,7 +70,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 可以追日榜、周榜、月榜和年榜，也能从庞大的作品列表中直达某部动画或游戏，或按主题关键词寻找壁纸。手机与桌面壁纸都有，特别适合定期补充轮播图库。
 
-[查看插件目录](plugins/anihonet-wallpaper/) · [使用说明](plugins/anihonet-wallpaper/doc_root/doc.md)
+[查看插件目录](plugins/anihonet-wallpaper/) · [使用说明](plugins/anihonet-wallpaper/README.md)
 
 #### 2dwallpapers
 
@@ -78,7 +78,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 输入部分作品名即可匹配站内游戏/动漫分类，例如 Genshin 或 Honkai；也能浏览未分类作品。比全站漫游更聚焦，很适合给某个主题单独建相册。
 
-[查看插件目录](plugins/twodwallpapers/) · [使用说明](plugins/twodwallpapers/doc_root/doc.md)
+[查看插件目录](plugins/twodwallpapers/) · [使用说明](plugins/twodwallpapers/README.md)
 
 ### 社区、帖子与创作者
 
@@ -88,7 +88,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 支持关键词搜索、单帖链接和作者主页三种入口，正文图片会完整收集，还能选择把评论区配图一起带走。相比通用插画站，它更接近玩家社区里正在流行的内容。
 
-[查看插件目录](plugins/miyoushe/) · [使用说明](plugins/miyoushe/doc_root/doc.md)
+[查看插件目录](plugins/miyoushe/) · [使用说明](plugins/miyoushe/README.md)
 
 #### bilibili 专栏
 
@@ -96,7 +96,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 可以按关键词批量搜索专栏，也可以只处理一个 `cv` 专栏或 Opus 链接，并保留标题等来源信息。关键词搜索和传统专栏依赖 B 站登录态，Opus 单帖通常更轻量。
 
-[查看插件目录](plugins/bilibili/) · [使用说明](plugins/bilibili/doc_root/doc.md)
+[查看插件目录](plugins/bilibili/) · [使用说明](plugins/bilibili/README.md)
 
 #### 小黑盒
 
@@ -104,7 +104,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 既能按关键词找帖，也能精准处理一条分享链接；正文和评论区图片都可以收。单帖链接更准、也更不容易触发风控；批量搜索时使用登录态通常更稳定。
 
-[查看插件目录](plugins/heybox/) · [使用说明](plugins/heybox/doc_root/doc.md)
+[查看插件目录](plugins/heybox/) · [使用说明](plugins/heybox/README.md)
 
 #### 小红书：怎么选
 
@@ -121,7 +121,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 支持小红书详情链接和短链；登录后推荐流会更贴近你的兴趣，未登录也能使用通用推荐。它不会绕过站点签名或访问控制，因此能力边界清晰、运行也更轻。
 
-[查看插件目录](plugins/xhs/) · [使用说明](plugins/xhs/doc_root/doc.md)
+[查看插件目录](plugins/xhs/) · [使用说明](plugins/xhs/README.md)
 
 ##### 小红书（WebView）
 
@@ -129,7 +129,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 它在真实网页中滚动加载并逐条进入详情，能沿用畅游里的登录状态；遇到登录或验证码时也可以直接在窗口内完成。收藏和点赞等私人列表需要对应账号本来就有访问权限。
 
-[查看插件目录](plugins/xhs-webview/) · [使用说明](plugins/xhs-webview/doc_root/doc.md)
+[查看插件目录](plugins/xhs-webview/) · [使用说明](plugins/xhs-webview/README.md)
 
 #### Kemono
 
@@ -137,7 +137,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 支持 Patreon、Fanbox、Fantia、Afdian 等多种来源，也能处理单帖链接。默认使用较稳定的 800px 缩略图；原图节点在许多网络环境中不可达。站内可能包含成人内容，收藏模式需要先登录。
 
-[查看插件目录](plugins/kemono/) · [使用说明](plugins/kemono/doc_root/doc.md)
+[查看插件目录](plugins/kemono/) · [使用说明](plugins/kemono/README.md)
 
 #### Patreon（WebView）
 
@@ -145,7 +145,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 真实浏览器后端可以通过 Patreon 的正常登录与 Cloudflare 检查，并把 ZIP、7z、tar 等压缩包中的图片逐张入库。它不会绕订阅墙或 DRM，也不处理 Patreon 视频；只能下载当前账号本来就能访问的内容。
 
-[查看插件目录](plugins/patreon-webview/) · [使用说明](plugins/patreon-webview/doc_root/doc.md)
+[查看插件目录](plugins/patreon-webview/) · [使用说明](plugins/patreon-webview/README.md)
 
 ### 视频
 
@@ -155,7 +155,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 支持 BV/av 号或链接、UP 主投稿、合集/系列、收藏夹以及关键词搜索；分离的音视频流会自动合流。登录后画质更稳定，大会员可获取账号有权播放的 4K/HDR；合流依赖 FFmpeg，目前不支持 Android，也不支持番剧、课程和直播。
 
-[查看插件目录](plugins/bilibili-video/) · [使用说明](plugins/bilibili-video/doc_root/doc.md)
+[查看插件目录](plugins/bilibili-video/) · [使用说明](plugins/bilibili-video/README.md)
 
 ### 综合壁纸站
 
@@ -165,7 +165,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 可按图片/视频、设备类型和标签缩小范围，详情元数据里还会保留作者、色系、分辨率等信息。插件获取的是站点可直接访问的预览资源，而不是需要登录的原图端点。
 
-[查看插件目录](plugins/haowallpaper/) · [使用说明](plugins/haowallpaper/doc_root/doc.md)
+[查看插件目录](plugins/haowallpaper/) · [使用说明](plugins/haowallpaper/README.md)
 
 #### ziworld
 
@@ -173,7 +173,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 目录覆盖 PC、手机、横屏、头像、二次元、原神、崩坏、鸣潮和视频壁纸等，一次可选多个主题。站点更新不算频繁，但内容精致，很适合快速搭一套基础图库。
 
-[查看插件目录](plugins/ziworld/) · [使用说明](plugins/ziworld/doc_root/doc.md)
+[查看插件目录](plugins/ziworld/) · [使用说明](plugins/ziworld/README.md)
 
 #### WallpapersCraft
 
@@ -181,7 +181,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 动漫、自然、城市、汽车、极简、科技等目录一应俱全，也能按标签、热度、日期和具体分辨率筛选。尤其适合明确知道屏幕尺寸，希望下载后无需再裁切的人。
 
-[查看插件目录](plugins/wallpapers-craft/) · [使用说明](plugins/wallpapers-craft/doc_root/doc.md)
+[查看插件目录](plugins/wallpapers-craft/) · [使用说明](plugins/wallpapers-craft/README.md)
 
 #### Wallspic
 
@@ -189,7 +189,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 它和 WallpapersCraft 都适合通用壁纸，但 Wallspic 更强调专辑、热门排序和设备预设；iPhone、Android、宽屏与 Ultra HD 都有现成入口。
 
-[查看插件目录](plugins/wallspic/) · [使用说明](plugins/wallspic/doc_root/doc.md)
+[查看插件目录](plugins/wallspic/) · [使用说明](plugins/wallspic/README.md)
 
 找不到想要的插件？请提一个issue吧，或者等待将来陆续推出！
 
@@ -203,7 +203,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 ## 仓库开发
 
-每个插件都位于 `plugins/<插件名>/`，入口与元数据以插件自己的 `package.json` 为准，用户文档位于 `doc_root/doc.md`。
+每个插件都位于 `plugins/<插件名>/`，入口与元数据以插件自己的 `package.json` 为准，用户文档位于 `README.md`。
 
 首次安装依赖：
 

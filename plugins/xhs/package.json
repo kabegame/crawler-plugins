@@ -214,6 +214,6 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "doc_root/doc.md"
+    "default": "README.md"
   }
 }

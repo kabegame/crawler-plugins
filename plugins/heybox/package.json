@@ -128,21 +128,21 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "doc_root/doc.md"
+    "default": "README.md"
   },
-  "kbDocAssets": {
-    "./src-xhh.png": "doc_root/src-xhh.png",
-    "./mode-keyword.png": "doc_root/mode-keyword.png",
-    "./fufu.png": "doc_root/fufu.png",
-    "./downloading.png": "doc_root/downloading.png",
-    "./images.png": "doc_root/images.png",
-    "./image-preview.png": "doc_root/image-preview.png",
-    "./share-btn.png": "doc_root/share-btn.png",
-    "./url-paste.png": "doc_root/url-paste.png",
-    "./url-images.png": "doc_root/url-images.png",
-    "./url-image-preview.png": "doc_root/url-image-preview.png",
-    "./captcha.png": "doc_root/captcha.png"
-  },
+  "kbAssets": [
+    "captcha.png",
+    "downloading.png",
+    "fufu.png",
+    "image-preview.png",
+    "images.png",
+    "mode-keyword.png",
+    "share-btn.png",
+    "src-xhh.png",
+    "url-image-preview.png",
+    "url-images.png",
+    "url-paste.png"
+  ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",
     "providers/tag_provider.json5"

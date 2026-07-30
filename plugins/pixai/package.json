@@ -498,7 +498,7 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "doc_root/doc.md"
+    "default": "README.md"
   },
   "kbRecommendedConfigs": [
     "configs/every-day-global.json",

@@ -135,17 +135,16 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "en": "doc_root/doc.en.md",
-    "ja": "doc_root/doc.ja.md",
-    "ko": "doc_root/doc.ko.md",
-    "default": "doc_root/doc.md",
-    "zh": "doc_root/doc.zh.md",
-    "zhtw": "doc_root/doc.zhtw.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
   },
-  "kbDocAssets": {
-    "./images/work-entry.png": "doc_root/images/work-entry.png",
-    "./images/work-pagination.png": "doc_root/images/work-pagination.png"
-  },
+  "kbAssets": [
+    "images/work-entry.png",
+    "images/work-pagination.png"
+  ],
   "kbPathQLProviders": [
     "providers/category_provider.json5",
     "providers/entry_provider.json5"

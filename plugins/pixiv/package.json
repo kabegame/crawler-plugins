@@ -522,23 +522,22 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "en": "doc_root/doc.en.md",
-    "ja": "doc_root/doc.ja.md",
-    "ko": "doc_root/doc.ko.md",
-    "default": "doc_root/doc.md",
-    "zh": "doc_root/doc.zh.md",
-    "zhtw": "doc_root/doc.zhtw.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
   },
-  "kbDocAssets": {
-    "./images/home.png": "doc_root/images/home.png",
-    "./images/console.png": "doc_root/images/console.png",
-    "./images/cookie.png": "doc_root/images/cookie.png",
-    "./images/header-config.png": "doc_root/images/header-config.png",
-    "./images/kabegame-surf.png": "doc_root/images/kabegame-surf.png",
-    "./images/surf-pixiv.png": "doc_root/images/surf-pixiv.png",
-    "./images/cookie-dialog.png": "doc_root/images/cookie-dialog.png",
-    "./images/user.png": "doc_root/images/user.png"
-  },
+  "kbAssets": [
+    "images/console.png",
+    "images/cookie-dialog.png",
+    "images/cookie.png",
+    "images/header-config.png",
+    "images/home.png",
+    "images/kabegame-surf.png",
+    "images/surf-pixiv.png",
+    "images/user.png"
+  ],
   "kbRecommendedConfigs": [
     "configs/every-day-ranking-daily.json",
     "configs/keyword-landscape-safe.json",

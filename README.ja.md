@@ -37,7 +37,7 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **作者**: Kabegame
 
 **パス**: `plugins/anime-pictures/`  
-**ユーザー向けドキュメント**: [plugins/anime-pictures/doc_root/doc.md](plugins/anime-pictures/doc_root/doc.md)
+**ユーザー向けドキュメント**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
 
 **機能**:
 - [anime-pictures.net](https://anime-pictures.net) からタグ・ページ範囲で壁紙を一括取得
@@ -83,7 +83,7 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **作者**: Kabegame
 
 **パス**: `plugins/ziworld/`  
-**ユーザー向けドキュメント**: [plugins/ziworld/doc_root/doc.md](plugins/ziworld/doc_root/doc.md)
+**ユーザー向けドキュメント**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
 
 **機能**:
 - [ziworld](https://t.ziworld.top/date.json) から壁紙を取得
@@ -232,7 +232,7 @@ pnpm run package-plugin crawler-plugins/plugins/<プラグイン名>
 
 1. 標準のプラグインファイル構成に従う
 2. 完全な manifest.json を用意する
-3. わかりやすい README.md とユーザー向け doc（doc_root/doc.md）を書く
+3. わかりやすい README.md とユーザー向け doc（README.md）を書く
 
 開発前にメインリポジトリの [プラグイン開発ガイド](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) と [Rhai API](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md) を参照してください。
 

@@ -47,4 +47,4 @@ If you like the site, consider supporting the author:
 - Tag must match the site exactly (language, parentheses, etc.) or you may get no results.
 
 楽しんで〜
-![icon](./icon.png)
+![icon](./doc-icon.png)

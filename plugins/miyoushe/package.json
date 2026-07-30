@@ -241,13 +241,13 @@
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "doc_root/doc.md"
+    "default": "README.md"
   },
-  "kbDocAssets": {
-    "./preview.png": "doc_root/preview.png",
-    "./source-miyoushe.png": "doc_root/source-miyoushe.png",
-    "./user-page.png": "doc_root/user-page.png"
-  },
+  "kbAssets": [
+    "preview.png",
+    "source-miyoushe.png",
+    "user-page.png"
+  ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",
     "providers/game_provider.json5"

@@ -37,7 +37,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Author**: Kabegame
 
 **Path**: `plugins/anime-pictures/`  
-**User doc**: [plugins/anime-pictures/doc_root/doc.md](plugins/anime-pictures/doc_root/doc.md)
+**User doc**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
 
 **Features**:
 - Batch download wallpapers from [anime-pictures.net](https://anime-pictures.net) by tag and page range
@@ -83,7 +83,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Author**: Kabegame
 
 **Path**: `plugins/ziworld/`  
-**User doc**: [plugins/ziworld/doc_root/doc.md](plugins/ziworld/doc_root/doc.md)
+**User doc**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
 
 **Features**:
 - Fetch wallpapers from [ziworld](https://t.ziworld.top/date.json)
@@ -104,7 +104,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **作者**: Kabegame
 
 **路径**: `plugins/pixiv/`  
-**用户文档**: [plugins/pixiv/doc_root/doc.md](plugins/pixiv/doc_root/doc.md)
+**用户文档**: [plugins/pixiv/README.md](plugins/pixiv/README.md)
 
 **功能**:
 - 从 [pixiv.net](https://www.pixiv.net) 爬取插画，支持四种模式：排行榜、个人收藏、画师作品、关键词搜索
@@ -120,7 +120,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 - Pixiv 排行榜：`start_date` / `end_date`（均为 `date` + `format: YYYYMMDD`），闭区间逐日抓取
 - `artist_id`：画师 UID（画师作品模式）
 - `keyword` / `search_mode` / `keyword_order`：关键词、搜索模式（安全/R18/全部）、排序方式
-- `num_artworks`：最大作品数（1～1000），流式下载说明见插件用户文档 `plugins/pixiv/doc_root/`
+- `num_artworks`：最大作品数（1～1000），流式下载说明见插件用户文档 `plugins/pixiv/`
 
 ![image](./images/pixiv.png)
 ---
@@ -133,7 +133,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **作者**: Kabegame
 
 **路径**: `plugins/twodwallpapers/`  
-**用户文档**: [plugins/twodwallpapers/doc_root/doc.md](plugins/twodwallpapers/doc_root/doc.md)
+**用户文档**: [plugins/twodwallpapers/README.md](plugins/twodwallpapers/README.md)
 
 **功能**:
 - 从 [2dwallpapers.com](https://2dwallpapers.com) 爬取动漫、游戏等二次元壁纸
@@ -285,7 +285,7 @@ Contributions are welcome. Please:
 
 1. Follow the standard plugin file structure
 2. Provide a complete manifest.json
-3. Add a clear README.md and user doc (doc_root/doc.md)
+3. Add a clear README.md and user doc (README.md)
 
 Before developing, read the main repo’s [Plugin development guide](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) and [Rhai API](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md).
 
