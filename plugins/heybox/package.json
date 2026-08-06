@@ -147,5 +147,12 @@
     "providers/entry_provider.json5",
     "providers/tag_provider.json5"
   ],
-  "kbDescriptionTemplate": "templates/description.ejs"
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
 }
