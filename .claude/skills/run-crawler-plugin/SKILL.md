@@ -23,7 +23,8 @@ ls ../target/release/kabegame-cli || (cd .. && deno task b -c kabegame-cli --rel
 `'errno.h' file not found` 失败。真要裸跑得自己补：
 
 ```bash
-export FFMPEG_PKG_CONFIG_PATH="$PWD/../third/FFmpeg-build/install/lib/pkgconfig"
+ARCH_TOKEN="$(uname -m)"; [ "$ARCH_TOKEN" = "aarch64" ] && ARCH_TOKEN="arm64"
+export FFMPEG_PKG_CONFIG_PATH="$PWD/../bin/macos/$ARCH_TOKEN/FFmpeg-build/install/lib/pkgconfig"
 export BINDGEN_EXTRA_CLANG_ARGS="-isysroot $(xcrun --sdk macosx --show-sdk-path)"
 cargo build -p kabegame-cli --release
 ```

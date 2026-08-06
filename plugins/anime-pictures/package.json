@@ -87,7 +87,8 @@
   "kbAssets": [
     "doc-icon.png",
     "hutao.png",
-    "scsho.png"
+    "scsho.png",
+    "icon.png"
   ],
   "kbRecommendedConfigs": [
     "configs/blue-archive.json",
