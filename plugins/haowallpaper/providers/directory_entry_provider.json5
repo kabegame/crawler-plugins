@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.haowallpaper",
+  "name": "directory_entry_provider",
+  "list": {
+    "${directory.directory_name}": {
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') AS directory_name, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, plugin_metadata FROM (${composed}) AS composed_result) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
+      "data_var": "directory",
+      "provider": "directory_provider",
+      "properties": {
+        "directory_name": "${directory.directory_name}",
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${directory.directory_name}",
+        "image_count": "${directory.image_count}",
+      },
+    },
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "directory_provider",
+      "properties": {
+        "directory_name": "${capture[1]}",
+      },
+      "meta": {
+        "isLeaf": true,
+      },
+    },
+  },
+  "note": "{\"title\":\"哲风壁纸目录\",\"content\":\"直接使用 metadata.category 原始字符串分组。\"}",
+}

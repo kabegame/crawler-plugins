@@ -1,7 +1,6 @@
 {
   "name": "haowallpaper",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "name.zh": "哲风壁纸",
   "name.en": "Haowallpaper",
   "name.ja": "哲風壁紙",
@@ -38,14 +37,15 @@
       "name.ja": "開始ページ",
       "name.ko": "시작 페이지",
       "name.zhtw": "起始頁面",
-      "descripts": "要拉取的起始页面",
-      "descripts.en": "The first page to crawl",
-      "descripts.ja": "取得を開始するページ",
-      "descripts.ko": "수집을 시작할 페이지",
-      "descripts.zhtw": "要拉取的起始頁面",
+      "descripts": "要拉取的起始页面，最小为 1",
+      "descripts.en": "The first page to crawl (minimum 1)",
+      "descripts.ja": "取得を開始するページ（最小 1）",
+      "descripts.ko": "수집을 시작할 페이지 (최소 1)",
+      "descripts.zhtw": "要拉取的起始頁面，最小為 1",
       "default": 1,
       "min": 1,
-      "max": null
+      "max": null,
+      "width": 1
     },
     {
       "key": "endPage",
@@ -55,14 +55,15 @@
       "name.ja": "終了ページ",
       "name.ko": "종료 페이지",
       "name.zhtw": "結束頁數",
-      "descripts": "要拉取的结束页面",
-      "descripts.en": "The last page to crawl",
-      "descripts.ja": "取得を終了するページ",
-      "descripts.ko": "수집을 종료할 페이지",
-      "descripts.zhtw": "要拉取的結束頁面",
+      "descripts": "要拉取的结束页面，不能小于起始页面；一次最多爬取 100 页",
+      "descripts.en": "The last page to crawl; must not be less than the start page, at most 100 pages per run",
+      "descripts.ja": "取得を終了するページ。開始ページ未満は不可、一度に最大 100 ページまで",
+      "descripts.ko": "수집을 종료할 페이지. 시작 페이지보다 작을 수 없으며 한 번에 최대 100페이지",
+      "descripts.zhtw": "要拉取的結束頁面，不能小於起始頁面；一次最多爬取 100 頁",
       "default": 5,
       "min": 1,
-      "max": null
+      "max": null,
+      "width": 1
     },
     {
       "key": "wallpaperType",
@@ -78,6 +79,7 @@
       "descripts.ko": "수집할 벽지 유형 선택: 데스크톱 또는 모바일",
       "descripts.zhtw": "選擇要爬取的壁紙類型：桌面壁紙或手機壁紙",
       "default": "homeView",
+      "width": 2,
       "options": [
         {
           "name": "桌面壁纸",
@@ -111,6 +113,7 @@
       "descripts.ko": "수집할 벽지 형식 선택",
       "descripts.zhtw": "勾選要爬取的壁紙格式",
       "default": ["image", "video"],
+      "width": 2,
       "options": [
         {
           "name": "图片",
@@ -144,13 +147,29 @@
       "descripts.ko": "이미지 태그에 이 중 하나라도 포함되면(부분 일치) 다운로드; 비우면 필터 없음",
       "descripts.zhtw": "只要圖片標籤列表中包含任意一個標籤（包括子字串）就下載該圖片；留空則不過濾",
       "default": [],
-      "options": ["二次元", "少女", "动漫"]
+      "options": ["二次元", "少女", "动漫"],
+      "width": 2
     }
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
     "default": "README.md"
   },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/directory_entry_provider.json5",
+    "providers/directory_provider.json5",
+    "providers/tag_entry_provider.json5",
+    "providers/tag_page_provider.json5",
+    "providers/tag_provider.json5",
+    "providers/color_entry_provider.json5",
+    "providers/color_provider.json5"
+  ],
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
+  "kbDescriptionTemplate": "templates/description.ejs",
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
     "@kabegame/types": "file:../../../packages/kabegame-types",

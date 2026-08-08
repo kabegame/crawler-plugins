@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.haowallpaper",
+  "name": "entry_provider",
+  "list": {
+    "directory": {
+      "provider": "directory_entry_provider",
+      "meta": {
+        "display": "目录",
+        "plain": true,
+      },
+    },
+    "tag": {
+      "provider": "tag_entry_provider",
+      "meta": {
+        "display": "标签",
+        "plain": true,
+      },
+    },
+    "color": {
+      "provider": "color_entry_provider",
+      "meta": {
+        "display": "色彩",
+        "plain": true,
+      },
+    },
+  },
+  "note": "{\"title\":\"哲风壁纸分类\",\"content\":\"按目录、标签或色彩浏览哲风壁纸。\"}",
+}

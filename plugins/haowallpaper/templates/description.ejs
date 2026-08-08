@@ -1,0 +1,203 @@
+<% const m = metadata || {}; %>
+<%
+  const str = function (value) { return value == null ? '' : String(value).trim(); };
+  const pub = m.publisher && typeof m.publisher === 'object' && !Array.isArray(m.publisher) ? m.publisher : {};
+  const detailUrl = str(m.detail_url);
+  const tagView = detailUrl.indexOf('/mobileViewLook/') >= 0 ? 'mobileView' : 'homeView';
+  const publisherId = str(pub.id || m.author_id);
+  const publisherName = str(pub.name || m.author);
+  const publisherProfileUrl = str(pub.profile_url) || (publisherId ? 'https://haowallpaper.com/userProfile/' + encodeURIComponent(publisherId) : '');
+  const publisherAvatarUrl = str(pub.avatar_url);
+  const publisherInitial = publisherName ? Array.from(publisherName)[0] : '?';
+  const tags = Array.isArray(m.tags) ? m.tags.map(str).filter(Boolean) : [];
+  const info = [
+    ['category', str(m.category)],
+    ['resolution', str(m.resolution) || (m.width && m.height ? String(m.width) + 'x' + String(m.height) : '')],
+    ['color', str(m.color)],
+    ['size', str(m.size)],
+    ['downloads', str(m.download_count)],
+    ['favorites', str(m.favorite_count)],
+    ['publishedAt', str(m.published_at)]
+  ].filter(function (item) { return !!item[1]; });
+  const publisherStats = [
+    ['followers', str(pub.follower_count)],
+    ['shares', str(pub.share_count)],
+    ['receivedDownloads', str(pub.download_count)]
+  ].filter(function (item) { return !!item[1]; });
+  const signature = str(pub.signature);
+  const hasPublisher = !!(publisherName || publisherId || publisherStats.length || signature);
+  const hasAny = !!(info.length || hasPublisher || tags.length);
+%>
+<% if (!hasAny) { %>
+<p id="hao-desc-empty" class="hao-desc-empty" style="margin:0;font-size:0.875rem;opacity:0.75;"></p>
+<% } else { %>
+<style>
+.hao-desc {
+  unicode-bidi: isolate;
+  color: var(--anime-text-primary, inherit);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.hao-desc, .hao-desc * { box-sizing: border-box; }
+.hao-card {
+  overflow: hidden;
+  margin: 0 0 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 72%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 5%, transparent);
+}
+.hao-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  padding: 0.45rem 0.75rem;
+}
+.hao-info-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.3rem;
+}
+.hao-info-row:last-child:nth-child(odd) { grid-column: 1 / -1; justify-content: center; }
+.hao-info-icon { width: 1.1rem; flex: 0 0 1.1rem; text-align: center; opacity: 0.75; }
+.hao-info-label { flex: 0 0 auto; color: var(--anime-text-secondary, inherit); }
+.hao-info-value { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.hao-color-dot {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-left: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--anime-text-primary, currentColor) 35%, transparent);
+  border-radius: 50%;
+  vertical-align: -0.08rem;
+}
+.hao-publisher {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0.85rem;
+  padding: 0.75rem 0 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--anime-border, currentColor) 72%, transparent);
+}
+.hao-avatar {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 2.8rem;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--anime-text-primary, currentColor);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--anime-primary, currentColor) 20%, transparent);
+  color: var(--anime-text-primary, inherit);
+  font-weight: 700;
+  text-decoration: none;
+}
+.hao-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hao-publisher-body { min-width: 0; }
+.hao-publisher-name { color: inherit; font-weight: 700; text-decoration: none; }
+.hao-publisher-name:hover, .hao-tag:hover { color: var(--anime-primary, inherit); }
+.hao-stats { display: flex; flex-wrap: wrap; gap: 0.15rem 0.5rem; color: var(--anime-text-secondary, inherit); font-size: 0.78rem; }
+.hao-stat + .hao-stat::before { margin-right: 0.5rem; content: '｜'; opacity: 0.55; }
+.hao-signature { margin-top: 0.15rem; color: var(--anime-text-secondary, inherit); font-size: 0.78rem; overflow-wrap: anywhere; }
+.hao-tags { margin: 0; padding: 0.2rem 0.1rem 0; }
+.hao-section-title { display: flex; align-items: center; gap: 0.45rem; margin: 0 0 0.65rem; font-size: 0.95rem; font-weight: 700; }
+.hao-tag-list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.hao-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--anime-text-primary, currentColor) 10%, transparent);
+  color: inherit;
+  text-decoration: none;
+}
+.hao-desc-empty { margin: 0; font-size: 0.875rem; opacity: 0.75; }
+@media (max-width: 420px) {
+  .hao-info { grid-template-columns: 1fr; }
+  .hao-info-row:last-child:nth-child(odd) { grid-column: auto; justify-content: flex-start; }
+}
+</style>
+<div class="hao-desc" id="hao-desc-root">
+  <% if (info.length || hasPublisher) { %>
+  <section class="hao-card" data-hao-panel="details" aria-label="">
+    <% if (info.length) { %>
+    <div class="hao-info">
+      <% const icons = { category: '⌗', resolution: '▣', color: '▦', size: '▤', downloads: '↓', favorites: '☆', publishedAt: '◷' }; %>
+      <% for (const item of info) { %>
+      <div class="hao-info-row">
+        <span class="hao-info-icon" aria-hidden="true"><%= icons[item[0]] || '•' %></span>
+        <span class="hao-info-label" data-hao-label="<%= item[0] %>"></span>
+        <span class="hao-info-value"><%= item[1] %><% if (item[0] === 'color' && m.color_hex) { %><span class="hao-color-dot" style="background:<%= str(m.color_hex) %>"></span><% } %></span>
+      </div>
+      <% } %>
+    </div>
+    <% } %>
+    <% if (hasPublisher) { %>
+    <div class="hao-publisher">
+      <% if (publisherProfileUrl) { %><a class="hao-avatar" href="<%= publisherProfileUrl %>" target="_blank" rel="noopener noreferrer"><% } else { %><span class="hao-avatar"><% } %>
+        <% if (publisherAvatarUrl) { %><img src="<%= publisherAvatarUrl %>" alt=""><% } else { %><%= publisherInitial %><% } %>
+      <% if (publisherProfileUrl) { %></a><% } else { %></span><% } %>
+      <div class="hao-publisher-body">
+        <% if (publisherName) { %>
+          <% if (publisherProfileUrl) { %><a class="hao-publisher-name" href="<%= publisherProfileUrl %>" target="_blank" rel="noopener noreferrer"><%= publisherName %></a><% } else { %><span class="hao-publisher-name"><%= publisherName %></span><% } %>
+        <% } %>
+        <% if (publisherStats.length) { %>
+        <div class="hao-stats">
+          <% for (const stat of publisherStats) { %><span class="hao-stat"><span data-hao-label="<%= stat[0] %>"></span> <strong><%= stat[1] %></strong></span><% } %>
+        </div>
+        <% } %>
+        <% if (signature) { %><div class="hao-signature"><span data-hao-label="signature"></span><%= signature %></div><% } %>
+      </div>
+    </div>
+    <% } %>
+  </section>
+  <% } %>
+
+  <% if (tags.length) { %>
+  <section class="hao-tags" data-hao-panel="tags" aria-label="">
+    <h2 class="hao-section-title"><span aria-hidden="true">⌾</span><span data-hao-label="relatedTags"></span></h2>
+    <div class="hao-tag-list">
+      <% for (const tag of tags) { const tagUrl = 'https://haowallpaper.com/' + tagView + '?lbName=' + encodeURIComponent(tag); %>
+      <a class="hao-tag" href="<%= tagUrl %>" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⊛</span><span><%= tag %></span></a>
+      <% } %>
+    </div>
+  </section>
+  <% } %>
+</div>
+<% } %>
+<script>
+(function () {
+  function labels(locale) {
+    var lang = String(locale || 'en').toLowerCase();
+    if (lang === 'zhtw') return { category:'分類：', resolution:'解析度：', color:'色系：', size:'大小：', downloads:'下載量：', favorites:'收藏量：', publishedAt:'發布時間：', followers:'粉絲', shares:'分享', receivedDownloads:'獲載', signature:'簽名：', relatedTags:'相關標籤', detailsAria:'壁紙基本資訊與發布者', tagsAria:'相關標籤' };
+    if (lang === 'zh' || (lang.indexOf('zh') === 0 && lang.indexOf('tw') < 0)) return { category:'分类：', resolution:'分辨率：', color:'色系：', size:'大小：', downloads:'下载量：', favorites:'收藏量：', publishedAt:'发布时间：', followers:'粉丝', shares:'分享', receivedDownloads:'获载', signature:'签名：', relatedTags:'相关标签', detailsAria:'壁纸基本信息与发布者', tagsAria:'相关标签' };
+    if (lang === 'ja') return { category:'カテゴリ：', resolution:'解像度：', color:'色：', size:'サイズ：', downloads:'ダウンロード数：', favorites:'お気に入り数：', publishedAt:'公開日：', followers:'フォロワー', shares:'投稿', receivedDownloads:'DL獲得', signature:'自己紹介：', relatedTags:'関連タグ', detailsAria:'壁紙情報と投稿者', tagsAria:'関連タグ' };
+    if (lang === 'ko') return { category:'분류:', resolution:'해상도:', color:'색상:', size:'크기:', downloads:'다운로드:', favorites:'즐겨찾기:', publishedAt:'게시일:', followers:'팔로워', shares:'공유', receivedDownloads:'다운로드 획득', signature:'소개:', relatedTags:'관련 태그', detailsAria:'배경화면 정보 및 게시자', tagsAria:'관련 태그' };
+    return { category:'Category:', resolution:'Resolution:', color:'Color:', size:'Size:', downloads:'Downloads:', favorites:'Favorites:', publishedAt:'Published:', followers:'Followers', shares:'Shares', receivedDownloads:'Downloads received', signature:'Bio:', relatedTags:'Related tags', detailsAria:'Wallpaper details and publisher', tagsAria:'Related tags' };
+  }
+  function apply(locale) {
+    var lang = String(locale || 'en').toLowerCase();
+    var text = labels(locale);
+    var nodes = document.querySelectorAll('[data-hao-label]');
+    for (var i = 0; i < nodes.length; i++) {
+      var key = nodes[i].getAttribute('data-hao-label');
+      if (key && text[key] != null) nodes[i].textContent = text[key];
+    }
+    var details = document.querySelector('[data-hao-panel="details"]');
+    var tags = document.querySelector('[data-hao-panel="tags"]');
+    if (details) details.setAttribute('aria-label', text.detailsAria);
+    if (tags) tags.setAttribute('aria-label', text.tagsAria);
+    var empty = document.getElementById('hao-desc-empty');
+    if (empty) empty.textContent = lang.indexOf('zh') === 0 ? '暂无哲风壁纸详情元数据（请使用最新版插件重新抓取）。' : 'No Haowallpaper detail metadata (re-crawl with the latest plugin).';
+  }
+  function ready() {
+    if (window.__bridge && window.__bridge.getLocale) window.__bridge.getLocale().then(apply).catch(function () { apply('en'); });
+    else apply((navigator.language || 'en').split('-')[0]);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', ready);
+  else ready();
+})();
+</script>

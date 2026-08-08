@@ -1,6 +1,6 @@
 {
   "name": "pixai",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "private": true,
   "name.zh": "PixAI",
   "name.en": "PixAI",
@@ -389,19 +389,20 @@
       }
     },
     {
-      "key": "skip_artwork_pages",
+      "key": "start_page",
       "type": "int",
-      "name": "跳过作品页数",
-      "name.en": "Skip Artwork Pages",
-      "name.ja": "スキップする作品ページ数",
-      "name.ko": "건너뛸 작품 페이지 수",
-      "descripts": "每个模型/标签/全站从第 N+1 页开始下载（前 N 页仅翻页不下载）",
-      "descripts.en": "For each model/tag/global stream, download from page N+1 (first N pages only advance cursor)",
-      "descripts.ja": "各モデル/タグ/全サイトで N+1 ページ目からダウンロード（最初の N ページはカーソル進行のみ）",
-      "descripts.ko": "모델/태그/전체 스트림 각각 N+1 페이지부터 다운로드(앞 N 페이지는 커서 이동만)",
-      "default": 0,
-      "min": 0,
-      "max": 199,
+      "name": "起始页数",
+      "name.en": "Start Page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "descripts": "每个模型/标签/作者/全站的作品流从第 N 页开始下载（之前的页仅翻页不下载）",
+      "descripts.en": "For each model/tag/author/global artwork stream, download from page N (earlier pages only advance the cursor)",
+      "descripts.ja": "各モデル/タグ/作者/全サイトの作品ストリームを N ページ目からダウンロード（それ以前のページはカーソル進行のみ）",
+      "descripts.ko": "모델/태그/작가/전체 작품 스트림을 N페이지부터 다운로드(앞 페이지는 커서 이동만)",
+      "default": 1,
+      "min": 1,
+      "max": 200,
+      "width": 2,
       "when": {
         "crawl_type": [
           "global",
@@ -412,15 +413,20 @@
       }
     },
     {
-      "key": "max_global_pages",
+      "key": "end_page",
       "type": "int",
-      "name": "全站作品分页数",
-      "name.en": "Global Artwork Pages",
-      "name.ja": "全サイト作品ページ数",
-      "name.ko": "전체 작품 페이지 수",
+      "name": "结束页数",
+      "name.en": "End Page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "descripts": "全站作品流爬取到第 N 页为止（含该页）",
+      "descripts.en": "Crawl the global artwork stream up to page N, inclusive",
+      "descripts.ja": "全サイト作品ストリームを N ページ目まで取得（このページを含む）",
+      "descripts.ko": "전체 작품 스트림을 N페이지까지 수집(해당 페이지 포함)",
       "default": 5,
       "min": 1,
       "max": 200,
+      "width": 2,
       "when": {
         "crawl_type": [
           "global"

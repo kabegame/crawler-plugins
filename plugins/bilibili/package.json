@@ -1,6 +1,6 @@
 {
   "name": "bilibili",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",
@@ -38,6 +38,9 @@
       "name.zhtw": "模式",
       "descripts": "关键词搜索多篇专栏；单篇可填传统专栏链接（如 https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1）或图文帖 https://www.bilibili.com/opus/…",
       "descripts.en": "Keyword search; single mode: classic column URL (e.g. https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1) or opus https://www.bilibili.com/opus/…",
+      "descripts.ja": "キーワード検索では複数のコラムを検索します。単一モードでは従来のコラム URL（例：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1）または画像付き投稿 https://www.bilibili.com/opus/… を指定できます",
+      "descripts.ko": "키워드 검색으로 여러 칼럼을 검색합니다. 단일 모드에서는 기존 칼럼 URL(예: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1) 또는 이미지 게시물 https://www.bilibili.com/opus/… 을 입력할 수 있습니다",
+      "descripts.zhtw": "可依關鍵字搜尋多篇專欄；單篇模式可填傳統專欄連結（如 https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1）或圖文帖 https://www.bilibili.com/opus/…",
       "default": "search",
       "options": [
         {
@@ -68,6 +71,9 @@
       "name.zhtw": "專欄 ID 或連結",
       "descripts": "传统专栏：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 数字 id）；图文：https://www.bilibili.com/opus/… 或 15 位以上纯数字",
       "descripts.en": "Column: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (or cv id only); opus: https://www.bilibili.com/opus/… or long numeric id",
+      "descripts.ja": "従来のコラム：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（cv の数字 ID のみでも可）。画像付き投稿：https://www.bilibili.com/opus/… または 15 桁以上の数字 ID",
+      "descripts.ko": "기존 칼럼: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (cv 숫자 ID만 입력해도 됨); 이미지 게시물: https://www.bilibili.com/opus/… 또는 15자리 이상의 숫자 ID",
+      "descripts.zhtw": "傳統專欄：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 數字 ID）；圖文：https://www.bilibili.com/opus/… 或 15 位以上純數字",
       "default": "",
       "when": {
         "mode": [
@@ -85,6 +91,9 @@
       "name.zhtw": "搜尋關鍵字",
       "descripts": "专栏 Tab 搜索关键词（与 search.bilibili.com/article 一致）",
       "descripts.en": "Article search keyword",
+      "descripts.ja": "コラムタブの検索キーワード（search.bilibili.com/article と同じ）",
+      "descripts.ko": "칼럼 탭 검색 키워드(search.bilibili.com/article와 동일)",
+      "descripts.zhtw": "專欄分頁的搜尋關鍵字（與 search.bilibili.com/article 相同）",
       "default": "美图 壁纸",
       "when": {
         "mode": [
@@ -102,7 +111,11 @@
       "name.zhtw": "排序",
       "descripts": "搜索列表排序方式（写入 WBI search 请求）",
       "descripts.en": "Search result sort (WBI search/type)",
+      "descripts.ja": "検索結果の並び順（WBI search リクエストに指定）",
+      "descripts.ko": "검색 결과 정렬 방식(WBI search 요청에 적용)",
+      "descripts.zhtw": "搜尋結果的排序方式（寫入 WBI search 請求）",
       "default": "totalrank",
+      "width": 2,
       "when": {
         "mode": [
           "search"
@@ -161,7 +174,11 @@
       "name.zhtw": "分區",
       "descripts": "专栏分区筛选（对应搜索接口 category_id）",
       "descripts.en": "Article category filter (category_id)",
+      "descripts.ja": "コラムのカテゴリーフィルター（検索 API の category_id に対応）",
+      "descripts.ko": "칼럼 카테고리 필터(검색 API의 category_id에 해당)",
+      "descripts.zhtw": "專欄分區篩選（對應搜尋 API 的 category_id）",
       "default": "0",
+      "width": 2,
       "when": {
         "mode": [
           "search"
@@ -243,7 +260,12 @@
       "name.ko": "시작 페이지",
       "name.zhtw": "起始頁",
       "descripts": "从第几页开始（含）",
+      "descripts.en": "First page to crawl (inclusive)",
+      "descripts.ja": "取得を開始するページ（このページを含む）",
+      "descripts.ko": "수집을 시작할 페이지(해당 페이지 포함)",
+      "descripts.zhtw": "從第幾頁開始（含）",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -259,7 +281,12 @@
       "name.ko": "끝 페이지",
       "name.zhtw": "結束頁",
       "descripts": "到第几页结束（含）",
+      "descripts.en": "Last page to crawl (inclusive)",
+      "descripts.ja": "取得を終了するページ（このページを含む）",
+      "descripts.ko": "수집을 종료할 페이지(해당 페이지 포함)",
+      "descripts.zhtw": "到第幾頁結束（含）",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -275,7 +302,12 @@
       "name.ko": "페이지당 개수",
       "name.zhtw": "每頁條數",
       "descripts": "搜索 API 的 page_size（一般 20）",
-      "default": 20,
+      "descripts.en": "Search API page_size (usually 20)",
+      "descripts.ja": "検索 API の page_size（通常は 20）",
+      "descripts.ko": "검색 API의 page_size(일반적으로 20)",
+      "descripts.zhtw": "搜尋 API 的 page_size（通常為 20）",
+      "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -287,9 +319,14 @@
   "kbDoc": {
     "default": "README.md"
   },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
   "kbAssets": [
     "article-url.jpg",
-    "b-posts.png",
+    "banners/banner-b-posts.jpg",
+    "banners/banner-post.jpg",
+    "banners/banner-images.jpg",
     "images.png",
     "post-url.jpg",
     "src-bilibili.png"

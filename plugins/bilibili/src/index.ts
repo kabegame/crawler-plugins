@@ -3,6 +3,7 @@ import { md5, sleep } from "@kabegame/plugin-sdk";
 
 const {
   addProgress,
+  createImageMetadata,
   delHeader,
   downloadImage,
   requireCookie,
@@ -310,13 +311,14 @@ async function processOneCv(cvId, img, sub, perCv, searchDesc) {
   const repliesData = await fetchArticleReplies(cvId, img, sub);
   const subject = coerceStr(vd?.title);
   const metadata = buildArticleMetadata(vd, cvId, searchDesc, repliesData, imgs.length, "");
+  const metadataId = Number(createImageMetadata(metadata, null));
   const perImage = perCv / imgs.length;
   const cvPageUrl = `https://www.bilibili.com/read/cv${cvId}`;
   for (let index = 0; index < imgs.length; index += 1) {
     const name = imgs.length > 1
       ? `${subject || `cv${cvId}`}(${index + 1})`
       : (subject || `cv${cvId}`);
-    await downloadImage(imgs[index], { name, metadata, url: cvPageUrl });
+    await downloadImage(imgs[index], { name, metadata_id: metadataId, url: cvPageUrl });
     addProgress(perImage);
   }
 }
@@ -349,11 +351,12 @@ async function processOneOpus(opusId, perTotal, img, sub) {
   const metadata = vd
     ? buildArticleMetadata(vd, cvId, "", repliesData, imgs.length, opusId)
     : { source: "bilibili_opus", opus_id: opusId, total_image_count: imgs.length };
+  const metadataId = Number(createImageMetadata(metadata, null));
   const base = coerceStr(vd?.title) || `图文 ${opusId}`;
   const perImage = perTotal / imgs.length;
   for (let index = 0; index < imgs.length; index += 1) {
     const name = imgs.length > 1 ? `${base}(${index + 1})` : base;
-    await downloadImage(imgs[index], { name, metadata, url: pageUrl });
+    await downloadImage(imgs[index], { name, metadata_id: metadataId, url: pageUrl });
     addProgress(perImage);
   }
 }

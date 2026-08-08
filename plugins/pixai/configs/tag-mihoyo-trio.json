@@ -18,6 +18,6 @@
     ],
     "max_tag_artwork_pages": 3,
     "artwork_sort": "trending",
-    "skip_artwork_pages": 0
+    "start_page": 1
   }
 }

@@ -16,6 +16,6 @@
     "skip_model_pages": 0,
     "max_artwork_pages": 1,
     "artwork_sort": "trending",
-    "skip_artwork_pages": 0
+    "start_page": 1
   }
 }
