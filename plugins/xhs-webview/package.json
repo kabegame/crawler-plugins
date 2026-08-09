@@ -32,6 +32,9 @@
       "id": "content.res.mobile"
     }
   ],
+  "kbAssets": [
+    "banners/search-page.jpg"
+  ],
   "kbConfig": [
     {
       "key": "crawl_mode",
@@ -203,7 +206,7 @@
       "descripts.zhtw": "限制本次清單任務進入詳情頁的作品數，避免無限捲動。最多 500 筆。",
       "default": 50,
       "min": 1,
-      "max": 500,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "recommend",
@@ -230,7 +233,7 @@
       "descripts.zhtw": "清單頁向底部捲動以觸發用戶端延遲載入的次數。達到最多筆數後會提前停止。",
       "default": 5,
       "min": 0,
-      "max": 100,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "recommend",
@@ -256,6 +259,7 @@
       "descripts.ko": "동영상 게시물의 미디어 스트림을 다운로드합니다. 서명 없는 백업 URL을 우선하고 없으면 기본 URL을 사용합니다.",
       "descripts.zhtw": "下載影片作品的媒體串流；優先使用無簽名備用 URL，找不到時回退到主 URL。",
       "default": true,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "recommend",
@@ -282,6 +286,7 @@
       "descripts.ko": "이미지에 라이브 포토 스트림이 있으면 같은 이름의 MP4도 다운로드합니다. 일반 이미지는 추가 다운로드하지 않습니다.",
       "descripts.zhtw": "若圖片帶原況照片串流，同時下載同名 MP4。一般圖片不會額外下載。",
       "default": false,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "recommend",

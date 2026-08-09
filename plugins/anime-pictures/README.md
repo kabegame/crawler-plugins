@@ -19,11 +19,11 @@
  
 在 [anime-pictures.net](https://anime-pictures.net) 找到喜欢的图片
 
-![scsho](./scsho.png)
+![scsho](./banners/scsho.png)
 
 在此截图的左上角可以看到”原神”、“胡桃(原神)”等一系列标签。选择你喜欢的一个（比如"胡桃(原神)"）
 
-![hutao](./hutao.png)
+![hutao](./banners/hutao.png)
 
 把这里的 "胡桃(原神)" 填入标签，然后把你想要的起始结束页数填入，即可愉快玩耍啦
 

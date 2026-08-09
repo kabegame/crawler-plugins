@@ -25,4 +25,4 @@ This plugin fetches anime wallpapers from `konachan.net` and adds them to the do
 - Set a reasonable page range to avoid overloading the server.
 
 Enjoy～
-![img](./image.jpg)
+![img](./banners/image.jpg)

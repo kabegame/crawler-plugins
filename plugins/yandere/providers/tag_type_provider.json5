@@ -1,0 +1,37 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.yandere",
+  "name": "tag_type_provider",
+  "properties": {
+    "tag_type": { "type": "string", "default": "unknown", "optional": false }
+  },
+  "query": {
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"sidebar_tags\":[]}' END, '$.sidebar_tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') = ${properties.tag_type})"
+  },
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.display') AS TEXT)), '')) AS tag_name, COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.display') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), '')) AS display_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"sidebar_tags\":[]}' END, '$.sidebar_tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') = ${properties.tag_type} AND COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.display') AS TEXT)), '')) IS NOT NULL GROUP BY tag_name, display_name ORDER BY image_count DESC, tag_name ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_type": "${properties.tag_type}",
+        "tag_name": "${tag.tag_name}"
+      },
+      "meta": {
+         "isLeaf": true
+      }
+    }
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "tag_provider",
+      "properties": {
+        "tag_type": "${properties.tag_type}",
+        "tag_name": "${capture[1]}"
+      },
+      "meta": {
+         "isLeaf": true
+      }
+    }
+  }
+}

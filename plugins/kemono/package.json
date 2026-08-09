@@ -1,6 +1,6 @@
 {
   "name": "kemono",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "Kemono创作者内容",
   "name.en": "Kemonocreator content",
@@ -30,6 +30,9 @@
     {
       "id": "auth.needCookie"
     }
+  ],
+  "kbAssets": [
+    "banners/tag-search.jpg"
   ],
   "kbConfig": [
     {
@@ -97,7 +100,7 @@
       "descripts.ja": "https://kemono.cr/<service>/user/<uid> とその /post/<pid> 形式に対応。旧ドメイン kemono.su / kemono.party のリンクも認識します。",
       "descripts.ko": "https://kemono.cr/<service>/user/<uid> 및 /post/<pid> 형식을 지원하며, 구 도메인 kemono.su / kemono.party 링크도 인식합니다.",
       "descripts.zhtw": "支援 https://kemono.cr/<service>/user/<uid> 及其 /post/<pid> 形式；舊網域 kemono.su / kemono.party 的連結也可辨識。",
-      "default": "",
+      "width": 2,
       "when": {
         "source": [
           "link"
@@ -187,6 +190,7 @@
           "variable": "afdian"
         }
       ],
+      "width": 2,
       "when": {
         "source": [
           "creator"
@@ -206,7 +210,7 @@
       "descripts.ja": "選択したサービスのクリエイター ID を入力します。",
       "descripts.ko": "선택한 서비스의 크리에이터 ID를 입력합니다.",
       "descripts.zhtw": "填寫所選服務中的作者 ID。",
-      "default": "",
+      "width": 2,
       "when": {
         "source": [
           "creator"
@@ -228,7 +232,7 @@
       "descripts.zhtw": "從作者貼文列表的第幾頁開始，每頁 50 篇。收藏作者模式下，此範圍套用於每一位收藏作者。",
       "default": 1,
       "min": 1,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "creator",
@@ -252,7 +256,7 @@
       "descripts.zhtw": "爬取到作者帖子列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
       "default": 1,
       "min": 0,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "creator",
@@ -276,7 +280,7 @@
       "descripts.zhtw": "從收藏作者列表的第幾頁開始，每頁 50 位作者。與「作者頁數範圍」疊加生效。",
       "default": 1,
       "min": 1,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "fav_creator"
@@ -298,7 +302,7 @@
       "descripts.zhtw": "爬取到收藏作者列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
       "default": 1,
       "min": 0,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "fav_creator"
@@ -319,6 +323,7 @@
       "descripts.ja": "サイト全体のタグで取得します（例：nsfw、wip、comic、nude）。タグは大文字小文字を区別します。一覧は kemono.cr/posts/tags を参照。",
       "descripts.ko": "사이트 전체 태그로 수집합니다(예: nsfw, wip, comic, nude). 태그는 대소문자를 구분합니다. 전체 목록은 kemono.cr/posts/tags 참고.",
       "descripts.zhtw": "依站點標籤爬取全站貼文，例如 nsfw、wip、comic、nude。標籤區分大小寫。可在 kemono.cr/posts/tags 查看全部標籤。",
+      "width": "2",
       "when": {
         "source": [
           "tag"
@@ -340,7 +345,7 @@
       "descripts.zhtw": "從收藏／標籤的貼文列表的第幾頁開始，每頁 50 件。",
       "default": 1,
       "min": 1,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "fav_post",
@@ -363,7 +368,7 @@
       "descripts.zhtw": "爬取到收藏／標籤的貼文列表第幾頁（含該頁）。填 0 表示一直爬到最後一頁。",
       "default": 1,
       "min": 0,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "fav_post",
@@ -417,12 +422,20 @@
       "descripts.ja": "元の --banner に対応します。投稿の file メインファイルも添付に含めます。画像以外のメインファイルは無効時も保持されます。",
       "descripts.ko": "원본 --banner에 대응합니다. 게시물의 file 기본 파일도 첨부에 포함합니다. 이미지가 아닌 기본 파일은 꺼도 유지됩니다.",
       "descripts.zhtw": "對應原下載器的 --banner：把貼文的 file 主檔案也加入附件。非圖片主檔案即使關閉也會保留。",
-      "default": false
+      "default": false,
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "README.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
   },
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",

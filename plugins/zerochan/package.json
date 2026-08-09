@@ -1,0 +1,246 @@
+{
+  "name": "zerochan",
+  "version": "1.0.0",
+  "private": true,
+  "name.zh": "Zerochan 动漫图板",
+  "name.en": "Zerochan anime image board",
+  "name.ja": "Zerochan アニメ画像掲示板",
+  "name.ko": "Zerochan 애니메이션 이미지 보드",
+  "description": "Zerochan 动漫图板收集源插件，可浏览全站、单标签或任意关键词搜索，支持最新/人气排序",
+  "description.zh": "Zerochan 动漫图板收集源插件，可浏览全站、单标签或任意关键词搜索，支持最新/人气排序",
+  "description.en": "Zerochan image board crawler: browse everything, one tag, or any search query, sorted by recent or popular",
+  "description.ja": "Zerochan 画像掲示板の収集プラグイン。全体・タグ・任意のキーワード検索に対応し、新着／人気で並べ替えできます",
+  "description.ko": "Zerochan 이미지 보드 수집 플러그인. 전체·태그·임의 검색어를 지원하며 최신/인기 정렬이 가능합니다",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.zerochan.net",
+  "kbLabels": [
+    {
+      "id": "auth.needProxy"
+    },
+    {
+      "id": "content.res.desktop"
+    }
+  ],
+  "kbAssets": [
+    "banners/homepage.jpg",
+    "banners/images.jpg"
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "浏览全站、按单个站内标签，或用任意关键词搜索",
+      "descripts.en": "Browse everything, one on-site tag, or any free-text search query",
+      "descripts.ja": "全体を閲覧、サイト内タグ1件、または任意のキーワード検索",
+      "descripts.ko": "전체 탐색, 사이트 태그 1개, 또는 임의의 검색어",
+      "descripts.zhtw": "瀏覽全站、按單個站內標籤，或用任意關鍵詞搜尋",
+      "default": "tag",
+      "options": [
+        {
+          "name": "浏览全部",
+          "name.en": "Browse all",
+          "name.ja": "全部を閲覧",
+          "name.ko": "전체 탐색",
+          "name.zhtw": "瀏覽全部",
+          "variable": "all"
+        },
+        {
+          "name": "标签",
+          "name.en": "Tag",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tag"
+        },
+        {
+          "name": "搜索",
+          "name.en": "Search",
+          "name.ja": "検索",
+          "name.ko": "검색",
+          "name.zhtw": "搜尋",
+          "variable": "search"
+        }
+      ]
+    },
+    {
+      "key": "tag",
+      "type": "string",
+      "name": "标签",
+      "name.en": "Tag",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "descripts": "站内标签的规范名（英文），例如 Arknights、Hatsune Miku、Genshin Impact",
+      "descripts.en": "Canonical on-site tag name, e.g. Arknights, Hatsune Miku, Genshin Impact",
+      "descripts.ja": "サイト内タグの正式名称（英語）。例：Arknights、Hatsune Miku、Genshin Impact",
+      "descripts.ko": "사이트 태그의 정식 명칭(영문). 예: Arknights, Hatsune Miku, Genshin Impact",
+      "descripts.zhtw": "站內標籤的規範名（英文），例如 Arknights、Hatsune Miku、Genshin Impact",
+      "default": "Arknights",
+      "when": {
+        "crawl_mode": [
+          "tag"
+        ]
+      }
+    },
+    {
+      "key": "search_query",
+      "type": "string",
+      "name": "搜索词",
+      "name.en": "Search query",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색어",
+      "name.zhtw": "搜尋詞",
+      "descripts": "任意关键词，站点会跳到最匹配的标签并用剩余词继续过滤，例如 blue hair smile",
+      "descripts.en": "Any free text; the site jumps to the best matching tag and keeps filtering with the rest, e.g. blue hair smile",
+      "descripts.ja": "任意のキーワード。サイトは最も一致するタグへ移動し、残りの語で絞り込みます。例：blue hair smile",
+      "descripts.ko": "임의의 검색어. 사이트가 가장 일치하는 태그로 이동한 뒤 나머지 단어로 계속 필터링합니다. 예: blue hair smile",
+      "descripts.zhtw": "任意關鍵詞，站點會跳到最匹配的標籤並用剩餘詞繼續過濾，例如 blue hair smile",
+      "default": "Genshin Impact",
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "sort_order",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort",
+      "name.ja": "並べ替え",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "最新＝按上传时间倒序；人气＝按收藏数倒序",
+      "descripts.en": "Recent = newest uploads first; Popular = most favorited first",
+      "descripts.ja": "新着＝アップロード日時の新しい順、人気＝お気に入り数の多い順",
+      "descripts.ko": "최신 = 업로드 최신순, 인기 = 즐겨찾기 많은 순",
+      "descripts.zhtw": "最新＝按上傳時間倒序；人氣＝按收藏數倒序",
+      "default": "id",
+      "options": [
+        {
+          "name": "最新",
+          "name.en": "Recent",
+          "name.ja": "新着",
+          "name.ko": "최신",
+          "name.zhtw": "最新",
+          "variable": "id"
+        },
+        {
+          "name": "人气",
+          "name.en": "Popular",
+          "name.ja": "人気",
+          "name.ko": "인기",
+          "name.zhtw": "人氣",
+          "variable": "fav"
+        }
+      ],
+      "width": 1
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面，每页 48 条",
+      "descripts.en": "Start page to crawl from; 48 items per page",
+      "descripts.ja": "取得開始ページ。1ページあたり48件です",
+      "descripts.ko": "가져올 시작 페이지. 페이지당 48개입니다",
+      "descripts.zhtw": "要拉取的起始頁面，每頁 48 條",
+      "default": 1,
+      "min": 1,
+      "width": 1
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "descripts.en": "End page. Keep at most 100 pages per run.",
+      "descripts.ja": "終了ページ。1回あたり100ページ以内にしてください。",
+      "descripts.ko": "끝 페이지. 실행당 최대 100페이지로 제한됩니다.",
+      "descripts.zhtw": "要拉取的結束頁面。請保持最多爬取100頁，降低並發量文明爬取。否則拒絕爬取",
+      "default": 2,
+      "min": 1,
+      "width": 1
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "name": "质量",
+      "name.en": "Quality",
+      "name.ja": "画質",
+      "name.ko": "화질",
+      "name.zhtw": "畫質",
+      "descripts": "高=原图直链（站点原始文件），中=站点 1024px 的 webp 预览图",
+      "descripts.en": "High = original file, Medium = the site's 1024px webp preview",
+      "descripts.ja": "高＝オリジナルファイル、中＝サイトの 1024px webp プレビュー",
+      "descripts.ko": "고화질 = 원본 파일, 중간 = 사이트의 1024px webp 미리보기",
+      "descripts.zhtw": "高＝原圖直鏈（站點原始檔案），中＝站點 1024px 的 webp 預覽圖",
+      "default": "high",
+      "options": [
+        {
+          "name": "高",
+          "name.en": "High",
+          "name.ja": "高",
+          "name.ko": "고화질",
+          "name.zhtw": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "name.en": "Medium",
+          "name.ja": "中",
+          "name.ko": "중간",
+          "name.zhtw": "中",
+          "variable": "medium"
+        }
+      ],
+      "width": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/arknights-popular.json",
+    "configs/everything-recent.json",
+    "configs/search-genshin.json"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

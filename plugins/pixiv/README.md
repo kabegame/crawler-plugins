@@ -2,51 +2,15 @@
 
 本插件用于从 Pixiv 爬取插画，支持排行榜、个人收藏、画师作品、关键词搜索四种模式。
 
-## HTTP 头配置（必读）
+![home](./banners/home.jpg)
 
-Pixiv API 需要认证与 Referer。**Cookie 需在「高级设置 → HTTP 头」中填写**，不会作为插件变量注入。
-
-### 如何获取 Cookie
-
-### 方法一：通过浏览器复制
-
-1. 使用浏览器**登录(没有登陆就注册)** [pixiv.net](https://www.pixiv.net)
-
-![home](./images/home.png)
-
-2. 打开开发者工具（F12），切换到网络选项卡（图中标示的红色输入框）
-
-![console](./images/console.png)
-
-3. 按照下图步骤复制你的cookie
-
-![cookie](./images/cookie.png)
-
-4. 打开kabegame
-5. 在需要提供cookie的配置下，添加http头
-
-![header](./images/header-config.png)
-
-### 方法二：通过Kabegame畅游页面复制（更简单， 但需要在电脑上）
-1. 打开 Kabegame，进入畅游tab
-
-![kabegame-surf](./images/kabegame-surf.png)
-
-2. 从插件快速进入 -> 选择pixiv -> 点击“开始畅游”
-这时候会弹出pixiv的主页窗口，如果提示登录的话在这里登录
-
-![surf-pixiv](./images/surf-pixiv.png)
-
-3. 登录完毕之后点击查看网站cookie（不要关闭窗口），会弹出窗口，复制即可
-
-![cookie-dialog](./images/cookie-dialog.png)
-
-4. 愉快玩耍！
+## 登陆态
+请先从kabegame的畅游界面打开pixiv.net，这样就会自动以你的身份爬取啦。
 
 ### 如何获取用户 ID（自己的和画师的）
-很简单，直接在p站打开该用户主页
+通过畅游或者浏览器在p站打开用户主页
 
-![user](./images/user.png)
+![user](./images/user.jpg)
 
 然后在顶部链接处中间部位或者末尾部位你可以看到一串数字（图中红色框），这就是用户id啦
 

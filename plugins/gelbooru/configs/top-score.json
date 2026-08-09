@@ -1,0 +1,19 @@
+{
+  "name": "高分精选（评分排序）",
+  "name.en": "Top scored picks",
+  "name.ja": "高スコア厳選",
+  "name.ko": "高점수 엄선",
+  "name.zhtw": "高分精選（評分排序）",
+  "description": "全站按评分从高到低抓两页，都是站里被顶得最高的图，适合第一次铺底",
+  "description.en": "Crawl two pages of the whole site ordered by score; the highest-voted images, a good first fill.",
+  "description.ja": "サイト全体をスコア順に2ページ取得します。最も評価の高い画像なので初回の作り置きに最適です。",
+  "description.ko": "사이트 전체를 점수 순으로 두 페이지 수집합니다. 가장 높은 평가를 받은 이미지라 첫 채우기에 좋습니다.",
+  "description.zhtw": "全站按評分從高到低抓兩頁，都是站裡被頂得最高的圖，適合第一次鋪底",
+  "userConfig": {
+    "crawl_mode": "all",
+    "sort_order": "sort:score:desc",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

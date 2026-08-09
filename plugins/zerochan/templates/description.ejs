@@ -1,0 +1,427 @@
+<%
+const m = metadata || {};
+const tags = Array.isArray(m.tags) ? m.tags : [];
+const stats = m.stats && typeof m.stats === "object" ? m.stats : {};
+const share = m.share && typeof m.share === "object" ? m.share : null;
+const source = m.source && typeof m.source === "object" ? m.source : null;
+const mangaka = m.mangaka && typeof m.mangaka === "object" ? m.mangaka : null;
+const uploader = m.uploader && typeof m.uploader === "object" ? m.uploader : null;
+// 站点自己的分类顺序：作者 → 作品 → 角色 → 主题 → 来源，其余按原序垫底
+const TYPE_ORDER = ["mangaka", "studio", "artist", "series", "movie", "game", "vtuber", "character", "group", "outfit", "theme", "ecchi", "meta", "media", "source-copyright", "source", "artbook"];
+const orderOf = (type) => {
+  const index = TYPE_ORDER.indexOf(String(type || ""));
+  return index < 0 ? TYPE_ORDER.length : index;
+};
+const sortedTags = tags.slice().sort((a, b) => orderOf(a.type) - orderOf(b.type));
+const dimensions = Number(stats.width) > 0 && Number(stats.height) > 0
+  ? `${stats.width}×${stats.height}` + (stats.megapixels ? ` (${stats.megapixels}MP)` : "")
+  : "";
+const shareRows = share
+  ? [
+      { key: "directLink", name: "permalink", value: share.permalink },
+      { key: "bbcode", name: "bbthumb", value: share.bbcode },
+      { key: "htmlThumb", name: "htmlthumb", value: share.html },
+    ].filter((row) => row.value)
+  : [];
+%>
+<style>
+  /* zerochan 侧栏复刻：色板与 sprite 均取自站点自身样式表 */
+  .zc-menu {
+    font: 9pt "Trebuchet MS", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--anime-text-primary, #333);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+  .zc-menu * { box-sizing: border-box; }
+  .zc-credit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 9pt;
+    color: var(--anime-text-secondary, #777);
+    margin: 0 0 4px;
+  }
+  .zc-credit img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+  .zc-credit a { color: var(--anime-text-primary, #333); text-decoration: none; }
+  .zc-credit a:hover { text-decoration: underline; }
+  .zc-menu h2 {
+    margin: 15px 0 0;
+    padding-bottom: 2px;
+    border-bottom: 1px dotted #def;
+    text-align: right;
+    font: 12pt "Trebuchet MS", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #439;
+    font-weight: normal;
+  }
+  .zc-menu section:first-of-type h2 { margin-top: 4px; }
+
+  /* --- sprite --- */
+  .zc-menu s {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    background-image: url(https://static.zerochan.net/css_sprites.png?13);
+    background-size: 220px 220px;
+    background-repeat: no-repeat;
+    flex-shrink: 0;
+  }
+
+  /* --- tags --- */
+  .zc-tags { list-style: none; padding: 0; margin: 6px 0 0; }
+  .zc-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px 1px 4px;
+    margin: 0 0 2px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: #ddd;
+    color: #555;
+    transition: background .15s;
+  }
+  .zc-tag a { color: inherit; text-decoration: none; flex: 1 1 auto; min-width: 0; }
+  .zc-tag a:hover { text-decoration: underline; }
+  .zc-tag.is-fav { border-color: rgba(128, 128, 128, .5); }
+  .zc-tag.is-primary a { font-weight: bold; }
+  .zc-mangaka, .zc-artist { background: #faa; color: #800; }
+  .zc-studio { background: #fbb; color: #800; }
+  .zc-series, .zc-movie { background: #def; color: #46a; }
+  .zc-game { background: #eaccff; color: #80f; }
+  .zc-character, .zc-group { background: #dfb; color: #480; }
+  .zc-theme, .zc-tag-unknown { background: #ddd; color: #555; }
+  .zc-meta { background: #444; color: #ccc; }
+  .zc-artbook { background: #cceaea; color: #066; }
+  .zc-vtuber { background: #daccff; color: #959; }
+  .zc-ecchi { background: #ecd; color: #806; }
+  .zc-source { background: #aee; color: #066; }
+  .zc-media { background: #fca; color: #630; }
+  .zc-source-copyright { background: #ade; color: #056; }
+  .zc-outfit { background: #eec; color: #664; }
+  .zc-transformation { background: #ff8; color: #660; }
+
+  /* --- source url --- */
+  .zc-source-url {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0 0;
+  }
+  .zc-source-url a {
+    color: var(--anime-primary, #439);
+    text-decoration: none;
+    word-break: break-all;
+  }
+  .zc-source-url a:hover { text-decoration: underline; }
+
+  /* --- share --- */
+  .zc-share {
+    background: color-mix(in srgb, var(--anime-text-primary, #555) 6%, transparent);
+    border-radius: 8px;
+    padding: 5px 8px 8px;
+    margin: 8px 0 0;
+  }
+  .zc-share label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    font-size: 8.5pt;
+  }
+  .zc-share label:first-child { margin-top: 2px; }
+  .zc-share-row { display: flex; gap: 4px; align-items: stretch; }
+  .zc-share input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 4px;
+    margin: 3px 0;
+    font: inherit;
+    font-size: 8pt;
+    color: var(--anime-text-primary, #333);
+    background: var(--anime-bg-card, #fff);
+    border: 1px solid var(--anime-border, #ccc);
+    border-radius: 4px;
+  }
+  .zc-copy {
+    flex: 0 0 auto;
+    margin: 3px 0;
+    padding: 0 8px;
+    font: inherit;
+    font-size: 8pt;
+    cursor: pointer;
+    color: var(--anime-text-secondary, #666);
+    background: var(--anime-bg-card, #fff);
+    border: 1px solid var(--anime-border, #ccc);
+    border-radius: 4px;
+  }
+  .zc-copy:hover { color: var(--anime-primary, #439); }
+  .zc-copy.is-done { color: #480; border-color: #8c5; }
+
+  /* --- stats --- */
+  .zc-stats { list-style: none; padding: 0; margin: 8px 0 0; }
+  .zc-stats li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 2px 0;
+    border-bottom: 1px dotted var(--anime-border, #e2e2e2);
+  }
+  .zc-stats li:last-child { border-bottom: none; }
+  .zc-stats .zc-stat-label { color: var(--anime-text-secondary, #777); }
+  .zc-stats .zc-stat-value { font-weight: bold; }
+
+  .zc-empty { margin: 8px 0 0; color: var(--anime-text-secondary, #999); }
+
+  /* --- dark（宿主没给 dark class，运行时按 --anime-bg-card 亮度判定） --- */
+  .zc-menu[data-dark="1"] h2 { color: var(--anime-text-primary, #eee); border-bottom: 1px solid #444; }
+  .zc-menu[data-dark="1"] .zc-mangaka,
+  .zc-menu[data-dark="1"] .zc-artist,
+  .zc-menu[data-dark="1"] .zc-studio { background: #511; color: #faa; }
+  .zc-menu[data-dark="1"] .zc-series { background: #036; color: #acf; }
+  .zc-menu[data-dark="1"] .zc-movie { background: #048; color: #acf; }
+  .zc-menu[data-dark="1"] .zc-game { background: #417; color: #e8f; }
+  .zc-menu[data-dark="1"] .zc-character,
+  .zc-menu[data-dark="1"] .zc-group { background: #240; color: #8d9; }
+  .zc-menu[data-dark="1"] .zc-theme,
+  .zc-menu[data-dark="1"] .zc-tag-unknown { background: #282828; color: #bbb; }
+  .zc-menu[data-dark="1"] .zc-meta { background: #383838; color: #eee; }
+  .zc-menu[data-dark="1"] .zc-vtuber { background: #424; color: #c9c; }
+  .zc-menu[data-dark="1"] .zc-ecchi { background: #524; color: #f8f; }
+  .zc-menu[data-dark="1"] .zc-source,
+  .zc-menu[data-dark="1"] .zc-source-copyright,
+  .zc-menu[data-dark="1"] .zc-artbook { background: #144; color: #6cc; }
+  .zc-menu[data-dark="1"] .zc-media { background: #431; color: #dc8; }
+  .zc-menu[data-dark="1"] .zc-outfit { background: #431; color: #dc8; }
+  .zc-menu[data-dark="1"] .zc-transformation { background: #442; color: #ee8; }
+</style>
+<div class="zc-menu" id="zc-menu">
+  <% if (mangaka || uploader || m.uploaded_at) { %>
+    <p class="zc-credit">
+      <% if (mangaka && mangaka.name) { %>
+        <s class="zc-icon" data-zc-icon="mangaka"></s>
+        <span data-zc-lbl="mangaka">Mangaka</span>
+        <% if (mangaka.url) { %>
+          <a href="<%= mangaka.url %>"><%= mangaka.name %></a>
+        <% } else { %>
+          <span><%= mangaka.name %></span>
+        <% } %>
+      <% } %>
+      <% if (uploader && uploader.name) { %>
+        <span data-zc-lbl="uploadedBy">Uploaded by</span>
+        <% if (uploader.avatar) { %><img src="<%= uploader.avatar %>" alt="" /><% } %>
+        <% if (uploader.url) { %>
+          <a href="<%= uploader.url %>"><%= uploader.name %></a>
+        <% } else { %>
+          <span><%= uploader.name %></span>
+        <% } %>
+      <% } %>
+      <% if (m.uploaded_at) { %><span><%= m.uploaded_at %></span><% } %>
+    </p>
+  <% } %>
+
+  <section>
+    <h2 data-zc-lbl="tags">Tags</h2>
+    <% if (sortedTags.length) { %>
+      <ul class="zc-tags">
+        <% sortedTags.forEach(function (tag) { %>
+          <li class="zc-tag zc-<%= tag.type || "tag-unknown" %><%= tag.fav ? " is-fav" : "" %><%= tag.primary ? " is-primary" : "" %>"<% if (tag.by) { %> data-zc-by="<%= tag.by %>"<% } %>>
+            <s class="zc-icon" data-zc-icon="<%= tag.icon || tag.type || "tag" %>"></s>
+            <% if (tag.url) { %>
+              <a href="<%= tag.url %>"><%= tag.label || tag.tag %></a>
+            <% } else { %>
+              <span><%= tag.label || tag.tag %></span>
+            <% } %>
+          </li>
+        <% }); %>
+      </ul>
+    <% } else { %>
+      <p class="zc-empty" data-zc-lbl="noTags">No tags</p>
+    <% } %>
+  </section>
+
+  <% if (source && source.url) { %>
+    <section>
+      <h2 data-zc-lbl="sourceUrl">Source URL</h2>
+      <p class="zc-source-url">
+        <s class="zc-icon" data-zc-icon="<%= source.icon || "source" %>"></s>
+        <a href="<%= source.url %>"><%= source.url %></a>
+      </p>
+    </section>
+  <% } %>
+
+  <% if (shareRows.length) { %>
+    <section>
+      <h2 data-zc-lbl="share">Share</h2>
+      <form class="zc-share" onsubmit="return false;">
+        <% shareRows.forEach(function (row) { %>
+          <label data-zc-lbl="<%= row.key %>"><%= row.name %></label>
+          <span class="zc-share-row">
+            <input type="text" readonly name="<%= row.name %>" value="<%= row.value %>" />
+            <button type="button" class="zc-copy" data-zc-lbl="copy">Copy</button>
+          </span>
+        <% }); %>
+      </form>
+    </section>
+  <% } %>
+
+  <% if (dimensions || Number(stats.favorites) > 0 || Number(stats.tag_count) > 0 || m.file_size) { %>
+    <section>
+      <h2 data-zc-lbl="stats">Stats</h2>
+      <ul class="zc-stats">
+        <% if (dimensions) { %>
+          <li><span class="zc-stat-label" data-zc-lbl="dimensions">Dimensions</span><span class="zc-stat-value"><%= dimensions %></span></li>
+        <% } %>
+        <% if (m.file_size) { %>
+          <li><span class="zc-stat-label" data-zc-lbl="fileSize">File</span><span class="zc-stat-value"><%= m.file_size %><%= m.file_ext ? " " + m.file_ext : "" %></span></li>
+        <% } %>
+        <% if (Number(stats.favorites) > 0) { %>
+          <li><span class="zc-stat-label" data-zc-lbl="favorites">Favorites</span><span class="zc-stat-value"><%= stats.favorites %></span></li>
+        <% } %>
+        <% if (Number(stats.tag_count) > 0) { %>
+          <li><span class="zc-stat-label" data-zc-lbl="tagCount">Tags</span><span class="zc-stat-value"><%= stats.tag_count %></span></li>
+        <% } %>
+      </ul>
+    </section>
+  <% } %>
+</div>
+<script>
+(function () {
+  var root = document.getElementById("zc-menu");
+  if (!root) return;
+
+  // 站点 sprite 是 10×10 网格，位置表逐条抄自 zerochan 样式表
+  var SPRITE = {
+    binoculars:[0,0],block:[1,0],copy:[2,0],discord:[3,0],"discord-circle":[3,0],minimize:[4,0],
+    instagram:[5,0],paste:[6,0],color:[7,0],colors:[7,0],upload:[8,0],outfit:[9,0],
+    group:[0,1],profile:[1,1],darkmode:[2,1],secure:[3,1],game:[4,1],left:[5,1],"left-arrow":[5,1],
+    patreon:[6,1],search:[7,1],comment:[8,1],speech:[8,1],dice:[9,1],
+    trash:[0,2],trashcan:[0,2],deviantart:[1,2],goback:[2,2],back:[2,2],"unsafe-rating":[3,2],ecchi:[3,2],
+    google:[4,2],link:[5,2],chain:[5,2],notification:[6,2],notifications:[6,2],bell:[6,2],"bell-full":[6,2],
+    series:[7,2],book:[7,2],weibo:[8,2],download:[9,2],
+    edit:[0,3],pencil:[0,3],eyes:[1,3],eye:[1,3],subscribe:[2,3],heart:[2,3],"heart-full":[2,3],
+    unsubscribe:[3,3],"heart-empty":[3,3],character:[4,3],anonymous:[4,3],lofter:[5,3],whatsapp:[6,3],
+    settings:[7,3],cogwheel:[7,3],youtube:[8,3],vtuber:[8,3],logout:[9,3],
+    gumroad:[0,4],source:[1,4],"source-copyright":[1,4],hair:[2,4],comb:[2,4],history:[3,4],restore:[3,4],
+    recent:[3,4],hierarchy:[4,4],folders:[4,4],directories:[4,4],login:[5,4],mobile:[6,4],register:[7,4],
+    report:[8,4],flag:[8,4],desktop:[9,4],screen:[9,4],
+    admin:[0,5],custom:[0,5],mangaka:[1,5],media:[1,5],artist:[1,5],meta:[2,5],tags:[2,5],movie:[3,5],
+    multiple:[4,5],all:[5,5],pinterest:[6,5],forum:[7,5],"search-file":[7,5],zerochan:[8,5],filter:[9,5],
+    pixiv:[0,6],share:[1,6],"new-window":[2,6],message:[3,6],post:[3,6],star:[4,6],"star-minus":[4,6],
+    reddit:[5,6],"reddit-circle":[5,6],right:[6,6],"right-arrow":[6,6],"star-empty":[7,6],"star-plus":[7,6],
+    "reddit-blue":[8,6],swipe:[9,6],
+    studio:[0,7],theme:[1,7],tag:[1,7],update:[2,7],invert:[2,7],tumblr:[3,7],"x-com":[4,7],add:[5,7],
+    select:[6,7],reply:[7,7],up:[7,7],facebook:[8,7],"fb-circle":[8,7],"facebook-circle":[8,7],ai:[9,7],
+    bluesky:[0,8],check:[1,8],quote:[2,8],twitter:[3,8],"twitter-circle":[3,8],mention:[4,8],at:[4,8],
+    miyoushe:[5,8],artstation:[6,8],alert:[7,8],"bell-empty":[8,8],"multiple-full":[9,8],
+    primary:[0,9],crown:[0,9],alias:[1,9],paws:[1,9],manual:[2,9],lightning:[2,9],auto:[3,9],
+    "lightning-full":[3,9],gender:[4,9],animal:[5,9],paw:[5,9],jewelry:[6,9],hair2:[7,9],text:[8,9],sort:[9,9]
+  };
+
+  var icons = Array.prototype.slice.call(root.querySelectorAll("[data-zc-icon]"));
+  icons.forEach(function (el) {
+    var names = String(el.getAttribute("data-zc-icon") || "").split(/\s+/);
+    var pos = null;
+    for (var i = 0; i < names.length && !pos; i += 1) pos = SPRITE[names[i]] || null;
+    if (!pos) { el.style.display = "none"; return; }
+    el.style.backgroundPosition = (pos[0] * -100) + "% " + (pos[1] * -100) + "%";
+  });
+  // sprite 来自站点 CDN；拿不到（离线 / 被墙）就把图标位收掉，别留一排空白方块
+  var spriteProbe = new Image();
+  spriteProbe.onerror = function () {
+    icons.forEach(function (el) { el.style.display = "none"; });
+  };
+  spriteProbe.src = "https://static.zerochan.net/css_sprites.png?13";
+
+  var labels = {
+    en: { tags: "Tags", sourceUrl: "Source URL", share: "Share", stats: "Stats",
+      directLink: "Direct Link", bbcode: "BBCode/Forum Thumbnail", htmlThumb: "HTML Thumbnail",
+      dimensions: "Dimensions", fileSize: "File", favorites: "Favorites", tagCount: "Tags",
+      copy: "Copy", copied: "Copied", noTags: "No tags", mangaka: "Mangaka", uploadedBy: "Uploaded by", addedBy: "Added by %s" },
+    zh: { tags: "标签", sourceUrl: "来源 URL", share: "分享", stats: "状态",
+      directLink: "直链", bbcode: "BBCode/论坛缩略图", htmlThumb: "HTML 缩略图",
+      dimensions: "尺寸", fileSize: "文件", favorites: "收藏", tagCount: "标签数",
+      copy: "复制", copied: "已复制", noTags: "暂无标签", mangaka: "画师", uploadedBy: "上传者", addedBy: "由 %s 添加" },
+    zhtw: { tags: "標籤", sourceUrl: "來源 URL", share: "分享", stats: "狀態",
+      directLink: "直連", bbcode: "BBCode/論壇縮圖", htmlThumb: "HTML 縮圖",
+      dimensions: "尺寸", fileSize: "檔案", favorites: "收藏", tagCount: "標籤數",
+      copy: "複製", copied: "已複製", noTags: "暫無標籤", mangaka: "畫師", uploadedBy: "上傳者", addedBy: "由 %s 新增" },
+    ja: { tags: "タグ", sourceUrl: "ソース URL", share: "シェア", stats: "ステータス",
+      directLink: "直リンク", bbcode: "BBCode/フォーラム用サムネイル", htmlThumb: "HTML サムネイル",
+      dimensions: "サイズ", fileSize: "ファイル", favorites: "お気に入り", tagCount: "タグ数",
+      copy: "コピー", copied: "コピー済み", noTags: "タグなし", mangaka: "絵師", uploadedBy: "投稿者", addedBy: "%s が追加" },
+    ko: { tags: "태그", sourceUrl: "출처 URL", share: "공유", stats: "상태",
+      directLink: "직접 링크", bbcode: "BBCode/포럼 썸네일", htmlThumb: "HTML 썸네일",
+      dimensions: "크기", fileSize: "파일", favorites: "즐겨찾기", tagCount: "태그 수",
+      copy: "복사", copied: "복사됨", noTags: "태그 없음", mangaka: "작가", uploadedBy: "업로더", addedBy: "%s 추가" }
+  };
+
+  function pickLang(loc) {
+    var s = String(loc || "en").toLowerCase();
+    if (s === "zhtw" || s.indexOf("zh-tw") === 0 || s.indexOf("zh-hant") === 0) return "zhtw";
+    if (s.indexOf("zh") === 0) return "zh";
+    if (s.indexOf("ja") === 0) return "ja";
+    if (s.indexOf("ko") === 0) return "ko";
+    return "en";
+  }
+
+  var lb = labels.en;
+  function applyLabels() {
+    root.querySelectorAll("[data-zc-lbl]").forEach(function (el) {
+      var key = el.getAttribute("data-zc-lbl");
+      if (lb[key] != null) el.textContent = lb[key];
+    });
+    // 「谁加的这个标签」跟站点一样只做 hover 提示，不占一行
+    root.querySelectorAll("[data-zc-by]").forEach(function (el) {
+      el.title = lb.addedBy.replace("%s", el.getAttribute("data-zc-by") || "");
+    });
+  }
+
+  // 宿主 iframe 没有 dark class，按注入的 --anime-bg-card 亮度自行判定。
+  // 变量值可能是 #rgb / #rrggbb，所以过一个探测节点让浏览器归一成 rgb()。
+  function applyTheme() {
+    var probe = document.createElement("div");
+    probe.style.cssText = "position:absolute;left:-9999px;background:var(--anime-bg-card, #fff)";
+    document.body.appendChild(probe);
+    var color = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    var rgb = /(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(color) ||
+      /(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(getComputedStyle(document.body).backgroundColor);
+    if (!rgb) return;
+    var luma = (Number(rgb[1]) * 299 + Number(rgb[2]) * 587 + Number(rgb[3]) * 114) / 1000;
+    root.setAttribute("data-dark", luma < 128 ? "1" : "0");
+  }
+
+  root.querySelectorAll(".zc-copy").forEach(function (button) {
+    button.addEventListener("click", function () {
+      var input = button.parentElement && button.parentElement.querySelector("input");
+      if (!input) return;
+      input.select();
+      var done = function () {
+        button.textContent = lb.copied;
+        button.classList.add("is-done");
+        setTimeout(function () {
+          button.textContent = lb.copy;
+          button.classList.remove("is-done");
+        }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(done, function () {});
+        return;
+      }
+      try { if (document.execCommand("copy")) done(); } catch (_) {}
+    });
+  });
+
+  applyTheme();
+  applyLabels();
+  if (window.__bridge && window.__bridge.getLocale) {
+    window.__bridge.getLocale().then(function (loc) {
+      lb = labels[pickLang(loc)] || labels.en;
+      applyLabels();
+    }, function () {});
+  } else {
+    lb = labels[pickLang(navigator.language)] || labels.en;
+    applyLabels();
+  }
+})();
+</script>

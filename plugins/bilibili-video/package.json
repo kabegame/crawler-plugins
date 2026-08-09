@@ -29,6 +29,12 @@
       "id": "auth.needCookie"
     }
   ],
+  "kbAssets": [
+    "banners/bangumi-page.jpg",
+    "banners/bangumi-params.jpg",
+    "banners/downloads.jpg",
+    "banners/view.jpg"
+  ],
   "kbConfig": [
     {
       "key": "mode",
@@ -112,6 +118,7 @@
       "descripts": "整季（ss/md）时从正片第几集开始（1 起），配合「最多下载数」截断；单集（ep）忽略此项",
       "descripts.en": "For ss/md: 1-based index into the main episode list to start from, capped by \"Max videos\"; ignored for a single ep",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "bangumi"
@@ -243,7 +250,8 @@
           "name.zhtw": "最多收藏",
           "variable": "stow"
         }
-      ]
+      ],
+      "width": 2
     },
     {
       "key": "duration",
@@ -302,7 +310,8 @@
           "name.zhtw": "60 分鐘以上",
           "variable": "4"
         }
-      ]
+      ],
+      "width": 2
     },
     {
       "key": "order",
@@ -345,7 +354,8 @@
           "name.zhtw": "最多收藏",
           "variable": "stow"
         }
-      ]
+      ],
+      "width": 2
     },
     {
       "key": "start_page",
@@ -358,6 +368,7 @@
       "descripts": "从第几页开始（含）。UP 主 / 合集每页 30 个，搜索每页 20 个",
       "descripts.en": "First page (inclusive); 30 per page for uploader/collection, 20 for search",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "space",
@@ -377,6 +388,7 @@
       "descripts": "到第几页结束（含）",
       "descripts.en": "Last page (inclusive)",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "space",
@@ -396,6 +408,7 @@
       "descripts": "本次最多下几个视频。视频动辄上百 MB，默认保守取 5",
       "descripts.en": "Cap on videos downloaded this run. Videos are hundreds of MB each; defaults to a conservative 5",
       "default": 5,
+      "width": 1,
       "when": {
         "mode": [
           "space",
@@ -445,7 +458,8 @@
           "name.en": "360P",
           "variable": "16"
         }
-      ]
+      ],
+      "width": 1
     },
     {
       "key": "prefer_avc",
@@ -457,7 +471,8 @@
       "name.zhtw": "優先 H.264",
       "descripts": "优先选择 avc1 编码，兼容性最好；关闭则按画质选，可能得到 HEVC/AV1",
       "descripts.en": "Prefer avc1 for best compatibility; when off, pick purely by quality (may yield HEVC/AV1)",
-      "default": true
+      "default": true,
+      "width": 1
     },
     {
       "key": "page_index",
@@ -470,6 +485,7 @@
       "descripts": "从 1 开始；填 0 下载全部分 P。UP 主投稿模式固定只取 P1",
       "descripts.en": "1-based; use 0 to download every part. The uploader mode always takes P1 only",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "single"
@@ -486,7 +502,8 @@
       "name.zhtw": "間隔秒數",
       "descripts": "视频之间、翻页之间以及失败重试前的等待秒数。调小容易触发风控",
       "descripts.en": "Wait between videos, between list pages, and before a retry. Lower values invite rate limiting",
-      "default": 10
+      "default": 10,
+      "width": 1
     },
     {
       "key": "retries",
@@ -498,7 +515,8 @@
       "name.zhtw": "重試次數",
       "descripts": "单个视频失败后的重试次数，0 表示不重试",
       "descripts.en": "Retries per video after a failure; 0 disables retrying",
-      "default": 1
+      "default": 1,
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",

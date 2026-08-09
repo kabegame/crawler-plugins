@@ -1,0 +1,20 @@
+{
+  "name": "关键词搜索（原神）",
+  "name.en": "Search by keyword (Genshin Impact)",
+  "name.ja": "キーワード検索（原神）",
+  "name.ko": "키워드 검색(원신)",
+  "name.zhtw": "關鍵詞搜尋（原神）",
+  "description": "用任意关键词搜索：站点会跳到最匹配的标签，多词时用剩余词继续过滤",
+  "description.en": "Free-text search: the site jumps to the best matching tag and keeps filtering with the remaining words.",
+  "description.ja": "任意のキーワードで検索します。サイトは最も一致するタグへ移動し、残りの語で絞り込みます。",
+  "description.ko": "임의의 검색어로 검색합니다. 사이트가 가장 일치하는 태그로 이동한 뒤 나머지 단어로 필터링합니다.",
+  "description.zhtw": "用任意關鍵詞搜尋：站點會跳到最匹配的標籤，多詞時用剩餘詞繼續過濾",
+  "userConfig": {
+    "crawl_mode": "search",
+    "search_query": "Genshin Impact",
+    "sort_order": "fav",
+    "start_page": 1,
+    "end_page": 1,
+    "quality": "high"
+  }
+}

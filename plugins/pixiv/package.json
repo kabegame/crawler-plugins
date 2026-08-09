@@ -84,7 +84,8 @@
       "descripts.en": "When required: Bookmarks = target user UID (URL only, no x-user-id). Artist = your account UID (x-user-id, required). Ranking + R18 age = your account UID (x-user-id, required; Cookie in Advanced). Safe ranking and keyword: optional.",
       "descripts.ja": "必須になる場合：ブックマーク＝対象 UID（URL のみ）。作家＝ログイン UID（x-user-id 必須）。ランキング＋R18＝ログイン UID（x-user-id 必須・Cookie 要）。全年齢ランキング・キーワードは任意。",
       "descripts.ko": "필수 시점: 북마크=대상 UID(URL만). 작가=로그인 UID(x-user-id 필수). 랭킹+R18=로그인 UID(x-user-id·Cookie). 전연령 랭킹·키워드는 선택.",
-      "descripts.zhtw": "何時必填：收藏＝被爬取用戶 UID（僅 URL）；畫師＝登入帳號 UID（x-user-id）；排行榜且 R18＝登入 UID（x-user-id，並需 Cookie）。全齡排行榜、關鍵字可留空。"
+      "descripts.zhtw": "何時必填：收藏＝被爬取用戶 UID（僅 URL）；畫師＝登入帳號 UID（x-user-id）；排行榜且 R18＝登入 UID（x-user-id，並需 Cookie）。全齡排行榜、關鍵字可留空。",
+      "width": 1
     },
     {
       "key": "content_mode",
@@ -260,6 +261,7 @@
           }
         }
       ],
+      "width": 1,
       "when": {
         "source": [
           "ranking"
@@ -298,6 +300,7 @@
           "variable": "r18"
         }
       ],
+      "width": 1,
       "when": {
         "source": [
           "ranking"
@@ -328,6 +331,7 @@
       "descripts.ko": "비우면 최신 기간. YYYYMMDD: 일간은 해당일, 주간·월간은 해당일 기준 기간.",
       "descripts.zhtw": "留空為最新一期；填寫為 YYYYMMDD。日榜為當日；週榜、月榜以該日為基準向前一週或一月。",
       "default": "",
+      "width": 1,
       "when": {
         "source": [
           "ranking"
@@ -347,6 +351,7 @@
       "descripts.ja": "取得する作家の Pixiv UID",
       "descripts.ko": "수집할 작가의 Pixiv UID",
       "descripts.zhtw": "要爬取的畫師 Pixiv UID",
+      "width": 1,
       "when": {
         "source": [
           "user"
@@ -368,7 +373,7 @@
       "descripts.zhtw": "畫師作品從第幾頁開始爬取。依 Pixiv 畫師頁順序計算，每頁 48 個作品。",
       "default": 1,
       "min": 1,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "user"
@@ -390,7 +395,7 @@
       "descripts.zhtw": "畫師作品爬取到第幾頁，包含該頁。填 0 表示一直爬到最後一頁。",
       "default": 1,
       "min": 1,
-      "max": 100000,
+      "width": 1,
       "when": {
         "source": [
           "user"
@@ -451,6 +456,7 @@
           "variable": "all"
         }
       ],
+      "width": 2,
       "when": {
         "source": [
           "keyword"
@@ -489,6 +495,7 @@
           "variable": "popular"
         }
       ],
+      "width": 2,
       "when": {
         "source": [
           "keyword"
@@ -510,7 +517,7 @@
       "descripts.zhtw": "以「作品」計數（非單張圖）。腳本邊拉列表邊下載；漫畫多頁仍可能多檔，落盤檔數可能大於本值。詳見說明。",
       "default": 50,
       "min": 1,
-      "max": 1000,
+      "width": 1,
       "when": {
         "source": [
           "ranking",
@@ -529,14 +536,11 @@
     "zhtw": "README.zhtw.md"
   },
   "kbAssets": [
-    "images/console.png",
-    "images/cookie-dialog.png",
-    "images/cookie.png",
-    "images/header-config.png",
-    "images/home.png",
-    "images/kabegame-surf.png",
-    "images/surf-pixiv.png",
-    "images/user.png"
+    "banners/home.jpg",
+    "banners/post.jpg",
+    "banners/images.jpg",
+    "banners/preview.jpg",
+    "images/user.jpg"
   ],
   "kbRecommendedConfigs": [
     "configs/every-day-ranking-daily.json",

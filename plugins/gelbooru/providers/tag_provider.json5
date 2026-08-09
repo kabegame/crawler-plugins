@@ -1,0 +1,32 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.gelbooru",
+  "name": "tag_provider",
+  "properties": {
+    "tag_category": { "type": "string", "default": "unknown", "optional": false },
+    "tag_name": { "type": "string", "default": "", "optional": false }
+  },
+  "query": {
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') = ${properties.tag_category} AND COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.display') AS TEXT)), '')) = ${properties.tag_name})"
+  },
+  "list": {
+    "${out.name}": {
+          "child_var": "out",
+          "delegate": {
+              "provider": "kabegame.paginate100_provider",
+          },
+          "provider": "${out.provider}",
+          "meta": "${out.meta}"
+      }
+  },
+  "resolve": {
+    "desc|x[1-9][0-9]*x|[1-9][0-9]*": {
+      "delegate": {
+        "provider": "kabegame.gallery_desc_pagination_page_comb"
+      },
+      "child_var": "child",
+      "provider": "${child.provider}",
+      "meta": "${child.meta}"
+    }
+  }
+}

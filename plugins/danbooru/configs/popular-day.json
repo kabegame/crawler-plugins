@@ -1,0 +1,19 @@
+{
+  "name": "每日人气榜（前两页）",
+  "name.en": "Daily popular (first two pages)",
+  "name.ja": "デイリー人気ランキング（最初の2ページ）",
+  "name.ko": "일간 인기 순위(첫 두 페이지)",
+  "name.zhtw": "每日人氣榜（前兩頁）",
+  "description": "抓取当天人气榜前两页，约 40 张原图，适合每天定时补新图",
+  "description.en": "Crawl the first two pages of today's popular ranking (about 40 originals); a good daily refill.",
+  "description.ja": "当日の人気ランキング上位2ページ（約40枚のオリジナル）を取得します。毎日の追加に最適です。",
+  "description.ko": "당일 인기 순위 상위 2페이지(약 40장 원본)를 수집합니다. 매일 채우기에 적합합니다.",
+  "description.zhtw": "抓取當天人氣榜前兩頁，約 40 張原圖，適合每天定時補新圖",
+  "userConfig": {
+    "crawl_mode": "popular",
+    "popular_scale": "day",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

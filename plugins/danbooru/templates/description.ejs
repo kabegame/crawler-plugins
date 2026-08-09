@@ -1,0 +1,219 @@
+<% const m = metadata || {}; %>
+<% const tags = Array.isArray(m.tags) ? m.tags : []; %>
+<% const commentary = m.commentary && typeof m.commentary === 'object' ? m.commentary : null; %>
+<% const tagsString = m.tags_string ? String(m.tags_string) : tags.map(function (t) { return t && t.name ? String(t.name) : ''; }).filter(Boolean).join(' '); %>
+<% const CATEGORY_ORDER = ['artist', 'copyright', 'character', 'general', 'meta']; %>
+<% const CATEGORY_LABELS = { artist: 'Artist', copyright: 'Copyright', character: 'Character', general: 'General', meta: 'Meta' }; %>
+<%
+  const grouped = {};
+  tags.forEach(function (t) {
+    if (!t) return;
+    const ty = (t.type && /^[a-z0-9_]+$/i.test(String(t.type))) ? String(t.type) : 'general';
+    (grouped[ty] || (grouped[ty] = [])).push(t);
+  });
+  const categories = CATEGORY_ORDER.filter(function (c) { return grouped[c] && grouped[c].length; })
+    .concat(Object.keys(grouped).filter(function (c) { return CATEGORY_ORDER.indexOf(c) < 0; }));
+%>
+<% const dims = (m.width && m.height) ? (m.width + '×' + m.height) : ''; %>
+<% const hasStats = !!(m.post_id || m.rating || (m.score != null && String(m.score) !== '') || m.fav_count || m.file_size || dims || m.uploader_name || m.source_href || m.posted_date_text); %>
+<style>
+.db-sidebar{font-size:0.875rem;line-height:1.45;color:var(--anime-text-primary,#e5e7eb);}
+.db-block{margin-bottom:1em;}
+.db-h5{margin:0 0 0.35em;font-size:0.82rem;font-weight:600;color:var(--anime-text-secondary,#9ca3af);}
+.db-cat{margin:0 0 0.55em;}
+.db-cat-title{margin:0 0 0.15em;font-size:0.72rem;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:var(--anime-text-secondary,#6b7280);}
+.db-tag-list{list-style:none;margin:0;padding:0;font-size:0.85em;}
+.db-tag-list li{margin:0.12em 0;line-height:1.35;}
+.db-tag-list a{text-decoration:none;}
+.db-tag-list a:hover{text-decoration:underline;}
+.db-tag-list .wiki-link{color:var(--anime-text-secondary,#6b7280);margin-right:0.35em;}
+.db-tag-list .post-count{color:var(--anime-text-secondary,#6b7280);margin-left:0.3em;font-size:0.9em;}
+.db-tag-list .tag-type-artist .search-tag{color:#c026d3;}
+.db-tag-list .tag-type-copyright .search-tag{color:#db2777;}
+.db-tag-list .tag-type-character .search-tag{color:#16a34a;}
+.db-tag-list .tag-type-meta .search-tag{color:#ea580c;}
+.db-tag-list .tag-type-general .search-tag{color:var(--anime-text-primary,#e5e7eb);}
+.db-tag-list .deprecated{opacity:0.55;text-decoration:line-through;}
+.db-prompt{margin:0.35em 0 0;}
+.db-prompt-box{width:100%;box-sizing:border-box;min-height:4.5em;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.72rem;line-height:1.4;padding:0.45em 0.55em;border-radius:4px;border:1px solid color-mix(in srgb,var(--anime-border,#374151) 65%,transparent);background:color-mix(in srgb,var(--anime-bg-secondary,#111827) 70%,transparent);color:var(--anime-text-primary,#e5e7eb);}
+.db-prompt-actions{display:flex;align-items:center;gap:0.5em;margin-top:0.3em;}
+.db-copy-btn{font-size:0.72rem;padding:0.2em 0.6em;border-radius:4px;cursor:pointer;border:1px solid color-mix(in srgb,var(--anime-border,#374151) 65%,transparent);background:transparent;color:var(--anime-text-secondary,#9ca3af);}
+.db-copy-btn:hover{color:var(--anime-text-primary,#e5e7eb);}
+.db-copy-hint{font-size:0.68rem;color:var(--anime-text-secondary,#6b7280);}
+.db-stats ul{list-style:none;margin:0;padding:0;}
+.db-stats ul > li{margin:0.2em 0;}
+.db-stats a{color:var(--anime-primary,#a78bfa);text-decoration:none;}
+.db-stats a:hover{text-decoration:underline;}
+.db-src-short{display:inline-block;max-width:12rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;}
+.db-commentary-title{margin:0 0 0.25em;font-size:0.82rem;font-weight:600;}
+.db-commentary-body{margin:0;font-size:0.8rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;}
+.db-crawl-hint{display:none;margin:0.75em 0 0;padding-top:0.5em;border-top:1px solid color-mix(in srgb,var(--anime-border,#374151) 55%,transparent);font-size:0.72rem;line-height:1.4;color:var(--anime-text-secondary,#9ca3af);}
+</style>
+<div class="db-sidebar">
+  <% if (tagsString) { %>
+  <div class="db-block db-prompt">
+    <h5 class="db-h5">Prompt</h5>
+    <textarea class="db-prompt-box" id="db-prompt-box" readonly spellcheck="false"><%= tagsString %></textarea>
+    <div class="db-prompt-actions">
+      <button type="button" class="db-copy-btn" id="db-copy-btn">Copy</button>
+      <span class="db-copy-hint"><%= tags.length %> tags</span>
+    </div>
+  </div>
+  <% } %>
+
+  <% if (categories.length) { %>
+  <div class="db-block">
+    <h5 class="db-h5">Tags</h5>
+    <% categories.forEach(function (cat) { %>
+    <div class="db-cat">
+      <p class="db-cat-title"><%= CATEGORY_LABELS[cat] || cat %></p>
+      <ul class="db-tag-list">
+        <% grouped[cat].forEach(function (t) {
+             const disp = t.display ? String(t.display) : String(t.name || '');
+             if (!disp) return;
+        %>
+        <li class="tag-type-<%= cat %><%= t.deprecated ? ' deprecated' : '' %>" data-name="<%= String(t.name || '').replace(/"/g, '&quot;') %>">
+          <% if (t.wiki_href) { %>
+            <a class="wiki-link" href="<%= t.wiki_href %>" target="_blank" rel="noopener noreferrer">?</a>
+          <% } %>
+          <% if (t.post_href) { %>
+            <a class="search-tag" href="<%= t.post_href %>" target="_blank" rel="noopener noreferrer"><%= disp %></a>
+          <% } else { %>
+            <span class="search-tag"><%= disp %></span>
+          <% } %>
+          <% if (t.count != null && String(t.count) !== '') { %>
+            <span class="post-count"><%= t.count %></span>
+          <% } %>
+        </li>
+        <% }); %>
+      </ul>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <% if (hasStats) { %>
+  <div class="db-block db-stats">
+    <h5 class="db-h5">Statistics</h5>
+    <ul>
+      <% if (m.post_id) { %>
+      <li>Id: <%= m.post_id %></li>
+      <% } %>
+      <% if (m.uploader_name) { %>
+      <li>
+        Uploader:
+        <% if (m.uploader_href) { %>
+          <a href="<%= m.uploader_href %>" target="_blank" rel="noopener noreferrer"><%= m.uploader_name %></a>
+        <% } else { %>
+          <%= m.uploader_name %>
+        <% } %>
+      </li>
+      <% } %>
+      <% if (m.posted_date_text || m.posted_date_iso) { %>
+      <li>
+        Date:
+        <% if (m.posted_date_href) { %>
+          <a href="<%= m.posted_date_href %>" target="_blank" rel="noopener noreferrer"<% if (m.posted_date_title) { %> title="<%= String(m.posted_date_title).replace(/"/g, '&quot;') %>"<% } %>><%= m.posted_date_text || m.posted_date_iso %></a>
+        <% } else { %>
+          <%= m.posted_date_text || m.posted_date_iso %>
+        <% } %>
+      </li>
+      <% } %>
+      <% if (m.file_size || dims || m.file_ext) { %>
+      <li>Size: <%= m.file_size || '' %><% if (m.file_ext) { %> .<%= m.file_ext %><% } %><% if (dims) { %> (<%= dims %>)<% } %></li>
+      <% } %>
+      <% if (m.source_href) { %>
+      <li>Source: <a href="<%= m.source_href %>" target="_blank" rel="noopener noreferrer" class="db-src-short"><%= m.source_text || m.source_href %></a></li>
+      <% } %>
+      <% if (m.rating) { %>
+      <li>Rating: <%= m.rating %></li>
+      <% } %>
+      <% if (m.score != null && String(m.score) !== '') { %>
+      <li>Score: <%= m.score %></li>
+      <% } %>
+      <% if (m.fav_count != null && String(m.fav_count) !== '') { %>
+      <li>Favorites: <%= m.fav_count %></li>
+      <% } %>
+      <% if (m.original_href) { %>
+      <li>Original: <a href="<%= m.original_href %>" target="_blank" rel="noopener noreferrer" class="db-src-short"><%= m.original_href %></a></li>
+      <% } %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (commentary && (commentary.title || commentary.body)) { %>
+  <div class="db-block">
+    <h5 class="db-h5">Artist Commentary</h5>
+    <% if (commentary.title) { %>
+    <p class="db-commentary-title"><%= commentary.title %></p>
+    <% } %>
+    <% if (commentary.body) { %>
+    <p class="db-commentary-body"><%= commentary.body %></p>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (tags.length || hasStats || commentary) { %>
+  <p class="db-crawl-hint" id="db-crawl-snapshot-hint" role="note"></p>
+  <% } %>
+</div>
+<script>
+(function () {
+  function snapshotHint(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') {
+      return '此側欄（含發帖時間、分數等文案）為抓取當下頁面快照，與目前瀏覽時刻或站台現狀可能不一致。';
+    }
+    if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
+      return '此侧栏（含发帖时间、分数等文案）为抓取当时页面快照，与当前浏览时刻或站点现状可能不一致。';
+    }
+    if (s === 'ja') {
+      return 'このサイドバー（投稿時刻やスコアを含む）は取得時点のページのスナップショットです。現在の状態とは一致しない場合があります。';
+    }
+    if (s === 'ko') {
+      return '이 사이드바(게시 시각·점수 포함)는 수집 시점의 페이지 스냅샷입니다. 현재 상태와 다를 수 있습니다.';
+    }
+    return 'This sidebar (including posted time and score) is a snapshot from when the image was downloaded; it may not match the live site.';
+  }
+  function copyLabel(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s.indexOf('zh') === 0) return ['复制', '已复制'];
+    if (s === 'ja') return ['コピー', 'コピーしました'];
+    if (s === 'ko') return ['복사', '복사됨'];
+    return ['Copy', 'Copied'];
+  }
+  function onReady() {
+    var hint = document.getElementById('db-crawl-snapshot-hint');
+    var btn = document.getElementById('db-copy-btn');
+    var box = document.getElementById('db-prompt-box');
+
+    function apply(loc) {
+      if (hint) {
+        hint.textContent = snapshotHint(loc);
+        hint.style.display = 'block';
+      }
+      if (btn) {
+        var labels = copyLabel(loc);
+        btn.textContent = labels[0];
+        btn.onclick = function () {
+          if (!box) return;
+          box.select();
+          // iframe 里 navigator.clipboard 常被权限策略挡掉，execCommand 是可靠回落
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+          btn.textContent = ok ? labels[1] : labels[0];
+          setTimeout(function () { btn.textContent = labels[0]; }, 1500);
+        };
+      }
+    }
+
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(apply).catch(function () { apply('en'); });
+    } else {
+      apply((navigator.language || 'en').split('-')[0]);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
+})();
+</script>

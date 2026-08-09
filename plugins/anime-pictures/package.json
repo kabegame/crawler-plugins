@@ -27,6 +27,21 @@
   ],
   "kbConfig": [
     {
+      "key": "tag",
+      "type": "string",
+      "name": "标签",
+      "name.en": "Tag",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "descripts": "要拉取的标签（默认无标签爬全站）",
+      "descripts.en": "Tag to filter (empty = all)",
+      "descripts.ja": "フィルター用タグ（空欄で全件）",
+      "descripts.ko": "필터 태그 (비우면 전체)",
+      "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）",
+      "default": ""
+    },
+    {
       "key": "startPage",
       "type": "int",
       "name": "起始页面",
@@ -41,7 +56,7 @@
       "descripts.zhtw": "要拉取的起始頁面",
       "default": 0,
       "min": 0,
-      "max": null
+      "width": 1
     },
     {
       "key": "endPage",
@@ -58,22 +73,7 @@
       "descripts.zhtw": "要拉取的結束頁面",
       "default": 5,
       "min": 0,
-      "max": null
-    },
-    {
-      "key": "tag",
-      "type": "string",
-      "name": "标签",
-      "name.en": "Tag",
-      "name.ja": "タグ",
-      "name.ko": "태그",
-      "name.zhtw": "標籤",
-      "descripts": "要拉取的标签（默认无标签爬全站）",
-      "descripts.en": "Tag to filter (empty = all)",
-      "descripts.ja": "フィルター用タグ（空欄で全件）",
-      "descripts.ko": "필터 태그 (비우면 전체)",
-      "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）",
-      "default": ""
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",
@@ -86,8 +86,9 @@
   },
   "kbAssets": [
     "doc-icon.png",
-    "hutao.png",
-    "scsho.png",
+    "banners/hutao.png",
+    "banners/scsho.png",
+    "banners/images.jpg",
     "icon.png"
   ],
   "kbRecommendedConfigs": [

@@ -1,0 +1,525 @@
+{
+  "name": "yandere",
+  "version": "1.0.0",
+  "private": true,
+  "name.zh": "yande.re 动漫壁纸",
+  "name.en": "yande.re anime wallpapers",
+  "name.ja": "yande.re アニメ壁紙",
+  "name.ko": "yande.re 애니메이션 벽지",
+  "name.zhtw": "yande.re 動漫桌布",
+  "description": "yande.re 高分辨率动漫壁纸收集源插件，带侧栏标签与评论区元数据",
+  "description.zh": "yande.re 高分辨率动漫壁纸收集源插件，带侧栏标签与评论区元数据",
+  "description.en": "yande.re high-resolution anime wallpaper crawler plugin with sidebar tags and comments metadata",
+  "description.ja": "yande.re の高解像度アニメ壁紙収集プラグイン（サイドバータグとコメント付き）",
+  "description.ko": "yande.re 고해상도 애니메이션 벽지 수집 플러그인 (사이드바 태그 및 댓글 포함)",
+  "description.zhtw": "yande.re 高解析度動漫桌布收集源插件，附側欄標籤與留言區中繼資料",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://yande.re",
+  "kbLabels": [
+    { "id": "auth.needProxy" },
+    { "id": "content.res.desktop" },
+    { "id": "content.nsfw" }
+  ],
+  "kbAssets": [
+    "banners/homepage.jpg",
+    "banners/images.jpg"
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "爬取模式，分为全部、标签和标签列表",
+      "descripts.en": "Crawl mode: all, tags or tag list",
+      "descripts.ja": "クロールモード：全部・タグ・タグ一覧",
+      "descripts.ko": "크롤 모드: 전체·태그·태그 목록",
+      "descripts.zhtw": "爬取模式，分為全部、標籤和標籤列表",
+      "default": "all",
+      "options": [
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "全部",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "标签",
+          "name.en": "Tags",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tags"
+        },
+        {
+          "name": "标签列表",
+          "name.en": "Tag list",
+          "name.ja": "タグ一覧",
+          "name.ko": "태그 목록",
+          "name.zhtw": "標籤列表",
+          "variable": "tag_list"
+        }
+      ]
+    },
+    {
+      "key": "mode_tag_value",
+      "type": "list",
+      "name": "标签组合",
+      "name.en": "Tag combination",
+      "name.ja": "タグ組み合わせ",
+      "name.ko": "태그 조합",
+      "name.zhtw": "標籤組合",
+      "descripts": "输入多个标签（列表），运行时会用+连接；标签中的空格会自动转为下划线_",
+      "descripts.en": "Input multiple tags as a list; runtime joins them with + and converts spaces to _",
+      "descripts.ja": "複数タグをリストで入力。実行時に + で連結し、空白は _ に変換します",
+      "descripts.ko": "여러 태그를 목록으로 입력합니다. 실행 시 + 로 결합하며 공백은 _ 로 변환됩니다",
+      "descripts.zhtw": "輸入多個標籤（列表），執行時會用 + 連接，標籤中的空格會自動轉為下劃線_",
+      "default": [
+        "genshin_impact",
+        "bikini"
+      ],
+      "options": null,
+      "when": {
+        "crawl_mode": [
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "rating",
+      "type": "options",
+      "name": "分级过滤",
+      "name.en": "Rating filter",
+      "name.ja": "レーティング絞り込み",
+      "name.ko": "등급 필터",
+      "name.zhtw": "分級過濾",
+      "descripts": "按站点分级过滤，实现上是把 rating: 元标签拼进搜索串。站内成人内容与全年龄内容混排，只想要干净图选「全年龄」",
+      "descripts.en": "Filter by site rating; implemented as the rating: metatag in the search string. The site mixes adult and all-ages content — pick Safe for clean images",
+      "descripts.ja": "サイトのレーティングで絞り込みます（rating: メタタグを検索文字列に付加）。成人向けと全年齢が混在するため、健全な画像だけなら Safe を選んでください",
+      "descripts.ko": "사이트 등급으로 필터링합니다(rating: 메타태그를 검색 문자열에 추가). 성인물과 전연령물이 섞여 있으므로 건전한 이미지만 원하면 Safe를 선택하세요",
+      "descripts.zhtw": "依站台分級過濾，實作上是把 rating: 元標籤拼進搜尋串。站內成人內容與全年齡內容混排，只想要乾淨圖請選「全年齡」",
+      "default": "",
+      "options": [
+        {
+          "name": "不限",
+          "name.en": "Any",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "不限",
+          "variable": ""
+        },
+        {
+          "name": "全年龄(Safe)",
+          "name.en": "Safe",
+          "name.ja": "全年齢 (Safe)",
+          "name.ko": "전체 이용가 (Safe)",
+          "name.zhtw": "全年齡(Safe)",
+          "variable": "safe"
+        },
+        {
+          "name": "存疑(Questionable)",
+          "name.en": "Questionable",
+          "name.ja": "際どい (Questionable)",
+          "name.ko": "애매함 (Questionable)",
+          "name.zhtw": "存疑(Questionable)",
+          "variable": "questionable"
+        },
+        {
+          "name": "限制级(Explicit)",
+          "name.en": "Explicit",
+          "name.ja": "露骨 (Explicit)",
+          "name.ko": "노골적 (Explicit)",
+          "name.zhtw": "限制級(Explicit)",
+          "variable": "explicit"
+        }
+      ]
+    },
+    {
+      "key": "sort_order",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort order",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "结果排序，实现上是把 order: 元标签拼进搜索串。留空为站点默认（最新发布优先）",
+      "descripts.en": "Result order, implemented as the order: metatag in the search string. Empty means site default (newest first)",
+      "descripts.ja": "結果の並び順（order: メタタグを検索文字列に付加）。空欄はサイト既定（新着順）です",
+      "descripts.ko": "결과 정렬(order: 메타태그를 검색 문자열에 추가). 비워두면 사이트 기본값(최신순)입니다",
+      "descripts.zhtw": "結果排序，實作上是把 order: 元標籤拼進搜尋串。留空為站台預設（最新發布優先）",
+      "default": "",
+      "options": [
+        {
+          "name": "最新发布",
+          "name.en": "Newest",
+          "name.ja": "新着順",
+          "name.ko": "최신순",
+          "name.zhtw": "最新發布",
+          "variable": ""
+        },
+        {
+          "name": "高分优先",
+          "name.en": "Highest score",
+          "name.ja": "スコア順",
+          "name.ko": "점수 높은 순",
+          "name.zhtw": "高分優先",
+          "variable": "order:score"
+        },
+        {
+          "name": "分辨率优先",
+          "name.en": "Largest resolution",
+          "name.ja": "解像度順",
+          "name.ko": "해상도 순",
+          "name.zhtw": "解析度優先",
+          "variable": "order:mpixels"
+        },
+        {
+          "name": "随机",
+          "name.en": "Random",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "order:random"
+        }
+      ]
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面，每页固定 40 张",
+      "descripts.en": "Start page to crawl from; the site serves 40 posts per page",
+      "descripts.ja": "取得開始ページ。1ページあたり40枚固定です",
+      "descripts.ko": "가져올 시작 페이지. 페이지당 40장 고정입니다",
+      "descripts.zhtw": "要拉取的起始頁面，每頁固定 40 張",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "descripts.en": "End page. Keep at most 100 pages per run.",
+      "descripts.ja": "終了ページ。1回あたり100ページ以内にしてください。",
+      "descripts.ko": "끝 페이지. 실행당 최대 100페이지로 제한됩니다.",
+      "descripts.zhtw": "要拉取的結束頁面。請保持最多爬取100頁，降低並發量文明爬取。否則拒絕爬取",
+      "default": 5,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "tag",
+      "type": "string",
+      "name": "标签匹配式",
+      "name.en": "Tag pattern",
+      "name.ja": "タグ検索式",
+      "name.ko": "태그 검색식",
+      "name.zhtw": "標籤匹配式",
+      "descripts": "标签列表模式下按名称匹配标签，可用*作为通配符（默认：genshin）",
+      "descripts.en": "Tag name pattern for tag list mode, use * as wildcard (default: genshin)",
+      "descripts.ja": "タグ一覧モードで使う名前の検索式。* をワイルドカードとして使えます（デフォルト：genshin）",
+      "descripts.ko": "태그 목록 모드에서 사용할 이름 검색식. *를 와일드카드로 사용합니다(기본값: genshin)",
+      "descripts.zhtw": "標籤列表模式下依名稱匹配標籤，可用*作為萬用字元（預設：genshin）",
+      "default": "genshin",
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_type",
+      "type": "options",
+      "name": "标签类型",
+      "name.en": "Tag type",
+      "name.ja": "タグタイプ",
+      "name.ko": "태그 타입",
+      "name.zhtw": "標籤類型",
+      "descripts": "标签类型，分为任意(Any)、通用(General)、作家(Artist)、版权(Copyright)、角色(Character)、圈子(Circle)、瑕疵(Faults)",
+      "descripts.en": "Tag type: Any, General, Artist, Copyright, Character, Circle, Faults",
+      "descripts.ja": "タグタイプ：任意(Any)、ジェネラル(General)、作家(Artist)、著作権(Copyright)、キャラクター(Character)、界隈(Circle)、不備(Faults)",
+      "descripts.ko": "태그 타입: 임의(Any), 일반(General), 작가(Artist), 저작권(Copyright), 캐릭터(Character), 서클(Circle), 결함(Faults)",
+      "descripts.zhtw": "標籤類型，分為任意(Any)、通用(General)、作家(Artist)、版權(Copyright)、角色(Character)、圈子(Circle)、瑕疵(Faults)",
+      "default": "",
+      "options": [
+        {
+          "name": "任意(Any)",
+          "name.en": "Any",
+          "name.ja": "任意",
+          "name.ko": "임의",
+          "name.zhtw": "任意",
+          "variable": ""
+        },
+        {
+          "name": "通用(General)",
+          "name.en": "General",
+          "name.ja": "ジェネラル",
+          "name.ko": "일반",
+          "name.zhtw": "通用",
+          "variable": "0"
+        },
+        {
+          "name": "作家(Artist)",
+          "name.en": "Artist",
+          "name.ja": "作家",
+          "name.ko": "작가",
+          "name.zhtw": "作家",
+          "variable": "1"
+        },
+        {
+          "name": "版权(Copyright)",
+          "name.en": "Copyright",
+          "name.ja": "著作権",
+          "name.ko": "저작권",
+          "name.zhtw": "版權",
+          "variable": "3"
+        },
+        {
+          "name": "角色(Character)",
+          "name.en": "Character",
+          "name.ja": "キャラクター",
+          "name.ko": "캐릭터",
+          "name.zhtw": "角色",
+          "variable": "4"
+        },
+        {
+          "name": "圈子(Circle)",
+          "name.en": "Circle",
+          "name.ja": "界隈",
+          "name.ko": "서클",
+          "name.zhtw": "圈子",
+          "variable": "5"
+        },
+        {
+          "name": "瑕疵(Faults)",
+          "name.en": "Faults",
+          "name.ja": "不備",
+          "name.ko": "결함",
+          "name.zhtw": "瑕疵",
+          "variable": "6"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_order",
+      "type": "options",
+      "name": "标签排序",
+      "name.en": "Tag order",
+      "name.ja": "タグ順序",
+      "name.ko": "태그 순서",
+      "name.zhtw": "標籤排序",
+      "descripts": "标签表的排序，分为图片数量(Count)、名称(Name)、日期(Date)",
+      "descripts.en": "Tag table order: Count, Name, Date",
+      "descripts.ja": "タグ表の並び順：画像数(Count)、名称(Name)、日付(Date)",
+      "descripts.ko": "태그 표 정렬: 이미지 수(Count), 이름(Name), 날짜(Date)",
+      "descripts.zhtw": "標籤表的排序，分為圖片數量(Count)、名稱(Name)、日期(Date)",
+      "default": "count",
+      "options": [
+        {
+          "name": "图片数量(Count)",
+          "name.en": "Count",
+          "name.ja": "画像数",
+          "name.ko": "이미지 수",
+          "name.zhtw": "圖片數量",
+          "variable": "count"
+        },
+        {
+          "name": "名称(Name)",
+          "name.en": "Name",
+          "name.ja": "名称",
+          "name.ko": "이름",
+          "name.zhtw": "名稱",
+          "variable": "name"
+        },
+        {
+          "name": "日期(Date)",
+          "name.en": "Date",
+          "name.ja": "日付",
+          "name.ko": "날짜",
+          "name.zhtw": "日期",
+          "variable": "date"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_skip",
+      "type": "int",
+      "name": "跳过标签数量",
+      "name.en": "Skip tag count",
+      "name.ja": "タグスキップ数",
+      "name.ko": "태그 스킵 수",
+      "name.zhtw": "跳過標籤數量",
+      "descripts": "从标签表开头跳过多少个标签再开始爬",
+      "descripts.en": "How many tags to skip from the start of the tag table",
+      "descripts.ja": "タグ表の先頭から何個スキップしてから開始するか",
+      "descripts.ko": "태그 표 처음부터 몇 개를 건너뛴 뒤 시작할지",
+      "descripts.zhtw": "從標籤表開頭跳過多少個標籤再開始爬",
+      "default": 0,
+      "options": null,
+      "min": 0,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_count",
+      "type": "int",
+      "name": "爬取标签数量",
+      "name.en": "Tag count",
+      "name.ja": "クロールするタグ数",
+      "name.ko": "크롤할 태그 수",
+      "name.zhtw": "爬取標籤數量",
+      "descripts": "标签列表模式下总共爬多少个标签",
+      "descripts.en": "How many tags to crawl in total in tag list mode",
+      "descripts.ja": "タグ一覧モードで合計いくつのタグをクロールするか",
+      "descripts.ko": "태그 목록 모드에서 총 몇 개의 태그를 크롤할지",
+      "descripts.zhtw": "標籤列表模式下總共爬多少個標籤",
+      "default": 3,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_pages",
+      "type": "int",
+      "name": "每个标签页数",
+      "name.en": "Pages per tag",
+      "name.ja": "タグごとのページ数",
+      "name.ko": "태그당 페이지 수",
+      "name.zhtw": "每個標籤頁數",
+      "descripts": "每个标签最多爬几页作品，每页 40 张",
+      "descripts.en": "Max pages of posts to crawl per tag, 40 posts per page",
+      "descripts.ja": "タグごとに最大何ページ取得するか（1ページ40枚）",
+      "descripts.ko": "태그당 최대 몇 페이지를 크롤할지(페이지당 40장)",
+      "descripts.zhtw": "每個標籤最多爬幾頁作品，每頁 40 張",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "tag_list"
+        ]
+      }
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "name": "质量",
+      "name.en": "Quality",
+      "name.ja": "画質",
+      "name.ko": "화질",
+      "name.zhtw": "畫質",
+      "descripts": "图片质量。这个站的原图动辄七八千像素、几十 MB，注意磁盘和带宽",
+      "descripts.en": "Image quality. Originals here are often 7000px+ and tens of MB — mind your disk and bandwidth",
+      "descripts.ja": "画質。このサイトのオリジナルは7000px超・数十MBになることも多いので、ディスクと帯域にご注意を",
+      "descripts.ko": "화질. 이 사이트의 원본은 7000px 이상, 수십 MB인 경우가 많으니 디스크와 대역폭에 유의하세요",
+      "descripts.zhtw": "圖片畫質。此站原圖動輒七八千像素、數十 MB，注意磁碟與頻寬",
+      "default": "high",
+      "options": [
+        {
+          "name": "高",
+          "name.en": "High",
+          "name.ja": "高",
+          "name.ko": "고화질",
+          "name.zhtw": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "name.en": "Medium",
+          "name.ja": "中",
+          "name.ko": "중간",
+          "name.zhtw": "中",
+          "variable": "medium"
+        }
+      ],
+      "width": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/daily-safe-5page.json",
+    "configs/genshin-bikini.json",
+    "configs/genshin-tag-list.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_provider.json5",
+    "providers/tag_type_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

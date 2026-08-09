@@ -18,11 +18,11 @@ Download wallpapers from [anime-pictures.net](https://anime-pictures.net) by tag
 3. **Finding tag names**  
    On [anime-pictures.net](https://anime-pictures.net), open an image you like.
 
-![scsho](./scsho.png)
+![scsho](./banners/scsho.png)
 
 The top-left area shows tags (e.g. "原神", "胡桃(原神)"). Pick one you want.
 
-![hutao](./hutao.png)
+![hutao](./banners/hutao.png)
 
 Enter that tag (e.g. "胡桃(原神)") in the plugin, set start/end pages, and run.
 

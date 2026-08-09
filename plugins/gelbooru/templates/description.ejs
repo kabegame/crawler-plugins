@@ -1,0 +1,217 @@
+<% const m = metadata || {}; %>
+<% const tags = Array.isArray(m.tags) ? m.tags : []; %>
+<% const tagsString = m.tags_string ? String(m.tags_string) : tags.map(function (t) { return t && t.name ? String(t.name) : ''; }).filter(Boolean).join(' '); %>
+<% /* 分组顺序与站点侧栏一致：Artist / Character / Copyright / Metadata / Tag（general 在站点上叫 Tag） */ %>
+<% const CATEGORY_ORDER = ['artist', 'character', 'copyright', 'metadata', 'general']; %>
+<% const CATEGORY_LABELS = { artist: 'Artist', character: 'Character', copyright: 'Copyright', metadata: 'Metadata', general: 'Tag', deprecated: 'Deprecated' }; %>
+<%
+  const grouped = {};
+  tags.forEach(function (t) {
+    if (!t) return;
+    const ty = (t.type && /^[a-z0-9_]+$/i.test(String(t.type))) ? String(t.type) : 'general';
+    (grouped[ty] || (grouped[ty] = [])).push(t);
+  });
+  const categories = CATEGORY_ORDER.filter(function (c) { return grouped[c] && grouped[c].length; })
+    .concat(Object.keys(grouped).filter(function (c) { return CATEGORY_ORDER.indexOf(c) < 0; }));
+%>
+<% const dims = (m.width && m.height) ? (m.width + 'x' + m.height) : ''; %>
+<% const hasStats = !!(m.post_id || m.rating || (m.score != null && String(m.score) !== '') || dims || m.uploader_name || m.source_href || m.source_text || m.posted_date_text); %>
+<style>
+/* 站点原样式来自 gelbooru.com/gridStyle.css 与 gridStyle-dark.css：
+   正文 verdana 12px / line-height 1.42857143，链接 #337ab7（暗色模式 #fff），
+   标签分类色 artist #A00 / character #0A0 / copyright #A0A / metadata #F80 /
+   deprecated #c0c0c0 删除线，计数 #a0a0a0。这里逐条照搬。
+   唯一不照搬的是页面底色：详情面板由宿主注入 --anime-* 并画好背景，
+   硬写站点的 #fff / #1f1f1f 会和面板打架，所以正文色仍走 --anime-text-primary。*/
+.gb-sidebar {
+  font-family: verdana, sans-serif, helvetica;
+  font-size: 12px;
+  line-height: 1.42857143;
+  color: var(--anime-text-primary, #000);
+  /* 站点的通用链接色；暗色模式站点把 a 统一刷成 #fff，这里跟随 */
+  --gb-link: #337ab7;
+}
+@media (prefers-color-scheme: dark) {
+  .gb-sidebar { --gb-link: #fff; }
+}
+.gb-sidebar a { font-size: 1em; color: var(--gb-link); text-decoration: none; }
+.gb-sidebar a:hover { text-decoration: underline; }
+.gb-sidebar h3 { font-size: 1.17em; font-weight: bold; margin: 0; }
+
+.gb-block { margin-bottom: 10px; }
+.gb-cat-title { font-weight: bold; margin: 10px 0 0; }
+.gb-tag-list { list-style: none; margin: 0; padding: 0; }
+/* 站点是 inline-block + 固定 200px 宽（240px 侧栏专用），详情面板窄得多，
+   这里改成整行折行，其余间距沿用站点的 2px/4px 节奏 */
+.gb-tag-list li { margin: 2px 0; }
+.gb-tag-list .wiki-link { color: var(--gb-link); }
+.gb-tag-list .tag-count { color: #a0a0a0; }
+.gb-tag-list .tag-type-artist > .search-tag { color: #A00; }
+.gb-tag-list .tag-type-artist > .search-tag:hover { color: #9093FF; }
+.gb-tag-list .tag-type-character > .search-tag { color: #0A0; }
+.gb-tag-list .tag-type-character > .search-tag:hover { color: #9093FF; }
+.gb-tag-list .tag-type-copyright > .search-tag { color: #A0A; }
+.gb-tag-list .tag-type-copyright > .search-tag:hover { color: #9093FF; }
+.gb-tag-list .tag-type-metadata > .search-tag { color: #F80; }
+.gb-tag-list .tag-type-metadata > .search-tag:hover { color: #FA6; }
+.gb-tag-list .tag-type-deprecated > .search-tag { color: #c0c0c0; text-decoration: line-through; }
+
+.gb-stats ul { list-style: none; margin: 0; padding: 0; }
+.gb-stats li { margin: 2px 0; }
+.gb-src-short { display: inline-block; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+
+/* Prompt 复制框是 kabegame 侧的增补，站点没有，样式贴着站点的表单元素来：
+   输入框 padding 7px、1px 边框（站点 input.tag-list-search），按钮同 .searchList 的蓝底白字 */
+.gb-prompt-box { width: 100%; box-sizing: border-box; min-height: 4.5em; resize: vertical; font-family: verdana, sans-serif, helvetica; font-size: 11px; line-height: 1.4; padding: 7px; border: 1px solid color-mix(in srgb, var(--anime-border, #e0e0e0) 80%, transparent); background: transparent; color: var(--anime-text-primary, #000); }
+.gb-prompt-actions { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.gb-copy-btn { font-weight: bold; font-family: verdana, sans-serif, helvetica; font-size: 11px; padding: 4px 12px; border: 0; color: #ffffff; background: #0773fb; cursor: pointer; }
+.gb-copy-hint { color: #a0a0a0; }
+.gb-crawl-hint { display: none; margin: 10px 0 0; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--anime-border, #f0f0f0) 70%, transparent); font-size: 11px; color: #a0a0a0; }
+</style>
+<div class="gb-sidebar">
+  <% if (tagsString) { %>
+  <div class="gb-block">
+    <h3>Prompt</h3>
+    <textarea class="gb-prompt-box" id="gb-prompt-box" readonly spellcheck="false"><%= tagsString %></textarea>
+    <div class="gb-prompt-actions">
+      <button type="button" class="gb-copy-btn" id="gb-copy-btn">Copy</button>
+      <span class="gb-copy-hint"><%= tags.length %> tags</span>
+    </div>
+  </div>
+  <% } %>
+
+  <% if (categories.length) { %>
+  <div class="gb-block">
+    <ul class="gb-tag-list">
+      <% categories.forEach(function (cat) { %>
+      <li class="gb-cat-title"><b><%= CATEGORY_LABELS[cat] || cat %></b></li>
+      <% grouped[cat].forEach(function (t) {
+           const disp = t.display ? String(t.display) : String(t.name || '');
+           if (!disp) return;
+      %>
+      <li class="tag-type-<%= cat %>" data-name="<%= String(t.name || '').replace(/"/g, '&quot;') %>">
+        <% if (t.wiki_href) { %><a class="wiki-link" href="<%= t.wiki_href %>" target="_blank" rel="noopener noreferrer">?</a> <% } %>
+        <% if (t.post_href) { %><a class="search-tag" href="<%= t.post_href %>" target="_blank" rel="noopener noreferrer"><%= disp %></a><% } else { %><span class="search-tag"><%= disp %></span><% } %>
+        <% if (t.count != null && String(t.count) !== '') { %> <span class="tag-count"><%= t.count %></span><% } %>
+      </li>
+      <% }); %>
+      <% }); %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (hasStats) { %>
+  <div class="gb-block gb-stats">
+    <h3>Statistics</h3>
+    <ul>
+      <% if (m.post_id) { %>
+      <li>Id: <%= m.post_id %></li>
+      <% } %>
+      <% if (m.posted_date_text || m.uploader_name) { %>
+      <li>
+        <% if (m.posted_date_text) { %>Posted: <%= m.posted_date_text %><% } %>
+        <% if (m.uploader_name) { %>
+          Uploader:
+          <% if (m.uploader_href) { %><a href="<%= m.uploader_href %>" target="_blank" rel="noopener noreferrer"><%= m.uploader_name %></a><% } else { %><%= m.uploader_name %><% } %>
+        <% } %>
+      </li>
+      <% } %>
+      <% if (dims) { %>
+      <li>Size: <%= dims %><% if (m.file_ext) { %> .<%= m.file_ext %><% } %></li>
+      <% } %>
+      <% if (m.source_href) { %>
+      <li>Source: <a href="<%= m.source_href %>" target="_blank" rel="noopener noreferrer" class="gb-src-short"><%= m.source_text || m.source_href %></a></li>
+      <% } else if (m.source_text) { %>
+      <li>Source: <%= m.source_text %></li>
+      <% } %>
+      <% if (m.rating) { %>
+      <li>Rating: <%= m.rating %></li>
+      <% } %>
+      <% if (m.score != null && String(m.score) !== '') { %>
+      <li>Score: <%= m.score %></li>
+      <% } %>
+      <% if (m.has_sound) { %>
+      <li>Sound: yes</li>
+      <% } %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (m.original_href || m.video_href) { %>
+  <div class="gb-block gb-stats">
+    <h3>Options</h3>
+    <ul>
+      <% if (m.original_href) { %>
+      <li><a href="<%= m.original_href %>" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">Original image</a></li>
+      <% } %>
+      <% if (m.video_href) { %>
+      <li><a href="<%= m.video_href %>" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">Original video</a></li>
+      <% } %>
+    </ul>
+  </div>
+  <% } %>
+
+  <% if (tags.length || hasStats) { %>
+  <p class="gb-crawl-hint" id="gb-crawl-snapshot-hint" role="note"></p>
+  <% } %>
+</div>
+<script>
+(function () {
+  function snapshotHint(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s === 'zhtw') {
+      return '此側欄（含發帖時間、分數等文案）為抓取當下頁面快照，與目前瀏覽時刻或站台現狀可能不一致。';
+    }
+    if (s === 'zh' || (s.indexOf('zh') === 0 && s.indexOf('tw') < 0)) {
+      return '此侧栏（含发帖时间、分数等文案）为抓取当时页面快照，与当前浏览时刻或站点现状可能不一致。';
+    }
+    if (s === 'ja') {
+      return 'このサイドバー（投稿時刻やスコアを含む）は取得時点のページのスナップショットです。現在の状態とは一致しない場合があります。';
+    }
+    if (s === 'ko') {
+      return '이 사이드바(게시 시각·점수 포함)는 수집 시점의 페이지 스냅샷입니다. 현재 상태와 다를 수 있습니다.';
+    }
+    return 'This sidebar (including posted time and score) is a snapshot from when the image was downloaded; it may not match the live site.';
+  }
+  function copyLabel(loc) {
+    var s = String(loc || 'en').toLowerCase();
+    if (s.indexOf('zh') === 0) return ['复制', '已复制'];
+    if (s === 'ja') return ['コピー', 'コピーしました'];
+    if (s === 'ko') return ['복사', '복사됨'];
+    return ['Copy', 'Copied'];
+  }
+  function onReady() {
+    var hint = document.getElementById('gb-crawl-snapshot-hint');
+    var btn = document.getElementById('gb-copy-btn');
+    var box = document.getElementById('gb-prompt-box');
+
+    function apply(loc) {
+      if (hint) {
+        hint.textContent = snapshotHint(loc);
+        hint.style.display = 'block';
+      }
+      if (btn) {
+        var labels = copyLabel(loc);
+        btn.textContent = labels[0];
+        btn.onclick = function () {
+          if (!box) return;
+          box.select();
+          // iframe 里 navigator.clipboard 常被权限策略挡掉，execCommand 是可靠回落
+          var ok = false;
+          try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+          btn.textContent = ok ? labels[1] : labels[0];
+          setTimeout(function () { btn.textContent = labels[0]; }, 1500);
+        };
+      }
+    }
+
+    if (window.__bridge && window.__bridge.getLocale) {
+      window.__bridge.getLocale().then(apply).catch(function () { apply('en'); });
+    } else {
+      apply((navigator.language || 'en').split('-')[0]);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', onReady);
+  else onReady();
+})();
+</script>

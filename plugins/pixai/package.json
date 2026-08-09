@@ -503,8 +503,17 @@
     }
   ],
   "kbIcon": "icon.png",
+  "kbAssets": [
+    "banners/homepage.jpg",
+    "banners/post.jpg",
+    "banners/images.jpg"
+  ],
   "kbDoc": {
-    "default": "README.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
   },
   "kbRecommendedConfigs": [
     "configs/every-day-global.json",

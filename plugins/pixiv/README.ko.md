@@ -2,52 +2,19 @@
 
 이 플러그인은 Pixiv에서 일러스트를 가져옵니다. 랭킹, 북마크, 작가 작품, 키워드 검색 네 가지 모드를 지원합니다.
 
-## HTTP 헤더 설정 (필수)
+![home](./banners/home.jpg)
 
-Pixiv API는 인증과 Referer가 필요합니다. **Cookie는 「고급 설정 → HTTP 헤더」에서 설정하세요.** 플러그인 변수로 주입되지 않습니다.
+## 로그인 상태
 
-### Cookie 얻는 방법
-
-#### 방법 1: 브라우저에서 복사
-
-1. 브라우저에서 [pixiv.net](https://www.pixiv.net) **로그인** (미가입 시 가입)
-
-![home](./images/home.png)
-
-2. 개발자 도구(F12) 열기 → 네트워크 탭으로 이동 (이미지의 빨간 상자)
-
-![console](./images/console.png)
-
-3. 이미지 순서대로 cookie 복사
-
-![cookie](./images/cookie.png)
-
-4. Kabegame 실행
-5. cookie가 필요한 설정에서 HTTP 헤더 추가
-
-![header](./images/header-config.png)
-
-#### 방법 2: Kabegame 서프 페이지에서 복사 (더 쉬움, PC만)
-
-1. Kabegame 실행 후 서프 탭으로 이동
-
-![kabegame-surf](./images/kabegame-surf.png)
-
-2. 플러그인 빠른 입장 → Pixiv 선택 → 「서프 시작」 클릭. Pixiv 창이 열리면 로그인
-
-![surf-pixiv](./images/surf-pixiv.png)
-
-3. 로그인 후 「사이트 cookie 보기」(창 닫지 말 것) 클릭 후 표시된 cookie 복사
-
-![cookie-dialog](./images/cookie-dialog.png)
-
-4. 준비 완료.
+먼저 Kabegame의 서프 화면에서 `pixiv.net`을 여세요. 로그인한 사용자 계정으로 자동 크롤링됩니다.
 
 ### 사용자 ID 얻기 (본인 또는 작가)
 
-Pixiv에서 해당 사용자 프로필을 열면, URL 중간 또는 끝의 숫자가 사용자 ID입니다.
+서프 또는 브라우저에서 Pixiv 사용자 프로필을 엽니다.
 
-![user](./images/user.png)
+![user](./images/user.jpg)
+
+URL 중간이나 끝에 있는 숫자 문자열(이미지의 빨간 상자)이 사용자 ID입니다.
 
 ### Cookie가 필요한 경우
 

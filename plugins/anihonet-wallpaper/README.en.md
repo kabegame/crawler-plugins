@@ -1,52 +1,65 @@
-# anihonet Anime Wallpaper - Plugin Guide
+# anihonet Anime Wallpapers
 
-This plugin fetches wallpapers from [anihonetwallpaper.com](https://anihonetwallpaper.com) and adds them to the download queue. It supports **Ranking** and **Anime/game title index** modes. The default is **Ranking** for backward compatibility.
+A Kabegame plugin that collects anime and game wallpapers from [anihonetwallpaper.com](https://anihonetwallpaper.com), with support for both mobile and desktop wallpapers.
 
-## Crawl mode (`crawl_mode`)
+## Crawl modes
 
-| Value | Description |
-|-------|-------------|
-| **ranking** (default) | Crawl ranking list pages by period, then open each item’s detail page to download |
-| **anime_game** | Start from the [anime/game title index](https://anihonetwallpaper.com/anime-game-wallpaper), pick kana rows, then: theme list → work detail → original image links |
+The plugin provides three crawl modes. The default is **Ranking**. After a mode is selected, Kabegame only displays the settings required by that mode.
 
-In **anime_game** mode, **anime_game_rows** lets you choose rows (あ/か/さ/…/わ), matching `h3` ids `a`, `ka`, `sa`, … on the site.
+### Ranking
 
-## Ranking mode
+Crawl wallpapers by ranking period, ranking category, and page range.
 
-1. Opens ranking URLs from **start/end page** and **ranking period** (e.g. `ranking-daily-imgpc/1`).
-2. The list page collects **every** `<a href>` on the page and visits them in order (may include nav links depending on the HTML).
-3. On the detail page, download links are taken from **`a.button:not(.add)`** (excludes anchors with the token class `add`, distinct from `add-dl`).
+- Ranking periods: Daily, Weekly, Monthly, and Annual.
+- Ranking categories: All, Mobile, High-quality images, High-quality PC, and PC wallpapers.
+- Both the start and end pages can be set from `1` to `5`. By default, pages `1` through `5` are crawled.
 
-**Progress (100% of the task)** splits as **per list page → per link on the page → per image on the detail**. Each download slot counts after handling (including skips). If a page has no `a`, that page’s share is added once; if a detail has no buttons, that item’s share is added once.
+For example, selecting **Daily** and **Mobile** uses the path `ranking-daily-sp`.
 
-## Anime/game index mode
+### Single work
 
-1. Opens the index page and parses theme entry `<a href>` values for the rows you selected.
-2. On each **theme list** page, work detail URLs come from **`.itiran:last-of-type > a`** (same idea as `$$('.itiran:last-of-type > a')` in the browser).
-3. On the detail page, originals use **`a.button.add-dl`**.
+Select one anime or game from the list built into the plugin. Each item maps to an `images/`, `category/`, or `tag/` path on the site.
 
-**Progress (100% of the task)** splits as **per theme (each list entry) → per work under the theme → per image under the work**. Skips/filters still consume that image’s slice so the bar does not stall.
+After selecting **Single work**, choose the desired title in the **Work** setting.
 
-## Wallpaper type and filters
+### By theme (index search)
 
-- **wallpaper_type**: `imgpc` keeps desktop images only; `sp` keeps mobile only. This uses the image URL **filename** containing `Android` (case-insensitive), matching the site’s naming.
-- **Originals**: URLs whose path contains **`resize`** (case-insensitive) are treated as thumbnails and **skipped**.
+On the site's title index, the plugin matches link text against the **Theme keyword**, opens the first theme containing that string, and then crawls the specified page range.
 
-## Config summary
+- The theme keyword is empty by default. For the best match, enter the exact Japanese text used on the site and mind letter case.
+- The theme list start page defaults to `1` and has a minimum value of `1`.
+- The theme list end page defaults to `10`, has a minimum value of `1`, and is inclusive.
+- If the site has no next page, the task ends early.
 
-| Key | Role | Shown when |
-|-----|------|------------|
-| **crawl_mode** | `ranking` / `anime_game` | Always |
-| **anime_game_rows** | Kana row checkboxes (a, ka, …, wa) | anime_game only |
-| **start_page / end_page** | Ranking pages 1–5 | ranking only |
-| **ranking_period** | daily / weekly / monthly / annual | ranking only |
-| **wallpaper_type** | imgpc / sp | Always |
+## Examples
 
-## Tips
+### Crawl high-quality PC wallpapers from the daily ranking
 
-- Mobile only: set wallpaper type to **Mobile**.
-- Desktop only: set wallpaper type to **Desktop**.
-- Index mode can be very large—narrow rows first. Logs prefixed with `[anihonet]` show pages and download attempts.
+1. Set **Crawl mode** to **Ranking**.
+2. Set **Ranking period** to **Daily**.
+3. Set **Ranking category** to **High-quality PC**.
+4. Set the start and end pages, then run the task.
 
-楽しんで～
-![image](./image.jpg)
+### Crawl a specific work
+
+1. Set **Crawl mode** to **Single work**.
+2. Select the desired anime or game in **Work**.
+3. Run the task.
+
+### Crawl by theme keyword
+
+1. Set **Crawl mode** to **By theme (index search)**.
+2. Enter a theme keyword matching the link text on the site.
+3. Set the theme list start and end pages, then run the task.
+
+## Development
+
+```bash
+npm run build
+```
+
+The build output entry point is `dist/main.js`.
+
+Enjoy!
+
+![anihonet anime wallpapers](./image.jpg)

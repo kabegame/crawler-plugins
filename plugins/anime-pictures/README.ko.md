@@ -18,8 +18,8 @@
 3. **태그 이름 찾기**  
    [anime-pictures.net](https://anime-pictures.net)에서 마음에 드는 이미지를 열면 왼쪽 위에 태그(예: 「原神」「胡桃(原神)」)가 보입니다. 원하는 태그를 **태그**란에 그대로 넣고, 시작·끝 페이지를 설정한 뒤 실행하면 됩니다.
 
-![scsho](./scsho.png)
-![hutao](./hutao.png)
+![scsho](./banners/scsho.png)
+![hutao](./banners/hutao.png)
 
 4. **예시**
 

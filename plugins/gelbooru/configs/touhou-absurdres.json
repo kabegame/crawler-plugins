@@ -1,0 +1,20 @@
+{
+  "name": "标签组合示例（东方 + 超高分辨率）",
+  "name.en": "Tag combination example (Touhou + absurdres)",
+  "name.ja": "タグ組み合わせ例（東方＋超高解像度）",
+  "name.ko": "태그 조합 예시(동방 + 초고해상도)",
+  "name.zhtw": "標籤組合範例（東方 + 超高解析度）",
+  "description": "用两个标签组合检索：东方 project 的超高分辨率作品，抓两页约 84 张原图",
+  "description.en": "Two-tag search: Touhou works at absurd resolution, two pages (about 84 originals).",
+  "description.ja": "2タグ検索：東方 project の超高解像度作品を2ページ（約84枚のオリジナル）取得します。",
+  "description.ko": "두 태그 검색: 동방 프로젝트의 초고해상도 작품을 두 페이지(약 84장 원본) 수집합니다.",
+  "description.zhtw": "用兩個標籤組合檢索：東方 project 的超高解析度作品，抓兩頁約 84 張原圖",
+  "userConfig": {
+    "crawl_mode": "tags",
+    "mode_tag_value": ["touhou", "absurdres"],
+    "sort_order": "",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

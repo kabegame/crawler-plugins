@@ -1,0 +1,23 @@
+{
+  "name": "标签列表示例（原神角色）",
+  "name.en": "Tag list example (Genshin Impact characters)",
+  "name.ja": "タグ一覧例（原神のキャラクター）",
+  "name.ko": "태그 목록 예시(원신 캐릭터)",
+  "name.zhtw": "標籤列表範例（原神角色）",
+  "description": "先在标签表里按作品数量找出名字含 genshin 的角色标签，再给每个标签抓一页作品，共5个标签约200张",
+  "description.en": "Browse the tag table for character tags matching \"genshin\" ordered by post count, then crawl one page of posts for each of the top 5 tags (about 200 images).",
+  "description.ja": "タグ表から「genshin」を含むキャラクタータグを画像数順に探し、上位5個それぞれ1ページ分（約200枚）を取得します。",
+  "description.ko": "태그 표에서 \"genshin\"이 포함된 캐릭터 태그를 이미지 수 순으로 찾은 뒤, 상위 5개 태그마다 한 페이지씩(약 200장) 수집합니다.",
+  "description.zhtw": "先在標籤表裡依作品數量找出名字含 genshin 的角色標籤，再給每個標籤抓一頁作品，共5個標籤約200張",
+  "userConfig": {
+    "crawl_mode": "tag_list",
+    "tag": "*genshin*",
+    "mode_tag_type": "4",
+    "mode_tag_order": "count",
+    "mode_tag_skip": 0,
+    "mode_tag_count": 5,
+    "mode_tag_pages": 1,
+    "rating": "",
+    "quality": "medium"
+  }
+}

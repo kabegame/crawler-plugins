@@ -25,4 +25,4 @@
 - 建議合理設定頁面範圍，避免對伺服器造成過大負擔
 
 楽しんで～
-![img](./image.jpg)
+![img](./banners/image.jpg)

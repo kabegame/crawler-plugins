@@ -1,6 +1,6 @@
 {
   "name": "heybox",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": true,
   "name.zh": "小黑盒",
   "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
@@ -81,6 +81,7 @@
       "name.ko": "시작 페이지(1부터)",
       "default": 1,
       "min": 1,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search"
@@ -96,6 +97,7 @@
       "name.ko": "끝 페이지(포함)",
       "default": 1,
       "min": 1,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search"
@@ -110,6 +112,7 @@
       "name.ja": "1ページあたり件数",
       "name.ko": "페이지당 개수",
       "default": 5,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search"
@@ -123,19 +126,28 @@
       "name.en": "Download Comment Images",
       "name.ja": "コメント画像をダウンロード",
       "name.ko": "댓글 이미지 다운로드",
-      "default": true
+      "default": true,
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "README.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
   },
   "kbAssets": [
     "captcha.png",
     "downloading.png",
-    "fufu.png",
-    "image-preview.png",
-    "images.png",
+    "params.jpg",
+    "banners/search.jpg",
+    "banners/images.jpg",
+    "banners/image-preview.jpg",
     "mode-keyword.png",
     "share-btn.png",
     "src-xhh.png",

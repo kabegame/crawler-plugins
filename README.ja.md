@@ -96,6 +96,99 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 ![image](./images/ziworld.png)
 ---
 
+### 5. danbooru
+
+**名前**: Danbooru 画像掲示板  
+**バージョン**: 1.0.0  
+**説明**: Danbooru 画像掲示板の収集プラグイン（全タグのメタデータ付き）  
+**作者**: Kabegame
+
+**パス**: `plugins/danbooru/`  
+**ドキュメント**: [plugins/danbooru/README.ja.md](plugins/danbooru/README.ja.md)
+
+**機能**:
+- danbooru.donmai.us（または全年齢のみの safebooru.donmai.us）から作品を取得
+- 4つのモード：タグ検索、人気ランキング（日間／週間／月間）、サイト全体の新着、タグ一覧
+- 投稿ページの**全タグ**を画像のメタデータとして保存し、カテゴリ
+  （絵師／著作権／キャラクター／ジェネラル／メタ）ごとに整理。詳細サイドバーはコピーボタン付きで
+  描画されるため、AI 生成のプロンプトにそのまま貼り付けられます
+- PathQL provider を登録し、ギャラリーで タグカテゴリ → タグ の2段階で閲覧可能
+- 画質：高（オリジナル）／中（サイトのリサイズ版 sample）。動画投稿はオリジナルに回落します
+
+**設定変数**:
+- `source_site`: `danbooru`（全体）または `safebooru`（全年齢のみ）
+- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `mode_tag_value`: タグ検索モードのタグリスト（未ログイン／一般アカウントは1回の検索でタグ2個まで）
+- `popular_scale`: `day` / `week` / `month`
+- `start_page`、`end_page`: ページ範囲。1回あたり最大100ページ
+- `per_page`: 一覧1ページあたり 20 / 50 / 100 / 200 件
+- `tag`、`mode_tag_type`、`mode_tag_order`、`mode_tag_skip`、`mode_tag_count`、`mode_tag_pages`: タグ一覧モード用
+- `quality`: `high` / `medium`
+
+---
+
+### 6. gelbooru
+
+**名前**: Gelbooru 画像掲示板  
+**バージョン**: 1.0.0  
+**説明**: Gelbooru 画像掲示板の収集プラグイン（全タグのメタデータ付き）  
+**作者**: Kabegame
+
+**パス**: `plugins/gelbooru/`  
+**ドキュメント**: [plugins/gelbooru/README.ja.md](plugins/gelbooru/README.ja.md)
+
+**機能**:
+- gelbooru.com から作品を取得
+- 3つのモード：タグ検索、サイト全体の新着、タグ一覧
+- 並び順は新着／高スコア／更新順／ランダム（サイトの `sort:` メタタグ）
+- 投稿ページの**全タグ**を画像のメタデータとして保存し、カテゴリ
+  （絵師／キャラクター／著作権／メタ／ジェネラル）ごとに整理。詳細サイドバーはサイト自身の配色を
+  再現し、コピーボタン付きなので AI 生成のプロンプトにそのまま貼り付けられます
+- PathQL provider を登録し、ギャラリーで タグカテゴリ → タグ の2段階で閲覧可能
+- 画質：高（オリジナル）／中（サイトのリサイズ版 sample）。動画投稿は元の mp4 を取得します
+
+**設定変数**:
+- `crawl_mode`: `tags` / `all` / `tag_list`
+- `mode_tag_value`: タグ検索モードのタグリスト
+- `sort_order`: 空 / `sort:score:desc` / `sort:updated:desc` / `sort:random`
+- `start_page`、`end_page`: ページ範囲。1回あたり最大100ページ（1ページ42件はサイト固定）
+- `tag`、`mode_tag_type`、`mode_tag_order`、`mode_tag_skip`、`mode_tag_count`、`mode_tag_pages`: タグ一覧モード用
+- `quality`: `high` / `medium`
+
+---
+
+### 9. zerochan
+
+**名称**: Zerochan アニメ画像掲示板  
+**バージョン**: 1.0.0  
+**説明**: Zerochan 画像掲示板の収集プラグイン。全体・タグ・任意のキーワード検索に対応し、新着／人気で並べ替えできます  
+**作者**: Kabegame
+
+**パス**: `plugins/zerochan/`  
+**ドキュメント**: [plugins/zerochan/README.ja.md](plugins/zerochan/README.ja.md)
+
+**機能**:
+- zerochan.net から画像を取得。サイトは完全な SSR なので `fetch` + DOM 解析のみで動作（WebView 不要）
+- 3つのモード: 全体を閲覧、サイト内タグ1件、任意のキーワード検索
+  （サイトが最も一致するタグへ移動し、残りの語で絞り込みます）
+- 並べ替え: 新着（アップロード日時）／人気（お気に入り数）
+- サイトの `xbotcheck` bot チェックを自動で通過
+- サイドバー全体をメタデータとして保存: カテゴリ分けされたタグ（追加者、fav / primary フラグ付き）、
+  原作公開ページの URL、シェア用の3種類の文字列、サイズとお気に入りの統計
+- 詳細サイドバーはサイト本来の配色とスプライトアイコンで右カラムを再現。
+  ブロックの文言はアプリの言語に、ライト／ダークはアプリのテーマに追従します
+- 画質: 高（オリジナルファイル）／中（サイトの 1024px webp プレビュー）
+
+**設定変数**:
+- `crawl_mode`: `all` / `tag` / `search`
+- `tag`: サイト内タグの正式名称。例：`Arknights`
+- `search_query`: 任意のキーワード
+- `sort_order`: `id`（新着）／`fav`（人気）
+- `start_page`、`end_page`: ページ範囲。1ページ48件、1回あたり最大100ページ
+- `quality`: `high` / `medium`
+
+---
+
 ## 使い方
 
 ### Git Submodule として

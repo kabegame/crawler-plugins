@@ -118,7 +118,7 @@
       "default": 1,
       "options": null,
       "min": 1,
-      "max": null,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "all",
@@ -142,7 +142,7 @@
       "default": 5,
       "options": null,
       "min": 1,
-      "max": null,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "all",
@@ -164,6 +164,7 @@
       "descripts.ko": "크롤할 태그、*를 사용하여 와일드카드（기본값：원신）",
       "descripts.zhtw": "要爬取的標籤，可用*作為通配符（預設：原神）",
       "default": "genshin_impact",
+      "width": 2,
       "when": {
         "crawl_mode": [
           "tag_list"
@@ -242,6 +243,7 @@
           "variable": "circle"
         }
       ],
+      "width": 2,
       "when": {
         "crawl_mode": [
           "tag_list"
@@ -288,6 +290,7 @@
           "variable": "date"
         }
       ],
+      "width": 2,
       "when": {
         "crawl_mode": [
           "tag_list"
@@ -310,7 +313,7 @@
       "default": 10,
       "options": null,
       "min": 0,
-      "max": null,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "tag_list"
@@ -335,6 +338,7 @@
         "bikini"
       ],
       "options": null,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "tags"
@@ -372,7 +376,8 @@
           "name.zhtw": "中",
           "variable": "medium"
         }
-      ]
+      ],
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",
@@ -387,7 +392,9 @@
     "default": "CHANGELOG.md"
   },
   "kbAssets": [
-    "image.jpg"
+    "banners/homepage.jpg",
+    "banners/post.jpg",
+    "banners/image.jpg"
   ],
   "kbRecommendedConfigs": [
     "configs/bikini.json",

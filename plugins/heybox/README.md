@@ -23,13 +23,13 @@
 
 3. 按需填 **起始页 / 结束页 / 每页条数**——数字越大，一次多看几篇帖子，也会更久啦（根据经验5条帖子大概是风控的阈值）。
 
-![kw-fufu](./fufu.png)
+![kw-kirei](./params.jpg)
 
 4. 开始收集后，程序会按页去搜，把能打开的帖子一条条处理。
 
 ![downloading](./downloading.png)
-![images](./images.png)
-![image-preview](./image-preview.png)
+![images](./banners/images.jpg)
+![image-preview](./banners/image-preview.jpg)
 
 ### 2. 只抓一篇帖子（你已经知道链接时用）
 

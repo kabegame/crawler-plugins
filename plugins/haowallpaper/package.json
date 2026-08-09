@@ -28,6 +28,11 @@
     { "id": "content.res.desktop" },
     { "id": "content.type.video" }
   ],
+  "kbAssets": [
+    "banners/homepage.jpg",
+    "banners/post.jpg",
+    "banners/images.jpg"
+  ],
   "kbConfig": [
     {
       "key": "startPage",

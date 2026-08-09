@@ -26,4 +26,4 @@
 
 
 楽しんで～
-![img](./image.jpg)
+![img](./banners/image.jpg)

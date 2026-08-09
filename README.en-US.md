@@ -149,6 +149,100 @@ This repository contains crawler plugins for the Kabegame image collection syste
 ![image](./images/2dwallpapers.png)
 ---
 
+### 7. danbooru
+
+**Name**: Danbooru image board  
+**Version**: 1.0.0  
+**Description**: Danbooru image board crawler plugin with full tag metadata  
+**Author**: Kabegame
+
+**Path**: `plugins/danbooru/`  
+**Documentation**: [plugins/danbooru/README.en.md](plugins/danbooru/README.en.md)
+
+**Features**:
+- Crawl posts from danbooru.donmai.us (or the general-rating-only safebooru.donmai.us)
+- Four modes: tag search, popular ranking (day/week/month), newest site-wide, and tag list
+- Stores the **full tag set** of each post as image metadata, grouped by category
+  (artist / copyright / character / general / meta) — the detail sidebar renders it with a
+  copy button so it can be pasted straight into an AI image prompt
+- Registers PathQL providers, so the gallery can browse downloaded images by tag category → tag
+- Quality: high (original file) / medium (the site's resized sample); video posts fall back to the original
+
+**Config variables**:
+- `source_site`: `danbooru` (full) or `safebooru` (general rating only)
+- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `mode_tag_value`: tag list for the tag search mode (the site allows 2 tags per search for anonymous/basic accounts)
+- `popular_scale`: `day` / `week` / `month`
+- `start_page`, `end_page`: page range, max 100 pages per run
+- `per_page`: 20 / 50 / 100 / 200 posts per listing page
+- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: tag list mode
+- `quality`: `high` / `medium`
+
+---
+
+### 8. gelbooru
+
+**Name**: Gelbooru image board  
+**Version**: 1.0.0  
+**Description**: Gelbooru image board crawler plugin with full tag metadata  
+**Author**: Kabegame
+
+**Path**: `plugins/gelbooru/`  
+**Documentation**: [plugins/gelbooru/README.en.md](plugins/gelbooru/README.en.md)
+
+**Features**:
+- Crawl posts from gelbooru.com
+- Three modes: tag search, newest site-wide, and tag list
+- Sort by newest / highest score / recently updated / random (the site's `sort:` metatag)
+- Stores the **full tag set** of each post as image metadata, grouped by category
+  (artist / character / copyright / metadata / general) — the detail sidebar reproduces the
+  site's own colors and has a copy button, so it can be pasted straight into an AI image prompt
+- Registers PathQL providers, so the gallery can browse downloaded images by tag category → tag
+- Quality: high (original file) / medium (the site's resized sample); video posts take the original mp4
+
+**Config variables**:
+- `crawl_mode`: `tags` / `all` / `tag_list`
+- `mode_tag_value`: tag list for the tag search mode
+- `sort_order`: empty / `sort:score:desc` / `sort:updated:desc` / `sort:random`
+- `start_page`, `end_page`: page range, max 100 pages per run (42 posts per page, fixed by the site)
+- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: tag list mode
+- `quality`: `high` / `medium`
+
+---
+
+### 9. zerochan
+
+**Name**: Zerochan anime image board  
+**Version**: 1.0.0  
+**Description**: Zerochan image board crawler: browse everything, one tag, or any search query, sorted by recent or popular  
+**Author**: Kabegame
+
+**Path**: `plugins/zerochan/`  
+**Documentation**: [plugins/zerochan/README.en.md](plugins/zerochan/README.en.md)
+
+**Features**:
+- Crawl images from zerochan.net — the site is pure SSR, so it runs on `fetch` + DOM parsing with no WebView
+- Three modes: browse everything, one on-site tag, or any free-text search query
+  (the site resolves the query to its best matching tag and keeps filtering with the rest)
+- Sort by recent (upload time) or popular (favorites)
+- Clears the site's `xbotcheck` bot check automatically
+- Stores the full sidebar as image metadata: categorised tags (with who added each one, plus
+  fav / primary flags), the original publication URL, the three share strings, and dimension /
+  favorite stats
+- The detail sidebar rebuilds the site's own right-hand column using its palette and sprite icons;
+  block labels follow the app language and light/dark follows the app theme
+- Quality: high (original file) / medium (the site's 1024px webp preview)
+
+**Config variables**:
+- `crawl_mode`: `all` / `tag` / `search`
+- `tag`: canonical on-site tag name, e.g. `Arknights`
+- `search_query`: any free text
+- `sort_order`: `id` (recent) / `fav` (popular)
+- `start_page`, `end_page`: page range, 48 items per page, max 100 pages per run
+- `quality`: `high` / `medium`
+
+---
+
 ## 使用方法
 
 ### As Git Submodule

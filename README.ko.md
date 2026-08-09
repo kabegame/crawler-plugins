@@ -96,6 +96,99 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 ![image](./images/ziworld.png)
 ---
 
+### 5. danbooru
+
+**이름**: Danbooru 이미지 보드  
+**버전**: 1.0.0  
+**설명**: Danbooru 이미지 보드 수집 플러그인 (전체 태그 메타데이터 포함)  
+**작성자**: Kabegame
+
+**경로**: `plugins/danbooru/`  
+**문서**: [plugins/danbooru/README.ko.md](plugins/danbooru/README.ko.md)
+
+**기능**:
+- danbooru.donmai.us(또는 전체 이용가 전용 safebooru.donmai.us)에서 작품 수집
+- 네 가지 모드: 태그 검색, 인기 순위(일간/주간/월간), 사이트 전체 최신, 태그 목록
+- 게시물 페이지의 **전체 태그**를 이미지 메타데이터로 저장하고 카테고리
+  (작가/저작권/캐릭터/일반/메타)별로 정리. 상세 사이드바에 복사 버튼이 있어 AI 생성
+  프롬프트로 바로 붙여넣을 수 있습니다
+- PathQL provider 를 등록하여 갤러리에서 태그 카테고리 → 태그 2단계 탐색 가능
+- 화질: 고화질(원본) / 중간(사이트 축소 sample). 동영상 게시물은 원본으로 대체됩니다
+
+**설정 변수**:
+- `source_site`: `danbooru`(전체) 또는 `safebooru`(전체 이용가만)
+- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `mode_tag_value`: 태그 검색 모드의 태그 목록 (비로그인/일반 계정은 검색당 태그 2개까지)
+- `popular_scale`: `day` / `week` / `month`
+- `start_page`, `end_page`: 페이지 범위. 실행당 최대 100페이지
+- `per_page`: 목록 페이지당 20 / 50 / 100 / 200개
+- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: 태그 목록 모드
+- `quality`: `high` / `medium`
+
+---
+
+### 6. gelbooru
+
+**이름**: Gelbooru 이미지 보드  
+**버전**: 1.0.0  
+**설명**: Gelbooru 이미지 보드 수집 플러그인 (전체 태그 메타데이터 포함)  
+**작성자**: Kabegame
+
+**경로**: `plugins/gelbooru/`  
+**문서**: [plugins/gelbooru/README.ko.md](plugins/gelbooru/README.ko.md)
+
+**기능**:
+- gelbooru.com에서 작품 수집
+- 세 가지 모드: 태그 검색, 사이트 전체 최신, 태그 목록
+- 정렬: 최신 / 높은 점수 / 최근 업데이트 / 무작위 (사이트의 `sort:` 메타태그)
+- 게시물의 **전체 태그**를 이미지 메타데이터로 저장하고 카테고리
+  (작가 / 캐릭터 / 저작권 / 메타 / 일반)별로 정리. 상세 사이드바는 사이트 자체 색상을 재현하며
+  복사 버튼이 있어 AI 이미지 프롬프트에 바로 붙여넣을 수 있습니다
+- PathQL provider를 등록하여 갤러리에서 태그 카테고리 → 태그 2단계 탐색 가능
+- 화질: 고화질(원본 파일) / 중간(사이트 축소 sample). 동영상 게시물은 원본 mp4를 받습니다
+
+**설정 변수**:
+- `crawl_mode`: `tags` / `all` / `tag_list`
+- `mode_tag_value`: 태그 검색 모드의 태그 목록
+- `sort_order`: 빈 값 / `sort:score:desc` / `sort:updated:desc` / `sort:random`
+- `start_page`, `end_page`: 페이지 범위, 실행당 최대 100페이지 (페이지당 42개는 사이트 고정)
+- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: 태그 목록 모드
+- `quality`: `high` / `medium`
+
+---
+
+### 9. zerochan
+
+**이름**: Zerochan 애니메이션 이미지 보드  
+**버전**: 1.0.0  
+**설명**: Zerochan 이미지 보드 수집 플러그인. 전체·태그·임의 검색어를 지원하며 최신/인기 정렬이 가능합니다  
+**작성자**: Kabegame
+
+**경로**: `plugins/zerochan/`  
+**문서**: [plugins/zerochan/README.ko.md](plugins/zerochan/README.ko.md)
+
+**기능**:
+- zerochan.net에서 이미지 수집. 사이트가 완전한 SSR이라 `fetch` + DOM 파싱만으로 동작(WebView 불필요)
+- 세 가지 모드: 전체 탐색, 사이트 태그 1개, 임의의 검색어
+  (사이트가 가장 일치하는 태그로 이동한 뒤 나머지 단어로 필터링)
+- 정렬: 최신(업로드 시간) / 인기(즐겨찾기 수)
+- 사이트의 `xbotcheck` 봇 검사를 자동으로 통과
+- 사이드바 전체를 메타데이터로 저장: 분류된 태그(추가자, fav / primary 플래그 포함),
+  원작 게시 페이지 URL, 공유 문자열 3종, 크기·즐겨찾기 통계
+- 상세 사이드바는 사이트 자체 색상과 스프라이트 아이콘으로 오른쪽 칼럼을 재현하며,
+  블록 문구는 앱 언어를, 라이트/다크는 앱 테마를 따릅니다
+- 화질: 고화질(원본 파일) / 중간(사이트의 1024px webp 미리보기)
+
+**설정 변수**:
+- `crawl_mode`: `all` / `tag` / `search`
+- `tag`: 사이트 태그의 정식 명칭. 예: `Arknights`
+- `search_query`: 임의의 검색어
+- `sort_order`: `id`(최신) / `fav`(인기)
+- `start_page`, `end_page`: 페이지 범위, 페이지당 48개, 실행당 최대 100페이지
+- `quality`: `high` / `medium`
+
+---
+
 ## 사용 방법
 
 ### Git Submodule로

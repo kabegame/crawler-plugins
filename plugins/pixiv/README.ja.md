@@ -2,52 +2,19 @@
 
 このプラグインは Pixiv からイラストを取得します。ランキング、ブックマーク、作家作品、キーワード検索の4モードに対応しています。
 
-## HTTP ヘッダー設定（必須）
+![home](./banners/home.jpg)
 
-Pixiv API には認証と Referer が必要です。**Cookie は「詳細設定 → HTTP ヘッダー」で設定してください**。プラグイン変数としては注入されません。
+## ログイン状態
 
-### Cookie の取得方法
-
-#### 方法1：ブラウザからコピー
-
-1. ブラウザで [pixiv.net](https://www.pixiv.net) に**ログイン**（未登録の場合は登録）
-
-![home](./images/home.png)
-
-2. 開発者ツール（F12）を開き、ネットワークタブに切り替える（図の赤枠）
-
-![console](./images/console.png)
-
-3. 図の手順で cookie をコピー
-
-![cookie](./images/cookie.png)
-
-4. Kabegame を開く
-5. cookie が必要な設定で HTTP ヘッダーを追加
-
-![header](./images/header-config.png)
-
-#### 方法2：Kabegame のサーフページからコピー（より簡単、PC のみ）
-
-1. Kabegame を開き、サーフタブへ
-
-![kabegame-surf](./images/kabegame-surf.png)
-
-2. プラグインクイック入り → Pixiv を選択 → 「サーフ開始」をクリック。Pixiv のウィンドウが開くので、表示に従ってログイン
-
-![surf-pixiv](./images/surf-pixiv.png)
-
-3. ログイン後「サイトの cookie を表示」（ウィンドウは閉じない）をクリックし、表示された cookie をコピー
-
-![cookie-dialog](./images/cookie-dialog.png)
-
-4. 準備完了です。
+最初に Kabegame のサーフ画面から `pixiv.net` を開いてください。ログイン中のユーザーとして自動的に作品を取得します。
 
 ### ユーザー ID の取得（自分または作家）
 
-Pixiv でそのユーザーのプロフィールを開き、URL の数字部分（中間または末尾）がユーザー ID です。
+サーフまたはブラウザで Pixiv のユーザーページを開きます。
 
-![user](./images/user.png)
+![user](./images/user.jpg)
+
+URL の中間または末尾にある数字列（画像の赤枠）がユーザー ID です。
 
 ### Cookie が必要な場合
 

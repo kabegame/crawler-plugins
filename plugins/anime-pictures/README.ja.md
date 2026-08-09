@@ -18,8 +18,8 @@
 3. **タグ名の調べ方**  
    [anime-pictures.net](https://anime-pictures.net) で気になる画像を開く。左上にタグ（例：「原神」「胡桃(原神)」）が表示されます。使いたいタグを選び、**タグ**欄にそのまま入力し、開始・終了ページを設定して実行。
 
-![scsho](./scsho.png)
-![hutao](./hutao.png)
+![scsho](./banners/scsho.png)
+![hutao](./banners/hutao.png)
 
 4. **例**
 

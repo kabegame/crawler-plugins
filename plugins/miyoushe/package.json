@@ -1,6 +1,6 @@
 {
   "name": "miyoushe",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "name.en": "HoYoLAB",
   "name.ja": "HoYoLAB",
@@ -76,7 +76,7 @@
       "name.en": "Author UID",
       "name.ja": "投稿者 UID",
       "name.ko": "작성자 UID",
-      "default": "",
+      "width": 1,
       "when": {
         "crawl_mode": [
           "user_posts"
@@ -105,11 +105,6 @@
       "name.ja": "ゲーム分区",
       "name.ko": "게임 섹션",
       "default": "",
-      "when": {
-        "crawl_mode": [
-          "search"
-        ]
-      },
       "options": [
         {
           "name": "全站",
@@ -167,7 +162,13 @@
           "name.ko": "대별야",
           "variable": "5"
         }
-      ]
+      ],
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
     },
     {
       "key": "start_page",
@@ -178,6 +179,7 @@
       "name.ko": "시작 페이지(1부터)",
       "default": 1,
       "min": 1,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search",
@@ -194,6 +196,7 @@
       "name.ko": "끝 페이지(포함)",
       "default": 3,
       "min": 1,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search",
@@ -211,6 +214,7 @@
       "default": 20,
       "min": 1,
       "max": 50,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "search",
@@ -225,7 +229,8 @@
       "name.en": "Download Comment Images",
       "name.ja": "コメント画像をダウンロード",
       "name.ko": "댓글 이미지 다운로드",
-      "default": false
+      "default": false,
+      "width": 1
     },
     {
       "key": "max_comments",
@@ -236,16 +241,26 @@
       "name.ko": "댓글 최대 수집 개수(기본 200)",
       "default": 200,
       "min": 20,
-      "max": 2000
+      "max": 2000,
+      "width": 1
     }
   ],
   "kbIcon": "icon.png",
   "kbDoc": {
-    "default": "README.md"
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
   },
   "kbAssets": [
-    "preview.png",
-    "source-miyoushe.png",
+    "banners/search.jpg",
+    "banners/images.jpg",
+    "banners/image-preview.jpg",
+    "source-miyoushe.jpg",
     "user-page.png"
   ],
   "kbPathQLProviders": [

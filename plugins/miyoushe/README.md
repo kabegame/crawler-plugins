@@ -2,13 +2,13 @@
 
 下面说的是：**你想从米游社把喜欢的图弄进 Kabegame 时，整体上会怎么走**。照这个顺序看，你基本就知道每一步在干嘛、要填哪些参数、遇到问题往哪看。
 
-![preview](./preview.png)
+![preview](./banners/image-preview.jpg)
 
 ---
 
 源选择米游社
 
-![source-miyoushe](./source-miyoushe.png)
+![source-miyoushe](./source-miyoushe.jpg)
 
 ---
 

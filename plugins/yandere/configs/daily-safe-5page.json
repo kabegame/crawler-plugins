@@ -1,0 +1,25 @@
+{
+  "name": "每日全年龄前5页",
+  "name.en": "Daily safe-rated first 5 pages",
+  "name.ja": "毎日 全年齢の先頭5ページ",
+  "name.ko": "매일 전연령 첫 5페이지",
+  "name.zhtw": "每日全年齡前5頁",
+  "description": "每日16:00爬取全站最新的前5页，只要 Safe 分级，约200张原图，保持壁纸库常新",
+  "description.en": "Every day at 16:00, crawl the newest 5 pages restricted to the Safe rating (about 200 originals) to keep the collection fresh.",
+  "description.ja": "毎日16:00に最新5ページを Safe レーティング限定でクロールします（約200枚のオリジナル）。コレクションを常に新鮮に保ちます。",
+  "description.ko": "매일 16:00에 최신 5페이지를 Safe 등급으로 한정해 크롤링합니다(원본 약 200장). 컬렉션을 항상 새롭게 유지합니다.",
+  "description.zhtw": "每日16:00爬取全站最新的前5頁，只要 Safe 分級，約200張原圖，保持桌布庫常新",
+  "userConfig": {
+    "crawl_mode": "all",
+    "rating": "safe",
+    "sort_order": "",
+    "start_page": 1,
+    "end_page": 5,
+    "quality": "high"
+  },
+  "scheduleSpec": {
+    "mode": "daily",
+    "hour": 16,
+    "minute": 0
+  }
+}

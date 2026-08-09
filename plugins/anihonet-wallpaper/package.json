@@ -1,6 +1,6 @@
 {
   "name": "anihonet-wallpaper",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "private": true,
   "name.zh": "anihonet动漫壁纸",
   "name.en": "anihonet anime wallpapers",
@@ -3288,104 +3288,10 @@
       "descripts.ko": "목록 링크 텍스트에 부분 문자열이 포함된 첫 작품",
       "descripts.zhtw": "一覽頁連結文案「包含」此字串的第一個主題",
       "default": "",
-      "options": null,
-      "min": null,
-      "max": null,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "by_theme"
-        ]
-      }
-    },
-    {
-      "key": "theme_start_page",
-      "type": "int",
-      "name": "主题列表起始页",
-      "name.en": "Theme list start page",
-      "name.ja": "テーマ一覧の開始ページ",
-      "name.ko": "테마 목록 시작 페이지",
-      "name.zhtw": "主題列表起始頁",
-      "descripts": "进入主题后，作品列表从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
-      "descripts.en": "1-based list page to start downloading (earlier pages are skipped)",
-      "descripts.ja": "テーマ内リストの取得開始ページ（1 始まり）",
-      "descripts.ko": "테마 목록에서 수집을 시작할 페이지(1부터)",
-      "descripts.zhtw": "進入主題後從第幾頁開始抓（1 為第一頁）",
-      "default": 1,
-      "options": null,
-      "min": 1,
-      "max": 9999,
-      "when": {
-        "crawl_mode": [
-          "by_theme"
-        ]
-      }
-    },
-    {
-      "key": "theme_end_page",
-      "type": "int",
-      "name": "主题列表结束页",
-      "name.en": "Theme list end page",
-      "name.ja": "テーマ一覧の終了ページ",
-      "name.ko": "테마 목록 끝 페이지",
-      "name.zhtw": "主題列表結束頁",
-      "descripts": "作品列表抓到第几页为止（含该页）；若站点无下一页则提前结束，进度会补足",
-      "descripts.en": "Last list page to crawl (inclusive); stops early if no next link",
-      "descripts.ja": "テーマ内リストの終了ページ（このページを含む）",
-      "descripts.ko": "테마 목록에서 수집을 끝낼 페이지(포함)",
-      "descripts.zhtw": "列表抓到第幾頁為止（含該頁）",
-      "default": 10,
-      "options": null,
-      "min": 1,
-      "max": 9999,
-      "when": {
-        "crawl_mode": [
-          "by_theme"
-        ]
-      }
-    },
-    {
-      "key": "start_page",
-      "type": "int",
-      "name": "起始页面",
-      "name.en": "Start page",
-      "name.ja": "開始ページ",
-      "name.ko": "시작 페이지",
-      "name.zhtw": "起始頁面",
-      "descripts": "要拉取的起始页面",
-      "descripts.en": "Start page to crawl from",
-      "descripts.ja": "取得開始ページ",
-      "descripts.ko": "가져올 시작 페이지",
-      "descripts.zhtw": "要拉取的起始頁面",
-      "default": 1,
-      "options": null,
-      "min": 1,
-      "max": 5,
-      "when": {
-        "crawl_mode": [
-          "ranking"
-        ]
-      }
-    },
-    {
-      "key": "end_page",
-      "type": "int",
-      "name": "结束页数",
-      "name.en": "End page",
-      "name.ja": "終了ページ",
-      "name.ko": "끝 페이지",
-      "name.zhtw": "結束頁數",
-      "descripts": "要拉取的结束页面",
-      "descripts.en": "End page to crawl to",
-      "descripts.ja": "取得終了ページ",
-      "descripts.ko": "가져올 끝 페이지",
-      "descripts.zhtw": "要拉取的結束頁面",
-      "default": 5,
-      "options": null,
-      "min": 1,
-      "max": 5,
-      "when": {
-        "crawl_mode": [
-          "ranking"
         ]
       }
     },
@@ -3450,6 +3356,100 @@
           "ranking"
         ]
       }
+    },
+    {
+      "key": "theme_start_page",
+      "type": "int",
+      "name": "主题列表起始页",
+      "name.en": "Theme list start page",
+      "name.ja": "テーマ一覧の開始ページ",
+      "name.ko": "테마 목록 시작 페이지",
+      "name.zhtw": "主題列表起始頁",
+      "descripts": "进入主题后，作品列表从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
+      "descripts.en": "1-based list page to start downloading (earlier pages are skipped)",
+      "descripts.ja": "テーマ内リストの取得開始ページ（1 始まり）",
+      "descripts.ko": "테마 목록에서 수집을 시작할 페이지(1부터)",
+      "descripts.zhtw": "進入主題後從第幾頁開始抓（1 為第一頁）",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "by_theme"
+        ]
+      }
+    },
+    {
+      "key": "theme_end_page",
+      "type": "int",
+      "name": "主题列表结束页",
+      "name.en": "Theme list end page",
+      "name.ja": "テーマ一覧の終了ページ",
+      "name.ko": "테마 목록 끝 페이지",
+      "name.zhtw": "主題列表結束頁",
+      "descripts": "作品列表抓到第几页为止（含该页）；若站点无下一页则提前结束，进度会补足",
+      "descripts.en": "Last list page to crawl (inclusive); stops early if no next link",
+      "descripts.ja": "テーマ内リストの終了ページ（このページを含む）",
+      "descripts.ko": "테마 목록에서 수집을 끝낼 페이지(포함)",
+      "descripts.zhtw": "列表抓到第幾頁為止（含該頁）",
+      "default": 10,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "by_theme"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 5,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面",
+      "descripts.en": "End page to crawl to",
+      "descripts.ja": "取得終了ページ",
+      "descripts.ko": "가져올 끝 페이지",
+      "descripts.zhtw": "要拉取的結束頁面",
+      "default": 5,
+      "options": null,
+      "min": 1,
+      "max": 5,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "ranking"
+        ]
+      }
     }
   ],
   "kbIcon": "icon.png",
@@ -3460,8 +3460,14 @@
     "default": "README.md",
     "zhtw": "README.zhtw.md"
   },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
   "kbAssets": [
-    "image.jpg"
+    "image.jpg",
+    "banners/homepage.jpg",
+    "banners/post.jpg",
+    "banners/images.jpg"
   ],
   "kbRecommendedConfigs": [
     "configs/every-day-mob.json",

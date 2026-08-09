@@ -1,0 +1,19 @@
+{
+  "name": "全站最新",
+  "name.en": "Everything, newest first",
+  "name.ja": "全体の新着",
+  "name.ko": "전체 최신순",
+  "name.zhtw": "全站最新",
+  "description": "不带标签地逛全站最新上传，适合每天补一点新图",
+  "description.en": "Browse the newest site-wide uploads without any tag — good for a daily top-up.",
+  "description.ja": "タグを指定せずサイト全体の新着を巡回します。毎日少しずつ補充するのに向いています。",
+  "description.ko": "태그 없이 사이트 전체의 최신 업로드를 훑습니다. 매일 조금씩 채우기에 좋습니다.",
+  "description.zhtw": "不帶標籤地逛全站最新上傳，適合每天補一點新圖",
+  "userConfig": {
+    "crawl_mode": "all",
+    "sort_order": "id",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

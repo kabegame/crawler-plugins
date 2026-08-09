@@ -1936,6 +1936,24 @@
           ]
         }
       },
+      "plugins/danbooru": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/gelbooru": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/haowallpaper": {
         "packageJson": {
           "dependencies": [
@@ -2027,6 +2045,24 @@
         }
       },
       "plugins/xhs": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/yandere": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/zerochan": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",

@@ -1,0 +1,21 @@
+{
+  "name": "标签组合示例（原神 + 比基尼）",
+  "name.en": "Tag combination example (Genshin Impact + bikini)",
+  "name.ja": "タグ組み合わせ例（原神＋ビキニ）",
+  "name.ko": "태그 조합 예시(원신 + 비키니)",
+  "name.zhtw": "標籤組合範例（原神 + 比基尼）",
+  "description": "用两个标签组合检索：原神的比基尼作品，按高分优先抓两页约80张原图",
+  "description.en": "Two-tag search: Genshin Impact bikini works sorted by score, two pages (about 80 originals).",
+  "description.ja": "2タグ検索：原神のビキニ作品をスコア順に2ページ（約80枚のオリジナル）取得します。",
+  "description.ko": "두 태그 검색: 원신 비키니 작품을 점수순으로 두 페이지(원본 약 80장) 수집합니다.",
+  "description.zhtw": "用兩個標籤組合檢索：原神的比基尼作品，依高分優先抓兩頁約80張原圖",
+  "userConfig": {
+    "crawl_mode": "tags",
+    "mode_tag_value": ["genshin_impact", "bikini"],
+    "rating": "",
+    "sort_order": "order:score",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

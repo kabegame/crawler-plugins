@@ -1,0 +1,20 @@
+{
+  "name": "标签人气榜（明日方舟）",
+  "name.en": "Popular by tag (Arknights)",
+  "name.ja": "タグ人気順（アークナイツ）",
+  "name.ko": "태그 인기순(명일방주)",
+  "name.zhtw": "標籤人氣榜（明日方舟）",
+  "description": "按收藏数倒序抓 Arknights 标签的前两页，最容易一次性收到高质量图",
+  "description.en": "Two pages of the Arknights tag sorted by favorites — the quickest way to grab well-liked art.",
+  "description.ja": "Arknights タグをお気に入り数の多い順に2ページ分取得します。高品質な作品を一気に集められます。",
+  "description.ko": "Arknights 태그를 즐겨찾기 많은 순으로 두 페이지 수집합니다. 좋은 작품을 한 번에 모으기 좋습니다.",
+  "description.zhtw": "按收藏數倒序抓 Arknights 標籤的前兩頁，最容易一次性收到高品質圖",
+  "userConfig": {
+    "crawl_mode": "tag",
+    "tag": "Arknights",
+    "sort_order": "fav",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high"
+  }
+}

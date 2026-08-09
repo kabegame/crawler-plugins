@@ -25,4 +25,4 @@
 - サーバー負荷を考え、ページ範囲は適切に設定してください
 
 楽しんで～
-![img](./image.jpg)
+![img](./banners/image.jpg)

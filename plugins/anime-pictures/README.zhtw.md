@@ -18,8 +18,8 @@
 3. **取得標籤名**  
    在 [anime-pictures.net](https://anime-pictures.net) 找到喜歡的圖片，左上角會顯示標籤（如「原神」、「胡桃(原神)」）。選一個填入**標籤**，再設起始/結束頁數即可。
 
-![scsho](./scsho.png)
-![hutao](./hutao.png)
+![scsho](./banners/scsho.png)
+![hutao](./banners/hutao.png)
 
 4. **範例**
 
@@ -41,4 +41,4 @@
 - 標籤需與站點一致（含語言、括號等），否則可能無結果。
 
 楽しんで〜
-![icon](./icon.png)
+![icon](./doc-icon.png)
