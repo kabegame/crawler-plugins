@@ -10,6 +10,9 @@ export const SERIES_API = "https://api.bilibili.com/x/series/archives";
 export const FAV_LIST_API = "https://api.bilibili.com/x/v3/fav/resource/list";
 export const FAV_IDS_API = "https://api.bilibili.com/x/v3/fav/resource/ids";
 export const SEARCH_API = "https://api.bilibili.com/x/web-interface/wbi/search/type";
+export const BANGUMI_SEASON_API = "https://api.bilibili.com/pgc/view/web/season";
+export const BANGUMI_PLAYURL_API = "https://api.bilibili.com/pgc/player/web/v2/playurl";
+export const BANGUMI_MEDIA_API = "https://api.bilibili.com/pgc/review/user";
 
 export const WEB_BASE = "https://www.bilibili.com";
 export const SPACE_BASE = "https://space.bilibili.com";
@@ -18,6 +21,9 @@ export const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 
 /** DASH + 全格式位掩码（yt-dlp `_download_playinfo`）。 */
 export const FNVAL_DASH = 4048;
+
+/** 番剧 playurl 的 fnval（yt-dlp `BiliBiliBangumiIE`：12240 = DASH + HDR + 4K + 杜比 + 8K）。 */
+export const FNVAL_BANGUMI = 12240;
 
 /** Range 分块大小。8 MiB 在吞吐和常驻内存之间比较平衡。 */
 export const CHUNK_SIZE = 8 * 1024 * 1024;

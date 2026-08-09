@@ -14,6 +14,9 @@ const NAV_URL = "https://api.bilibili.com/x/web-interface/nav";
 const SEARCH_API = "https://api.bilibili.com/x/web-interface/wbi/search/type";
 const VIEW_API = "https://api.bilibili.com/x/article/view";
 const REPLY_API = "https://api.bilibili.com/x/v2/reply/wbi/main";
+// 图文流接口（gallery-dl BilibiliAPI 同源）：space 按 UP 主翻页，fav 是登录用户自己的图文收藏。
+const OPUS_FEED_SPACE_API = "https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/feed/space";
+const OPUS_FEED_FAV_API = "https://api.bilibili.com/x/polymer/web-dynamic/v1/opus/feed/fav";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 const MIXIN_TAB = [
   46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35,
@@ -216,6 +219,58 @@ function parseOpusIdFromInput(raw) {
   return /^\d{15,}$/.test(work) ? work : "";
 }
 
+function parseMidFromInput(raw) {
+  const work = coerceStr(raw).trim();
+  const fromUrl = work.match(/space\.bilibili\.com\/(\d+)/)?.[1];
+  if (fromUrl) return fromUrl;
+  return /^\d+$/.test(work) ? work : "";
+}
+
+/**
+ * 解析 opus 页内嵌的 `window.__INITIAL_STATE__`（gallery-dl BilibiliAPI.article 同法）。
+ * 页面偶发下发风控壳页（window._riskdata_），此时没有该对象，返回 null 走正则回退。
+ */
+function parseOpusInitialState(html) {
+  const marker = "window.__INITIAL_STATE__=";
+  const text = coerceStr(html);
+  const idx = text.indexOf(marker);
+  if (idx < 0) return null;
+  const seg = text.slice(idx + marker.length);
+  const end = seg.indexOf("};");
+  if (end < 0) return null;
+  try {
+    return JSON.parse(seg.slice(0, end + 1));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 从 INITIAL_STATE 收集结构化图片：头图相册 + 正文段落，每项 {url, liveUrl}。
+ * liveUrl 是实况图（LivePhoto）的视频轨，普通图片没有。
+ * 相比正则抠 HTML 的优势：拿得到 live_url，且不受评论区里贴图的干扰。
+ */
+function collectOpusPicsFromState(state) {
+  const out = [];
+  const seen = new Set();
+  const push = (pic) => {
+    const url = ensureHttpsBfs(pic?.url);
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    out.push({ url, liveUrl: ensureHttpsBfs(pic?.live_url || "") });
+  };
+  for (const module of state?.detail?.modules || []) {
+    if (module?.module_type === "MODULE_TYPE_BLOCKED") {
+      warn(`图文被内容门槛拦截：${coerceStr(module?.module_blocked?.hint_message) || "（如充电专属）"}`);
+    }
+    for (const pic of module?.module_top?.display?.album?.pics || []) push(pic);
+    for (const paragraph of module?.module_content?.paragraphs || []) {
+      for (const pic of paragraph?.pic?.pics || []) push(pic);
+    }
+  }
+  return out;
+}
+
 function parseCvIdFromOpusHtml(html) {
   const idx = coerceStr(html).indexOf("opus-module-copyright__right");
   const slice = idx >= 0 ? coerceStr(html).slice(idx, idx + 4000) : coerceStr(html);
@@ -321,14 +376,25 @@ async function processOneCv(cvId, img, sub, perCv, searchDesc) {
   }
 }
 
-async function processOneOpus(opusId, perTotal, img, sub) {
+async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
   const pageUrl = `https://www.bilibili.com/opus/${opusId}`;
   setHeader("Referer", pageUrl);
   setHeader("Origin", "https://www.bilibili.com");
   const html = await (await fetch(pageUrl)).text();
-  const imgs = collectImageUrlsFromContent(html);
-  if (imgs.length === 0) {
-    warn("opus 页面未解析到 bfs 图片链接，可能为壳页或结构变化；可尝试先在畅游登录 bilibili 后重试。");
+
+  // 首选 INITIAL_STATE 结构化取图（能拿到实况图 live_url），失败回退正则抠 bfs 链接。
+  const state = parseOpusInitialState(html);
+  let pics = collectOpusPicsFromState(state);
+  if (pics.length === 0) {
+    pics = collectImageUrlsFromContent(html).map((url) => ({ url, liveUrl: "" }));
+  }
+  if (pics.length === 0) {
+    if (state) {
+      // 结构化数据解析成功但确实没图：纯文字动态，批量模式下很常见，不当告警。
+      console.log(`[bilibili] opus ${opusId} 没有图片（纯文字动态），跳过`);
+    } else {
+      warn("opus 页面未解析到 bfs 图片链接，可能为壳页或结构变化；可尝试先在畅游登录 bilibili 后重试。");
+    }
     addProgress(perTotal);
     return;
   }
@@ -347,15 +413,71 @@ async function processOneOpus(opusId, perTotal, img, sub) {
   }
 
   const metadata = vd
-    ? buildArticleMetadata(vd, cvId, "", repliesData, imgs.length, opusId)
-    : { source: "bilibili_opus", opus_id: opusId, total_image_count: imgs.length };
+    ? buildArticleMetadata(vd, cvId, "", repliesData, pics.length, opusId)
+    : { source: "bilibili_opus", opus_id: opusId, total_image_count: pics.length };
   const base = coerceStr(vd?.title) || `图文 ${opusId}`;
-  const perImage = perTotal / imgs.length;
-  for (let index = 0; index < imgs.length; index += 1) {
-    const name = imgs.length > 1 ? `${base}(${index + 1})` : base;
-    await downloadImage(imgs[index], { name, metadata, url: pageUrl });
-    addProgress(perImage);
+  // 进度按实际文件数分摊：实况图的视频轨算一个独立文件（gallery-dl 同样输出两个文件）。
+  const liveCount = livePhoto ? pics.filter((p) => p.liveUrl).length : 0;
+  const perFile = perTotal / (pics.length + liveCount);
+  for (let index = 0; index < pics.length; index += 1) {
+    const name = pics.length > 1 ? `${base}(${index + 1})` : base;
+    await downloadImage(pics[index].url, { name, metadata, url: pageUrl });
+    addProgress(perFile);
+    if (livePhoto && pics[index].liveUrl) {
+      await downloadImage(pics[index].liveUrl, { name: `${name}(live)`, metadata, url: pageUrl });
+      addProgress(perFile);
+    }
   }
+}
+
+/** UP 主图文列表（gallery-dl user_articles）：opus_id 游标翻页直到 has_more 为假。 */
+async function collectSpaceOpusIds(mid, maxArticles) {
+  const ids = [];
+  let offset = "";
+  while (ids.length < maxArticles) {
+    const url = `${OPUS_FEED_SPACE_API}?host_mid=${mid}${offset ? `&offset=${offset}` : ""}`;
+    const json = await fetchJson(url);
+    if (json?.code !== 0) {
+      checkBilibiliRisk(json?.code);
+      throw new Error(`UP 主图文接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    }
+    const data = json?.data || {};
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (items.length === 0) break;
+    for (const item of items) {
+      if (ids.length >= maxArticles) break;
+      if (item?.opus_id != null) ids.push(coerceStr(item.opus_id));
+    }
+    if (data.has_more !== true) break;
+    offset = coerceStr(data.offset) || coerceStr(items[items.length - 1]?.opus_id);
+    await sleep(2000);
+  }
+  return ids;
+}
+
+/** 登录用户自己的图文收藏（gallery-dl user_favlist）：page 翻页，需要登录态。 */
+async function collectFavOpusIds(maxArticles) {
+  const ids = [];
+  let page = 1;
+  while (ids.length < maxArticles) {
+    const json = await fetchJson(`${OPUS_FEED_FAV_API}?page=${page}&page_size=20`);
+    if (json?.code !== 0) {
+      // -101 会在这里硬失败并提示登录：收藏夹只属于登录用户，没有匿名可看的形态。
+      checkBilibiliRisk(json?.code);
+      throw new Error(`图文收藏接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    }
+    const data = json?.data || {};
+    const items = Array.isArray(data.items) ? data.items : [];
+    if (items.length === 0) break;
+    for (const item of items) {
+      if (ids.length >= maxArticles) break;
+      if (item?.opus_id != null) ids.push(coerceStr(item.opus_id));
+    }
+    if (data.has_more !== true) break;
+    page += 1;
+    await sleep(2000);
+  }
+  return ids;
 }
 
 export async function crawl(_common, custom) {
@@ -370,6 +492,8 @@ export async function crawl(_common, custom) {
     warn("未从畅游获取到 B 站 Cookie，将以未登录状态抓取；部分内容可能失败。如需完整结果请先在畅游登录 bilibili。");
   }
 
+  const livePhoto = vars.live_photo !== false;
+
   if (vars.mode === "single") {
     const opusId = parseOpusIdFromInput(vars.cv_id_or_url);
     if (opusId) {
@@ -379,10 +503,49 @@ export async function crawl(_common, custom) {
       } catch {
         // Opus image extraction can still work without WBI metadata.
       }
-      await processOneOpus(opusId, 100.0, keys.img, keys.sub);
+      await processOneOpus(opusId, 100.0, keys.img, keys.sub, livePhoto);
       addProgress(100.0);
       return;
     }
+  }
+
+  if (vars.mode === "space" || vars.mode === "favlist") {
+    // WBI 只服务于 opus 关联 cv 的元数据与评论，拿不到也不阻断批量取图。
+    let keys = { img: "", sub: "" };
+    try {
+      keys = await getWbiKeys();
+    } catch {
+      // 同上。
+    }
+    const maxArticles = Math.max(1, Number(vars.max_articles ?? 20));
+    let opusIds;
+    if (vars.mode === "space") {
+      const mid = parseMidFromInput(vars.mid);
+      if (!mid) throw new Error("请填写 UP 主 UID（纯数字）或主页链接（space.bilibili.com/<UID>）");
+      opusIds = await collectSpaceOpusIds(mid, maxArticles);
+      if (opusIds.length === 0) throw new Error(`UP 主 ${mid} 没有任何图文动态`);
+    } else {
+      opusIds = await collectFavOpusIds(maxArticles);
+      if (opusIds.length === 0) throw new Error("图文收藏是空的（该收藏属于当前登录账号，请确认已在畅游登录 bilibili）");
+    }
+
+    console.log(`[bilibili] 共取到 ${opusIds.length} 篇图文（上限 ${maxArticles}），开始逐篇下载`);
+    const perOpus = 100.0 / opusIds.length;
+    let failed = 0;
+    for (let index = 0; index < opusIds.length; index += 1) {
+      if (index > 0) await sleep(1000);
+      try {
+        await processOneOpus(opusIds[index], perOpus, keys.img, keys.sub, livePhoto);
+      } catch (error) {
+        failed += 1;
+        warn(`opus ${opusIds[index]} 下载失败：${coerceStr(error?.message ?? error)}`);
+        addProgress(perOpus);
+      }
+    }
+    if (failed > 0 && failed === opusIds.length) throw new Error("所有图文均下载失败");
+    if (failed > 0) warn(`共 ${opusIds.length} 篇图文，其中 ${failed} 篇失败。`);
+    addProgress(100.0);
+    return;
   }
 
   const keys = await getWbiKeys();

@@ -4,12 +4,11 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { FNVAL_DASH, PLAYURL_API, VIEW_API, WEB_BASE } from "./consts";
-import { pickAudio, pickVideo, qualityLabels, streamUrls } from "./formats";
+import { ingestDash } from "./ingest";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds } from "./util";
-import { downloadStreamToVfs, removeQuietly } from "./vfs";
 import { buildDmParams, signQuery } from "./wbi";
 
-const { addProgress, downloadImage, ffmpeg, fs, warn } = Kabegame;
+const { warn } = Kabegame;
 
 function buildMetadata(view, page, video, audio, qualityLabel) {
   return {
@@ -84,64 +83,19 @@ async function processPart(view, page, keys, vars, budget) {
     throw new Error("playurl 未返回 DASH 流（可能是番剧/课程等需要专用接口的内容）");
   }
 
-  const video = pickVideo(dash, Number(vars.max_quality ?? 0), vars.prefer_avc !== false);
-  const audio = pickAudio(dash);
-  if (!video) throw new Error("playurl 未返回可用视频流");
-  if (!audio) throw new Error("playurl 未返回可用音频流");
-
-  const qualityLabel = qualityLabels(play?.data)[Number(video.id ?? 0)] || `quality ${video.id}`;
-  console.log(
-    `[bilibili-video] ▶ ${displayName}：${qualityLabel} / ${video.width}x${video.height} / ${coerceStr(video.codecs)}`,
-  );
-
-  const root = fs.getRoot();
-  const stem = `${bvid}_${cid}`;
-  const videoPath = `${root}/tmp/${stem}.video.m4s`;
-  const audioPath = `${root}/tmp/${stem}.audio.m4s`;
-  const outputPath = `${root}/tmp/${stem}.mp4`;
-
-  try {
-    // 进度切分：视频 60% / 音频 20% / 合流 10% / 入库 10%。
-    let reported = 0;
-    const reportChunk = (share) => (received, total) => {
-      const step = (received / total) * budget * share;
-      reported += step;
-      addProgress(step);
-    };
-
-    await downloadStreamToVfs(
-      streamUrls(video), videoPath, Number(video.size ?? 0), `${displayName} 视频流`, reportChunk(0.6),
-    );
-    await downloadStreamToVfs(
-      streamUrls(audio), audioPath, Number(audio.size ?? 0), `${displayName} 音频流`, reportChunk(0.2),
-    );
-
-    await ffmpeg.muxStreams([videoPath, audioPath], outputPath);
-    addProgress(budget * 0.1);
-    reported += budget * 0.1;
-
-    const probe = await ffmpeg.probe(outputPath);
-    if (probe && !probe.browserSafe) {
-      warn(`${displayName} 合流结果不是浏览器可直接播放的编码（${probe.mimeType}），画廊可能只显示缩略图。`);
-    }
-
-    const pageUrl = isMultiPart
-      ? `${WEB_BASE}/video/${bvid}?p=${partIndex}`
-      : `${WEB_BASE}/video/${bvid}`;
-    await downloadImage(outputPath, {
-      name: displayName,
-      metadata: buildMetadata(view, page, video, audio, qualityLabel),
-      url: pageUrl,
-    });
-
-    // 补齐本 P 剩余额度（分块进度是估算，未必刚好加满）。
-    addProgress(Math.max(0, budget - reported));
-    console.log(`[bilibili-video] ◀ ${displayName} 已提交下载队列`);
-  } finally {
-    // 合流产物 outputPath 交给下次任务开头的 cleanupStaleTmp 清理，见 vfs.ts。
-    await removeQuietly(videoPath);
-    await removeQuietly(audioPath);
-  }
+  const pageUrl = isMultiPart
+    ? `${WEB_BASE}/video/${bvid}?p=${partIndex}`
+    : `${WEB_BASE}/video/${bvid}`;
+  await ingestDash({
+    dash,
+    formatSource: play?.data,
+    displayName,
+    stem: `${bvid}_${cid}`,
+    pageUrl,
+    buildMeta: (video, audio, qualityLabel) => buildMetadata(view, page, video, audio, qualityLabel),
+    vars,
+    budget,
+  });
 }
 
 /** partIndex：1 起的分 P 序号，0 表示全部分 P。 */

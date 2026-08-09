@@ -1,6 +1,6 @@
 {
   "name": "bilibili-video",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "name.zh": "bilibili视频",
   "name.en": "Bilibili Videos",
@@ -38,8 +38,8 @@
       "name.ja": "モード",
       "name.ko": "모드",
       "name.zhtw": "模式",
-      "descripts": "单个视频，或按 UP 主 / 合集 / 收藏夹 / 关键词批量下载",
-      "descripts.en": "A single video, or bulk-download by uploader / collection / favorites / search",
+      "descripts": "单个视频，或按 UP 主 / 合集 / 收藏夹 / 关键词 / 番剧批量下载",
+      "descripts.en": "A single video, or bulk-download by uploader / collection / favorites / search / bangumi",
       "default": "single",
       "options": [
         {
@@ -73,8 +73,50 @@
           "name.ko": "키워드 검색",
           "name.zhtw": "關鍵字搜尋",
           "variable": "search"
+        },
+        {
+          "name": "番剧 / 剧集",
+          "name.en": "Bangumi / episodes",
+          "name.ja": "アニメ / エピソード",
+          "name.ko": "애니메이션 / 에피소드",
+          "name.zhtw": "番劇 / 劇集",
+          "variable": "bangumi"
         }
       ]
+    },
+    {
+      "key": "bangumi_url",
+      "type": "string",
+      "name": "番剧链接或编号",
+      "name.en": "Bangumi URL or id",
+      "name.ja": "アニメの URL または ID",
+      "name.ko": "애니메이션 URL 또는 ID",
+      "name.zhtw": "番劇連結或編號",
+      "descripts": "单集 ep21495、整季 ss26801、剧集页 md24097891，或对应完整链接（bilibili.com/bangumi/play/ep21495 等）。ss/md 按正片列表批量下载",
+      "descripts.en": "Single episode (ep21495), whole season (ss26801), media page (md24097891), or the full URL. ss/md bulk-download the main episode list",
+      "default": "",
+      "when": {
+        "mode": [
+          "bangumi"
+        ]
+      }
+    },
+    {
+      "key": "ep_start",
+      "type": "int",
+      "name": "起始集数",
+      "name.en": "Start episode",
+      "name.ja": "開始話数",
+      "name.ko": "시작 화수",
+      "name.zhtw": "起始集數",
+      "descripts": "整季（ss/md）时从正片第几集开始（1 起），配合「最多下载数」截断；单集（ep）忽略此项",
+      "descripts.en": "For ss/md: 1-based index into the main episode list to start from, capped by \"Max videos\"; ignored for a single ep",
+      "default": 1,
+      "when": {
+        "mode": [
+          "bangumi"
+        ]
+      }
     },
     {
       "key": "video",
@@ -358,7 +400,8 @@
         "mode": [
           "space",
           "list",
-          "search"
+          "search",
+          "bangumi"
         ]
       }
     },

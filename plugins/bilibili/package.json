@@ -1,6 +1,6 @@
 {
   "name": "bilibili",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",
@@ -36,8 +36,8 @@
       "name.ja": "モード",
       "name.ko": "모드",
       "name.zhtw": "模式",
-      "descripts": "关键词搜索多篇专栏；单篇可填传统专栏链接（如 https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1）或图文帖 https://www.bilibili.com/opus/…",
-      "descripts.en": "Keyword search; single mode: classic column URL (e.g. https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1) or opus https://www.bilibili.com/opus/…",
+      "descripts": "关键词搜索多篇专栏；单篇可填传统专栏链接或图文帖 opus 链接；也可按 UP 主批量抓图文动态，或抓当前登录账号的图文收藏",
+      "descripts.en": "Keyword search; single mode: classic column URL or an opus URL; or bulk-crawl an uploader's opus feed / the logged-in account's favorite articles",
       "default": "search",
       "options": [
         {
@@ -55,8 +55,71 @@
           "name.ko": "단일 칼럼",
           "name.zhtw": "單篇專欄",
           "variable": "single"
+        },
+        {
+          "name": "UP 主图文",
+          "name.en": "Uploader's articles",
+          "name.ja": "投稿者の画像投稿",
+          "name.ko": "업로더 이미지 게시물",
+          "name.zhtw": "UP 主圖文",
+          "variable": "space"
+        },
+        {
+          "name": "我的图文收藏",
+          "name.en": "My favorite articles",
+          "name.ja": "自分のお気に入り",
+          "name.ko": "내 즐겨찾기",
+          "name.zhtw": "我的圖文收藏",
+          "variable": "favlist"
         }
       ]
+    },
+    {
+      "key": "mid",
+      "type": "string",
+      "name": "UP 主 UID 或主页链接",
+      "name.en": "Uploader UID or space URL",
+      "name.ja": "投稿者 UID またはマイページ URL",
+      "name.ko": "업로더 UID 또는 홈 URL",
+      "name.zhtw": "UP 主 UID 或主頁連結",
+      "descripts": "纯数字 UID（3985676）或主页链接（https://space.bilibili.com/3985676）。抓取其全部图文动态（opus）",
+      "descripts.en": "Numeric UID (3985676) or space URL. Crawls the uploader's opus (image post) feed",
+      "default": "",
+      "when": {
+        "mode": [
+          "space"
+        ]
+      }
+    },
+    {
+      "key": "max_articles",
+      "type": "int",
+      "name": "最多图文篇数",
+      "name.en": "Max articles",
+      "name.ja": "最大投稿数",
+      "name.ko": "최대 게시물 수",
+      "name.zhtw": "最多圖文篇數",
+      "descripts": "本次最多抓几篇图文（每篇可能有多张图）",
+      "descripts.en": "Cap on articles fetched this run (each may contain multiple images)",
+      "default": 20,
+      "when": {
+        "mode": [
+          "space",
+          "favlist"
+        ]
+      }
+    },
+    {
+      "key": "live_photo",
+      "type": "boolean",
+      "name": "下载实况图视频",
+      "name.en": "Download live photos",
+      "name.ja": "ライブフォトを保存",
+      "name.ko": "라이브 포토 저장",
+      "name.zhtw": "下載實況圖影片",
+      "descripts": "实况图（LivePhoto）除静态图外还有一段短视频，开启后一并入库",
+      "descripts.en": "Live photos carry a short video besides the still image; also ingest it when enabled",
+      "default": true
     },
     {
       "key": "cv_id_or_url",

@@ -8,10 +8,12 @@
 // 模块分工：
 //   consts  端点与常量        wbi     WBI 签名与反爬指纹参数
 //   util    取值/HTTP/输入解析 formats DASH 流挑选
-//   vfs     Range 分块下载     video   单视频完整链路（view→playurl→合流→入库）
-//   space   UP 主投稿列表
+//   vfs     Range 分块下载     ingest  DASH 挑流→下载→合流→入库（UGC/PGC 共用）
+//   video   单视频链路（view→playurl→ingest）
+//   space   UP 主投稿列表      bangumi 番剧 PGC 链路（season→playurl→ingest）
 import { sleep } from "@kabegame/plugin-sdk";
 
+import { crawlBangumi, parseBangumiId } from "./bangumi";
 import { UA, WEB_BASE } from "./consts";
 import { collectListEntries } from "./list";
 import { collectSearchEntries } from "./search";
@@ -85,8 +87,18 @@ export async function crawl(_common, custom) {
     return;
   }
 
+  if (vars.mode === "bangumi") {
+    // PGC 接口不吃 WBI，keys 无需传入。
+    await crawlBangumi(vars, intervalMs, retries);
+    return;
+  }
+
   const { bvid, aid } = parseVideoId(vars.video);
   if (!bvid && !aid) {
+    // 常见误用：把番剧链接贴进「单个视频」。给出可行动的提示而不是笼统报错。
+    if (parseBangumiId(vars.video).kind) {
+      throw new Error("这是番剧 / 剧集链接，请把「模式」切换为「番剧」再试");
+    }
     throw new Error("请填写 BV 号（BV13x41117TL）、av 号（av1074402）或视频链接");
   }
   await downloadWithRetry(
