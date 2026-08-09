@@ -1,0 +1,33 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.haowallpaper",
+  "name": "color_entry_provider",
+  "list": {
+    "${color.color_name}": {
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.color') AS TEXT)), '') AS color_name, MIN(NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.color_hex') AS TEXT)), '')) AS color_hex, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, plugin_metadata FROM (${composed}) AS composed_result) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.color') AS TEXT)), '') IS NOT NULL GROUP BY color_name ORDER BY image_count DESC, color_name ASC",
+      "data_var": "color",
+      "provider": "color_provider",
+      "properties": {
+        "color_name": "${color.color_name}",
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${color.color_name}",
+        "color_hex": "${color.color_hex}",
+        "image_count": "${color.image_count}",
+      },
+    },
+  },
+  "resolve": {
+    "([^/]+)": {
+      "provider": "color_provider",
+      "properties": {
+        "color_name": "${capture[1]}",
+      },
+      "meta": {
+        "isLeaf": true,
+      },
+    },
+  },
+  "note": "{\"title\":\"哲风壁纸色彩\",\"content\":\"按 metadata.color 分组，并在节点 meta 中附带 color_hex。\"}",
+}

@@ -2,7 +2,7 @@
 
 下面说的是：**你想从 B 站「专栏」里按关键词搜多篇、或只收单帖，把图收进 Kabegame 时，整体上会怎么走**，照着做心里就有数啦。（截图可在插件目录下自行补充，与 Heybox 文档同款命名习惯即可。）
 
-![b-posts](./b-posts.png)
+![posts](./banners/banner-b-posts.jpg)
 
 ---
 

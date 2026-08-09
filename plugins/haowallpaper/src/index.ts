@@ -14,7 +14,7 @@ const { addProgress, currentDocument, downloadImage, to, warn } = Kabegame;
 const DEFAULT_BASE_URL = "https://haowallpaper.com";
 
 /** metadata 结构版本，改字段时递增，供后续 migration 脚本识别。 */
-const METADATA_SCHEMA = 1;
+const METADATA_SCHEMA = 2;
 
 function coerceStr(value) {
   return value == null ? "" : String(value);
@@ -98,6 +98,30 @@ function parseTags(document, root) {
     .filter(Boolean);
 }
 
+/** 详情卡片底部的发布者信息。只保存结构化字段，不冻结站点 HTML。 */
+function parsePublisher(root, pageUrl) {
+  const block = root.querySelector(".col-son-bottom");
+  const profileLink = block?.querySelector('a[href*="/userProfile/"]');
+  const profileUrl = resolveUrl(profileLink?.getAttribute("href"), pageUrl);
+  const counts = {};
+  for (const item of Array.from(block?.querySelectorAll(".col-count") || [])) {
+    const label = textOf(item.querySelector("span:first-child"));
+    const value = textOf(item.querySelector(".count"));
+    if (label) counts[label] = value;
+  }
+
+  return {
+    id: profileUrl.match(/userProfile\/(\d+)/)?.[1] || "",
+    name: textOf(block?.querySelector(".user-nick-name")),
+    profile_url: profileUrl,
+    avatar_url: resolveUrl(block?.querySelector(".user-avatar-img")?.getAttribute("src"), pageUrl),
+    follower_count: counts["粉丝"] || "",
+    share_count: counts["分享"] || "",
+    download_count: counts["获载"] || "",
+    signature: textOf(block?.querySelector(".user-relevant-2")).replace(/^签名[:：]\s*/, ""),
+  };
+}
+
 /** 分页条最后一个数字即总页数（`.page-content` 里混有「...」等非数字项）。 */
 function parseTotalPages(root) {
   let maxPage = 1;
@@ -159,11 +183,15 @@ async function processDetailPage(detailUrl, wantedTags, formats) {
     return false;
   }
 
-  const rows = parseInfoRows(root);
+  const detailPanel =
+    root.querySelector(
+      ".preview-block .col-md-4.is-nt-front .col-4-son-1",
+    ) || root;
+  const rows = parseInfoRows(detailPanel);
   const title = coerceStr(jsonLd.caption || jsonLd.name || textOf(root.querySelector(".details-page h1")));
   const postId = finalUrl.match(/ViewLook\/(\d+)/)?.[1] || "";
   const fileId = downloadUrl.match(/previewFileImg\/(\w+)/)?.[1] || "";
-  const authorLink = root.querySelector('.col-son-bottom a[href*="/userProfile/"]');
+  const publisher = parsePublisher(detailPanel, finalUrl);
 
   const metadata = {
     schema: METADATA_SCHEMA,
@@ -181,15 +209,17 @@ async function processDetailPage(detailUrl, wantedTags, formats) {
     height: Number(jsonLd.height) || 0,
     color: rows["色系"] || "",
     color_hex:
-      root.querySelector(".color-bg")?.getAttribute("style")?.match(/background-color:\s*([^;]+)/)?.[1]?.trim() || "",
+      detailPanel.querySelector(".color-bg")?.getAttribute("style")?.match(/background-color:\s*([^;]+)/)?.[1]?.trim() || "",
     size: rows["大小"] || coerceStr(jsonLd.contentSize),
     format: coerceStr(jsonLd.encodingFormat || jsonLd.fileFormat),
     duration: coerceStr(jsonLd.duration),
     download_count: rows["下载量"] || "",
     favorite_count: rows["收藏量"] || "",
     published_at: rows["发布时间"] || "",
-    author: textOf(root.querySelector(".user-nick-name")),
-    author_id: authorLink?.getAttribute("href")?.match(/userProfile\/(\d+)/)?.[1] || "",
+    // 保留 schema 1 的扁平字段，兼容既有模板 / provider；完整发布者信息放在 publisher。
+    author: publisher.name,
+    author_id: publisher.id,
+    publisher,
   };
 
   const opts = { metadata, url: finalUrl };

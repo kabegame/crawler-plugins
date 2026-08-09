@@ -105,11 +105,44 @@ function commandExists(command: string): boolean {
   return r.status === 0;
 }
 
+// @kabegame/plugin-sdk 的 exports 指向 dist/，但 SDK 子仓库只提交 src/；
+// 新 checkout 或 SDK 更新后 dist 缺失/过期时，所有 import SDK 的插件都会在
+// rspack 解析阶段报 "Can't resolve '@kabegame/plugin-sdk'"。
+// 所以在跑任何插件构建前，先确保 SDK 的 dist 是新鲜的。
+const SDK_DIR = path.join(WORKSPACE_ROOT, "packages", "kabegame-plugin-sdk");
+let sdkEnsured = false;
+
+function ensureSdkBuilt(): void {
+  if (sdkEnsured) return;
+  sdkEnsured = true;
+  const srcDir = path.join(SDK_DIR, "src");
+  if (!fs.existsSync(srcDir)) return; // SDK 源码不在（submodule 未拉取等），让后续构建自然报错
+  const distEntry = path.join(SDK_DIR, "dist", "index.js");
+  let stale = !fs.existsSync(distEntry);
+  if (!stale) {
+    const distMtime = fs.statSync(distEntry).mtimeMs;
+    stale = fs
+      .readdirSync(srcDir)
+      .some((f) => fs.statSync(path.join(srcDir, f)).mtimeMs > distMtime);
+  }
+  if (!stale) return;
+  console.log(chalk.blue("🔧 构建 @kabegame/plugin-sdk（dist 缺失或过期）..."));
+  const r = spawnSync("deno", ["task", "build"], {
+    cwd: SDK_DIR,
+    stdio: "inherit",
+    env: { ...process.env },
+  });
+  if (r.status !== 0) {
+    throw new Error("构建 @kabegame/plugin-sdk 失败");
+  }
+}
+
 function runPluginBuild(pluginDir: string, pkg: PluginPackageJson): void {
   const buildScript = pkg.scripts?.build;
   if (typeof buildScript !== "string" || buildScript.trim().length === 0) {
     return;
   }
+  ensureSdkBuilt();
 
   // deno 优先（项目工具链），npm 次之，bun 兜底。构建职责集中在这里：
   // kabegame-cli plugin pack 只打包已构建好的目录，不再自己跑 build。

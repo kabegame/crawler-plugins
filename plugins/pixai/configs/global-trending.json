@@ -12,7 +12,7 @@
   "userConfig": {
     "crawl_type": "global",
     "artwork_sort": "trending",
-    "max_global_pages": 5,
-    "skip_artwork_pages": 0
+    "start_page": 1,
+    "end_page": 5
   }
 }

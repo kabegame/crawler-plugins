@@ -38,6 +38,9 @@
       "name.zhtw": "模式",
       "descripts": "关键词搜索多篇专栏；单篇可填传统专栏链接或图文帖 opus 链接；也可按 UP 主批量抓图文动态，或抓当前登录账号的图文收藏",
       "descripts.en": "Keyword search; single mode: classic column URL or an opus URL; or bulk-crawl an uploader's opus feed / the logged-in account's favorite articles",
+      "descripts.ja": "キーワード検索で複数のコラムを検索。単一モードでは従来のコラム URL または画像付き投稿（opus）URL を指定。投稿者単位の一括取得や、ログイン中アカウントのお気に入り画像投稿の取得も可能です",
+      "descripts.ko": "키워드 검색으로 여러 칼럼을 검색합니다. 단일 모드에서는 기존 칼럼 URL 또는 이미지 게시물(opus) URL을 입력합니다. 업로더 단위 일괄 수집이나 로그인 계정의 즐겨찾기 이미지 게시물 수집도 지원합니다",
+      "descripts.zhtw": "可依關鍵字搜尋多篇專欄；單篇模式可填傳統專欄連結或圖文帖 opus 連結；也可按 UP 主批次抓取圖文動態，或抓取目前登入帳號的圖文收藏",
       "default": "search",
       "options": [
         {
@@ -84,6 +87,9 @@
       "name.zhtw": "UP 主 UID 或主頁連結",
       "descripts": "纯数字 UID（3985676）或主页链接（https://space.bilibili.com/3985676）。抓取其全部图文动态（opus）",
       "descripts.en": "Numeric UID (3985676) or space URL. Crawls the uploader's opus (image post) feed",
+      "descripts.ja": "数字の UID（3985676）またはマイページ URL（https://space.bilibili.com/3985676）。その投稿者の画像投稿（opus）を取得します",
+      "descripts.ko": "숫자 UID(3985676) 또는 홈 URL(https://space.bilibili.com/3985676). 해당 업로더의 이미지 게시물(opus)을 수집합니다",
+      "descripts.zhtw": "純數字 UID（3985676）或主頁連結（https://space.bilibili.com/3985676）。抓取其全部圖文動態（opus）",
       "default": "",
       "when": {
         "mode": [
@@ -101,6 +107,9 @@
       "name.zhtw": "最多圖文篇數",
       "descripts": "本次最多抓几篇图文（每篇可能有多张图）",
       "descripts.en": "Cap on articles fetched this run (each may contain multiple images)",
+      "descripts.ja": "今回取得する投稿数の上限（1 件に複数枚の画像が含まれる場合があります）",
+      "descripts.ko": "이번 실행에서 수집할 최대 게시물 수(게시물마다 여러 이미지가 있을 수 있음)",
+      "descripts.zhtw": "本次最多抓幾篇圖文（每篇可能有多張圖）",
       "default": 20,
       "when": {
         "mode": [
@@ -119,6 +128,9 @@
       "name.zhtw": "下載實況圖影片",
       "descripts": "实况图（LivePhoto）除静态图外还有一段短视频，开启后一并入库",
       "descripts.en": "Live photos carry a short video besides the still image; also ingest it when enabled",
+      "descripts.ja": "ライブフォトには静止画のほかに短い動画があり、有効にすると動画も保存します",
+      "descripts.ko": "라이브 포토에는 정지 이미지 외에 짧은 동영상이 있으며, 켜면 동영상도 함께 저장합니다",
+      "descripts.zhtw": "實況圖（LivePhoto）除靜態圖外還有一段短影片，開啟後一併入庫",
       "default": true
     },
     {
@@ -131,6 +143,9 @@
       "name.zhtw": "專欄 ID 或連結",
       "descripts": "传统专栏：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 数字 id）；图文：https://www.bilibili.com/opus/… 或 15 位以上纯数字",
       "descripts.en": "Column: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (or cv id only); opus: https://www.bilibili.com/opus/… or long numeric id",
+      "descripts.ja": "従来のコラム：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（cv の数字 ID のみでも可）。画像付き投稿：https://www.bilibili.com/opus/… または 15 桁以上の数字 ID",
+      "descripts.ko": "기존 칼럼: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (cv 숫자 ID만 입력해도 됨); 이미지 게시물: https://www.bilibili.com/opus/… 또는 15자리 이상의 숫자 ID",
+      "descripts.zhtw": "傳統專欄：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 數字 ID）；圖文：https://www.bilibili.com/opus/… 或 15 位以上純數字",
       "default": "",
       "when": {
         "mode": [
@@ -148,6 +163,9 @@
       "name.zhtw": "搜尋關鍵字",
       "descripts": "专栏 Tab 搜索关键词（与 search.bilibili.com/article 一致）",
       "descripts.en": "Article search keyword",
+      "descripts.ja": "コラムタブの検索キーワード（search.bilibili.com/article と同じ）",
+      "descripts.ko": "칼럼 탭 검색 키워드(search.bilibili.com/article와 동일)",
+      "descripts.zhtw": "專欄分頁的搜尋關鍵字（與 search.bilibili.com/article 相同）",
       "default": "美图 壁纸",
       "when": {
         "mode": [
@@ -165,7 +183,11 @@
       "name.zhtw": "排序",
       "descripts": "搜索列表排序方式（写入 WBI search 请求）",
       "descripts.en": "Search result sort (WBI search/type)",
+      "descripts.ja": "検索結果の並び順（WBI search リクエストに指定）",
+      "descripts.ko": "검색 결과 정렬 방식(WBI search 요청에 적용)",
+      "descripts.zhtw": "搜尋結果的排序方式（寫入 WBI search 請求）",
       "default": "totalrank",
+      "width": 2,
       "when": {
         "mode": [
           "search"
@@ -224,7 +246,11 @@
       "name.zhtw": "分區",
       "descripts": "专栏分区筛选（对应搜索接口 category_id）",
       "descripts.en": "Article category filter (category_id)",
+      "descripts.ja": "コラムのカテゴリーフィルター（検索 API の category_id に対応）",
+      "descripts.ko": "칼럼 카테고리 필터(검색 API의 category_id에 해당)",
+      "descripts.zhtw": "專欄分區篩選（對應搜尋 API 的 category_id）",
       "default": "0",
+      "width": 2,
       "when": {
         "mode": [
           "search"
@@ -306,7 +332,12 @@
       "name.ko": "시작 페이지",
       "name.zhtw": "起始頁",
       "descripts": "从第几页开始（含）",
+      "descripts.en": "First page to crawl (inclusive)",
+      "descripts.ja": "取得を開始するページ（このページを含む）",
+      "descripts.ko": "수집을 시작할 페이지(해당 페이지 포함)",
+      "descripts.zhtw": "從第幾頁開始（含）",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -322,7 +353,12 @@
       "name.ko": "끝 페이지",
       "name.zhtw": "結束頁",
       "descripts": "到第几页结束（含）",
+      "descripts.en": "Last page to crawl (inclusive)",
+      "descripts.ja": "取得を終了するページ（このページを含む）",
+      "descripts.ko": "수집을 종료할 페이지(해당 페이지 포함)",
+      "descripts.zhtw": "到第幾頁結束（含）",
       "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -338,7 +374,12 @@
       "name.ko": "페이지당 개수",
       "name.zhtw": "每頁條數",
       "descripts": "搜索 API 的 page_size（一般 20）",
-      "default": 20,
+      "descripts.en": "Search API page_size (usually 20)",
+      "descripts.ja": "検索 API の page_size（通常は 20）",
+      "descripts.ko": "검색 API의 page_size(일반적으로 20)",
+      "descripts.zhtw": "搜尋 API 的 page_size（通常為 20）",
+      "default": 1,
+      "width": 1,
       "when": {
         "mode": [
           "search"
@@ -350,12 +391,24 @@
   "kbDoc": {
     "default": "README.md"
   },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
   "kbAssets": [
     "article-url.jpg",
-    "b-posts.png",
+    "banners/banner-b-posts.jpg",
+    "banners/banner-post.jpg",
+    "banners/banner-images.jpg",
     "images.png",
     "post-url.jpg",
     "src-bilibili.png"
   ],
-  "kbDescriptionTemplate": "templates/description.ejs"
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
 }

@@ -1,0 +1,34 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.haowallpaper",
+  "name": "tag_entry_provider",
+  "list": {
+    "${tag.tag_name}": {
+      "sql": "WITH source AS (SELECT id, plugin_metadata FROM (${composed}) AS composed_result), grouped AS (SELECT NULLIF(TRIM(CAST(tag.value AS TEXT)), '') AS tag_name, COUNT(DISTINCT source.id) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN COALESCE(json_extract(source.plugin_metadata, '$.tags'), json('[]')) ELSE json('[]') END) AS tag WHERE NULLIF(TRIM(CAST(tag.value AS TEXT)), '') IS NOT NULL GROUP BY tag_name), counted AS (SELECT tag_name, image_count, COUNT(*) OVER () AS total_tag_count FROM grouped) SELECT tag_name, image_count FROM counted WHERE total_tag_count <= 100 ORDER BY image_count DESC, tag_name ASC",
+      "data_var": "tag",
+      "provider": "tag_provider",
+      "properties": {
+        "tag_name": "${tag.tag_name}",
+      },
+      "meta": {
+        "isLeaf": true,
+        "display": "${tag.tag_name}",
+        "image_count": "${tag.image_count}",
+      },
+    },
+    "page-${page.page_num}": {
+      "sql": "WITH source AS (SELECT id, plugin_metadata FROM (${composed}) AS composed_result), grouped AS (SELECT NULLIF(TRIM(CAST(tag.value AS TEXT)), '') AS tag_name, COUNT(DISTINCT source.id) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN COALESCE(json_extract(source.plugin_metadata, '$.tags'), json('[]')) ELSE json('[]') END) AS tag WHERE NULLIF(TRIM(CAST(tag.value AS TEXT)), '') IS NOT NULL GROUP BY tag_name), numbered AS (SELECT tag_name, image_count, ROW_NUMBER() OVER (ORDER BY image_count DESC, tag_name ASC) AS rn, COUNT(*) OVER () AS total_tag_count FROM grouped), page_tags AS (SELECT ((rn - 1) / 100) + 1 AS page_num, tag_name, image_count, rn FROM numbered WHERE total_tag_count > 100) SELECT page_num, json_group_array(json_object('tag_name', tag_name, 'image_count', image_count)) AS page_tags_json FROM (SELECT page_num, tag_name, image_count, rn FROM page_tags ORDER BY rn) AS ordered_page_tags GROUP BY page_num ORDER BY page_num",
+      "data_var": "page",
+      "provider": "tag_page_provider",
+      "properties": {
+        "page_num": "${page.page_num}",
+        "page_tags_json": "${page.page_tags_json}",
+      },
+      "meta": {
+        "page_num": "${page.page_num}",
+        "plain": true,
+      },
+    },
+  },
+  "note": "{\"title\":\"哲风壁纸标签\",\"content\":\"按 metadata.tags 分组；标签超过 100 个时每 100 个生成一页。\"}",
+}

@@ -1890,8 +1890,6 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@rspack/cli@1",
-        "npm:@rspack/core@1",
         "npm:@types/node@22",
         "npm:archiver@^7.0.1",
         "npm:chalk@^5.3.0",
@@ -1900,6 +1898,152 @@
         "npm:husky@^9.1.7",
         "npm:typescript@^5.5.0"
       ]
+    },
+    "members": {
+      "plugins/anihonet-wallpaper": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/anime-pictures": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/bilibili": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/bilibili-video": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/haowallpaper": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/heybox": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kemono": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/konachan": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/miyoushe": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/pixai": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/pixiv": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/twodwallpapers": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/wallpapers-craft": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/wallspic": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/xhs": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/ziworld": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      }
     }
   }
 }

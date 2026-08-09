@@ -671,5 +671,12 @@
     "ko": "README.ko.md",
     "default": "README.md",
     "zhtw": "README.zhtw.md"
+  },
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
   }
 }
