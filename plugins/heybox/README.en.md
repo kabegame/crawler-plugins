@@ -91,6 +91,8 @@ Whether a post came from search results or a URL you provided, **every post** fo
 | Crawl Mode | Always | Keyword Search / Single Post URL | Keyword Search |
 | Post Share URL | Single-post mode | Paste a share link | Empty |
 | Search Keyword | Keyword Search | What to search for | 美图 |
+| Auto Comment | Always | Like every crawled post and post one comment | Off |
+| Comment Text | Auto Comment enabled | The comment to post | 我用 kabegame 把美图拿走喽，谢谢！ |
 | Start Page (1-based) | Keyword Search | First results page to process | 1 |
 | End Page (inclusive) | Keyword Search | Last results page to process | 1 |
 | Page Size | Keyword Search | Number of posts fetched per page | 5 |

@@ -1,7 +1,6 @@
 {
   "name": "heybox",
-  "version": "0.1.11",
-  "private": true,
+  "version": "0.1.12",
   "name.zh": "小黑盒",
   "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
   "author": "Kabegame",
@@ -71,6 +70,35 @@
       "name.ja": "検索キーワード",
       "name.ko": "검색어",
       "default": "美图"
+    },
+    {
+      "key": "auto_comment",
+      "type": "boolean",
+      "name": "自动评论",
+      "name.en": "Auto Comment",
+      "name.ja": "自動コメント",
+      "name.ko": "자동 댓글",
+      "descripts": "给每个爬到的帖子点个赞，并自动发一条评论；仅当帖子已抓到的评论里没有完全相同的内容时才发送评论（点赞是幂等的，照点）。需要先在畅游登录小黑盒。",
+      "descripts.en": "Like every crawled post and post one comment; the comment is only sent when no crawled comment has identical content (liking is idempotent and always runs). Requires signing in to Heybox in Surf first.",
+      "descripts.ja": "クロールした各投稿にいいねを付け、コメントを1件投稿します。コメントは取得済みコメントに全く同じ内容が無い場合のみ送信します（いいねは冪等なので毎回実行）。事前に Surf で小黑盒へログインが必要です。",
+      "descripts.ko": "크롤링한 게시물마다 좋아요를 누르고 댓글을 하나 등록합니다. 댓글은 수집된 댓글에 완전히 같은 내용이 없을 때만 전송합니다(좋아요는 멱등이라 항상 실행). 먼저 Surf에서 샤오헤이허에 로그인해야 합니다.",
+      "default": false,
+      "width": 1
+    },
+    {
+      "key": "auto_comment_text",
+      "type": "string",
+      "name": "评论内容",
+      "name.en": "Comment Text",
+      "name.ja": "コメント本文",
+      "name.ko": "댓글 내용",
+      "default": "我用 kabegame 把美图拿走喽，谢谢！",
+      "width": 3,
+      "when": {
+        "auto_comment": [
+          "true"
+        ]
+      }
     },
     {
       "key": "start_page",
