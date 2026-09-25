@@ -6,6 +6,7 @@ const {
   addProgress,
   currentHtml,
   downloadImage,
+  requireCookie,
   setHeader,
   to,
   warn,
@@ -16,15 +17,24 @@ const DEFAULT_BASE_URL = "https://anime-pictures.net";
 const REQUEST_HEADERS = {
   Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
   "Accept-Language": "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7",
+  // 兜底 UA（Linux 畅游）；运行时优先用 Kabegame.cefUserAgent()
   "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
   Cookie:
-    "aigentx=cookie6bf08fcb6cb63ebe32c194e694883f45; sitelang=zh-cn; time_zone=Asia/Tokyo",
+    "cf_clearance=q6gt2WvaiZKCAZmqJ9iDbIqgz6yUnB_mgAzo6TtPXSs-1790330800-1.2.1.1-8MEugIKOtbpR5AVN8GKOZrgiqwhq4q5CYojToNImPPiomNoBGO9X66oVfx2qfVXjVFLUNWKI4Q_BpNVO2YPlubBPwEVhnDkPjRBLdOB3KEId1zSTCwC2z92_X4hfYY30ODuVlfOvrh282ixe7UWBsbafzV63OTyWS.rPeUiS1RVjq5uzJ36KzrRP7sIfQQkbSEB8uyj85DimhiZQAJmT5qhvkGuyv6SCXJaK.j_4EWNxRpiOitqkxWONGlXa4fNuL6SZIL8c17av1SXKXHwtD40l3X2wlEVS0QSBrpRuA9t04S4_mvJ7lz.SNRaMdi7KPxahIu_RwXbc.t6yxR8fOjbbVbnCaA2nsInJlIf8MzW5nWH_gcFZ7xmIvKQ5vJxkQkve9QOYSiA_wEYlN5NhQw7LjJatcQv54h8.fZ2_XxFryMQ6959ucG71fC18DccEAl_ZvYm_fizoTS9UXmQplxRue9ySi6UdKb6MID_At3tEoE8FMyCKGRdAju96mIgMHzDN5kYPvfaR_Ty23SlGdQ; sitelang=zh-cn; time_zone=Asia%2FTokyo",
 };
 
 function setRequestHeaders() {
   for (const [key, value] of Object.entries(REQUEST_HEADERS)) {
     setHeader(key, value);
+  }
+  // cf_clearance 绑定签发时的 UA：用畅游的真实 UA 覆盖上面写死的（旧版应用无此接口时保留兜底值）
+  const cefUa = Kabegame.cefUserAgent?.();
+  if (cefUa) setHeader("User-Agent", cefUa);
+  log(`[anime-pictures] User-Agent 来源：${cefUa ? `畅游 CEF (${cefUa})` : "内置兜底"}`);
+  // 优先用畅游持久化的 Cookie（含 HttpOnly 的 cf_clearance），会覆盖上面写死的 Cookie
+  if (!requireCookie()) {
+    log("[anime-pictures] 未取到畅游 Cookie，回退到内置 Cookie；若 403 请先在畅游打开 anime-pictures 通过验证", "warn");
   }
 }
 
