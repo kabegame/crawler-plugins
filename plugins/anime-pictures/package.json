@@ -84,6 +84,9 @@
     "default": "README.md",
     "zhtw": "README.zhtw.md"
   },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
   "kbAssets": [
     "doc-icon.png",
     "banners/hutao.png",

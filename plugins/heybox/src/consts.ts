@@ -10,6 +10,8 @@ export const PATH_TREE = "/bbs/app/link/tree";
 export const PATH_ORIGINAL = "/bbs/app/api/original/image";
 export const PATH_COMMENT_CREATE = "/bbs/app/comment/create";
 export const PATH_AWARD_LINK = "/bbs/app/profile/award/link";
+// 官网评论框表情面板用的列表接口，返回 { emoji_version, emoji_groups: [{ group_code, emojis: [{ code, img }] }] }。
+export const PATH_EMOJI_LIST = "/bbs/app/api/emojis/list";
 
 // 官网 axios 拦截器合并的公共参数。heybox_id 留空即可（登录态由 Cookie 承载），
 // 实测发评论也不需要真实值。

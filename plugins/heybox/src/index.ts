@@ -5,6 +5,7 @@
 //   consts  端点与公共参数            sign     Web 端 hkey 签名（保留在插件内部）
 //   util    取值/清洗/HTTP/宿主桥接    post     tree 响应结构解析
 //   image   缩略图换原图              comment  自动评论
+//   emoji   表情表按需更新到 plugin_data
 import { resolveAutoCommentText, runAutoInteract } from "./comment";
 import {
   API_HOST,
@@ -14,6 +15,7 @@ import {
   PATH_TREE,
   SEARCH_UNITS_PER_POST,
 } from "./consts";
+import { collectEmojiKeys, ensureEmojis } from "./emoji";
 import { resolveOriginalUrl } from "./image";
 import {
   authorFromLink,
@@ -147,6 +149,8 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
     comments_render_css: commentsRender?.css || "",
     image_total: imageTotal,
   };
+  // 详情模板靠 plugin_data 里的表情表补全静态表没有的新表情，写 metadata 前先按需更新。
+  await ensureEmojis(collectEmojiKeys(metadata), commonParams);
   const metadataId = createImageMetadata(metadata);
 
   const deltaPerImage = itemWeight / imageTotal;
