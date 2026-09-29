@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 
-const { addProgress, currentHtml, downloadImage, to } = Kabegame;
+const { addProgress, currentHtml, delHeader, downloadImage, requireCookie, setHeader, to, warn } = Kabegame;
 
-const DEFAULT_BASE_URL = "https://danbooru.donmai.us";
+const DEFAULT_BASE_URL = "https://donmai.moe";
 
 // 站点在 li/tr 上只给数字分类（tag-type-N / data-category）；这里翻成可读名，
 // 元数据、provider 分组和 description.ejs 三处都按这套名字对齐。
@@ -18,10 +18,11 @@ const TAG_CATEGORY_NAMES = {
 // 侧栏标签展示顺序（站点自身的 h3 分组顺序），全量 tag 串按这个顺序拼
 const TAG_CATEGORY_ORDER = ["artist", "copyright", "character", "general", "meta"];
 
-// 根据源站选项解析基础 URL：danbooru = 全站，safebooru = 只含 general 分级的镜像
+// 根据源站选项解析基础 URL：moe = 只含 general 分级的安全站，danbooru = 全站。
+// safebooru 是 1.0.0 的旧选项值，已保存的运行配置仍会带着它，一并指向安全站。
 function resolveBaseUrl(source, fallback) {
   const site = coerceStr(source).trim().toLowerCase();
-  if (site === "safebooru") return "https://safebooru.donmai.us";
+  if (site === "moe" || site === "safebooru") return "https://donmai.moe";
   if (site === "danbooru") return "https://danbooru.donmai.us";
   return coerceStr(fallback) || DEFAULT_BASE_URL;
 }
@@ -42,9 +43,66 @@ function parseHtml(html) {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
+// donmai 各域名的 Cloudflare 规则不一样（2026-09 实测，均未带 cf_clearance）：
+// - danbooru.donmai.us、cdn.donmai.us：非浏览器 UA 直接放行，浏览器 UA 反而 403；
+// - donmai.moe：任何 UA 都 403，必须带畅游里通过验证拿到的 cf_clearance，且它绑定签发时的 UA，
+//   所以要同时换成畅游的 CEF UA。
+// 因此只有 donmai.moe 需要「浏览器身份」。它的原图同样在 cdn.donmai.us，而 downloadImage 在调用
+// 那一刻快照任务请求头，所以下载前临时撤掉这两个头，下载后再恢复。
+const BROWSER_IDENTITY_HOSTS = new Set(["donmai.moe"]);
+
+let site = null; // { baseUrl, host, ua, browserIdentity }
+
+function applySiteHeaders() {
+  if (!site.browserIdentity) return true;
+  if (site.ua) setHeader("User-Agent", site.ua);
+  return requireCookie(site.host);
+}
+
+function clearSiteHeaders() {
+  if (!site.browserIdentity) return;
+  delHeader("User-Agent");
+  delHeader("Cookie");
+}
+
+function prepareSite(baseUrl) {
+  const host = new URL(baseUrl).host;
+  // 旧版应用没有 cefUserAgent 接口，此时不覆盖 UA
+  site = {
+    baseUrl,
+    host,
+    ua: Kabegame.cefUserAgent?.() || "",
+    browserIdentity: BROWSER_IDENTITY_HOSTS.has(host),
+  };
+  if (!applySiteHeaders()) {
+    warn(`[danbooru] 未从畅游取到 ${host} 的 Cookie；若请求被 403 拦截，请先在畅游中打开 ${baseUrl} 通过验证`);
+  }
+}
+
+function siteBlockedError(reason) {
+  const hint = site.browserIdentity
+    ? `请先在畅游中打开 ${site.baseUrl} 通过验证，再重新运行任务`
+    : "请检查代理网络或稍后重试";
+  return new Error(`[danbooru] ${site.host} ${reason}，被 Cloudflare 拦截：${hint}`);
+}
+
+function isChallengePage(document) {
+  const title = trimText(document.title);
+  return /just a moment|attention required|checking your browser/i.test(title);
+}
+
 async function openDocument(url) {
-  const finalUrl = await to(url);
-  return { finalUrl, document: parseHtml(await currentHtml()) };
+  let finalUrl;
+  try {
+    finalUrl = await to(url);
+  } catch (error) {
+    // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
+    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError("返回 403");
+    throw error;
+  }
+  const document = parseHtml(await currentHtml());
+  if (isChallengePage(document)) throw siteBlockedError("返回了验证页");
+  return { finalUrl, document };
 }
 
 function resolveUrl(url, base) {
@@ -107,6 +165,42 @@ function parseSidebarTags(document, pageUrl) {
 }
 
 // AI 生图直接可用的完整 tag 串：按站点分组顺序拼，组内保持页面原序
+// 标签画册：站点只有五类标签——作家 artist / 角色 character / 版权 copyright / 元信息 meta / 通用 general，
+// 各自映射到 `danbooru/<分类>` 目录下；分类缺失或不在这五类里时按 general 处理，保证不会多出第六个目录。
+// 两个源站共用同一套标签词表，所以都挂在 danbooru 下。
+// key 用站点自己的 tag 标识（小写、丢弃 key 字符集之外的字符），如 `hakurei_reimu`；派生后为空或超长的跳过。
+// metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本（迁移运行在无 import 的裸 V8 里），
+// 改这里要同步改那里。
+const LABEL_CATEGORIES = new Set(["artist", "character", "copyright", "meta", "general"]);
+
+function tagLabelType(type) {
+  const value = String(type || "").trim().toLowerCase();
+  return LABEL_CATEGORIES.has(value) ? value : "general";
+}
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromTags(tags) {
+  const labels = [];
+  for (const tag of tags || []) {
+    const key = tagLabelKey(tag && tag.name);
+    if (!key) continue;
+    labels.push({
+      key,
+      category: `danbooru/${tagLabelType(tag.type)}`,
+      name: trimText(tag.display) || key.replace(/_/g, " "),
+    });
+  }
+  return labels;
+}
+
 function buildTagsString(tags) {
   const ordered = [];
   for (const category of TAG_CATEGORY_ORDER) {
@@ -228,7 +322,14 @@ async function processDetailPage(href, baseUrl, quality) {
   }
   const opts = { url: finalUrl };
   if (metadataNonEmpty(meta)) opts.metadata = meta;
-  await downloadImage(imageUrl, opts);
+  const labels = labelsFromTags(meta.tags);
+  if (labels.length > 0) opts.labels = labels;
+  clearSiteHeaders();
+  try {
+    await downloadImage(imageUrl, opts);
+  } finally {
+    applySiteHeaders();
+  }
 }
 
 function collectPostHrefs(document, pageUrl) {
@@ -417,6 +518,7 @@ async function crawlByTagList(baseUrl, quality, vars) {
 export async function crawl(common, custom) {
   const vars = custom || {};
   const baseUrl = resolveBaseUrl(vars.source_site, common?.baseUrl);
+  prepareSite(baseUrl);
   const quality = coerceStr(vars.quality || "high");
   const mode = coerceStr(vars.crawl_mode);
 

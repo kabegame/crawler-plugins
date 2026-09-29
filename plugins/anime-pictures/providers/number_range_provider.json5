@@ -1,0 +1,35 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.anime-pictures",
+  "name": "number_range_provider",
+  // 数值区间过滤：metadata 中 json_path 指向的数值落在闭区间 [min, max] 内。
+  // 值以文本存（如 "12"、"-3"），去空白 / 千分位后按整数比较；缺失或空串的图不命中任何区间。
+  "properties": {
+    "json_path": { "type": "string", "default": "$.score", "optional": false },
+    "min": { "type": "number", "default": -9007199254740991, "optional": true },
+    "max": { "type": "number", "default": 9007199254740991, "optional": true }
+  },
+  "query": {
+    "where": "CAST(REPLACE(NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, ${properties.json_path}) AS TEXT)), ''), ',', '') AS INTEGER) BETWEEN ${properties.min} AND ${properties.max}"
+  },
+  "list": {
+    "${out.name}": {
+      "child_var": "out",
+      "delegate": {
+        "provider": "kabegame.paginate100_provider"
+      },
+      "provider": "${out.provider}",
+      "meta": "${out.meta}"
+    }
+  },
+  "resolve": {
+    "desc|x[1-9][0-9]*x|[1-9][0-9]*": {
+      "delegate": {
+        "provider": "kabegame.gallery_desc_pagination_page_comb"
+      },
+      "child_var": "child",
+      "provider": "${child.provider}",
+      "meta": "${child.meta}"
+    }
+  }
+}

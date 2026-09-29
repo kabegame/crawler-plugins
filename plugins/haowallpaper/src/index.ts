@@ -13,6 +13,9 @@ const { addProgress, currentDocument, downloadImage, to, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://haowallpaper.com";
 
+/** 站点列表的默认排序（桌面 / 手机均为 3 =「昨日热门」），与站内搜索框提交的一致。 */
+const SORT_TYPE = "3";
+
 /** metadata 结构版本，改字段时递增，供后续 migration 脚本识别。 */
 const METADATA_SCHEMA = 2;
 
@@ -122,11 +125,14 @@ function parsePublisher(root, pageUrl) {
   };
 }
 
-/** 分页条最后一个数字即总页数（`.page-content` 里混有「...」等非数字项）。 */
+/**
+ * 分页条最大的数字即总页数。页码是 `<a>`，「...」省略号是 `<div>`，
+ * 两者都扫，非数字项自然被跳过。
+ */
 function parseTotalPages(root) {
   let maxPage = 1;
-  for (const div of Array.from(root.querySelectorAll(".page-content div"))) {
-    const num = Number(textOf(div));
+  for (const el of Array.from(root.querySelectorAll(".page-content a, .page-content div"))) {
+    const num = Number(textOf(el));
     if (Number.isInteger(num) && num > maxPage) maxPage = num;
   }
   return maxPage;
@@ -157,13 +163,54 @@ function wantsFormat(formats, isVideo) {
   return isVideo ? video : image;
 }
 
-/** 只要图片标签命中任意一个配置标签（含子串）就下载；配置为空表示不过滤。 */
-function matchesTags(wantedTags, itemTags) {
-  if (wantedTags.length === 0) return true;
-  return wantedTags.some((wanted) => itemTags.some((tag) => tag.includes(wanted)));
+/** 站点「种类」下拉的取值：1 = 静态壁纸，2 = 动态壁纸。 */
+const KIND_STATIC = 1;
+const KIND_DYNAMIC = 2;
+
+/**
+ * 照搬站点前端 SearchBar 的 `Ke(routerName, 种类)`，把「页面 × 种类」翻译成 wpType：
+ *   1 电脑静态 / 2 手机静态 / 3,4 电脑动态 / 5,6 手机动态。
+ * 不传 wpType 时站点用页面默认集合（homeView = 1,3,4,7，mobileView = 2,5,6,8），
+ * 即静态 + 动态都要。页面与 wpType 必须配对：homeView 配手机种类时，
+ * 详情链接指向 homeViewLook 却拿不到 JSON-LD。
+ */
+function wpTypeOf(routerName, kind) {
+  if (kind == KIND_STATIC) {
+    if (routerName == "homeView") return "1";
+    if (routerName == "mobileView") return "2";
+  } else if (kind == KIND_DYNAMIC) {
+    if (routerName == "homeView") return "3,4";
+    if (routerName == "mobileView") return "5,6";
+  }
+  return null;
 }
 
-async function processDetailPage(detailUrl, wantedTags, formats) {
+/** 壁纸格式 → 站点「种类」：只勾一种时定向，两种都勾则不限（null，走站点默认集合）。 */
+function kindOf(formats) {
+  const image = wantsFormat(formats, false);
+  const video = wantsFormat(formats, true);
+  if (image && !video) return KIND_STATIC;
+  if (video && !image) return KIND_DYNAMIC;
+  return null;
+}
+
+/**
+ * 列表页地址，查询参数与站内搜索栏提交的一致，例如
+ * `/homeView?page=8&search=动漫、二次元&sortType=3&wpType=3,4`。
+ * 标签走站点搜索：多个标签用「、」连接，站点按并集返回。
+ */
+function buildListUrl(baseUrl, wallpaperType, page, tags, kind) {
+  const params = new URLSearchParams();
+  if (page > 1) params.set("page", String(page));
+  if (tags.length > 0) params.set("search", tags.join("、"));
+  params.set("sortType", SORT_TYPE);
+  const wpType = wpTypeOf(wallpaperType, kind);
+  if (wpType) params.set("wpType", wpType);
+  // 保留 wpType 里的逗号，与站点地址（`wpType=3,4`）保持一致。
+  return `${baseUrl}/${wallpaperType}?${params.toString().replace(/%2C/gi, ",")}`;
+}
+
+async function processDetailPage(detailUrl, formats) {
   const { document, finalUrl, root } = await openDocument(detailUrl);
   const jsonLd = parseJsonLd(document);
   if (!jsonLd) {
@@ -175,7 +222,6 @@ async function processDetailPage(detailUrl, wantedTags, formats) {
   if (!wantsFormat(formats, isVideo)) return false;
 
   const tags = parseTags(document, root);
-  if (!matchesTags(wantedTags, tags)) return false;
 
   const downloadUrl = resolveUrl(jsonLd.contentUrl, finalUrl);
   if (!downloadUrl) {
@@ -235,9 +281,15 @@ export async function crawl(common, custom) {
   const endPageConfig = Number(vars.endPage ?? startPage);
   const wallpaperType = coerceStr(vars.wallpaperType || "homeView").trim();
   const formats = vars.formats || {};
-  const wantedTags = (Array.isArray(vars.tags) ? vars.tags : [])
-    .map((t) => coerceStr(t).trim())
-    .filter(Boolean);
+  // 站点用「、」分隔多个搜索词，标签自身里的「、」会被拆开，这里预先按同样规则拆分去重。
+  const searchTags = Array.from(
+    new Set(
+      (Array.isArray(vars.tags) ? vars.tags : [])
+        .flatMap((t) => coerceStr(t).split("、"))
+        .map((t) => t.trim())
+        .filter(Boolean),
+    ),
+  );
 
   if (endPageConfig < startPage) throw new Error("结束页面需要比开始页面大");
   if (endPageConfig >= startPage + 100) {
@@ -246,14 +298,14 @@ export async function crawl(common, custom) {
   if (!wantsFormat(formats, false) && !wantsFormat(formats, true)) {
     throw new Error("没有勾选任何格式");
   }
+  const kind = kindOf(formats);
 
   console.log(
-    `[haowallpaper] 开始爬取: 类型=${wallpaperType}, 页码=${startPage}-${endPageConfig}, 标签=[${wantedTags.join(", ")}]`,
+    `[haowallpaper] 开始爬取: 类型=${wallpaperType}, 页码=${startPage}-${endPageConfig}, 搜索=[${searchTags.join("、")}], wpType=${wpTypeOf(wallpaperType, kind) ?? "默认"}`,
   );
 
-  // 先开首页拿总页数，据此收窄结束页。
-  const firstUrl = `${baseUrl}/${wallpaperType}?page=${startPage}`;
-  let { finalUrl, root } = await openDocument(firstUrl);
+  // 先开起始页拿总页数（搜索时为搜索结果的总页数），据此收窄结束页。
+  let { finalUrl, root } = await openDocument(buildListUrl(baseUrl, wallpaperType, startPage, searchTags, kind));
   const totalPages = parseTotalPages(root);
   const endPage = Math.min(endPageConfig, totalPages);
   if (startPage > totalPages) {
@@ -268,8 +320,7 @@ export async function crawl(common, custom) {
 
   for (let page = startPage; page <= endPage; page += 1) {
     if (page !== startPage) {
-      const pageUrl = `${baseUrl}/${wallpaperType}?page=${page}`;
-      ({ finalUrl, root } = await openDocument(pageUrl));
+      ({ finalUrl, root } = await openDocument(buildListUrl(baseUrl, wallpaperType, page, searchTags, kind)));
     }
 
     const detailLinks = parseDetailLinks(root, finalUrl);
@@ -289,7 +340,7 @@ export async function crawl(common, custom) {
     let downloaded = 0;
     for (const detailUrl of detailLinks) {
       try {
-        if (await processDetailPage(detailUrl, wantedTags, formats)) downloaded += 1;
+        if (await processDetailPage(detailUrl, formats)) downloaded += 1;
       } catch (e) {
         warn(`[haowallpaper] 处理详情页失败，跳过: ${detailUrl} (${e?.message ?? e})`);
       }

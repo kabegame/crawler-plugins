@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.anime-pictures",
+  "name": "color_provider",
+  "properties": {
+    "color_name": { "type": "string", "default": "", "optional": false }
+  },
+  "query": {
+    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.details') AS detail WHERE json_extract(detail.value, '$.color') IS NOT NULL AND NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') = ${properties.color_name})"
+  },
+  "list": {
+    "${out.name}": {
+      "child_var": "out",
+      "delegate": {
+        "provider": "kabegame.paginate100_provider"
+      },
+      "provider": "${out.provider}",
+      "meta": "${out.meta}"
+    }
+  },
+  "resolve": {
+    "desc|x[1-9][0-9]*x|[1-9][0-9]*": {
+      "delegate": {
+        "provider": "kabegame.gallery_desc_pagination_page_comb"
+      },
+      "child_var": "child",
+      "provider": "${child.provider}",
+      "meta": "${child.meta}"
+    }
+  }
+}

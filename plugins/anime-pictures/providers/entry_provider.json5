@@ -2,19 +2,17 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.anime-pictures",
   "name": "entry_provider",
+  // 标签浏览交给应用级标签（anime-pictures/<类型>），这里只提供星数与主色维度。
   "list": {
-    "${tag_type.tag_type}": {
-      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(tag_group.value, '$.name') AS TEXT)), '') AS tag_type, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, plugin_metadata FROM (${composed}) AS composed_result) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) AND json_extract(source.plugin_metadata, '$.schema') = 1 THEN source.plugin_metadata ELSE '{\"tagGroups\":[]}' END, '$.tagGroups') AS tag_group WHERE NULLIF(TRIM(CAST(json_extract(tag_group.value, '$.name') AS TEXT)), '') IS NOT NULL GROUP BY tag_type ORDER BY image_count DESC, tag_type ASC",
-      "data_var": "tag_type",
-      "provider": "tag_type_provider",
-      "properties": {
-        "tag_type": "${tag_type.tag_type}"
-      },
-      "meta": {
-        "image_count": "${tag_type.image_count}",
-        "plain": true
-      }
+    "stars": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.rating.count" },
+      "meta": { "plain": true }
+    },
+    "color": {
+      "provider": "color_router",
+      "meta": { "plain": true }
     }
   },
-  "note": "{\"title\":\"Anime Pictures tag groups\",\"content\":\"Group anime-pictures images by version 1 metadata tag group names.\"}"
+  "note": "{\"title\":\"Anime Pictures\",\"content\":\"Filter by star count (N+ buckets; a segment also accepts <min>-<max>, <min>+ or -<max>) or by the site's dominant color name.\"}"
 }

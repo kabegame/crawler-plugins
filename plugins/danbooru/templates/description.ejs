@@ -1,7 +1,6 @@
 <% const m = metadata || {}; %>
 <% const tags = Array.isArray(m.tags) ? m.tags : []; %>
 <% const commentary = m.commentary && typeof m.commentary === 'object' ? m.commentary : null; %>
-<% const tagsString = m.tags_string ? String(m.tags_string) : tags.map(function (t) { return t && t.name ? String(t.name) : ''; }).filter(Boolean).join(' '); %>
 <% const CATEGORY_ORDER = ['artist', 'copyright', 'character', 'general', 'meta']; %>
 <% const CATEGORY_LABELS = { artist: 'Artist', copyright: 'Copyright', character: 'Character', general: 'General', meta: 'Meta' }; %>
 <%
@@ -34,12 +33,6 @@
 .db-tag-list .tag-type-meta .search-tag{color:#ea580c;}
 .db-tag-list .tag-type-general .search-tag{color:var(--anime-text-primary,#e5e7eb);}
 .db-tag-list .deprecated{opacity:0.55;text-decoration:line-through;}
-.db-prompt{margin:0.35em 0 0;}
-.db-prompt-box{width:100%;box-sizing:border-box;min-height:4.5em;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.72rem;line-height:1.4;padding:0.45em 0.55em;border-radius:4px;border:1px solid color-mix(in srgb,var(--anime-border,#374151) 65%,transparent);background:color-mix(in srgb,var(--anime-bg-secondary,#111827) 70%,transparent);color:var(--anime-text-primary,#e5e7eb);}
-.db-prompt-actions{display:flex;align-items:center;gap:0.5em;margin-top:0.3em;}
-.db-copy-btn{font-size:0.72rem;padding:0.2em 0.6em;border-radius:4px;cursor:pointer;border:1px solid color-mix(in srgb,var(--anime-border,#374151) 65%,transparent);background:transparent;color:var(--anime-text-secondary,#9ca3af);}
-.db-copy-btn:hover{color:var(--anime-text-primary,#e5e7eb);}
-.db-copy-hint{font-size:0.68rem;color:var(--anime-text-secondary,#6b7280);}
 .db-stats ul{list-style:none;margin:0;padding:0;}
 .db-stats ul > li{margin:0.2em 0;}
 .db-stats a{color:var(--anime-primary,#a78bfa);text-decoration:none;}
@@ -50,17 +43,6 @@
 .db-crawl-hint{display:none;margin:0.75em 0 0;padding-top:0.5em;border-top:1px solid color-mix(in srgb,var(--anime-border,#374151) 55%,transparent);font-size:0.72rem;line-height:1.4;color:var(--anime-text-secondary,#9ca3af);}
 </style>
 <div class="db-sidebar">
-  <% if (tagsString) { %>
-  <div class="db-block db-prompt">
-    <h5 class="db-h5">Prompt</h5>
-    <textarea class="db-prompt-box" id="db-prompt-box" readonly spellcheck="false"><%= tagsString %></textarea>
-    <div class="db-prompt-actions">
-      <button type="button" class="db-copy-btn" id="db-copy-btn">Copy</button>
-      <span class="db-copy-hint"><%= tags.length %> tags</span>
-    </div>
-  </div>
-  <% } %>
-
   <% if (categories.length) { %>
   <div class="db-block">
     <h5 class="db-h5">Tags</h5>
@@ -175,35 +157,13 @@
     }
     return 'This sidebar (including posted time and score) is a snapshot from when the image was downloaded; it may not match the live site.';
   }
-  function copyLabel(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s.indexOf('zh') === 0) return ['复制', '已复制'];
-    if (s === 'ja') return ['コピー', 'コピーしました'];
-    if (s === 'ko') return ['복사', '복사됨'];
-    return ['Copy', 'Copied'];
-  }
   function onReady() {
     var hint = document.getElementById('db-crawl-snapshot-hint');
-    var btn = document.getElementById('db-copy-btn');
-    var box = document.getElementById('db-prompt-box');
 
     function apply(loc) {
       if (hint) {
         hint.textContent = snapshotHint(loc);
         hint.style.display = 'block';
-      }
-      if (btn) {
-        var labels = copyLabel(loc);
-        btn.textContent = labels[0];
-        btn.onclick = function () {
-          if (!box) return;
-          box.select();
-          // iframe 里 navigator.clipboard 常被权限策略挡掉，execCommand 是可靠回落
-          var ok = false;
-          try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-          btn.textContent = ok ? labels[1] : labels[0];
-          setTimeout(function () { btn.textContent = labels[0]; }, 1500);
-        };
       }
     }
 

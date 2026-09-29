@@ -1,0 +1,30 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.konachan",
+  "name": "rating_router",
+  // 按 metadata.stats.rating（Safe / Questionable / Explicit）分组；konachan.net 只有 Safe。
+  "list": {
+    "${rating.rating}": {
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.stats.rating') AS TEXT)), '') AS rating, COUNT(DISTINCT id) AS image_count FROM (${composed}) AS composed_result WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.stats.rating') AS TEXT)), '') IS NOT NULL GROUP BY 1 ORDER BY CASE rating WHEN 'Safe' THEN 1 WHEN 'Questionable' THEN 2 WHEN 'Explicit' THEN 3 ELSE 4 END, rating ASC",
+      "data_var": "rating",
+      "provider": "rating_provider",
+      "properties": {
+        "rating": "${rating.rating}"
+      },
+      "meta": {
+        "isLeaf": true,
+        "image_count": "${rating.image_count}"
+      }
+    }
+  },
+  "resolve": {
+    // 只收纯字母，避免吞掉宿主自动追加在末尾的 filter_comb 段
+    "([A-Za-z]+)": {
+      "provider": "rating_provider",
+      "properties": {
+        "rating": "${capture[1]}"
+      },
+      "meta": { "isLeaf": true }
+    }
+  }
+}

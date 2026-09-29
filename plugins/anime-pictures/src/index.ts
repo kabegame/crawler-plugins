@@ -285,6 +285,35 @@ function extractTagGroups(document, pageUrl) {
   return groups.filter((group) => group.name || group.tags.length);
 }
 
+// 标签画册：把作品 / 角色 / 画师 / 参考 / 物体五类 tag 映射为应用标签，各自一个目录；没有类型的 tag 不写入。
+// key 由 tag 名派生（小写、丢弃 key 字符集之外的字符、空白折叠为单个空格并去首尾），
+// 保留 `sua (alien stage)` 这类原样的空格与括号；派生后为空或超长的直接跳过，
+// 不做别的修正。metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本（迁移运行在
+// 无 import 的裸 V8 里），改这里要同步改那里。
+const LABEL_TAG_TYPES = ["copyright", "character", "artist", "reference", "object"];
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromTagGroups(tagGroups) {
+  const labels = [];
+  for (const group of tagGroups || []) {
+    for (const tag of group.tags || []) {
+      if (!LABEL_TAG_TYPES.includes(tag.type)) continue;
+      const key = tagLabelKey(tag.name);
+      if (!key) continue;
+      labels.push({ key, category: `anime-pictures/${tag.type}`, name: tag.name });
+    }
+  }
+  return labels;
+}
+
 function buildAnimePicturesMetadata(document, pageUrl) {
   const head = document.querySelector(".post_content.head-info");
   if (!head) return null;
@@ -370,6 +399,8 @@ async function crawlDetail(url, pageWeight) {
   };
   if (displayName) opts.name = displayName;
   if (metadata) opts.metadata = metadata;
+  const labels = labelsFromTagGroups(metadata?.tagGroups);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(downloadUrl, opts);
   addProgress(pageWeight);
 }

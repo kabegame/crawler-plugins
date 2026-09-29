@@ -95,6 +95,8 @@
   text-decoration: none;
 }
 .hao-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hao-avatar img[hidden] { display: none; }
+.hao-avatar.has-avatar .hao-avatar-initial { display: none; }
 .hao-publisher-body { min-width: 0; }
 .hao-publisher-name { color: inherit; font-weight: 700; text-decoration: none; }
 .hao-publisher-name:hover, .hao-tag:hover { color: var(--anime-primary, inherit); }
@@ -138,7 +140,8 @@
     <% if (hasPublisher) { %>
     <div class="hao-publisher">
       <% if (publisherProfileUrl) { %><a class="hao-avatar" href="<%= publisherProfileUrl %>" target="_blank" rel="noopener noreferrer"><% } else { %><span class="hao-avatar"><% } %>
-        <% if (publisherAvatarUrl) { %><img src="<%= publisherAvatarUrl %>" alt=""><% } else { %><%= publisherInitial %><% } %>
+        <span class="hao-avatar-initial"><%= publisherInitial %></span>
+        <% if (publisherAvatarUrl) { %><img class="hao-avatar-img" data-hao-avatar-src="<%= publisherAvatarUrl %>" alt="" hidden><% } %>
       <% if (publisherProfileUrl) { %></a><% } else { %></span><% } %>
       <div class="hao-publisher-body">
         <% if (publisherName) { %>
@@ -193,7 +196,35 @@
     var empty = document.getElementById('hao-desc-empty');
     if (empty) empty.textContent = lang.indexOf('zh') === 0 ? '暂无哲风壁纸详情元数据（请使用最新版插件重新抓取）。' : 'No Haowallpaper detail metadata (re-crawl with the latest plugin).';
   }
+  // 站点图片按 Referer 防盗链：iframe 直连会带上外站 Referer 被 403。
+  // 改走宿主 proxy_fetch 并带上站点 Referer，拿到字节后转 Blob URL；失败则保留首字母占位。
+  var HAO_IMG_HEADERS = { Referer: 'https://haowallpaper.com/' };
+  function loadAvatars() {
+    if (!window.__bridge || !window.__bridge.fetch) return;
+    var imgs = document.querySelectorAll('img[data-hao-avatar-src]');
+    for (var i = 0; i < imgs.length; i++) {
+      (function (img) {
+        var url = img.getAttribute('data-hao-avatar-src');
+        img.removeAttribute('data-hao-avatar-src');
+        if (!url) return;
+        window.__bridge.fetch(url, { headers: HAO_IMG_HEADERS }).then(function (res) {
+          if (!res || !res.base64) return;
+          var contentType = res.contentType || 'image/jpeg';
+          if (contentType.indexOf('image/') !== 0) return;
+          var bin = atob(res.base64);
+          var arr = new Uint8Array(bin.length);
+          for (var j = 0; j < bin.length; j++) arr[j] = bin.charCodeAt(j);
+          img.onload = function () {
+            img.hidden = false;
+            if (img.parentNode && img.parentNode.classList) img.parentNode.classList.add('has-avatar');
+          };
+          img.src = URL.createObjectURL(new Blob([arr], { type: contentType }));
+        }).catch(function () {});
+      })(imgs[i]);
+    }
+  }
   function ready() {
+    loadAvatars();
     if (window.__bridge && window.__bridge.getLocale) window.__bridge.getLocale().then(apply).catch(function () { apply('en'); });
     else apply((navigator.language || 'en').split('-')[0]);
   }

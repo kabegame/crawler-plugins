@@ -1,5 +1,23 @@
 # Danbooru 更新日志
 
+## 1.1.0
+
+- 全年龄源站由 `safebooru.donmai.us` 换成 `donmai.moe`，并设为默认源站（与 konachan 一致，默认只爬全年龄内容）；
+  要爬全站请在「源站」里选 `danbooru.donmai.us`
+- 已保存的运行配置中旧的 `safebooru` 选项会自动指向 `donmai.moe`
+- 适配 donmai.moe 的 Cloudflare 验证：请求它的页面时使用畅游的浏览器 UA 并注入畅游里的 Cookie，下载原图时不带这两个
+  请求头（原图 CDN 对浏览器 UA 反而会拦截）；全站 `danbooru.donmai.us` 保持直连不变
+- 页面被拦截（403 / 验证页）时任务直接终止并提示：donmai.moe 提示先在畅游中通过验证，全站提示检查代理网络
+- 下载时把侧栏的标签按分类写入应用的「标签」分区：作家、角色、版权、元信息、通用分别在 `danbooru/artist`、
+  `danbooru/character`、`danbooru/copyright`、`danbooru/meta`、`danbooru/general` 下，可在画册页浏览、在搜索里按标签筛选；
+  两个源站共用这套标签
+- 标签 key 使用站点的标签名（如 `hakurei_reimu`），显示名使用页面上的文字
+- 历史下载的图片会在元数据迁移时自动补上标签
+- 最低应用版本提升至 `4.4.1`
+- 移除插件自带的「标签分类 → 标签」浏览（已由应用级标签取代），画廊插件扩展改为按 **分数 score / 收藏数 favorites** 筛选：
+  列表给出 `5+`、`10+` … `1000+` 等「不低于某值」的档位，路径段也支持区间 `100-500`、`100+`、`-50`（两端包含）
+- 图片详情侧栏去掉 Prompt 全量标签串与复制按钮
+
 ## 1.0.0
 
 首个版本。

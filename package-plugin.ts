@@ -63,9 +63,23 @@ interface PluginResult {
 }
 
 interface PluginPackageJson {
+  name?: string;
   kbPackageVersion?: number;
   main?: string;
   scripts?: Record<string, string>;
+}
+
+function validatePluginId(pluginId: string): void {
+  const byteLength = new TextEncoder().encode(pluginId).length;
+  if (
+    byteLength === 0 ||
+    byteLength > 64 ||
+    !/^[a-zA-Z0-9_-]+$/.test(pluginId)
+  ) {
+    throw new Error(
+      `插件 ID "${pluginId}" 不合规：只允许 ASCII 字母、数字、_ 和 -，且不超过 64 字节`,
+    );
+  }
 }
 
 function ensureCli(): void {
@@ -410,6 +424,12 @@ async function packagePlugin(
   return new Promise(async (resolve, reject) => {
     try {
       const pkg = readPluginPackageJson(pluginDir);
+      const pluginId = path.basename(pluginDir);
+      validatePluginId(pluginId);
+      if (typeof pkg?.name === "string") {
+        validatePluginId(pkg.name);
+      }
+      validatePluginId(path.basename(outputFile, ".kgpg"));
       if (isV3PluginPackage(pkg)) {
         const main = pkg?.main;
         if (!main || typeof main !== "string") {

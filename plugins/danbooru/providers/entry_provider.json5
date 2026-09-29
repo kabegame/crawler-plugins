@@ -2,23 +2,18 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.danbooru",
   "name": "entry_provider",
+  // 标签浏览交给应用级标签（danbooru/<分类>），这里只提供站点数值维度。
   "list": {
-    "${tag_category.tag_category}": {
-      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') AS tag_category, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"tags\":[]}' END, '$.tags') AS tag GROUP BY tag_category ORDER BY image_count DESC, tag_category ASC",
-      "data_var": "tag_category",
-      "provider": "tag_category_provider",
-      "properties": {
-        "tag_category": "${tag_category.tag_category}"
-      },
+    "score": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.score" },
+      "meta": { "plain": true }
+    },
+    "favorites": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.fav_count" },
+      "meta": { "plain": true }
     }
   },
-  "resolve": {
-    "([^/]+)": {
-      "provider": "tag_category_provider",
-      "properties": {
-        "tag_category": "${capture[1]}"
-      }
-    }
-  },
-  "note": "{\"title\":\"Danbooru tags\",\"content\":\"Group Danbooru images by tag category (artist / copyright / character / general / meta) from image metadata.\"}"
+  "note": "{\"title\":\"Danbooru\",\"content\":\"Filter by score or favorites. List shows cumulative N+ buckets; a segment also accepts <min>-<max>, <min>+ or -<max>, e.g. score/100+ or favorites/10-50.\"}"
 }

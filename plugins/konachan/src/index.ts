@@ -100,6 +100,39 @@ function parseSidebarTags(document, pageUrl) {
     .filter((tag) => tag.name || tag.display);
 }
 
+// 标签画册：侧栏每种颜色是一种 tag 类型（artist / copyright / character / circle / style / general），
+// 各自映射到 `konachan/<类型>` 目录下；类型缺失或不合规时按 general 处理（与 description.ejs 一致）。
+// key 用站点自己的 tag 标识（小写、丢弃 key 字符集之外的字符），如 `futaba_akane_(pentagon)`；
+// 派生后为空或超长的直接跳过。metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本
+// （迁移运行在无 import 的裸 V8 里），改这里要同步改那里。
+function tagLabelType(type) {
+  const value = String(type || "").trim().toLowerCase();
+  return /^[a-z0-9_-]{1,64}$/.test(value) ? value : "general";
+}
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromSidebarTags(tags) {
+  const labels = [];
+  for (const tag of tags || []) {
+    const key = tagLabelKey(tag && tag.name);
+    if (!key) continue;
+    labels.push({
+      key,
+      category: `konachan/${tagLabelType(tag.type)}`,
+      name: trimText(tag.display) || key.replace(/_/g, " "),
+    });
+  }
+  return labels;
+}
+
 function parseRelatedPosts(document, pageUrl) {
   const heading = Array.from(document.querySelectorAll("h5")).find((el) =>
     /Related Posts/i.test(textOf(el)),
@@ -190,6 +223,8 @@ async function processDetailPage(href, baseUrl, quality) {
   if (!imageUrl) return;
   const opts = { url: finalUrl };
   if (metadataNonEmpty(meta)) opts.metadata = meta;
+  const labels = labelsFromSidebarTags(meta.sidebar_tags);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(imageUrl, opts);
 }
 

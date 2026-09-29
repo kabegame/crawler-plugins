@@ -197,3 +197,30 @@ export function migrate(input) {
 
   return JSON.stringify(out);
 }
+
+// 历史图片补标签：应用在 migrate 成功后以其输出调用。规则与 src/index.ts 的
+// labelsFromTagGroups 一致（此处无法 import，保持两份同步）。
+const LABEL_TAG_TYPES = ["copyright", "character", "artist", "reference", "object"];
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+export function provideLabels(input) {
+  const m = JSON.parse(input);
+  const labels = [];
+  for (const group of (m && m.tagGroups) || []) {
+    for (const tag of group.tags || []) {
+      if (!LABEL_TAG_TYPES.includes(tag.type)) continue;
+      const key = tagLabelKey(tag.name);
+      if (!key) continue;
+      labels.push({ key, category: `anime-pictures/${tag.type}`, name: tag.name });
+    }
+  }
+  return labels;
+}

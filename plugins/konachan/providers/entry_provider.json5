@@ -2,23 +2,17 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.konachan",
   "name": "entry_provider",
+  // 标签浏览交给应用级标签（konachan/<类型>），这里只提供分数与分级维度。
   "list": {
-    "${tag_type.tag_type}": {
-      "sql": "SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.type') AS TEXT)), ''), 'unknown') AS tag_type, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{\"sidebar_tags\":[]}' END, '$.sidebar_tags') AS tag GROUP BY tag_type ORDER BY image_count DESC, tag_type ASC",
-      "data_var": "tag_type",
-      "provider": "tag_type_provider",
-      "properties": {
-        "tag_type": "${tag_type.tag_type}"
-      },
+    "score": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.score" },
+      "meta": { "plain": true }
+    },
+    "rating": {
+      "provider": "rating_router",
+      "meta": { "plain": true }
     }
   },
-  "resolve": {
-    "([^/]+)": {
-      "provider": "tag_type_provider",
-      "properties": {
-        "tag_type": "${capture[1]}"
-      }
-    }
-  },
-  "note": "{\"title\":\"Konachan tags\",\"content\":\"Group Konachan images by sidebar tag type from image metadata.\"}"
+  "note": "{\"title\":\"Konachan\",\"content\":\"Filter by score (N+ buckets; a segment also accepts <min>-<max>, <min>+ or -<max>) or by rating (Safe / Questionable / Explicit).\"}"
 }

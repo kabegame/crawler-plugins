@@ -81,10 +81,10 @@ await defineCases("danbooru", [
     expect: expectFiles({ minTotal: 20 }),
   },
   {
-    // safebooru 镜像：DOM 同构，验证源站切换真的换了 host。
-    name: "safebooru-tags",
+    // 以上用例走默认的全年龄站 donmai.moe；这里显式切到全站，DOM 同构，验证源站切换真的换了 host。
+    name: "full-site-tags",
     vars: {
-      source_site: "safebooru",
+      source_site: "danbooru",
       crawl_mode: "tags",
       mode_tag_value: "kirisame_marisa",
       per_page: "20",
