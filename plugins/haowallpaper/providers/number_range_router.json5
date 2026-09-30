@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.haowallpaper",
+  "name": "number_range_router",
+  // 数值维度路由：list 只列「≥ N」的累计档（N+，空档不列）；
+  // resolve 支持完整区间：<min>-<max>（闭区间）、<min>+ 或 <min>-（≥ min）、-<max>（≤ max），两端可为负数。
+  "properties": {
+    "json_path": { "type": "string", "default": "$.download_count", "optional": false },
+  },
+  "list": {
+    "${range.bucket}": {
+      "sql": "SELECT b.bucket AS bucket, b.min_value AS min_value, COUNT(DISTINCT s.id) AS image_count FROM (SELECT 1 AS ord, '5+' AS bucket, 5 AS min_value UNION ALL SELECT 2, '10+', 10 UNION ALL SELECT 3, '20+', 20 UNION ALL SELECT 4, '50+', 50 UNION ALL SELECT 5, '100+', 100 UNION ALL SELECT 6, '200+', 200 UNION ALL SELECT 7, '500+', 500 UNION ALL SELECT 8, '1000+', 1000) AS b JOIN (SELECT id, CAST(REPLACE(NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, ${properties.json_path}) AS TEXT)), ''), ',', '') AS INTEGER) AS v FROM (${composed}) AS composed_result) AS s ON s.v >= b.min_value GROUP BY b.ord, b.bucket, b.min_value ORDER BY b.ord",
+      "data_var": "range",
+      "provider": "number_range_provider",
+      "properties": {
+        "json_path": "${properties.json_path}",
+        "min": "${range.min_value}",
+      },
+      "meta": {
+        "isLeaf": true,
+        "image_count": "${range.image_count}",
+      },
+    },
+  },
+  "resolve": {
+    "(-?[0-9]+)-(-?[0-9]+)": {
+      "provider": "number_range_provider",
+      "properties": {
+        "json_path": "${properties.json_path}",
+        "min": "${capture[1]}",
+        "max": "${capture[2]}",
+      },
+      "meta": { "isLeaf": true },
+    },
+    "(-?[0-9]+)[+-]": {
+      "provider": "number_range_provider",
+      "properties": {
+        "json_path": "${properties.json_path}",
+        "min": "${capture[1]}",
+      },
+      "meta": { "isLeaf": true },
+    },
+    "-(-?[0-9]+)": {
+      "provider": "number_range_provider",
+      "properties": {
+        "json_path": "${properties.json_path}",
+        "max": "${capture[1]}",
+      },
+      "meta": { "isLeaf": true },
+    },
+  },
+}

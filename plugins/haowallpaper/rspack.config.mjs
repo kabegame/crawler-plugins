@@ -2,7 +2,10 @@ import { defineConfig } from "@rspack/cli";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
-  entry: { main: "./src/index.ts" },
+  entry: {
+    main: "./src/index.ts",
+    migrate: "./metadata_migrations/migrate.ts",
+  },
   target: "es2022",
   devtool: false,
   // 仅打包不压缩:保留可读符号名,插件报错栈有意义

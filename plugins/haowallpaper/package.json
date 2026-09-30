@@ -1,6 +1,6 @@
 {
   "name": "haowallpaper",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "name.zh": "哲风壁纸",
   "name.en": "Haowallpaper",
   "name.ja": "哲風壁紙",
@@ -15,7 +15,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.5.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",
@@ -167,14 +167,16 @@
     "providers/entry_provider.json5",
     "providers/directory_entry_provider.json5",
     "providers/directory_provider.json5",
-    "providers/tag_entry_provider.json5",
-    "providers/tag_page_provider.json5",
-    "providers/tag_provider.json5",
+    "providers/number_range_router.json5",
+    "providers/number_range_provider.json5",
     "providers/color_entry_provider.json5",
     "providers/color_provider.json5"
   ],
-  "kbMetadataMigration": "metadata_migrations/migrate.js",
+  "kbMetadataMigration": "dist/migrate.js",
   "kbDescriptionTemplate": "templates/description.ejs",
+  "dependencies": {
+    "tiny-pinyin": "^1.3.2"
+  },
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
     "@kabegame/types": "file:../../../packages/kabegame-types",

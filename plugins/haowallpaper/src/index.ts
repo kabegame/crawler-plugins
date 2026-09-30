@@ -9,6 +9,8 @@
 //   - 无需 referer / cookie / UA，不受限制；
 //   - 原图端点 downloadFile 需要登录（401），本插件不碰。
 
+import { labelsFromMetadata } from "./labels";
+
 const { addProgress, currentDocument, downloadImage, to, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://haowallpaper.com";
@@ -270,6 +272,8 @@ async function processDetailPage(detailUrl, formats) {
 
   const opts = { metadata, url: finalUrl };
   if (title) opts.name = title;
+  const labels = labelsFromMetadata(metadata);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(downloadUrl, opts);
   return true;
 }

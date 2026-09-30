@@ -3,6 +3,7 @@
 // 详情补齐与进度分摊。
 import { MEDIA_API_BASE } from "./consts";
 import { fetchPixaiArtworkDetail, fetchPixaiComments } from "./api";
+import { labelsFromArtworkDetail } from "./labels";
 import { arrayValue, coerceStr, log } from "./util";
 
 const { addProgress, createImageMetadata: createImageMetadataRow, downloadImage } = Kabegame;
@@ -41,10 +42,12 @@ function createImageMetadata(metadata) {
 
 async function downloadArtwork(finalDownloadUrl, artworkDetail, displayName, pixaiUrl) {
   const metadataId = createImageMetadata({ v2: artworkDetail });
+  const labels = labelsFromArtworkDetail(artworkDetail);
   await downloadImage(finalDownloadUrl, {
     name: displayName,
     metadata_id: metadataId,
     url: pixaiUrl,
+    labels,
   });
 }
 

@@ -2,42 +2,18 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.pixai",
   "name": "entry_provider",
-  "query": {
-    "fields": [
-      {
-        "sql": "CASE WHEN json_valid(plugin_im.data) THEN COALESCE(json_extract(plugin_im.data, '$.v2.tacks'), json('[]')) ELSE json('[]') END",
-        "as": "pixai_tags",
-        "in_need": true
-      }
-    ]
-  },
+  // 标签与作者浏览交给应用级标签（pixai/tag、pixai/artist），这里只提供互动数分段。
   "list": {
-    "${tag.display_name}": {
-      "sql": "WITH source AS (SELECT pixai_tags FROM (${composed}) AS composed_result), grouped AS (SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), '')), ''), NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), '')), ''), COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), ''))) AS display_name, COUNT(*) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.pixai_tags) THEN source.pixai_tags ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) IS NOT NULL GROUP BY tag_key), counted AS (SELECT tag_key, display_name, image_count, COUNT(*) OVER () AS total_tag_count FROM grouped) SELECT tag_key, display_name, image_count FROM counted WHERE total_tag_count <= 100 ORDER BY image_count DESC, tag_key ASC",
-      "data_var": "tag",
-      "provider": "tag_provider",
-      "properties": {
-        "tag_key": "${tag.tag_key}"
-      },
-      "meta": {
-        "isLeaf": true,
-        "display": "${tag.display_name}",
-        "image_count": "${tag.image_count}"
-      }
+    "likes": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.v2.likedCount" },
+      "meta": { "plain": true }
     },
-    "page-${page.page_num}": {
-      "sql": "WITH source AS (SELECT pixai_tags FROM (${composed}) AS composed_result), grouped AS (SELECT COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) AS tag_key, COALESCE(NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.displayName') AS TEXT)), '')), ''), NULLIF(MIN(NULLIF(TRIM(CAST(json_extract(tag.value, '$.defaultName') AS TEXT)), '')), ''), COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), ''))) AS display_name, COUNT(*) AS image_count FROM source JOIN json_each(CASE WHEN json_valid(source.pixai_tags) THEN source.pixai_tags ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.codeName') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.id') AS TEXT)), '')) IS NOT NULL GROUP BY tag_key), numbered AS (SELECT tag_key, display_name, image_count, ROW_NUMBER() OVER (ORDER BY image_count DESC, tag_key ASC) AS rn, COUNT(*) OVER () AS total_tag_count FROM grouped), page_tags AS (SELECT ((rn - 1) / 100) + 1 AS page_num, tag_key, display_name, image_count, rn FROM numbered WHERE total_tag_count > 100) SELECT page_num, json_group_array(json_object('tag_key', tag_key, 'display_name', display_name, 'image_count', image_count)) AS page_tags_json FROM (SELECT page_num, tag_key, display_name, image_count, rn FROM page_tags ORDER BY rn) AS ordered_page_tags GROUP BY page_num ORDER BY page_num",
-      "data_var": "page",
-      "provider": "tag_page_provider",
-      "properties": {
-        "page_num": "${page.page_num}",
-        "page_tags_json": "${page.page_tags_json}"
-      },
-      "meta": {
-        "page_num": "${page.page_num}",
-        "plain": true
-      }
+    "comments": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.v2.commentCount" },
+      "meta": { "plain": true }
     }
   },
-  "note": "{\"title\":\"PixAI tags\",\"content\":\"Group PixAI images by resolved provider tags from image metadata.\"}"
+  "note": "{\"title\":\"PixAI\",\"content\":\"Filter by like or comment count (N+ segments; a segment also accepts <min>-<max>, <min>+ or -<max>).\"}"
 }

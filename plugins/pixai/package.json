@@ -1,6 +1,6 @@
 {
   "name": "pixai",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "name.zh": "PixAI",
   "name.en": "PixAI",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.5.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",
@@ -524,9 +524,10 @@
   ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",
-    "providers/tag_page_provider.json5",
-    "providers/tag_provider.json5"
+    "providers/number_range_provider.json5",
+    "providers/number_range_router.json5"
   ],
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
   "kbDescriptionTemplate": "templates/description.ejs",
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",

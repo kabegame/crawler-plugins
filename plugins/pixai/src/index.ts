@@ -7,6 +7,7 @@
 //   util     取值归一、日志、起始页/结束页 → 分页窗口
 //   api      GraphQL 访问层（请求头、URL 拼装、作品详情与评论）
 //   tacks    标签 codeName → tackId 解析与 plugin_data 缓存
+//   labels   作品 tags / 作者 → 应用标签
 //   download 一页作品 edges → 下载入库
 //   artworks 作品流翻页（全站/标签/模型/作者共用）
 //   models   按模型爬（模型列表分页 → 每模型作品流）

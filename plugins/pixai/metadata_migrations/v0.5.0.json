@@ -1,0 +1,205 @@
+{
+  "v2": {
+    "id": "2039056195465564720",
+    "title": "^_^",
+    "authorId": "1982807854269063639",
+    "prompts": "",
+    "createdAt": "2026-07-29T04:11:37.954Z",
+    "updatedAt": "2026-07-29T04:11:38.543Z",
+    "mediaId": "748756306816986118",
+    "videoMediaId": null,
+    "likedCount": 250,
+    "commentCount": 2,
+    "extra": {
+      "isMinors": false,
+      "isWarned": false,
+      "faceCenter": null,
+      "description": "",
+      "isRealistic": false,
+      "isSensitive": false,
+      "imageBlurHash": "UWM%7WQ,ADxY}ZrXkXkVCRS1V^WV=|S~I;kV",
+      "naturalPrompts": "HIDDEN_BY_AUTHOR",
+      "suggestedTacks": [
+        "1941984459632434772",
+        "1941984459565326112",
+        "1941984459628239862",
+        "1941984459531769135",
+        "1941984459598880612",
+        "1941984459569518275",
+        "1941984459628239891",
+        "1941984459535964013",
+        "1941984459993144779",
+        "1941984459603073645",
+        "1941984459573714936",
+        "1941984459586297242",
+        "1941984459598877336",
+        "1941984459993144781",
+        "1941984459565322892",
+        "1941984459703736348"
+      ],
+      "taskProcessType": "normal"
+    },
+    "media": {
+      "id": "748756306816986118",
+      "type": "IMAGE",
+      "width": 992,
+      "height": 1280,
+      "imageType": "webp",
+      "urls": [
+        {
+          "variant": "PUBLIC",
+          "url": "https://images-ng.pixai.art/gi/orig/6b8b939c-cfd8-4d06-a554-c99232ff901a"
+        },
+        {
+          "variant": "THUMBNAIL",
+          "url": "https://images-ng.pixai.art/gi/thumb/6b8b939c-cfd8-4d06-a554-c99232ff901a"
+        },
+        {
+          "variant": "STILL_THUMBNAIL",
+          "url": "https://images-ng.pixai.art/gi/stillThumb/6b8b939c-cfd8-4d06-a554-c99232ff901a"
+        }
+      ]
+    },
+    "author": {
+      "id": "1982807854269063639",
+      "username": "z0ey-b1ackw00d",
+      "displayName": "Zo£y.",
+      "avatarMediaId": "692508865089041394",
+      "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/c888dea3-d88c-4793-9889-2397bab4298f",
+      "accountType": "default",
+      "activeDecorations": []
+    },
+    "tacks": [
+      {
+        "id": "1941984459535964013",
+        "codeName": "water",
+        "category": "general",
+        "defaultName": "水",
+        "displayName": "water",
+        "tackTerms": [
+          {
+            "category": "ja",
+            "name": "水"
+          },
+          {
+            "category": "zh",
+            "name": "水"
+          },
+          {
+            "category": "en",
+            "name": "water"
+          },
+          {
+            "category": "ko",
+            "name": "물"
+          }
+        ]
+      },
+      {
+        "id": "1941984459603073645",
+        "codeName": "animal",
+        "category": "general",
+        "defaultName": "動物",
+        "displayName": "Animal",
+        "tackTerms": [
+          {
+            "category": "ja",
+            "name": "動物"
+          },
+          {
+            "category": "zh",
+            "name": "動物"
+          },
+          {
+            "category": "en",
+            "name": "Animal"
+          },
+          {
+            "category": "ko",
+            "name": "동물"
+          }
+        ]
+      },
+      {
+        "id": "1941984459632434772",
+        "codeName": "1girl",
+        "category": "general",
+        "defaultName": "女の子",
+        "displayName": "Girl",
+        "tackTerms": [
+          {
+            "category": "ja",
+            "name": "女の子"
+          },
+          {
+            "category": "zh",
+            "name": "女孩"
+          },
+          {
+            "category": "en",
+            "name": "Girl"
+          },
+          {
+            "category": "ko",
+            "name": "소녀"
+          },
+          {
+            "category": "ja_romaji",
+            "name": "onnanoko"
+          }
+        ]
+      },
+      {
+        "id": "1941984459703736348",
+        "codeName": "goldfish",
+        "category": "general",
+        "defaultName": "金魚",
+        "displayName": "Goldfish",
+        "tackTerms": [
+          {
+            "category": "ja",
+            "name": "金魚"
+          },
+          {
+            "category": "en",
+            "name": "Goldfish"
+          },
+          {
+            "category": "ko",
+            "name": "금붕어"
+          },
+          {
+            "category": "zh",
+            "name": "金魚"
+          }
+        ]
+      }
+    ],
+    "comments": [
+      {
+        "id": "2039084117840276107",
+        "type": "TEXT",
+        "content": "Amazing art!❤",
+        "createdAt": "2026-07-29T06:02:35.045Z",
+        "author": {
+          "id": "1995344842103510221",
+          "username": "momonga1101",
+          "displayName": "モモンガ",
+          "avatarSmallThumbnailMediaUrl": "https://images-ng.pixai.art/images/avatar/20dfbdcf-ac36-4d86-9b9f-7c6bde5d7699"
+        }
+      },
+      {
+        "id": "2040221376351820214",
+        "type": "TEXT",
+        "content": "What a beautiful composition✨",
+        "createdAt": "2026-08-01T09:21:38.603Z",
+        "author": {
+          "id": "1981229862011833705",
+          "username": "matcha67",
+          "displayName": "まっちゃ",
+          "avatarSmallThumbnailMediaUrl": null
+        }
+      }
+    ]
+  }
+}

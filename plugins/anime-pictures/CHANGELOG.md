@@ -8,5 +8,5 @@
 - 修复爬取时被 Cloudflare 拦截返回 403：`cf_clearance` 与签发它的浏览器 UA 绑定，原先写死的 Windows Chrome/124 UA
   与畅游不一致，导致验证失效。现在改用畅游的 UA（`Kabegame.cefUserAgent()`）和 Cookie（`requireCookie()`，含 HttpOnly 的 `cf_clearance`）发请求。
 - 取不到畅游的 UA 或 Cookie 时回退到内置值，并在任务日志中提示；若仍然 403，请先在畅游中打开 anime-pictures 并选择接受cookie。
-- 最低应用版本提升至 `4.4.1`。
+- 最低应用版本提升至 `4.5.0`。
 - 移除插件自带的「标签分组 → 标签」浏览（已由应用级标签取代），画廊插件扩展改为按 **星数 stars**（`5+` … `1000+` 档位，路径段支持区间 `10-50`、`10+`、`-5`）与站点标注的 **主色 color**（如 `palevioletred`）筛选。

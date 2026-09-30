@@ -10,10 +10,19 @@
         "plain": true,
       },
     },
-    "tag": {
-      "provider": "tag_entry_provider",
+    "downloads": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.download_count" },
       "meta": {
-        "display": "标签",
+        "display": "下载量",
+        "plain": true,
+      },
+    },
+    "favorites": {
+      "provider": "number_range_router",
+      "properties": { "json_path": "$.favorite_count" },
+      "meta": {
+        "display": "收藏量",
         "plain": true,
       },
     },
@@ -25,5 +34,5 @@
       },
     },
   },
-  "note": "{\"title\":\"哲风壁纸分类\",\"content\":\"按目录、标签或色彩浏览哲风壁纸。\"}",
+  "note": "{\"title\":\"哲风壁纸分类\",\"content\":\"按目录、下载量、收藏量或色彩浏览哲风壁纸；站点标签与作者统一进入应用级标签画册。\"}",
 }

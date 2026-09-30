@@ -24,6 +24,8 @@ LoRAs, like count, and comments.
 For each download, the plugin fetches the artwork details and recent comments, and saves a link to the original PixAI
 page. Animated artworks prefer the animated media resource, while static artworks use the public image resource. After
 the task finishes, you can browse the results in Kabegame and return to the source page from the artwork details.
+Artwork tags and authors are saved under the `pixai/tag` and `pixai/artist` label directories. The PixAI gallery
+extension also filters by `N+` like-count and comment-count segments.
 
 ![PixAI artworks downloaded to the Kabegame gallery](banners/images.jpg)
 

@@ -3319,35 +3319,35 @@
           "variable": "all"
         },
         {
-          "name": "手机壁纸 (sp)",
-          "name.en": "Mobile (sp)",
-          "name.ja": "スマホ壁紙 (sp)",
-          "name.ko": "모바일 (sp)",
-          "name.zhtw": "手機壁紙 (sp)",
+          "name": "手机壁纸",
+          "name.en": "Mobile",
+          "name.ja": "スマホ壁紙",
+          "name.ko": "모바일",
+          "name.zhtw": "手機壁紙",
           "variable": "sp"
         },
         {
-          "name": "高质量图片 (image)",
-          "name.en": "High-quality images (image)",
-          "name.ja": "高品質画像 (image)",
-          "name.ko": "고품질 이미지 (image)",
-          "name.zhtw": "高品質圖片 (image)",
+          "name": "高质量图片",
+          "name.en": "High-quality images",
+          "name.ja": "高品質画像",
+          "name.ko": "고품질 이미지",
+          "name.zhtw": "高品質圖片",
           "variable": "image"
         },
         {
-          "name": "高质量PC壁纸 (imgpc)",
-          "name.en": "High-quality PC (imgpc)",
-          "name.ja": "高品質PC壁紙 (imgpc)",
-          "name.ko": "고품질 PC (imgpc)",
-          "name.zhtw": "高品質PC壁紙 (imgpc)",
+          "name": "高质量PC壁纸",
+          "name.en": "High-quality PC",
+          "name.ja": "高品質PC壁紙",
+          "name.ko": "고품질 PC",
+          "name.zhtw": "高品質PC壁紙",
           "variable": "imgpc"
         },
         {
-          "name": "PC壁纸 (pc)",
-          "name.en": "PC wallpapers (pc)",
-          "name.ja": "PC壁紙 (pc)",
-          "name.ko": "PC 벽지 (pc)",
-          "name.zhtw": "PC壁紙 (pc)",
+          "name": "PC壁纸",
+          "name.en": "PC wallpapers",
+          "name.ja": "PC壁紙",
+          "name.ko": "PC 벽지",
+          "name.zhtw": "PC壁紙",
           "variable": "pc"
         }
       ],

@@ -14,4 +14,18 @@
 ## 说明
 
 - 每张壁纸会进入其详情页，从中读取分类、分辨率、色系、大小、标签、发布时间、作者等信息写入 metadata。
+- 相关标签会转换为拼音 key 后写入 `haowallpaper/tag` 标签画册（例如“二次元”→`er-ci-yuan`）；作者按站内用户 ID 写入 `haowallpaper/artist`。`tiny-pinyin` 以体积优先，不保证多音字读音准确。
+- 插件 Provider 可按目录、下载量、收藏量与色彩浏览；站点标签与作者统一从应用的标签画册浏览。
 - 需要登录的原图端点不在抓取范围内。
+
+## 第三方许可
+
+本插件内置了 [tiny-pinyin](https://github.com/creeperyang/pinyin) 1.3.2（MIT License）。
+
+Copyright (c) 2017 Creeper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
