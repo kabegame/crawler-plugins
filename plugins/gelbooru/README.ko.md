@@ -39,7 +39,8 @@
 - `uploader_name` / `uploader_href`, `posted_date_text`, `source_text` / `source_href`
 - `original_href`, `sample_href`, `video_href`, `has_sound`, `has_children`
 
-함께 PathQL provider도 등록하므로 갤러리에서 **태그 카테고리 → 태그** 2단계로 탐색할 수 있습니다.
+다운로드할 때 다섯 가지 태그 분류도 앱의 태그 영역에 `gelbooru/<분류>/<태그 key>` 경로로 저장합니다.
+1.1.0으로 업그레이드하면 위 `tags` 메타데이터가 있는 기존 이미지에도 태그가 자동으로 보충됩니다.
 
 ## 주의 사항
 

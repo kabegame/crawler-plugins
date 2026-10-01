@@ -39,7 +39,8 @@
 - `uploader_name` / `uploader_href`、`posted_date_text`、`source_text` / `source_href`
 - `original_href`、`sample_href`、`video_href`、`has_sound`、`has_children`
 
-あわせて PathQL provider を登録するので、ギャラリーで **タグカテゴリ → タグ** の 2 階層でも辿れます。
+ダウンロード時には 5 種類のタグもアプリの「タグ」領域へ `gelbooru/<カテゴリ>/<タグ key>` の
+パスで保存します。1.1.0 へ更新すると、上記 `tags` メタデータを持つ既存画像にも自動で補完されます。
 
 ## 注意事項
 

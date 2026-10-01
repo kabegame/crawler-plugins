@@ -3,7 +3,7 @@
 import { processDetailPage } from "./detail";
 import { openDocument, resolveUrl, textOf } from "./runtime";
 
-const { addProgress } = Kabegame;
+const { addProgress, warn } = Kabegame;
 
 function collectDetailPageHrefs(document, pageUrl) {
   return Array.from(document.querySelectorAll(".itiran:last-of-type > a[href]"))
@@ -36,6 +36,17 @@ export async function crawlAnimeSeries(
   let end = Number(userEnd || 0);
   const rangeMode = end > 0;
   if (rangeMode && start > end) [start, end] = [end, start];
+  const requestedRange = rangeMode ? `${start}-${end}` : "全部";
+  const actualRange = `1-${listTotalPages}`;
+  console.log(`[anihonet] 作品页数范围参数=${requestedRange}，检测到的实际页数范围=${actualRange}`);
+  if (rangeMode && (start > listTotalPages || end > listTotalPages)) {
+    warn(`[anihonet] 检测到的实际页数范围 ${actualRange} 未覆盖输入范围 ${requestedRange}，超出部分不会抓取`);
+  }
+  if (rangeMode && start > listTotalPages) {
+    addProgress(themePctBudget);
+    return;
+  }
+  if (rangeMode) end = Math.min(end, listTotalPages);
   const pageSpan = Math.max(1, rangeMode ? end - start + 1 : listTotalPages);
   const pctPerListPage = themePctBudget / pageSpan;
   let pageIdx = 1;

@@ -20,7 +20,7 @@ For example, selecting **Daily** and **Mobile** uses the path `ranking-daily-sp`
 
 Select one anime or game from the list built into the plugin. Each item maps to an `images/`, `category/`, or `tag/` path on the site.
 
-After selecting **Single work**, choose the desired title in the **Work** setting.
+After selecting **Single work**, choose the desired title in **Work** and set the **Work list start page** and **Work list end page**. The default range is pages `1` through `10`. The plugin logs both the requested and detected ranges, and warns when the requested range extends beyond the site's last page.
 
 ### By theme (index search)
 
@@ -44,7 +44,7 @@ On the site's title index, the plugin matches link text against the **Theme keyw
 
 1. Set **Crawl mode** to **Single work**.
 2. Select the desired anime or game in **Work**.
-3. Run the task.
+3. Set the work list start and end pages, then run the task.
 
 ### Crawl by theme keyword
 

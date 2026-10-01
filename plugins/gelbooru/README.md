@@ -36,7 +36,8 @@
 - `uploader_name` / `uploader_href`、`posted_date_text`、`source_text` / `source_href`
 - `original_href`、`sample_href`、`video_href`、`has_sound`、`has_children`
 
-同时插件注册了 PathQL provider，画廊里可以按 **标签分类 → 标签** 两级浏览已下载的图。
+下载时也会把五类标签写入应用的「标签」分区，路径为 `gelbooru/<分类>/<标签 key>`；
+升级到 1.1.0 后，带有上述 `tags` 元数据的历史图片会自动补齐这些标签。
 
 ## 注意事项
 

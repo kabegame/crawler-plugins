@@ -30,7 +30,16 @@ export async function crawl(common, custom) {
       addProgress(100.0);
       return;
     }
-    await crawlAnimeSeries(`${baseUrl}/${workSlug}`, 100.0, "single", 1, 1, 1, 0, baseUrl);
+    await crawlAnimeSeries(
+      `${baseUrl}/${workSlug}`,
+      100.0,
+      "single",
+      1,
+      1,
+      vars.work_start_page == null ? 1 : Number(vars.work_start_page),
+      vars.work_end_page == null ? 0 : Number(vars.work_end_page),
+      baseUrl,
+    );
   } else if (vars.crawl_mode === "by_theme") {
     await crawlThemeFromIndex(
       vars.theme_search,

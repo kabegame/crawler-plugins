@@ -1,5 +1,15 @@
 # Gelbooru 更新日志
 
+## 1.1.0
+
+- 下载时把详情页标签按分类写入应用的「标签」分区：作家、版权、角色、通用、元信息分别位于
+  `gelbooru/artist`、`gelbooru/copyright`、`gelbooru/character`、`gelbooru/general`、
+  `gelbooru/metadata` 下
+- 标签 key 使用站点的规范标签名（如 `hakurei_reimu`），显示名使用页面文字
+- 历史下载的图片会通过 `provideLabels` 自动补上标签；没有 `tags` 元数据的图片无法补齐
+- 最低应用版本提升至 `4.5.0`
+- 移除插件自带的「标签分类 → 标签」PathQL 浏览，统一改用应用级标签画册浏览和筛选
+
 ## 1.0.0
 
 首个版本。

@@ -39,8 +39,9 @@ Every image carries metadata parsed from its post page, rendered in the detail s
 - `uploader_name` / `uploader_href`, `posted_date_text`, `source_text` / `source_href`
 - `original_href`, `sample_href`, `video_href`, `has_sound`, `has_children`
 
-The plugin also registers PathQL providers, so the gallery can browse downloaded images by
-**tag category → tag**.
+Downloads also write all five tag categories into the app's Labels section under
+`gelbooru/<category>/<tag key>`. After upgrading to 1.1.0, historical images carrying the `tags`
+metadata above are backfilled automatically.
 
 ## Notes
 

@@ -36,7 +36,8 @@
 - `uploader_name` / `uploader_href`、`posted_date_text`、`source_text` / `source_href`
 - `original_href`、`sample_href`、`video_href`、`has_sound`、`has_children`
 
-同時外掛註冊了 PathQL provider，圖庫裡可以按 **標籤分類 → 標籤** 兩級瀏覽已下載的圖。
+下載時也會把五類標籤寫入應用程式的「標籤」分區，路徑為 `gelbooru/<分類>/<標籤 key>`；
+升級到 1.1.0 後，帶有上述 `tags` 中繼資料的歷史圖片會自動補齊這些標籤。
 
 ## 注意事項
 

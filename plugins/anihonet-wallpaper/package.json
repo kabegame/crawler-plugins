@@ -1,6 +1,6 @@
 {
   "name": "anihonet-wallpaper",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "private": true,
   "name.zh": "anihonet动漫壁纸",
   "name.en": "anihonet anime wallpapers",
@@ -3268,6 +3268,54 @@
           "variable": "images/tenshitsuki"
         }
       ],
+      "when": {
+        "crawl_mode": [
+          "single_work"
+        ]
+      }
+    },
+    {
+      "key": "work_start_page",
+      "type": "int",
+      "name": "作品列表起始页",
+      "name.en": "Work list start page",
+      "name.ja": "作品一覧の開始ページ",
+      "name.ko": "작품 목록 시작 페이지",
+      "name.zhtw": "作品列表起始頁",
+      "descripts": "所选作品从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
+      "descripts.en": "1-based page to start downloading for the selected work (earlier pages are skipped)",
+      "descripts.ja": "選択した作品の取得開始ページ（1 始まり）",
+      "descripts.ko": "선택한 작품에서 수집을 시작할 페이지(1부터)",
+      "descripts.zhtw": "所選作品從第幾頁開始爬取（1 為列表第一頁）",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "single_work"
+        ]
+      }
+    },
+    {
+      "key": "work_end_page",
+      "type": "int",
+      "name": "作品列表结束页",
+      "name.en": "Work list end page",
+      "name.ja": "作品一覧の終了ページ",
+      "name.ko": "작품 목록 끝 페이지",
+      "name.zhtw": "作品列表結束頁",
+      "descripts": "所选作品抓到第几页为止（含该页）；若站点无下一页则提前结束并打印警告",
+      "descripts.en": "Last page to crawl for the selected work (inclusive); warns and stops at the site's last page",
+      "descripts.ja": "選択した作品の終了ページ（このページを含む）。サイトの最終ページを超える場合は警告します",
+      "descripts.ko": "선택한 작품에서 수집을 끝낼 페이지(포함). 사이트의 마지막 페이지를 넘으면 경고합니다",
+      "descripts.zhtw": "所選作品爬取到第幾頁為止（含該頁）；超過網站末頁時會警告",
+      "default": 10,
+      "options": null,
+      "min": 1,
+      "max": 9999,
+      "width": 1,
       "when": {
         "crawl_mode": [
           "single_work"

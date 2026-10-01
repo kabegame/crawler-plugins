@@ -183,7 +183,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 ### 8. gelbooru
 
 **Name**: Gelbooru image board  
-**Version**: 1.0.0  
+**Version**: 1.1.0
 **Description**: Gelbooru image board crawler plugin with full tag metadata  
 **Author**: Kabegame
 
@@ -197,7 +197,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 - Stores the **full tag set** of each post as image metadata, grouped by category
   (artist / character / copyright / metadata / general) — the detail sidebar reproduces the
   site's own colors and has a copy button, so it can be pasted straight into an AI image prompt
-- Registers PathQL providers, so the gallery can browse downloaded images by tag category → tag
+- Writes those tags into the app-level Labels section for browsing and filtering, including automatic backfill for historical images
 - Quality: high (original file) / medium (the site's resized sample); video posts take the original mp4
 
 **Config variables**:

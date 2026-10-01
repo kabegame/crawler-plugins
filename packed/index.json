@@ -1,6 +1,6 @@
 {
   "version": "v4.4.0",
-  "generated_at": "2026-09-30T07:43:37.746Z",
+  "generated_at": "2026-09-30T16:26:14.786Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -154,13 +154,13 @@
     },
     {
       "id": "gelbooru",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": "Kabegame",
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.4.0/gelbooru.kgpg",
-      "sizeBytes": 1104744,
-      "sha256": "7cdc5090ad92d5bb44426ec1c421d4b46014f928aab3f332cbfe2062fdd857f2",
-      "minAppVersion": "4.3.0",
+      "sizeBytes": 1103920,
+      "sha256": "b00c5896f839f53d7fba629af659ef9ce013039de0260f0fa855ab131f8b9e68",
+      "minAppVersion": "4.5.0",
       "name": "gelbooru",
       "name.zh": "Gelbooru 二次元图库",
       "name.en": "Gelbooru image board",

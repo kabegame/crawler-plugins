@@ -109,6 +109,41 @@ function parseSidebarTags(document, pageUrl) {
     .filter((tag) => tag.name);
 }
 
+// 标签画册：Gelbooru 详情页用 tag-type-* 直接给出五种分类，分别映射到
+// `gelbooru/<分类>` 目录下；缺失或未知分类按 general 处理，避免生成意外目录。
+// key 使用站点规范标签名（通常为小写下划线形式），显示名使用页面文字。
+// metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本（迁移环境不能 import），
+// 改这里时必须同步修改那里。
+const LABEL_CATEGORIES = new Set(["artist", "copyright", "character", "general", "metadata"]);
+
+function tagLabelType(type) {
+  const value = String(type || "").trim().toLowerCase();
+  return LABEL_CATEGORIES.has(value) ? value : "general";
+}
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromTags(tags) {
+  const labels = [];
+  for (const tag of tags || []) {
+    const key = tagLabelKey(tag && tag.name);
+    if (!key) continue;
+    labels.push({
+      key,
+      category: `gelbooru/${tagLabelType(tag.type)}`,
+      name: trimText(tag.display) || key.replace(/_/g, " "),
+    });
+  }
+  return labels;
+}
+
 // AI 生图直接可用的完整 tag 串：按分类顺序拼，组内保持页面原序
 function buildTagsString(tags) {
   const ordered = [];
@@ -281,6 +316,8 @@ async function processDetailPage(href, baseUrl, quality) {
   }
   const opts = { url: finalUrl };
   if (metadataNonEmpty(meta)) opts.metadata = meta;
+  const labels = labelsFromTags(meta.tags);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(mediaUrl, opts);
 }
 
