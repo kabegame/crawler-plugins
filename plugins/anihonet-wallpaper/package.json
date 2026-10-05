@@ -1,6 +1,6 @@
 {
   "name": "anihonet-wallpaper",
-  "version": "1.6.6",
+  "version": "1.7.0",
   "private": true,
   "name.zh": "anihonet动漫壁纸",
   "name.en": "anihonet anime wallpapers",
@@ -35,11 +35,11 @@
       "name.ja": "取得モード",
       "name.ko": "수집 모드",
       "name.zhtw": "爬取模式",
-      "descripts": "排行榜：按周期排行页抓取。单个作品：从固定列表选择一部作品抓取。主题模式：在一覧页按标题关键字匹配进入该主题，再抓列表指定页范围",
-      "descripts.en": "Ranking, pick one work from the list, or find one theme by keyword on the index page",
-      "descripts.ja": "ランキング、作品リストから1作品を選択、またはキーワードで作品を検索",
-      "descripts.ko": "랭킹, 목록에서 작품 선택, 또는 키워드로 작품 검색",
-      "descripts.zhtw": "排行榜、從固定清單選取一部作品、或以關鍵字進入主題",
+      "descripts": "排行榜：按周期排行页抓取。单个作品：从固定列表选择一部作品抓取。搜索：通过站内搜索 URL 按关键词、方向、排序和页码范围抓取",
+      "descripts.en": "Ranking, pick one work from the list, or use site search with configurable direction and sorting",
+      "descripts.ja": "ランキング、作品リストから1作品を選択、または方向・並び順を指定してサイト内検索",
+      "descripts.ko": "랭킹, 목록에서 작품 선택, 또는 방향과 정렬을 지정한 사이트 검색",
+      "descripts.zhtw": "排行榜、從固定清單選取一部作品，或以可設定的方向與排序進行站內搜尋",
       "default": "ranking",
       "options": [
         {
@@ -59,12 +59,12 @@
           "variable": "single_work"
         },
         {
-          "name": "主题模式（一覧检索）",
-          "name.en": "By theme (index search)",
-          "name.ja": "テーマ指定（一覧から検索）",
-          "name.ko": "테마 지정(목록 검색)",
-          "name.zhtw": "主題模式（一覽搜尋）",
-          "variable": "by_theme"
+          "name": "搜索",
+          "name.en": "Search",
+          "name.ja": "検索",
+          "name.ko": "검색",
+          "name.zhtw": "搜尋",
+          "variable": "search"
         }
       ]
     },
@@ -3323,23 +3323,101 @@
       }
     },
     {
-      "key": "theme_search",
+      "key": "search_query",
       "type": "string",
-      "name": "主题关键字",
-      "name.en": "Theme keyword",
-      "name.ja": "作品名キーワード",
-      "name.ko": "작품 키워드",
-      "name.zhtw": "主題關鍵字",
-      "descripts": "在作品タイトル一覧页中，匹配链接文案「包含」此字符串的第一个主题（区分大小写与日语原文一致更易命中）",
-      "descripts.en": "First index link whose text contains this substring (case-sensitive)",
-      "descripts.ja": "一覧のリンク文言にこの文字列が含まれる最初の作品へ",
-      "descripts.ko": "목록 링크 텍스트에 부분 문자열이 포함된 첫 작품",
-      "descripts.zhtw": "一覽頁連結文案「包含」此字串的第一個主題",
+      "name": "搜索关键词",
+      "name.en": "Search keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색 키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "作为站内搜索 URL 的 s 参数；支持作品名、角色名等站点可检索内容",
+      "descripts.en": "Value of the site search URL's s parameter, such as a title or character name",
+      "descripts.ja": "サイト内検索 URL の s パラメータ。作品名やキャラクター名などを入力します",
+      "descripts.ko": "작품명이나 캐릭터명 등 사이트 검색 URL의 s 매개변수 값",
+      "descripts.zhtw": "作為站內搜尋 URL 的 s 參數，可輸入作品名、角色名等",
       "default": "",
       "width": 2,
       "when": {
         "crawl_mode": [
-          "by_theme"
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "search_order",
+      "type": "options",
+      "name": "排列方向",
+      "name.en": "Direction",
+      "name.ja": "並び方向",
+      "name.ko": "정렬 방향",
+      "name.zhtw": "排列方向",
+      "descripts": "对应搜索 URL 的 order 参数",
+      "descripts.en": "The search URL's order parameter",
+      "descripts.ja": "検索 URL の order パラメータ",
+      "descripts.ko": "검색 URL의 order 매개변수",
+      "descripts.zhtw": "對應搜尋 URL 的 order 參數",
+      "default": "DESC",
+      "options": [
+        {
+          "name": "降序",
+          "name.en": "Descending",
+          "name.ja": "降順",
+          "name.ko": "내림차순",
+          "name.zhtw": "降冪",
+          "variable": "DESC"
+        },
+        {
+          "name": "升序",
+          "name.en": "Ascending",
+          "name.ja": "昇順",
+          "name.ko": "오름차순",
+          "name.zhtw": "升冪",
+          "variable": "ASC"
+        }
+      ],
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "search_orderby",
+      "type": "options",
+      "name": "排序方式",
+      "name.en": "Sort by",
+      "name.ja": "並び順",
+      "name.ko": "정렬 기준",
+      "name.zhtw": "排序方式",
+      "descripts": "对应搜索 URL 的 orderby 参数；随机排序时方向不影响结果",
+      "descripts.en": "The search URL's orderby parameter; direction does not affect random sorting",
+      "descripts.ja": "検索 URL の orderby パラメータ。ランダムでは並び方向は結果に影響しません",
+      "descripts.ko": "검색 URL의 orderby 매개변수. 무작위 정렬에서는 방향이 결과에 영향을 주지 않습니다",
+      "descripts.zhtw": "對應搜尋 URL 的 orderby 參數；隨機排序時方向不影響結果",
+      "default": "post_date",
+      "options": [
+        {
+          "name": "发布日期",
+          "name.en": "Published date",
+          "name.ja": "投稿日",
+          "name.ko": "게시일",
+          "name.zhtw": "發布日期",
+          "variable": "post_date"
+        },
+        {
+          "name": "随机",
+          "name.en": "Random",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "rand"
+        }
+      ],
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
         ]
       }
     },
@@ -3406,48 +3484,48 @@
       }
     },
     {
-      "key": "theme_start_page",
+      "key": "search_start_page",
       "type": "int",
-      "name": "主题列表起始页",
-      "name.en": "Theme list start page",
-      "name.ja": "テーマ一覧の開始ページ",
-      "name.ko": "테마 목록 시작 페이지",
-      "name.zhtw": "主題列表起始頁",
-      "descripts": "进入主题后，作品列表从第几页开始抓取（1 为列表第一页）；此前的页仅翻页不下载",
-      "descripts.en": "1-based list page to start downloading (earlier pages are skipped)",
-      "descripts.ja": "テーマ内リストの取得開始ページ（1 始まり）",
-      "descripts.ko": "테마 목록에서 수집을 시작할 페이지(1부터)",
-      "descripts.zhtw": "進入主題後從第幾頁開始抓（1 為第一頁）",
+      "name": "搜索起始页",
+      "name.en": "Search start page",
+      "name.ja": "検索開始ページ",
+      "name.ko": "검색 시작 페이지",
+      "name.zhtw": "搜尋起始頁",
+      "descripts": "搜索结果从第几页开始抓取（1 为第一页）",
+      "descripts.en": "1-based search results page to start downloading",
+      "descripts.ja": "検索結果の取得開始ページ（1 始まり）",
+      "descripts.ko": "검색 결과 수집을 시작할 페이지(1부터)",
+      "descripts.zhtw": "搜尋結果從第幾頁開始爬取（1 為第一頁）",
       "default": 1,
       "options": null,
       "min": 1,
       "width": 1,
       "when": {
         "crawl_mode": [
-          "by_theme"
+          "search"
         ]
       }
     },
     {
-      "key": "theme_end_page",
+      "key": "search_end_page",
       "type": "int",
-      "name": "主题列表结束页",
-      "name.en": "Theme list end page",
-      "name.ja": "テーマ一覧の終了ページ",
-      "name.ko": "테마 목록 끝 페이지",
-      "name.zhtw": "主題列表結束頁",
-      "descripts": "作品列表抓到第几页为止（含该页）；若站点无下一页则提前结束，进度会补足",
-      "descripts.en": "Last list page to crawl (inclusive); stops early if no next link",
-      "descripts.ja": "テーマ内リストの終了ページ（このページを含む）",
-      "descripts.ko": "테마 목록에서 수집을 끝낼 페이지(포함)",
-      "descripts.zhtw": "列表抓到第幾頁為止（含該頁）",
+      "name": "搜索结束页",
+      "name.en": "Search end page",
+      "name.ja": "検索終了ページ",
+      "name.ko": "검색 끝 페이지",
+      "name.zhtw": "搜尋結束頁",
+      "descripts": "搜索结果抓取到第几页为止（含该页）；超过站点末页的部分会跳过",
+      "descripts.en": "Last search results page to crawl (inclusive); pages beyond the site's last page are skipped",
+      "descripts.ja": "検索結果の終了ページ（このページを含む）。サイトの最終ページを超える部分はスキップします",
+      "descripts.ko": "검색 결과 수집을 끝낼 페이지(포함). 사이트의 마지막 페이지를 넘는 부분은 건너뜁니다",
+      "descripts.zhtw": "搜尋結果爬取到第幾頁為止（含該頁）；超過網站末頁的部分會略過",
       "default": 10,
       "options": null,
       "min": 1,
       "width": 1,
       "when": {
         "crawl_mode": [
-          "by_theme"
+          "search"
         ]
       }
     },

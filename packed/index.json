@@ -1,6 +1,6 @@
 {
   "version": "v4.4.0",
-  "generated_at": "2026-09-30T16:26:14.786Z",
+  "generated_at": "2026-10-05T08:05:35.726Z",
   "repository": {
     "owner": "kabegame",
     "name": "crawler-plugins",
@@ -10,12 +10,12 @@
   "plugins": [
     {
       "id": "anihonet-wallpaper",
-      "version": "1.6.5",
+      "version": "1.7.0",
       "author": "Kabegame",
       "packageVersion": 3,
       "downloadUrl": "https://github.com/kabegame/crawler-plugins/releases/download/v4.4.0/anihonet-wallpaper.kgpg",
-      "sizeBytes": 922581,
-      "sha256": "04edff7f00ee8e0b27646c2f2801a77af76bc800ea83beb1f46003c8d9fc5f03",
+      "sizeBytes": 925198,
+      "sha256": "98979189e8db4a9b4bf2bef14b3d846c6c540f6db398ee4300c2a360926a47aa",
       "minAppVersion": "4.3.0",
       "name": "anihonet-wallpaper",
       "name.zh": "anihonet动漫壁纸",

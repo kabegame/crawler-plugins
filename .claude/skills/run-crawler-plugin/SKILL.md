@@ -6,7 +6,7 @@ description: 用 kabegame-cli 真跑一个爬虫插件来验证改动 —— 打
 # 跑爬虫插件（kabegame-cli plugin run）
 
 **改完 `plugins/<name>/` 下的插件源码，用本 skill 真跑一遍验证。** 不需要启动 GUI，
-不需要 daemon —— `kabegame-cli plugin run` 在自己进程里初始化 TaskScheduler + V8 运行时，
+`kabegame-cli plugin run` 在自身进程里初始化 TaskScheduler + V8 运行时，
 走的是和主应用**完全同一条链路**（`commands::task::start_task` → 调度器冻结参数 → worker
 在 `spawn_blocking` 里跑 V8）。
 

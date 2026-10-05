@@ -20,7 +20,7 @@ function parseListPageTotalPages(document) {
 
 export async function crawlAnimeSeries(
   seriesHref,
-  themePctBudget,
+  listPctBudget,
   rowId,
   idxInRow,
   totalInRow,
@@ -43,12 +43,12 @@ export async function crawlAnimeSeries(
     warn(`[anihonet] 检测到的实际页数范围 ${actualRange} 未覆盖输入范围 ${requestedRange}，超出部分不会抓取`);
   }
   if (rangeMode && start > listTotalPages) {
-    addProgress(themePctBudget);
+    addProgress(listPctBudget);
     return;
   }
   if (rangeMode) end = Math.min(end, listTotalPages);
   const pageSpan = Math.max(1, rangeMode ? end - start + 1 : listTotalPages);
-  const pctPerListPage = themePctBudget / pageSpan;
+  const pctPerListPage = listPctBudget / pageSpan;
   let pageIdx = 1;
   let completed = 0;
 
@@ -76,6 +76,6 @@ export async function crawlAnimeSeries(
   }
 
   const used = pctPerListPage * (rangeMode ? completed : pageIdx);
-  const remainder = themePctBudget - used;
+  const remainder = listPctBudget - used;
   if (remainder > 0.0001) addProgress(remainder);
 }

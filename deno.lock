@@ -1949,6 +1949,15 @@
           ]
         }
       },
+      "plugins/e-shuushuu": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/gelbooru": {
         "packageJson": {
           "dependencies": [

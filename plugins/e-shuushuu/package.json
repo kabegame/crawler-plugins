@@ -1,0 +1,201 @@
+{
+  "name": "e-shuushuu",
+  "version": "0.3.0",
+  "private": true,
+  "name.zh": "e-shuushuu",
+  "name.en": "e-shuushuu",
+  "name.ja": "e-shuushuu",
+  "name.ko": "e-shuushuu",
+  "name.zhtw": "e-shuushuu",
+  "description": "e-shuushuu 可爱风动漫图库收集源插件",
+  "description.zh": "e-shuushuu 可爱风动漫图库收集源插件",
+  "description.en": "Crawler plugin for the e-shuushuu cute anime image board",
+  "description.ja": "e-shuushuu（かわいい系アニメ画像掲示板）の収集プラグイン",
+  "description.ko": "e-shuushuu 귀여운 애니메이션 이미지 보드 수집 플러그인",
+  "description.zhtw": "e-shuushuu 可愛風動漫圖庫收集源外掛",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://e-shuushuu.net",
+  "kbLabels": [
+    {
+      "id": "content.res.mobile"
+    },
+    {
+      "id": "content.res.desktop"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "name": "Mode",
+      "name.zh": "模式",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "Homepage: newest uploads page by page. Top: the site's Top Rated list. Search URL: crawl the results of a search page you set up on the site.",
+      "descripts.zh": "主页：按最新上传翻页。排行榜：站点的 Top Rated 榜单。搜索 URL：抓取你在站点搜索页设置好的搜索结果。",
+      "descripts.ja": "トップ：新着順にページ送り。ランキング：サイトの Top Rated 一覧。検索 URL：サイトの検索ページで設定した検索結果を取得。",
+      "descripts.ko": "홈: 최신 업로드를 페이지 단위로. 랭킹: 사이트의 Top Rated 목록. 검색 URL: 사이트 검색 페이지에서 설정한 검색 결과를 수집.",
+      "descripts.zhtw": "主頁：依最新上傳翻頁。排行榜：站點的 Top Rated 榜單。搜尋 URL：抓取你在站點搜尋頁設定好的搜尋結果。",
+      "default": "home",
+      "options": [
+        {
+          "name": "Homepage",
+          "name.zh": "主页",
+          "name.ja": "トップページ",
+          "name.ko": "홈",
+          "name.zhtw": "主頁",
+          "variable": "home"
+        },
+        {
+          "name": "Top rated",
+          "name.zh": "排行榜",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "top"
+        },
+        {
+          "name": "Search URL",
+          "name.zh": "搜索 URL",
+          "name.ja": "検索 URL",
+          "name.ko": "검색 URL",
+          "name.zhtw": "搜尋 URL",
+          "variable": "search"
+        }
+      ]
+    },
+    {
+      "key": "top_period",
+      "type": "options",
+      "name": "Ranking range",
+      "name.zh": "排行范围",
+      "name.ja": "ランキング期間",
+      "name.ko": "랭킹 기간",
+      "name.zhtw": "排行範圍",
+      "descripts": "Same four ranges as the site. The ranking has at most 20 pages.",
+      "descripts.zh": "与站点的四个范围一致；排行榜最多 20 页。",
+      "descripts.ja": "サイトと同じ 4 つの期間。ランキングは最大 20 ページ。",
+      "descripts.ko": "사이트와 같은 네 가지 기간. 랭킹은 최대 20페이지.",
+      "descripts.zhtw": "與站點的四個範圍一致；排行榜最多 20 頁。",
+      "default": "all",
+      "when": {
+        "mode": [
+          "top"
+        ]
+      },
+      "options": [
+        {
+          "name": "All time",
+          "name.zh": "全部时间",
+          "name.ja": "全期間",
+          "name.ko": "전체 기간",
+          "name.zhtw": "全部時間",
+          "variable": "all"
+        },
+        {
+          "name": "This year",
+          "name.zh": "今年",
+          "name.ja": "今年",
+          "name.ko": "올해",
+          "name.zhtw": "今年",
+          "variable": "year"
+        },
+        {
+          "name": "This month",
+          "name.zh": "本月",
+          "name.ja": "今月",
+          "name.ko": "이번 달",
+          "name.zhtw": "本月",
+          "variable": "month"
+        },
+        {
+          "name": "This week",
+          "name.zh": "本周",
+          "name.ja": "今週",
+          "name.ko": "이번 주",
+          "name.zhtw": "本週",
+          "variable": "week"
+        }
+      ]
+    },
+    {
+      "key": "search_url",
+      "type": "string",
+      "name": "Search URL",
+      "name.zh": "搜索 URL",
+      "name.ja": "検索 URL",
+      "name.ko": "검색 URL",
+      "name.zhtw": "搜尋 URL",
+      "descripts": "Set filters and sorting on https://e-shuushuu.net/search, then paste the address bar URL here. Pages follow the start/end page settings below.",
+      "descripts.zh": "在 https://e-shuushuu.net/search 设置好筛选与排序后，把地址栏的 URL 粘贴到这里；页码以下方起止页为准。",
+      "descripts.ja": "https://e-shuushuu.net/search で絞り込みと並び順を設定し、アドレスバーの URL を貼り付けてください。ページは下の開始/終了ページに従います。",
+      "descripts.ko": "https://e-shuushuu.net/search 에서 필터와 정렬을 설정한 뒤 주소창의 URL을 붙여 넣으세요. 페이지는 아래 시작/끝 페이지를 따릅니다.",
+      "descripts.zhtw": "在 https://e-shuushuu.net/search 設定好篩選與排序後，把網址列的 URL 貼到這裡；頁碼以下方起止頁為準。",
+      "default": "",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "Start page",
+      "name.zh": "起始页",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "First page to crawl (20 images per page).",
+      "descripts.zh": "从第几页开始抓取（每页 20 张）。",
+      "descripts.ja": "何ページ目から取得するか（1 ページ 20 枚）。",
+      "descripts.ko": "몇 번째 페이지부터 수집할지(페이지당 20장).",
+      "descripts.zhtw": "從第幾頁開始抓取（每頁 20 張）。",
+      "default": 1,
+      "width": 2,
+      "min": 1
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "End page",
+      "name.zh": "结束页",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "Last page to crawl (inclusive).",
+      "descripts.zh": "抓取到第几页为止（含该页）。",
+      "descripts.ja": "何ページ目まで取得するか（そのページを含む）。",
+      "descripts.ko": "몇 번째 페이지까지 수집할지(해당 페이지 포함).",
+      "descripts.zhtw": "抓取到第幾頁為止（含該頁）。",
+      "default": 1,
+      "width": 2,
+      "min": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

@@ -22,14 +22,15 @@ Select one anime or game from the list built into the plugin. Each item maps to 
 
 After selecting **Single work**, choose the desired title in **Work** and set the **Work list start page** and **Work list end page**. The default range is pages `1` through `10`. The plugin logs both the requested and detected ranges, and warns when the requested range extends beyond the site's last page.
 
-### By theme (index search)
+### Search
 
-On the site's title index, the plugin matches link text against the **Theme keyword**, opens the first theme containing that string, and then crawls the specified page range.
+Use the site's native search URL to crawl results by keyword, with configurable direction, sorting, and page range.
 
-- The theme keyword is empty by default. For the best match, enter the exact Japanese text used on the site and mind letter case.
-- The theme list start page defaults to `1` and has a minimum value of `1`.
-- The theme list end page defaults to `10`, has a minimum value of `1`, and is inclusive.
-- If the site has no next page, the task ends early.
+- The search keyword becomes the URL's `s` parameter. It can be a title, character name, or any other content supported by the site search.
+- Direction maps to `order=DESC|ASC` and defaults to descending.
+- Sorting maps to `orderby=post_date|rand` and defaults to published date. Direction has no effect on random sorting.
+- Search start and end pages default to `1` through `10`, inclusive.
+- The plugin detects the site's actual last page, skips any excess range, and writes a warning.
 
 ## Examples
 
@@ -46,11 +47,11 @@ On the site's title index, the plugin matches link text against the **Theme keyw
 2. Select the desired anime or game in **Work**.
 3. Set the work list start and end pages, then run the task.
 
-### Crawl by theme keyword
+### Search for wallpapers
 
-1. Set **Crawl mode** to **By theme (index search)**.
-2. Enter a theme keyword matching the link text on the site.
-3. Set the theme list start and end pages, then run the task.
+1. Set **Crawl mode** to **Search**.
+2. Enter a search keyword and choose the direction and sorting.
+3. Set the search start and end pages, then run the task.
 
 ## Development
 

@@ -1,0 +1,170 @@
+<%
+  // 还原 e-shuushuu 详情页右侧三张卡片（Uploaded by / Tags / Image Information）与下方评论区。
+  // 配色取自源站 :root（亮色）变量；数据来自 src/index.ts 的 buildMetadata（schema 1）。
+  const m = metadata || {};
+  const BASE = 'https://e-shuushuu.net';
+  const up = m.uploader || null;
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  const comments = (Array.isArray(m.comments) ? m.comments : []).filter(function (c) { return c && !c.deleted; });
+  const TYPE_ORDER = ['Artist', 'Source', 'Character', 'Theme'];
+  const ordered = TYPE_ORDER.reduce(function (acc, ty) {
+    return acc.concat(tags.filter(function (t) { return t && t.type_name === ty; }));
+  }, []).concat(tags.filter(function (t) { return t && TYPE_ORDER.indexOf(t.type_name) < 0; }));
+  function tagClass(t) {
+    const ty = String(t.type_name || '').toLowerCase();
+    return ['artist', 'source', 'character', 'theme'].indexOf(ty) >= 0 ? ty : 'theme';
+  }
+  function userClass(u) {
+    const g = (u && Array.isArray(u.groups) ? u.groups : []).map(function (x) { return String(x).toLowerCase(); });
+    if (g.some(function (x) { return x.indexOf('admin') >= 0; })) return 'es-user-admin';
+    if (g.some(function (x) { return x.indexOf('mod') >= 0; })) return 'es-user-mod';
+    if (g.some(function (x) { return x.indexOf('tagger') >= 0; })) return 'es-user-tagger';
+    return '';
+  }
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    if (!iso || isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  function fmtAgo(iso) {
+    const d = new Date(iso);
+    if (!iso || isNaN(d)) return '';
+    const s = Math.round((Date.now() - d.getTime()) / 1000);
+    const steps = [[60, 'second'], [60, 'minute'], [24, 'hour'], [30, 'day'], [12, 'month'], [Infinity, 'year']];
+    let v = s;
+    for (let i = 0; i < steps.length; i++) {
+      if (Math.abs(v) < steps[i][0]) return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(-v, steps[i][1]);
+      v = Math.round(v / steps[i][0]);
+    }
+    return fmtDate(iso);
+  }
+  function fmtSize(n) {
+    if (!(n > 0)) return '';
+    if (n >= 1048576) return (n / 1048576).toFixed(2) + ' MB';
+    if (n >= 1024) return (n / 1024).toFixed(1) + ' KB';
+    return n + ' B';
+  }
+  const dims = (m.width && m.height) ? (m.width + ' × ' + m.height) : '';
+  const shortSource = String(m.source_url || '').replace(/^https?:\/\/(www\.)?/, '');
+  const ratingNum = Number(m.rating);
+  const hasRating = m.num_ratings > 0 && isFinite(ratingNum);
+%>
+<style>
+.es{
+  --tag-theme-bg:oklch(85% .08 260);--tag-theme-text:oklch(30% .12 260);
+  --tag-source-bg:oklch(85% .08 145);--tag-source-text:oklch(30% .12 145);
+  --tag-artist-bg:oklch(85% .08 350);--tag-artist-text:oklch(30% .12 350);
+  --tag-character-bg:oklch(85% .08 70);--tag-character-text:oklch(30% .12 70);
+  --es-fg:oklch(12.9% .042 264.695);--es-card:oklch(99% .005 247);--es-muted:oklch(96.8% .007 247.896);
+  --es-muted-fg:oklch(42% .046 257.417);--es-border:oklch(92.9% .013 255.508);--es-primary:oklch(50% .2 260);
+  --username-admin:#084;--username-mod:#d05;--username-tagger:#f57f0a;--radius:.625rem;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:14px;line-height:1.5;color:var(--es-fg);
+}
+.es a{color:var(--es-primary);text-decoration:none;}
+.es a:hover{text-decoration:underline;}
+.es-card{background:var(--es-card);border:1px solid var(--es-border);border-radius:var(--radius);padding:1rem;margin-bottom:1rem;box-shadow:0 1px 2px rgb(0 0 0/.05);}
+.es-card h3{margin:0 0 .75rem;font-size:1rem;font-weight:600;}
+.es-uploader{display:flex;gap:.75rem;align-items:flex-start;}
+.es-avatar{width:40px;height:40px;border-radius:4px;object-fit:cover;flex:none;background:var(--es-muted);}
+.es-uname{font-size:1rem;}
+.es-utitle{font-size:.8rem;color:var(--es-muted-fg);}
+.es-udate{font-size:.875rem;color:var(--es-muted-fg);}
+.es-user-admin{color:var(--username-admin)!important;}
+.es-user-mod{color:var(--username-mod)!important;}
+.es-user-tagger{color:var(--username-tagger)!important;}
+.es-tags{display:flex;flex-wrap:wrap;gap:.4rem;}
+.es-tag{display:inline-flex;border-radius:calc(var(--radius) - 2px);overflow:hidden;font-weight:500;font-size:.875rem;}
+.es-tag a{color:inherit!important;}
+.es-tag .main{padding:.25rem .5rem .25rem .75rem;white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;}
+.es-tag .page{padding:.25rem .4rem;border-left:1px solid color-mix(in oklab,currentColor 30%,transparent);}
+.es-tag.artist{background:var(--tag-artist-bg);color:var(--tag-artist-text);}
+.es-tag.source{background:var(--tag-source-bg);color:var(--tag-source-text);}
+.es-tag.character{background:var(--tag-character-bg);color:var(--tag-character-text);}
+.es-tag.theme{background:var(--tag-theme-bg);color:var(--tag-theme-text);}
+.es-info{display:grid;grid-template-columns:max-content 1fr;column-gap:1.25rem;row-gap:.15rem;font-size:.875rem;}
+.es-info dt{font-weight:600;text-align:right;background:var(--es-muted);padding:0 .5rem;margin:0;}
+.es-info dd{margin:0;word-break:break-all;}
+.es-links{margin-top:.75rem;border-top:1px solid var(--es-border);font-size:.875rem;}
+.es-links a{display:block;padding:.6rem 0;color:var(--es-muted-fg);border-bottom:1px solid var(--es-border);}
+.es-links a:last-child{border-bottom:none;}
+.es-comments h2{font-size:1.4rem;font-weight:600;margin:1.25rem 0 .75rem;}
+.es-empty{text-align:center;color:var(--es-muted-fg);padding:1.5rem 0;font-size:.875rem;}
+.es-clist{border:1px solid var(--es-border);border-radius:var(--radius);padding:1rem;}
+.es-comment{display:flex;gap:.75rem;}
+.es-comment + .es-comment{margin-top:1rem;}
+.es-comment.reply{margin-left:2.5rem;}
+.es-cbody{flex:1;min-width:0;border-bottom:1px solid var(--es-border);padding-bottom:.75rem;}
+.es-chead{font-size:.8rem;color:var(--es-muted-fg);}
+.es-chead .es-uname{font-size:.875rem;font-weight:600;}
+.es-ctext{margin-top:.35rem;white-space:pre-wrap;word-break:break-word;}
+</style>
+<div class="es">
+  <% if (up && up.username) { %>
+  <div class="es-card">
+    <h3>Uploaded by</h3>
+    <div class="es-uploader">
+      <% if (up.avatar_url) { %><img class="es-avatar" src="<%= up.avatar_url %>" alt="" referrerpolicy="no-referrer"><% } %>
+      <div>
+        <a class="es-uname <%= userClass(up) %>" href="<%= BASE %>/users/<%= up.user_id %>" target="_blank" rel="noopener noreferrer"><%= up.username %></a>
+        <% if (up.user_title) { %><div class="es-utitle"><%= up.user_title %></div><% } %>
+        <% if (m.date_added) { %><div class="es-udate"><%= fmtDate(m.date_added) %></div><% } %>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <% if (ordered.length) { %>
+  <div class="es-card">
+    <h3>Tags</h3>
+    <div class="es-tags">
+      <% ordered.forEach(function (t) { %>
+      <span class="es-tag <%= tagClass(t) %>">
+        <a class="main" href="<%= BASE %>/search?tags=<%= t.tag_id %>" target="_blank" rel="noopener noreferrer" title="<%= t.type_name %>"><%= t.title %></a><a class="page" href="<%= BASE %>/tags/<%= t.tag_id %>" target="_blank" rel="noopener noreferrer">›</a>
+      </span>
+      <% }); %>
+    </div>
+  </div>
+  <% } %>
+
+  <div class="es-card">
+    <h3>Image Information</h3>
+    <dl class="es-info">
+      <% if (m.image_id) { %><dt>ID:</dt><dd>#<%= m.image_id %></dd><% } %>
+      <% if (dims) { %><dt>Dimensions:</dt><dd><%= dims %></dd><% } %>
+      <% if (m.filesize) { %><dt>File Size:</dt><dd><%= fmtSize(m.filesize) %></dd><% } %>
+      <% if (m.ext) { %><dt>Format:</dt><dd><%= String(m.ext).toUpperCase() %></dd><% } %>
+      <% if (hasRating) { %><dt>Rating:</dt><dd><%= ratingNum.toFixed(1) %> / 10 (<%= m.num_ratings %> vote<%= m.num_ratings > 1 ? 's' : '' %>)</dd><% } %>
+      <dt>Favorites:</dt><dd><%= m.favorites || 0 %></dd>
+      <% if (m.source_url) { %><dt>Source:</dt><dd><a href="<%= m.source_url %>" target="_blank" rel="noopener noreferrer"><%= shortSource %></a></dd><% } %>
+      <% if (m.caption) { %><dt>Caption:</dt><dd><%= m.caption %></dd><% } %>
+    </dl>
+    <div class="es-links">
+      <% if (m.page_url) { %><a href="<%= m.page_url %>" target="_blank" rel="noopener noreferrer">View on e-shuushuu</a><% } %>
+      <% if (m.image_id) { %><a href="<%= BASE %>/images/<%= m.image_id %>/history" target="_blank" rel="noopener noreferrer">View history</a><% } %>
+    </div>
+  </div>
+
+  <div class="es-comments">
+    <h2>Comments (<%= comments.length || m.comment_count || 0 %>)</h2>
+    <% if (!comments.length) { %>
+    <div class="es-empty">No comments yet.</div>
+    <% } else { %>
+    <div class="es-clist">
+      <% comments.forEach(function (c) { const u = c.user || {}; %>
+      <div class="es-comment<%= c.parent_comment_id ? ' reply' : '' %>">
+        <% if (u.avatar_url) { %><img class="es-avatar" src="<%= u.avatar_url %>" alt="" referrerpolicy="no-referrer"><% } else { %><span class="es-avatar"></span><% } %>
+        <div class="es-cbody">
+          <div class="es-chead">
+            <a class="es-uname <%= userClass(u) %>" href="<%= BASE %>/users/<%= u.user_id %>" target="_blank" rel="noopener noreferrer"><%= u.username || 'Anonymous' %></a>
+            <% if (u.user_title) { %> · <%= u.user_title %><% } %>
+            <% if (c.date) { %> · <span title="<%= c.date %>"><%= fmtAgo(c.date) %></span><% } %>
+          </div>
+          <div class="es-ctext"><%= c.post_text %></div>
+        </div>
+      </div>
+      <% }); %>
+    </div>
+    <% } %>
+  </div>
+</div>

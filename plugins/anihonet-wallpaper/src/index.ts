@@ -7,11 +7,11 @@
 //   detail    详情页图片命名、过滤和下载
 //   series    作品列表分页与单作品抓取
 //   ranking   排行榜分页
-//   theme     作品标题一览中的主题检索
+//   search    站内关键词搜索与分页
 import { crawlKind } from "./ranking";
 import { DEFAULT_BASE_URL, coerceStr } from "./runtime";
+import { crawlSearch } from "./search";
 import { crawlAnimeSeries } from "./series";
-import { crawlThemeFromIndex } from "./theme";
 
 const { addProgress } = Kabegame;
 
@@ -40,11 +40,13 @@ export async function crawl(common, custom) {
       vars.work_end_page == null ? 0 : Number(vars.work_end_page),
       baseUrl,
     );
-  } else if (vars.crawl_mode === "by_theme") {
-    await crawlThemeFromIndex(
-      vars.theme_search,
-      Number(vars.theme_start_page ?? 1),
-      Number(vars.theme_end_page ?? 1),
+  } else if (vars.crawl_mode === "search") {
+    await crawlSearch(
+      vars.search_query,
+      vars.search_order,
+      vars.search_orderby,
+      Number(vars.search_start_page ?? 1),
+      Number(vars.search_end_page ?? 1),
       baseUrl,
     );
   } else if (vars.crawl_mode === "ranking") {
@@ -56,6 +58,6 @@ export async function crawl(common, custom) {
       baseUrl,
     );
   } else {
-    console.log("错误：crawl_mode 必须是 ranking、single_work 或 by_theme");
+    console.log("错误：crawl_mode 必须是 ranking、single_work 或 search");
   }
 }

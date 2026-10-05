@@ -19,7 +19,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 | --- | --- | --- |
 | 追 Pixiv 画师、榜单或收藏 | [Pixiv](#pixiv) | 排行榜、收藏、画师、关键词一站齐全 |
 | 发掘高质量 AI 插画 | [PixAI](#pixai) | 能按作品、模型、LoRA、标签和作者一路深挖 |
-| 精确收你推的角色或作品 | [anime-pictures](#anime-pictures)、[anihonet](#anihonet-wallpaper)、[2dwallpapers](#2dwallpapers) | 标签、作品分类和主题入口更直接 |
+| 精确收你推的角色或作品 | [anime-pictures](#anime-pictures)、[anihonet](#anihonet-wallpaper)、[2dwallpapers](#2dwallpapers) | 标签、作品分类和站内搜索更直接 |
 | 收原神、崩铁、绝区零等同人图 | [米游社](#米游社)、[Pixiv](#pixiv)、[ziworld](#ziworld) | 社区新图、专业插画和精选壁纸各有所长 |
 | 从小红书保存图片、视频或 Live Photo | [小红书](#小红书怎么选) | 单作品/推荐用轻量版，作者/搜索/收藏用 WebView 版 |
 | 从社区帖子连评论区一起收图 | [小黑盒](#小黑盒)、[米游社](#米游社) | 正文之外还能发现评论区里的隐藏好图 |
@@ -103,7 +103,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 **适合你，如果：** 你想要的是“拿来就能用”的动漫/游戏壁纸，而不是从海量插画里自己判断尺寸。
 
-可以追日榜、周榜、月榜和年榜，也能从庞大的作品列表中直达某部动画或游戏，或按主题关键词寻找壁纸。手机与桌面壁纸都有，特别适合定期补充轮播图库。
+可以追日榜、周榜、月榜和年榜，也能从庞大的作品列表中直达某部动画或游戏，或按关键词搜索并控制新旧、随机排序。手机与桌面壁纸都有，特别适合定期补充轮播图库。
 
 [查看插件目录](plugins/anihonet-wallpaper/) · [使用说明](plugins/anihonet-wallpaper/README.md)
 

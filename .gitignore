@@ -16,3 +16,5 @@ __pycache__/
 
 # 本地 B 站 Cookie（fetch_reply_sample.py）
 plugins/bilibili/.bili_cookie.local
+
+dist
