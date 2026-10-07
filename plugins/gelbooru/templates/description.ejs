@@ -1,6 +1,5 @@
 <% const m = metadata || {}; %>
 <% const tags = Array.isArray(m.tags) ? m.tags : []; %>
-<% const tagsString = m.tags_string ? String(m.tags_string) : tags.map(function (t) { return t && t.name ? String(t.name) : ''; }).filter(Boolean).join(' '); %>
 <% /* 分组顺序与站点侧栏一致：Artist / Character / Copyright / Metadata / Tag（general 在站点上叫 Tag） */ %>
 <% const CATEGORY_ORDER = ['artist', 'character', 'copyright', 'metadata', 'general']; %>
 <% const CATEGORY_LABELS = { artist: 'Artist', character: 'Character', copyright: 'Copyright', metadata: 'Metadata', general: 'Tag', deprecated: 'Deprecated' }; %>
@@ -60,8 +59,6 @@
 .gb-stats li { margin: 2px 0; }
 .gb-src-short { display: inline-block; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
 
-.gb-copy-btn { font-weight: bold; font-family: verdana, sans-serif, helvetica; font-size: 11px; padding: 4px 12px; border: 0; color: #ffffff; background: #0773fb; cursor: pointer; }
-.gb-copy-hint { color: #a0a0a0; }
 .gb-crawl-hint { display: none; margin: 10px 0 0; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--anime-border, #f0f0f0) 70%, transparent); font-size: 11px; color: #a0a0a0; }
 </style>
 <div class="gb-sidebar">
@@ -157,13 +154,6 @@
       return '이 사이드바(게시 시각·점수 포함)는 수집 시점의 페이지 스냅샷입니다. 현재 상태와 다를 수 있습니다.';
     }
     return 'This sidebar (including posted time and score) is a snapshot from when the image was downloaded; it may not match the live site.';
-  }
-  function copyLabel(loc) {
-    var s = String(loc || 'en').toLowerCase();
-    if (s.indexOf('zh') === 0) return ['复制', '已复制'];
-    if (s === 'ja') return ['コピー', 'コピーしました'];
-    if (s === 'ko') return ['복사', '복사됨'];
-    return ['Copy', 'Copied'];
   }
   function onReady() {
     var hint = document.getElementById('gb-crawl-snapshot-hint');
