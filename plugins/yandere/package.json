@@ -1,6 +1,6 @@
 {
   "name": "yandere",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "name.zh": "yande.re 动漫壁纸",
   "name.en": "yande.re anime wallpapers",
@@ -16,7 +16,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.5.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",
@@ -42,11 +42,11 @@
       "name.ja": "クロールモード",
       "name.ko": "크롤 모드",
       "name.zhtw": "爬取模式",
-      "descripts": "爬取模式，分为全部、标签和标签列表",
-      "descripts.en": "Crawl mode: all, tags or tag list",
-      "descripts.ja": "クロールモード：全部・タグ・タグ一覧",
-      "descripts.ko": "크롤 모드: 전체·태그·태그 목록",
-      "descripts.zhtw": "爬取模式，分為全部、標籤和標籤列表",
+      "descripts": "爬取模式，分为全部、标签和排行榜",
+      "descripts.en": "Crawl mode: all, tags or ranking",
+      "descripts.ja": "クロールモード：全部・タグ・ランキング",
+      "descripts.ko": "크롤 모드: 전체·태그·랭킹",
+      "descripts.zhtw": "爬取模式，分為全部、標籤和排行榜",
       "default": "all",
       "options": [
         {
@@ -66,12 +66,12 @@
           "variable": "tags"
         },
         {
-          "name": "标签列表",
-          "name.en": "Tag list",
-          "name.ja": "タグ一覧",
-          "name.ko": "태그 목록",
-          "name.zhtw": "標籤列表",
-          "variable": "tag_list"
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "popular"
         }
       ]
     },
@@ -100,6 +100,142 @@
       }
     },
     {
+      "key": "popular_scale",
+      "type": "options",
+      "name": "排行榜类型",
+      "name.en": "Ranking type",
+      "name.ja": "ランキングの種類",
+      "name.ko": "랭킹 종류",
+      "name.zhtw": "排行榜類型",
+      "descripts": "日榜、周榜、月榜按自然日、周、月统计，可以指定日期看往期；「最近」系列是截至现在的滚动窗口，只有当期。yande.re 每期只有一页，最多 40 张",
+      "descripts.en": "Daily / weekly / monthly rankings follow calendar periods and can look back by date; the \"Last …\" rankings are rolling windows up to now and only have the current period. Each period on yande.re is a single page of at most 40 posts",
+      "descripts.ja": "日間・週間・月間は暦の区切りで集計され、日付を指定して過去分も見られます。「直近」系は現在までのローリング期間で、当期のみです。yande.re は1期1ページ、最大40枚です",
+      "descripts.ko": "일간·주간·월간은 달력 기준으로 집계되며 날짜를 지정해 지난 기간도 볼 수 있습니다. 「최근」 계열은 지금까지의 롤링 기간이라 현재 기간만 있습니다. yande.re는 기간마다 한 페이지, 최대 40장입니다",
+      "descripts.zhtw": "日榜、週榜、月榜依自然日、週、月統計，可以指定日期看往期；「最近」系列是截至現在的滾動區間，只有當期。yande.re 每期只有一頁，最多 40 張",
+      "default": "day",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "day"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "week"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "month"
+        },
+        {
+          "name": "最近 24 小时",
+          "name.en": "Last 24 hours",
+          "name.ja": "直近24時間",
+          "name.ko": "최근 24시간",
+          "name.zhtw": "最近 24 小時",
+          "variable": "1d"
+        },
+        {
+          "name": "最近一周",
+          "name.en": "Last week",
+          "name.ja": "直近1週間",
+          "name.ko": "최근 1주",
+          "name.zhtw": "最近一週",
+          "variable": "1w"
+        },
+        {
+          "name": "最近一个月",
+          "name.en": "Last month",
+          "name.ja": "直近1か月",
+          "name.ko": "최근 1개월",
+          "name.zhtw": "最近一個月",
+          "variable": "1m"
+        },
+        {
+          "name": "最近一年",
+          "name.en": "Last year",
+          "name.ja": "直近1年",
+          "name.ko": "최근 1년",
+          "name.zhtw": "最近一年",
+          "variable": "1y"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "popular_date",
+      "type": "date",
+      "format": "YYYY-MM-DD",
+      "dateMin": "2006-01-01",
+      "dateMax": "today",
+      "name": "排行榜日期",
+      "name.en": "Ranking date",
+      "name.ja": "ランキング日付",
+      "name.ko": "랭킹 날짜",
+      "name.zhtw": "排行榜日期",
+      "descripts": "留空为当期。日榜取这一天，周榜取这一天所在的那一周，月榜取这一天所在的月份",
+      "descripts.en": "Empty = current period. Daily uses this day, weekly the week containing it, monthly the month containing it",
+      "descripts.ja": "空欄は当期。日間はその日、週間はその日を含む週、月間はその日を含む月です",
+      "descripts.ko": "비우면 현재 기간. 일간은 해당일, 주간은 해당일이 속한 주, 월간은 해당일이 속한 달입니다",
+      "descripts.zhtw": "留空為當期。日榜取這一天，週榜取這一天所在的那一週，月榜取這一天所在的月份",
+      "default": "",
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
+        ]
+      }
+    },
+    {
+      "key": "popular_periods",
+      "type": "int",
+      "name": "回溯期数",
+      "name.en": "Periods",
+      "name.ja": "遡る期数",
+      "name.ko": "거슬러 올라갈 기간 수",
+      "name.zhtw": "回溯期數",
+      "descripts": "从上面的日期起往前连抓多少期，每期最多 40 张，一次最多 100 期",
+      "descripts.en": "How many consecutive periods to crawl going back from the date above; up to 40 posts each, at most 100 periods per run",
+      "descripts.ja": "上の日付から遡って連続で何期分取得するか。1期最大40枚、1回最大100期",
+      "descripts.ko": "위 날짜부터 거슬러 올라가며 연속으로 몇 기간을 수집할지. 기간당 최대 40장, 실행당 최대 100기간",
+      "descripts.zhtw": "從上面的日期起往前連抓多少期，每期最多 40 張，一次最多 100 期",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 100,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
+        ]
+      }
+    },
+    {
       "key": "rating",
       "type": "options",
       "name": "分级过滤",
@@ -107,11 +243,11 @@
       "name.ja": "レーティング絞り込み",
       "name.ko": "등급 필터",
       "name.zhtw": "分級過濾",
-      "descripts": "按站点分级过滤，实现上是把 rating: 元标签拼进搜索串。站内成人内容与全年龄内容混排，只想要干净图选「全年龄」",
-      "descripts.en": "Filter by site rating; implemented as the rating: metatag in the search string. The site mixes adult and all-ages content — pick Safe for clean images",
-      "descripts.ja": "サイトのレーティングで絞り込みます（rating: メタタグを検索文字列に付加）。成人向けと全年齢が混在するため、健全な画像だけなら Safe を選んでください",
-      "descripts.ko": "사이트 등급으로 필터링합니다(rating: 메타태그를 검색 문자열에 추가). 성인물과 전연령물이 섞여 있으므로 건전한 이미지만 원하면 Safe를 선택하세요",
-      "descripts.zhtw": "依站台分級過濾，實作上是把 rating: 元標籤拼進搜尋串。站內成人內容與全年齡內容混排，只想要乾淨圖請選「全年齡」",
+      "descripts": "按站点分级过滤。全部和标签模式把 rating: 元标签拼进搜索串，排行榜模式在插件里按每张图的分级筛选。站内成人内容与全年龄内容混排，只想要干净图选「全年龄」",
+      "descripts.en": "Filter by site rating. All and tags modes add the rating: metatag to the search string; ranking mode filters each post by its rating inside the plugin. The site mixes adult and all-ages content — pick Safe for clean images",
+      "descripts.ja": "サイトのレーティングで絞り込みます。全部・タグモードは rating: メタタグを検索文字列に付加し、ランキングモードはプラグイン内で各作品のレーティングを見て絞り込みます。成人向けと全年齢が混在するため、健全な画像だけなら Safe を選んでください",
+      "descripts.ko": "사이트 등급으로 필터링합니다. 전체·태그 모드는 rating: 메타태그를 검색 문자열에 추가하고, 랭킹 모드는 플러그인 안에서 작품별 등급으로 거릅니다. 성인물과 전연령물이 섞여 있으므로 건전한 이미지만 원하면 Safe를 선택하세요",
+      "descripts.zhtw": "依站台分級過濾。全部和標籤模式把 rating: 元標籤拼進搜尋串，排行榜模式在插件裡依每張圖的分級篩選。站內成人內容與全年齡內容混排，只想要乾淨圖請選「全年齡」",
       "default": "",
       "options": [
         {
@@ -195,7 +331,13 @@
           "name.zhtw": "隨機",
           "variable": "order:random"
         }
-      ]
+      ],
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
     },
     {
       "key": "start_page",
@@ -242,219 +384,6 @@
         "crawl_mode": [
           "all",
           "tags"
-        ]
-      }
-    },
-    {
-      "key": "tag",
-      "type": "string",
-      "name": "标签匹配式",
-      "name.en": "Tag pattern",
-      "name.ja": "タグ検索式",
-      "name.ko": "태그 검색식",
-      "name.zhtw": "標籤匹配式",
-      "descripts": "标签列表模式下按名称匹配标签，可用*作为通配符（默认：genshin）",
-      "descripts.en": "Tag name pattern for tag list mode, use * as wildcard (default: genshin)",
-      "descripts.ja": "タグ一覧モードで使う名前の検索式。* をワイルドカードとして使えます（デフォルト：genshin）",
-      "descripts.ko": "태그 목록 모드에서 사용할 이름 검색식. *를 와일드카드로 사용합니다(기본값: genshin)",
-      "descripts.zhtw": "標籤列表模式下依名稱匹配標籤，可用*作為萬用字元（預設：genshin）",
-      "default": "genshin",
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_type",
-      "type": "options",
-      "name": "标签类型",
-      "name.en": "Tag type",
-      "name.ja": "タグタイプ",
-      "name.ko": "태그 타입",
-      "name.zhtw": "標籤類型",
-      "descripts": "标签类型，分为任意(Any)、通用(General)、作家(Artist)、版权(Copyright)、角色(Character)、圈子(Circle)、瑕疵(Faults)",
-      "descripts.en": "Tag type: Any, General, Artist, Copyright, Character, Circle, Faults",
-      "descripts.ja": "タグタイプ：任意(Any)、ジェネラル(General)、作家(Artist)、著作権(Copyright)、キャラクター(Character)、界隈(Circle)、不備(Faults)",
-      "descripts.ko": "태그 타입: 임의(Any), 일반(General), 작가(Artist), 저작권(Copyright), 캐릭터(Character), 서클(Circle), 결함(Faults)",
-      "descripts.zhtw": "標籤類型，分為任意(Any)、通用(General)、作家(Artist)、版權(Copyright)、角色(Character)、圈子(Circle)、瑕疵(Faults)",
-      "default": "",
-      "options": [
-        {
-          "name": "任意(Any)",
-          "name.en": "Any",
-          "name.ja": "任意",
-          "name.ko": "임의",
-          "name.zhtw": "任意",
-          "variable": ""
-        },
-        {
-          "name": "通用(General)",
-          "name.en": "General",
-          "name.ja": "ジェネラル",
-          "name.ko": "일반",
-          "name.zhtw": "通用",
-          "variable": "0"
-        },
-        {
-          "name": "作家(Artist)",
-          "name.en": "Artist",
-          "name.ja": "作家",
-          "name.ko": "작가",
-          "name.zhtw": "作家",
-          "variable": "1"
-        },
-        {
-          "name": "版权(Copyright)",
-          "name.en": "Copyright",
-          "name.ja": "著作権",
-          "name.ko": "저작권",
-          "name.zhtw": "版權",
-          "variable": "3"
-        },
-        {
-          "name": "角色(Character)",
-          "name.en": "Character",
-          "name.ja": "キャラクター",
-          "name.ko": "캐릭터",
-          "name.zhtw": "角色",
-          "variable": "4"
-        },
-        {
-          "name": "圈子(Circle)",
-          "name.en": "Circle",
-          "name.ja": "界隈",
-          "name.ko": "서클",
-          "name.zhtw": "圈子",
-          "variable": "5"
-        },
-        {
-          "name": "瑕疵(Faults)",
-          "name.en": "Faults",
-          "name.ja": "不備",
-          "name.ko": "결함",
-          "name.zhtw": "瑕疵",
-          "variable": "6"
-        }
-      ],
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_order",
-      "type": "options",
-      "name": "标签排序",
-      "name.en": "Tag order",
-      "name.ja": "タグ順序",
-      "name.ko": "태그 순서",
-      "name.zhtw": "標籤排序",
-      "descripts": "标签表的排序，分为图片数量(Count)、名称(Name)、日期(Date)",
-      "descripts.en": "Tag table order: Count, Name, Date",
-      "descripts.ja": "タグ表の並び順：画像数(Count)、名称(Name)、日付(Date)",
-      "descripts.ko": "태그 표 정렬: 이미지 수(Count), 이름(Name), 날짜(Date)",
-      "descripts.zhtw": "標籤表的排序，分為圖片數量(Count)、名稱(Name)、日期(Date)",
-      "default": "count",
-      "options": [
-        {
-          "name": "图片数量(Count)",
-          "name.en": "Count",
-          "name.ja": "画像数",
-          "name.ko": "이미지 수",
-          "name.zhtw": "圖片數量",
-          "variable": "count"
-        },
-        {
-          "name": "名称(Name)",
-          "name.en": "Name",
-          "name.ja": "名称",
-          "name.ko": "이름",
-          "name.zhtw": "名稱",
-          "variable": "name"
-        },
-        {
-          "name": "日期(Date)",
-          "name.en": "Date",
-          "name.ja": "日付",
-          "name.ko": "날짜",
-          "name.zhtw": "日期",
-          "variable": "date"
-        }
-      ],
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_skip",
-      "type": "int",
-      "name": "跳过标签数量",
-      "name.en": "Skip tag count",
-      "name.ja": "タグスキップ数",
-      "name.ko": "태그 스킵 수",
-      "name.zhtw": "跳過標籤數量",
-      "descripts": "从标签表开头跳过多少个标签再开始爬",
-      "descripts.en": "How many tags to skip from the start of the tag table",
-      "descripts.ja": "タグ表の先頭から何個スキップしてから開始するか",
-      "descripts.ko": "태그 표 처음부터 몇 개를 건너뛴 뒤 시작할지",
-      "descripts.zhtw": "從標籤表開頭跳過多少個標籤再開始爬",
-      "default": 0,
-      "options": null,
-      "min": 0,
-      "width": 1,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_count",
-      "type": "int",
-      "name": "爬取标签数量",
-      "name.en": "Tag count",
-      "name.ja": "クロールするタグ数",
-      "name.ko": "크롤할 태그 수",
-      "name.zhtw": "爬取標籤數量",
-      "descripts": "标签列表模式下总共爬多少个标签",
-      "descripts.en": "How many tags to crawl in total in tag list mode",
-      "descripts.ja": "タグ一覧モードで合計いくつのタグをクロールするか",
-      "descripts.ko": "태그 목록 모드에서 총 몇 개의 태그를 크롤할지",
-      "descripts.zhtw": "標籤列表模式下總共爬多少個標籤",
-      "default": 3,
-      "options": null,
-      "min": 1,
-      "width": 1,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_pages",
-      "type": "int",
-      "name": "每个标签页数",
-      "name.en": "Pages per tag",
-      "name.ja": "タグごとのページ数",
-      "name.ko": "태그당 페이지 수",
-      "name.zhtw": "每個標籤頁數",
-      "descripts": "每个标签最多爬几页作品，每页 40 张",
-      "descripts.en": "Max pages of posts to crawl per tag, 40 posts per page",
-      "descripts.ja": "タグごとに最大何ページ取得するか（1ページ40枚）",
-      "descripts.ko": "태그당 최대 몇 페이지를 크롤할지(페이지당 40장)",
-      "descripts.zhtw": "每個標籤最多爬幾頁作品，每頁 40 張",
-      "default": 1,
-      "options": null,
-      "min": 1,
-      "width": 1,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
         ]
       }
     },
@@ -506,15 +435,17 @@
   },
   "kbRecommendedConfigs": [
     "configs/daily-safe-5page.json",
-    "configs/genshin-bikini.json",
-    "configs/genshin-tag-list.json"
+    "configs/genshin-bikini.json"
   ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",
-    "providers/tag_provider.json5",
-    "providers/tag_type_provider.json5"
+    "providers/number_range_provider.json5",
+    "providers/number_range_router.json5",
+    "providers/rating_provider.json5",
+    "providers/rating_router.json5"
   ],
   "kbDescriptionTemplate": "templates/description.ejs",
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
     "@kabegame/types": "file:../../../packages/kabegame-types",

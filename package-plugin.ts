@@ -36,7 +36,8 @@ const TARGET_DIR = process.env.CARGO_TARGET_DIR
   : path.join(WORKSPACE_ROOT, "target");
 const CLI_NAME =
   process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli";
-const CLI_EXE = path.join(TARGET_DIR, "release", CLI_NAME);
+// KABEGAME_CLI 可指定打包用的 cli（kabegame-plugin skill 默认用 target/debug 的 dev 版）
+const CLI_EXE = process.env.KABEGAME_CLI || path.join(TARGET_DIR, "release", CLI_NAME);
 
 interface PluginFile {
   relativePath: string;

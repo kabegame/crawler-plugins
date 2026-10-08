@@ -4,7 +4,7 @@
 //   deno run -A plugins/yandere/test/e2e.ts tags-basic
 //
 // 站点列表每页固定 40 条（未登录时 URL 上没有可用的每页条数参数），所以单页用例
-// 可以锁死 40；标签列表模式的条目数随站点内容浮动，只断言下限。
+// 可以锁死 40。
 // 用例都刻意压到 1 页：这是链路验证，不是灌库。
 import { defineCases, expectFiles } from "../../../test/harness.ts";
 
@@ -69,21 +69,19 @@ await defineCases("yandere", [
     expect: expectFiles({ total: 40 }),
   },
   {
-    // 标签列表模式：/tag 解析 + 数字 type 过滤 + 逐标签抓 1 页。
-    // 取 2 个角色标签，每个 1 页 40 条。type=4 是 character，传英文名会被站点
-    // 静默当成 general——这条用例正是在守这个坑。
-    name: "tag-list-genshin",
+    // 排行榜：往期日榜 2 期 + 分级过滤。榜单页不接受 tags，分级靠页面脚本 Post.register 里的
+    // rating 在插件内筛。往期榜单内容固定，但具体张数取决于当期分级构成，只断言下限。
+    // 2026-10 实测 2026-09-01 / 08-31 两期的 Questionable 分别是 27 / 21 张。
+    name: "popular-day-questionable",
     vars: {
-      crawl_mode: "tag_list",
-      tag: "*genshin*",
-      mode_tag_type: "4",
-      mode_tag_order: "count",
-      mode_tag_skip: 0,
-      mode_tag_count: 2,
-      mode_tag_pages: 1,
+      crawl_mode: "popular",
+      popular_scale: "day",
+      popular_date: "2026-09-01",
+      popular_periods: 2,
+      rating: "questionable",
       quality: "medium",
     },
     timeout: 1800,
-    expect: expectFiles({ minTotal: 60 }),
+    expect: expectFiles({ minTotal: 40 }),
   },
 ]);

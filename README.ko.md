@@ -117,12 +117,12 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 
 **설정 변수**:
 - `source_site`: `danbooru`(전체) 또는 `safebooru`(전체 이용가만)
-- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `crawl_mode`: `tags` / `popular` / `all`
 - `mode_tag_value`: 태그 검색 모드의 태그 목록 (비로그인/일반 계정은 검색당 태그 2개까지)
 - `popular_scale`: `day` / `week` / `month`
+- `rating`: `g` / `s` / `q` / `e` 등급 필터. 전체 사이트 전용(태그 2개 제한에 포함되지 않음)
 - `start_page`, `end_page`: 페이지 범위. 실행당 최대 100페이지
 - `per_page`: 목록 페이지당 20 / 50 / 100 / 200개
-- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: 태그 목록 모드
 - `quality`: `high` / `medium`
 
 ---

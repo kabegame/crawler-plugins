@@ -1,6 +1,6 @@
 {
   "name": "zerochan",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "name.zh": "Zerochan 动漫图板",
   "name.en": "Zerochan anime image board",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.5.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",
@@ -124,11 +124,11 @@
       "name.ja": "並べ替え",
       "name.ko": "정렬",
       "name.zhtw": "排序",
-      "descripts": "最新＝按上传时间倒序；人气＝按收藏数倒序",
-      "descripts.en": "Recent = newest uploads first; Popular = most favorited first",
-      "descripts.ja": "新着＝アップロード日時の新しい順、人気＝お気に入り数の多い順",
-      "descripts.ko": "최신 = 업로드 최신순, 인기 = 즐겨찾기 많은 순",
-      "descripts.zhtw": "最新＝按上傳時間倒序；人氣＝按收藏數倒序",
+      "descripts": "最新＝按上传时间倒序；人气＝按收藏数倒序；随机＝站点随机挑选。标签和搜索下随机只有一页",
+      "descripts.en": "Recent = newest uploads first; Popular = most favorited first; Random = picked at random by the site. In tag and search modes, random has only one page",
+      "descripts.ja": "新着＝アップロード日時の新しい順、人気＝お気に入り数の多い順、ランダム＝サイトが無作為に選択。タグ・検索ではランダムは1ページのみ",
+      "descripts.ko": "최신 = 업로드 최신순, 인기 = 즐겨찾기 많은 순, 무작위 = 사이트가 무작위로 선택. 태그·검색에서는 무작위가 한 페이지뿐입니다",
+      "descripts.zhtw": "最新＝按上傳時間倒序；人氣＝按收藏數倒序；隨機＝站台隨機挑選。標籤與搜尋下隨機只有一頁",
       "default": "id",
       "options": [
         {
@@ -146,9 +146,59 @@
           "name.ko": "인기",
           "name.zhtw": "人氣",
           "variable": "fav"
+        },
+        {
+          "name": "随机",
+          "name.en": "Random",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "random"
         }
       ],
       "width": 1
+    },
+    {
+      "key": "popular_range",
+      "type": "options",
+      "name": "人气时间范围",
+      "name.en": "Popular time range",
+      "name.ja": "人気の期間",
+      "name.ko": "인기 기간",
+      "name.zhtw": "人氣時間範圍",
+      "descripts": "首页人气榜统计哪段时间内的收藏。站点的「全部时间」档目前会返回 500，所以只提供这两档",
+      "descripts.en": "Which period the front-page popular ranking counts favorites over. The site's All time ranking currently returns HTTP 500, so only these two are offered",
+      "descripts.ja": "トップページの人気順で集計する期間。サイトの「全期間」は現在 HTTP 500 を返すため、この2つのみです",
+      "descripts.ko": "첫 페이지 인기순에서 즐겨찾기를 집계하는 기간입니다. 사이트의 \"전체 기간\"은 현재 HTTP 500을 반환하므로 이 두 가지만 제공합니다",
+      "descripts.zhtw": "首頁人氣榜統計哪段時間內的收藏。站台的「全部時間」檔目前會回傳 500，所以只提供這兩檔",
+      "default": "2",
+      "options": [
+        {
+          "name": "近一周",
+          "name.en": "Last week",
+          "name.ja": "直近1週間",
+          "name.ko": "최근 1주",
+          "name.zhtw": "近一週",
+          "variable": "1"
+        },
+        {
+          "name": "近三个月",
+          "name.en": "Last 3 months",
+          "name.ja": "直近3か月",
+          "name.ko": "최근 3개월",
+          "name.zhtw": "近三個月",
+          "variable": "2"
+        }
+      ],
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "all"
+        ],
+        "sort_order": [
+          "fav"
+        ]
+      }
     },
     {
       "key": "start_page",
@@ -235,6 +285,7 @@
     "configs/everything-recent.json",
     "configs/search-genshin.json"
   ],
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
   "kbDescriptionTemplate": "templates/description.ejs",
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",

@@ -110,11 +110,6 @@ function resolveUrl(url, base) {
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function parseIntOrZero(text) {
-  const token = trimText(text).replace(/,/g, "");
-  return /^\d+$/.test(token) ? Number(token) : 0;
-}
-
 function normalizeTagToken(text) {
   return trimText(text).replace(/\s+/g, "_");
 }
@@ -332,14 +327,17 @@ async function processDetailPage(href, baseUrl, quality) {
   }
 }
 
-function collectPostHrefs(document, pageUrl) {
-  const hrefs = Array.from(document.querySelectorAll("article.post-preview a.post-preview-link"))
-    .map((a) => resolveUrl(a.getAttribute("href"), pageUrl))
+// ratingLetter 非空时只留 data-rating 相同的作品（人气榜页不接受 tags 参数，分级只能在这里筛）
+function collectPostHrefs(document, pageUrl, ratingLetter = "") {
+  const articles = Array.from(document.querySelectorAll("article.post-preview"));
+  const hrefs = articles
+    .filter((article) => !ratingLetter || coerceStr(article.getAttribute("data-rating")) === ratingLetter)
+    .map((article) => resolveUrl(article.querySelector("a.post-preview-link")?.getAttribute("href"), pageUrl))
     .filter(Boolean);
   // 空结果页仍然带 .posts-container（里面写着 No posts found）；连容器都没有说明拿到的
   // 根本不是列表页——多半是 Cloudflare 挑战页或错误页。两者在解析上都是「0 个作品」，
   // 不区分的话风控会伪装成「这个标签没图」静默跑完。
-  if (hrefs.length === 0 && !document.querySelector(".posts-container, #posts")) {
+  if (articles.length === 0 && !document.querySelector(".posts-container, #posts")) {
     console.warn(`[danbooru] 页面里没有作品列表容器，可能被站点拦截或返回了错误页：${pageUrl}`);
   }
   return hrefs;
@@ -359,14 +357,20 @@ function normalizePerPage(value) {
 }
 
 // 列表页统一入口：给 URL 生成器，按页取详情页并均摊进度
-async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
+async function crawlListPages(makePageUrl, quality, startPage, endPage, label, ratingLetter = "") {
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = makePageUrl(page);
     console.log(`[danbooru][${label}] 打开页面 ${page}/${endPage}: ${pageUrl}`);
     const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = collectPostHrefs(document, finalUrl);
+    const hrefs = collectPostHrefs(document, finalUrl, ratingLetter);
+    if (hrefs.length === 0 && ratingLetter && document.querySelector("article.post-preview")) {
+      // 这一页有作品、只是都被分级筛掉了，后面的页仍可能有符合的
+      console.log(`[danbooru][${label}] 第 ${page} 页没有分级为 ${ratingLetter} 的作品，继续下一页`);
+      addProgress(pageProgress);
+      continue;
+    }
     if (hrefs.length === 0) {
       console.log(`[danbooru][${label}] 第 ${page} 页没有作品，结束`);
       addProgress(pageProgress);
@@ -377,6 +381,21 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
       addProgress(pageProgress / hrefs.length);
     }
   }
+}
+
+// 分级过滤：g(General) / s(Sensitive) / q(Questionable) / e(Explicit)，配置值直接是站点的单字母。
+// 2026-10 实测 rating: 元标签不占普通账号「每次最多 2 个标签」的名额（2 个标签 + rating:g 正常返回，
+// 3 个普通标签返回 422）。donmai.moe 只有 General，所以 kbConfig 里只在全站时显示这一项。
+const RATING_LETTERS = new Set(["g", "s", "q", "e"]);
+
+function ratingLetterOf(vars) {
+  const letter = trimText(vars.rating).toLowerCase();
+  return RATING_LETTERS.has(letter) ? letter : "";
+}
+
+function withRatingToken(tagsValue, vars) {
+  const letter = ratingLetterOf(vars);
+  return [tagsValue, letter ? `rating:${letter}` : ""].filter(Boolean).join(" ");
 }
 
 function buildPostsUrl(baseUrl, tagsValue, perPage, page) {
@@ -392,7 +411,7 @@ async function crawlAll(baseUrl, quality, vars) {
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   await crawlListPages(
-    (page) => buildPostsUrl(baseUrl, "", perPage, page),
+    (page) => buildPostsUrl(baseUrl, withRatingToken("", vars), perPage, page),
     quality,
     startPage,
     endPage,
@@ -411,7 +430,7 @@ async function crawlByTags(baseUrl, quality, vars) {
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   await crawlListPages(
-    (page) => buildPostsUrl(baseUrl, tagsValue, perPage, page),
+    (page) => buildPostsUrl(baseUrl, withRatingToken(tagsValue, vars), perPage, page),
     quality,
     startPage,
     endPage,
@@ -429,90 +448,8 @@ async function crawlPopular(baseUrl, quality, vars) {
     startPage,
     endPage,
     `popular-${scale}`,
+    ratingLetterOf(vars),
   );
-}
-
-function buildTagSearchUrl(baseUrl, name, category, order, page) {
-  const params = [
-    `search[name_matches]=${encodeURIComponent(name)}`,
-    `search[order]=${encodeURIComponent(order)}`,
-    `page=${page}`,
-  ];
-  if (category) params.push(`search[category]=${encodeURIComponent(category)}`);
-  return `${baseUrl}/tags?${params.join("&")}`;
-}
-
-// /tags 每行：tr[data-post-count][data-category] + td.name-column 里指向 /posts?tags= 的链接
-function parseTagRows(document) {
-  return Array.from(document.querySelectorAll("tr[data-id][data-post-count]"))
-    .map((row) => {
-      const anchor = row.querySelector("td.name-column a[href*='/posts?tags=']");
-      return {
-        name: normalizeTagToken(textOf(anchor)),
-        href: coerceStr(anchor?.getAttribute("href")),
-        count: parseIntOrZero(row.getAttribute("data-post-count")),
-        category: categoryNameOf(row.getAttribute("data-category")),
-      };
-    })
-    .filter((tag) => tag.name && tag.href);
-}
-
-// 单个标签：按页把它的作品全部取完，最多 maxPages 页
-async function crawlTagPosts(baseUrl, quality, tag, perPage, maxPages, perTagProgress) {
-  const perPageProgress = maxPages > 0 ? perTagProgress / maxPages : perTagProgress;
-  let downloaded = 0;
-  for (let page = 1; page <= maxPages; page += 1) {
-    const pageUrl = buildPostsUrl(baseUrl, tag.name, perPage, page);
-    const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = collectPostHrefs(document, finalUrl);
-    if (hrefs.length === 0) {
-      addProgress(perPageProgress * (maxPages - page + 1));
-      break;
-    }
-    for (const href of hrefs) {
-      await processDetailPage(href, finalUrl, quality);
-      downloaded += 1;
-    }
-    addProgress(perPageProgress);
-  }
-  console.log(`[danbooru][tag-list] 标签完成: ${tag.name}（${tag.category}），实际下载 ${downloaded} / 站内共 ${tag.count}`);
-}
-
-async function crawlByTagList(baseUrl, quality, vars) {
-  const searchName = trimText(vars.tag) || "*";
-  const category = coerceStr(vars.mode_tag_type);
-  const order = coerceStr(vars.mode_tag_order || "count");
-  const skipCount = Math.max(0, Number(vars.mode_tag_skip ?? 0));
-  const tagCount = Math.max(1, Number(vars.mode_tag_count ?? 5));
-  const perPage = normalizePerPage(vars.per_page);
-  const maxPages = Math.max(1, Number(vars.mode_tag_pages ?? 1));
-
-  console.log(`[danbooru][tag-list] 开始标签列表模式：匹配 ${searchName}，跳过 ${skipCount} 个，取 ${tagCount} 个`);
-  const perTagProgress = 99.0 / tagCount;
-
-  // 站点 /tags 每页行数不保证恒定，所以用流水计数跳过，而不是按页大小取模
-  let seen = 0;
-  let picked = 0;
-  for (let page = 1; picked < tagCount; page += 1) {
-    const pageUrl = buildTagSearchUrl(baseUrl, searchName, category, order, page);
-    const { document } = await openDocument(pageUrl);
-    const rows = parseTagRows(document);
-    if (rows.length === 0) {
-      console.log(`[danbooru][tag-list] 第 ${page} 页没有标签，结束`);
-      break;
-    }
-    for (const tag of rows) {
-      if (seen++ < skipCount) continue;
-      if (picked >= tagCount) break;
-      picked += 1;
-      if (tag.count <= 0) {
-        addProgress(perTagProgress);
-        continue;
-      }
-      await crawlTagPosts(baseUrl, quality, tag, perPage, maxPages, perTagProgress);
-    }
-  }
-  if (picked === 0) console.warn("[danbooru][tag-list] 没有匹配到任何标签，检查匹配式与跳过数量");
 }
 
 export async function crawl(common, custom) {
@@ -531,8 +468,6 @@ export async function crawl(common, custom) {
   } else if (mode === "popular") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
     await crawlPopular(baseUrl, quality, vars);
-  } else if (mode === "tag_list") {
-    await crawlByTagList(baseUrl, quality, vars);
   } else {
     throw new Error(`未知的爬取模式: ${mode}`);
   }

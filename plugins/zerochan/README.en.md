@@ -20,14 +20,18 @@ into the image metadata and rebuilt in the image detail sidebar using the site's
 All three modes accept a **sort order**:
 
 - **Recent (id)** — newest uploads first
-- **Popular (fav)** — most favorited first
+- **Popular (fav)** — most favorited first. When browsing all, it counts over the last week or
+  the last 3 months; the site's All time ranking currently returns HTTP 500
+- **Random (random)** — picked at random by the site; only one page in tag and search modes
 
 ## Options
 
 - **Crawl mode (crawl_mode)** — browse all / tag / search
 - **Tag (tag)** — canonical on-site tag name, e.g. `Arknights`, `Hatsune Miku`, `Genshin Impact`
 - **Search query (search_query)** — any free text
-- **Sort (sort_order)** — recent / popular
+- **Sort (sort_order)** — recent / popular / random
+- **Popular time range (popular_range)** — last week / last 3 months; shown only when browsing
+  all with popular sort, defaults to last 3 months
 - **Start page / End page (start_page / end_page)** — 48 items per page, at most 100 pages per run
 - **Quality (quality)**
   - **High** — original file (`static.zerochan.net/….full.….jpg`)
@@ -51,6 +55,11 @@ The sidebar's four blocks (Tags / Source URL / Share / Stats) **follow the app l
 (Simplified Chinese, Traditional Chinese, English, Japanese, Korean). Tag colours and icons come
 straight from the site's own stylesheet, and light/dark tracks the app theme. Each share string
 has a one-click copy button.
+
+Sidebar tags are also written to the app's **Labels** section by type (`zerochan/character`,
+`zerochan/series`, `zerochan/mangaka`, …), so you can browse them on the albums page and filter by
+tag in search. Keys are derived from the canonical name (`Fate/Grand Order` → `fate grand order`);
+tag names longer than 64 bytes get no label.
 
 ## Notes
 

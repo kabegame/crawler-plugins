@@ -64,21 +64,20 @@ await defineCases("danbooru", [
     expect: expectFiles({ total: 20 }),
   },
   {
-    // 标签列表模式：/tags 解析 + 逐标签抓 1 页。取 2 个标签，每个 1 页 20 条。
-    name: "tag-list-genshin",
+    // 分级过滤：两个普通标签再加 rating:g，验证 rating: 元标签不占「最多 2 个标签」的名额
+    // （3 个普通标签站点会返回 422）。donmai.moe 只有 General，结果条数与不过滤时一致。
+    name: "tags-rating-general",
     vars: {
-      crawl_mode: "tag_list",
-      tag: "*genshin*",
-      mode_tag_type: "4",
-      mode_tag_order: "count",
-      mode_tag_skip: 0,
-      mode_tag_count: 2,
-      mode_tag_pages: 1,
+      crawl_mode: "tags",
+      mode_tag_value: "touhou,1girl",
+      rating: "g",
       per_page: "20",
+      start_page: 1,
+      end_page: 1,
       quality: "medium",
     },
-    timeout: 1200,
-    expect: expectFiles({ minTotal: 20 }),
+    timeout: 900,
+    expect: expectFiles({ total: 20 }),
   },
   {
     // 以上用例走默认的全年龄站 donmai.moe；这里显式切到全站，DOM 同构，验证源站切换真的换了 host。

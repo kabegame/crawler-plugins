@@ -1,6 +1,6 @@
 {
   "name": "konachan",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
@@ -24,6 +24,7 @@
   "kbBaseUrl": "https://konachan.net",
   "kbLabels": [
     { "id": "auth.needProxy" },
+    { "id": "auth.needCookie" },
     { "id": "content.res.desktop" },
     { "id": "content.nsfw" }
   ],
@@ -36,11 +37,11 @@
       "name.ja": "ソースサイト",
       "name.ko": "소스 사이트",
       "name.zhtw": "來源站",
-      "descripts": "选择爬取来源站点：konachan.net 或 konachan.com",
-      "descripts.en": "Choose the source site to crawl: konachan.net or konachan.com",
-      "descripts.ja": "クロール元のサイトを選択：konachan.net または konachan.com",
-      "descripts.ko": "크롤 소스 사이트 선택: konachan.net 또는 konachan.com",
-      "descripts.zhtw": "選擇爬取來源站點：konachan.net 或 konachan.com",
+      "descripts": "选择爬取来源站点。konachan.net 只收录全年龄内容；konachan.com 是完整站（含 R18），有 Cloudflare 验证，需要先在畅游中打开 konachan.com 通过验证",
+      "descripts.en": "Source site. konachan.net hosts all-ages content only; konachan.com is the full site (incl. R18) behind Cloudflare — open konachan.com in Surf and pass the check first",
+      "descripts.ja": "クロール元のサイト。konachan.net は全年齢のみ、konachan.com は R18 を含む完全版で Cloudflare 認証があるため、先にサーフで konachan.com を開いて認証を通してください",
+      "descripts.ko": "소스 사이트. konachan.net은 전체 이용가만, konachan.com은 R18을 포함한 전체 사이트이며 Cloudflare 인증이 있으므로 먼저 서핑에서 konachan.com을 열어 인증을 통과하세요",
+      "descripts.zhtw": "選擇爬取來源站點。konachan.net 只收錄全年齡內容；konachan.com 是完整站（含 R18），有 Cloudflare 驗證，需要先在暢遊中打開 konachan.com 通過驗證",
       "default": "net",
       "options": [
         {
@@ -69,11 +70,11 @@
       "name.ja": "クロールモード",
       "name.ko": "크롤 모드",
       "name.zhtw": "爬取模式",
-      "descripts": "爬取模式，分为全部、标签列表和标签",
-      "descripts.en": "Crawl mode, divided into all, tag list and tags",
-      "descripts.ja": "クロールモード、全部・タグ一覧・タグに分かれています",
-      "descripts.ko": "크롤 모드, 전체·태그 목록·태그로 나뉩니다",
-      "descripts.zhtw": "爬取模式，分為全部、標籤列表和標籤",
+      "descripts": "爬取模式，分为全部、标签和排行榜",
+      "descripts.en": "Crawl mode, divided into all, tags and ranking",
+      "descripts.ja": "クロールモード、全部・タグ・ランキングに分かれています",
+      "descripts.ko": "크롤 모드, 전체·태그·랭킹으로 나뉩니다",
+      "descripts.zhtw": "爬取模式，分為全部、標籤和排行榜",
       "default": "all",
       "options": [
         {
@@ -85,22 +86,76 @@
           "variable": "all"
         },
         {
-          "name": "标签列表",
-          "name.en": "Tag list",
-          "name.ja": "タグ一覧",
-          "name.ko": "태그 목록",
-          "name.zhtw": "標籤列表",
-          "variable": "tag_list"
-        },
-        {
           "name": "标签",
           "name.en": "Tags",
           "name.ja": "タグ",
           "name.ko": "태그",
           "name.zhtw": "標籤",
           "variable": "tags"
+        },
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "popular"
         }
       ]
+    },
+    {
+      "key": "rating",
+      "type": "options",
+      "name": "分级过滤",
+      "name.en": "Rating filter",
+      "name.ja": "レーティング絞り込み",
+      "name.ko": "등급 필터",
+      "name.zhtw": "分級過濾",
+      "descripts": "按站点分级过滤。全部和标签模式把 rating: 元标签拼进搜索串，排行榜模式在插件里按每张图的分级筛选。只有 R18 站（konachan.com）有存疑与限制级内容",
+      "descripts.en": "Filter by site rating. All and tags modes add the rating: metatag to the search string; ranking mode filters each post by its rating inside the plugin. Only the R18 site (konachan.com) has Questionable and Explicit content",
+      "descripts.ja": "サイトのレーティングで絞り込みます。全部・タグモードは rating: メタタグを検索文字列に付加し、ランキングモードはプラグイン内で各作品のレーティングを見て絞り込みます。際どい・露骨なコンテンツは R18 サイト（konachan.com）にのみあります",
+      "descripts.ko": "사이트 등급으로 필터링합니다. 전체·태그 모드는 rating: 메타태그를 검색 문자열에 추가하고, 랭킹 모드는 플러그인 안에서 작품별 등급으로 거릅니다. 애매함·노골적 콘텐츠는 R18 사이트(konachan.com)에만 있습니다",
+      "descripts.zhtw": "依站台分級過濾。全部和標籤模式把 rating: 元標籤拼進搜尋串，排行榜模式在插件裡依每張圖的分級篩選。只有 R18 站（konachan.com）有存疑與限制級內容",
+      "default": "",
+      "options": [
+        {
+          "name": "不限",
+          "name.en": "Any",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "不限",
+          "variable": ""
+        },
+        {
+          "name": "全年龄(Safe)",
+          "name.en": "Safe",
+          "name.ja": "全年齢 (Safe)",
+          "name.ko": "전체 이용가 (Safe)",
+          "name.zhtw": "全年齡(Safe)",
+          "variable": "safe"
+        },
+        {
+          "name": "存疑(Questionable)",
+          "name.en": "Questionable",
+          "name.ja": "際どい (Questionable)",
+          "name.ko": "애매함 (Questionable)",
+          "name.zhtw": "存疑(Questionable)",
+          "variable": "questionable"
+        },
+        {
+          "name": "限制级(Explicit)",
+          "name.en": "Explicit",
+          "name.ja": "露骨 (Explicit)",
+          "name.ko": "노골적 (Explicit)",
+          "name.zhtw": "限制級(Explicit)",
+          "variable": "explicit"
+        }
+      ],
+      "when": {
+        "source_site": [
+          "com"
+        ]
+      }
     },
     {
       "key": "start_page",
@@ -151,176 +206,6 @@
       }
     },
     {
-      "key": "tag",
-      "type": "string",
-      "name": "标签",
-      "name.en": "Tag",
-      "name.ja": "タグ",
-      "name.ko": "태그",
-      "name.zhtw": "標籤",
-      "descripts": "要爬取的标签，可用*作为通配符（默认：genshin_impact）",
-      "descripts.en": "Tag to crawl, use * as wildcard (default: genshin_impact)",
-      "descripts.ja": "クロールするタグ、*を使用してワイルドカード（デフォルト：原神）",
-      "descripts.ko": "크롤할 태그、*를 사용하여 와일드카드（기본값：원신）",
-      "descripts.zhtw": "要爬取的標籤，可用*作為通配符（預設：原神）",
-      "default": "genshin_impact",
-      "width": 2,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_type",
-      "type": "options",
-      "name": "标签类型",
-      "name.en": "Tag type",
-      "name.ja": "タグタイプ",
-      "name.ko": "태그 타입",
-      "name.zhtw": "標籤類型",
-      "descripts": "标签类型，分为任意(Any)、通用(General)、作家(Artist)、版权(Copyright)、角色(Character)、风格(Style)、圈子(Circle)",
-      "descripts.en": "Tag type, divided into Any, General, Artist, Copyright, Character, Style, Circle",
-      "descripts.ja": "タグタイプ、任意(Any)、ジェネラル(General)、作家(Artist)、著作権(Copyright)、キャラクター(Character)、スタイル(Style)、界隈(Circle)に分かれています",
-      "descripts.ko": "태그 타입, 任意(Any)、중복(General)、작가(Artist)、저작권(Copyright)、캐릭터(Character)、스타일(Style)、원(Circle)에 나뉩니다",
-      "descripts.zhtw": "標籤類型，分為任意(Any)、通用(General)、作家(Artist)、版權(Copyright)、角色(Character)、風格(Style)、圈子(Circle)",
-      "default": "",
-      "options": [
-        {
-          "name": "任意(Any)",
-          "name.en": "Any",
-          "name.ja": "任意",
-          "name.ko": "任意",
-          "name.zhtw": "任意",
-          "variable": ""
-        },
-        {
-          "name": "通用(General)",
-          "name.en": "General",
-          "name.ja": "通用",
-          "name.ko": "通用",
-          "name.zhtw": "通用",
-          "variable": "general"
-        },
-        {
-          "name": "作家(Artist)",
-          "name.en": "Artist",
-          "name.ja": "作家",
-          "name.ko": "作家",
-          "name.zhtw": "作家",
-          "variable": "artist"
-        },
-        {
-          "name": "版权(Copyright)",
-          "name.en": "Copyright",
-          "name.ja": "著作権",
-          "name.ko": "저작권",
-          "name.zhtw": "版權",
-          "variable": "copyright"
-        },
-        {
-          "name": "角色(Character)",
-          "name.en": "Character",
-          "name.ja": "キャラクター",
-          "name.ko": "캐릭터",
-          "name.zhtw": "角色",
-          "variable": "character"
-        },
-        {
-          "name": "风格(Style)",
-          "name.en": "Style",
-          "name.ja": "スタイル",
-          "name.ko": "스타일",
-          "name.zhtw": "風格",
-          "variable": "style"
-        },
-        {
-          "name": "圈子(Circle)",
-          "name.en": "Circle",
-          "name.ja": "界隈",
-          "name.ko": "원",
-          "name.zhtw": "圈子",
-          "variable": "circle"
-        }
-      ],
-      "width": 2,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_order",
-      "type": "options",
-      "name": "标签排序",
-      "name.en": "Tag order",
-      "name.ja": "タグ順序",
-      "name.ko": "태그 순서",
-      "name.zhtw": "標籤排序",
-      "descripts": "标签排序，分为名称(Name)、图片数量(Count)、日期(Date)",
-      "descripts.en": "Tag order, divided into Name, Count, Date",
-      "descripts.ja": "タグ順序、名称(Name)、画像数(Count)、日付(Date)に分かれています",
-      "descripts.ko": "태그 순서, 이름(Name)、이미지 수(Count)、날짜(Date)에 나뉩니다",
-      "descripts.zhtw": "標籤排序，分為名稱(Name)、圖片數量(Count)、日期(Date)",
-      "default": "name",
-      "options": [
-        {
-          "name": "名称(Name)",
-          "name.en": "Name",
-          "name.ja": "名称",
-          "name.ko": "이름",
-          "name.zhtw": "名稱",
-          "variable": "name"
-        },
-        {
-          "name": "图片数量(Count)",
-          "name.en": "Count",
-          "name.ja": "画像数",
-          "name.ko": "이미지 수",
-          "name.zhtw": "圖片數量",
-          "variable": "count"
-        },
-        {
-          "name": "日期(Date)",
-          "name.en": "Date",
-          "name.ja": "日付",
-          "name.ko": "날짜",
-          "name.zhtw": "日期",
-          "variable": "date"
-        }
-      ],
-      "width": 2,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
-      "key": "mode_tag_skip",
-      "type": "int",
-      "name": "跳过标签数量",
-      "name.en": "Skip tag count",
-      "name.ja": "タグスキップ数",
-      "name.ko": "태그 스킵 수",
-      "name.zhtw": "跳過標籤數量",
-      "descripts": "跳过标签数量，默认跳过10个标签",
-      "descripts.en": "Skip tag count, default skip 10 tags",
-      "descripts.ja": "タグスキップ数、デフォルトで10個のタグをスキップします",
-      "descripts.ko": "태그 스킵 수, 기본적으로 10개의 태그를 스킵합니다",
-      "descripts.zhtw": "跳過標籤數量，預設跳過10個標籤",
-      "default": 10,
-      "options": null,
-      "min": 0,
-      "width": 1,
-      "when": {
-        "crawl_mode": [
-          "tag_list"
-        ]
-      }
-    },
-    {
       "key": "mode_tag_value",
       "type": "list",
       "name": "标签组合",
@@ -342,6 +227,142 @@
       "when": {
         "crawl_mode": [
           "tags"
+        ]
+      }
+    },
+    {
+      "key": "popular_scale",
+      "type": "options",
+      "name": "排行榜类型",
+      "name.en": "Ranking type",
+      "name.ja": "ランキングの種類",
+      "name.ko": "랭킹 종류",
+      "name.zhtw": "排行榜類型",
+      "descripts": "日榜、周榜、月榜按自然日、周、月统计，可以指定日期看往期；「最近」系列是截至现在的滚动窗口，只有当期。konachan 每期只有一页，最多 40 张",
+      "descripts.en": "Daily / weekly / monthly rankings follow calendar periods and can look back by date; the \"Last …\" rankings are rolling windows up to now and only have the current period. Each period on konachan is a single page of at most 40 posts",
+      "descripts.ja": "日間・週間・月間は暦の区切りで集計され、日付を指定して過去分も見られます。「直近」系は現在までのローリング期間で、当期のみです。konachan は1期1ページ、最大40枚です",
+      "descripts.ko": "일간·주간·월간은 달력 기준으로 집계되며 날짜를 지정해 지난 기간도 볼 수 있습니다. 「최근」 계열은 지금까지의 롤링 기간이라 현재 기간만 있습니다. konachan는 기간마다 한 페이지, 최대 40장입니다",
+      "descripts.zhtw": "日榜、週榜、月榜依自然日、週、月統計，可以指定日期看往期；「最近」系列是截至現在的滾動區間，只有當期。konachan 每期只有一頁，最多 40 張",
+      "default": "day",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "day"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "week"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "month"
+        },
+        {
+          "name": "最近 24 小时",
+          "name.en": "Last 24 hours",
+          "name.ja": "直近24時間",
+          "name.ko": "최근 24시간",
+          "name.zhtw": "最近 24 小時",
+          "variable": "1d"
+        },
+        {
+          "name": "最近一周",
+          "name.en": "Last week",
+          "name.ja": "直近1週間",
+          "name.ko": "최근 1주",
+          "name.zhtw": "最近一週",
+          "variable": "1w"
+        },
+        {
+          "name": "最近一个月",
+          "name.en": "Last month",
+          "name.ja": "直近1か月",
+          "name.ko": "최근 1개월",
+          "name.zhtw": "最近一個月",
+          "variable": "1m"
+        },
+        {
+          "name": "最近一年",
+          "name.en": "Last year",
+          "name.ja": "直近1年",
+          "name.ko": "최근 1년",
+          "name.zhtw": "最近一年",
+          "variable": "1y"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "popular_date",
+      "type": "date",
+      "format": "YYYY-MM-DD",
+      "dateMin": "2008-01-01",
+      "dateMax": "today",
+      "name": "排行榜日期",
+      "name.en": "Ranking date",
+      "name.ja": "ランキング日付",
+      "name.ko": "랭킹 날짜",
+      "name.zhtw": "排行榜日期",
+      "descripts": "留空为当期。日榜取这一天，周榜取这一天所在的那一周，月榜取这一天所在的月份",
+      "descripts.en": "Empty = current period. Daily uses this day, weekly the week containing it, monthly the month containing it",
+      "descripts.ja": "空欄は当期。日間はその日、週間はその日を含む週、月間はその日を含む月です",
+      "descripts.ko": "비우면 현재 기간. 일간은 해당일, 주간은 해당일이 속한 주, 월간은 해당일이 속한 달입니다",
+      "descripts.zhtw": "留空為當期。日榜取這一天，週榜取這一天所在的那一週，月榜取這一天所在的月份",
+      "default": "",
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
+        ]
+      }
+    },
+    {
+      "key": "popular_periods",
+      "type": "int",
+      "name": "回溯期数",
+      "name.en": "Periods",
+      "name.ja": "遡る期数",
+      "name.ko": "거슬러 올라갈 기간 수",
+      "name.zhtw": "回溯期數",
+      "descripts": "从上面的日期起往前连抓多少期，每期最多 40 张，一次最多 100 期",
+      "descripts.en": "How many consecutive periods to crawl going back from the date above; up to 40 posts each, at most 100 periods per run",
+      "descripts.ja": "上の日付から遡って連続で何期分取得するか。1期最大40枚、1回最大100期",
+      "descripts.ko": "위 날짜부터 거슬러 올라가며 연속으로 몇 기간을 수집할지. 기간당 최대 40장, 실행당 최대 100기간",
+      "descripts.zhtw": "從上面的日期起往前連抓多少期，每期最多 40 張，一次最多 100 期",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 100,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
         ]
       }
     },
@@ -398,8 +419,7 @@
   ],
   "kbRecommendedConfigs": [
     "configs/bikini.json",
-    "configs/every-day-5page.json",
-    "configs/genshin_impact.json"
+    "configs/every-day-5page.json"
   ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",

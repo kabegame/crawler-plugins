@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 
-const { addProgress, currentHtml, downloadImage, to } = Kabegame;
+const { addProgress, currentHtml, downloadImage, requireCookie, setHeader, to, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://konachan.net";
 
@@ -11,6 +11,40 @@ function resolveBaseUrl(source, fallback) {
   if (site === "com") return "https://konachan.com";
   if (site === "net") return "https://konachan.net";
   return coerceStr(fallback) || DEFAULT_BASE_URL;
+}
+
+// 两个站的 Cloudflare 规则不一样（2026-10 实测，均未带 cf_clearance）：
+// - konachan.net：页面和原图都直接放行；
+// - konachan.com：页面、post.json、/jpeg/ 原图一律 403 质询（/sample/ 反而放行），
+//   必须带畅游里通过验证拿到的 cf_clearance，且它绑定签发时的 UA，所以同时换成畅游的 CEF UA。
+// 原图和页面同域，downloadImage 调用时快照任务请求头，所以浏览器身份全程保留、不必在下载前撤掉。
+const BROWSER_IDENTITY_HOSTS = new Set(["konachan.com"]);
+
+let site = null; // { baseUrl, host, browserIdentity }
+
+function prepareSite(baseUrl) {
+  const host = new URL(baseUrl).host;
+  site = { baseUrl, host, browserIdentity: BROWSER_IDENTITY_HOSTS.has(host) };
+  if (!site.browserIdentity) return;
+  // 旧版应用没有 cefUserAgent 接口，此时不覆盖 UA
+  const ua = Kabegame.cefUserAgent?.() || "";
+  if (ua) setHeader("User-Agent", ua);
+  if (requireCookie(host)) {
+    console.log(`[konachan] 已注入畅游中 ${host} 的 Cookie${ua ? " 与 CEF UA" : ""}`);
+  } else {
+    warn(`[konachan] 未从畅游取到 ${host} 的 Cookie；若请求被 403 拦截，请先在畅游中打开 ${baseUrl} 通过验证`);
+  }
+}
+
+function siteBlockedError(reason) {
+  const hint = site.browserIdentity
+    ? `请先在畅游中打开 ${site.baseUrl} 通过验证，再重新运行任务`
+    : "请检查代理网络或稍后重试";
+  return new Error(`[konachan] ${site.host} ${reason}，被 Cloudflare 拦截：${hint}`);
+}
+
+function isChallengePage(document) {
+  return /just a moment|attention required|checking your browser/i.test(trimText(document.title));
 }
 
 function coerceStr(value) {
@@ -30,8 +64,18 @@ function parseHtml(html) {
 }
 
 async function openDocument(url) {
-  const finalUrl = await to(url);
-  return { finalUrl, document: parseHtml(await currentHtml()) };
+  let finalUrl;
+  try {
+    finalUrl = await to(url);
+  } catch (error) {
+    // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
+    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError("返回 403");
+    throw error;
+  }
+  const html = await currentHtml();
+  const document = parseHtml(html);
+  if (isChallengePage(document)) throw siteBlockedError("返回了验证页");
+  return { finalUrl, document, html };
 }
 
 function resolveUrl(url, base) {
@@ -39,20 +83,28 @@ function resolveUrl(url, base) {
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function parseIntOrZero(text) {
-  const token = trimText(text);
-  return /^\d+$/.test(token) ? Number(token) : 0;
-}
-
 function normalizeTagToken(text) {
   return trimText(text).replace(/\s+/g, "_");
 }
 
-function buildTagsValueFromList(tagList) {
-  return (Array.isArray(tagList) ? tagList : [])
-    .map((tag) => normalizeTagToken(tag))
-    .filter(Boolean)
-    .join("+");
+// 标签组合经 GUI 传进来是数组，但 kabegame-cli 的 --var 只能给字符串，
+// 所以字符串形态也要接：按逗号/空白/加号切开。
+function tagListOf(tagList) {
+  const items = Array.isArray(tagList) ? tagList : coerceStr(tagList).split(/[,+\s]+/);
+  return items.map((tag) => normalizeTagToken(tag)).filter(Boolean);
+}
+
+// 分级是站点的 rating: 元标签，跟普通标签一样拼进搜索串，过滤发生在服务端分页之前。
+// konachan.net 只收录全年龄内容，Questionable / Explicit 在那边查出来是空的。
+function metaTokensOf(vars) {
+  const rating = trimText(vars.rating);
+  return rating ? [`rating:${rating}`] : [];
+}
+
+// 站点搜索串：token 之间用 +，每个 token 单独编码（rating:safe 里的冒号要转义）
+function buildPostListUrl(baseUrl, tokens, page) {
+  const query = tokens.map((token) => encodeURIComponent(token)).join("+");
+  return query ? `${baseUrl}/post?tags=${query}&page=${page}` : `${baseUrl}/post?page=${page}`;
 }
 
 // 站点新结构中标签类型只体现在 li 的 tag-type-* class 上
@@ -228,6 +280,12 @@ async function processDetailPage(href, baseUrl, quality) {
   await downloadImage(imageUrl, opts);
 }
 
+function collectPostHrefs(document, pageUrl) {
+  return Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
+    .map((a) => resolveUrl(a.getAttribute("href"), pageUrl))
+    .filter(Boolean);
+}
+
 function validatePageRange(startPage, endPage) {
   if (endPage >= startPage + 100) {
     throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
@@ -235,115 +293,136 @@ function validatePageRange(startPage, endPage) {
   if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
 }
 
-async function crawlQualityAll(baseUrl, quality, startPage, endPage) {
+async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
-    const pageUrl = `${baseUrl}/post/?page=${page}`;
+    const pageUrl = buildPostListUrl(baseUrl, tokens, page);
     console.log(`[konachan][all] 打开页面 ${page}/${endPage}: ${pageUrl}`);
     const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
-      .map((a) => resolveUrl(a.getAttribute("href"), finalUrl))
-      .filter(Boolean);
+    const hrefs = collectPostHrefs(document, finalUrl);
     for (const href of hrefs) {
       await processDetailPage(href, finalUrl, quality);
       if (hrefs.length > 0) addProgress(pageProgress / hrefs.length);
-    }
-  }
-}
-
-function buildTagSearchUrl(baseUrl, name, tagType, tagOrder, page) {
-  return `${baseUrl}/tag?name=${encodeURIComponent(name)}&type=${encodeURIComponent(tagType)}&order=${encodeURIComponent(tagOrder)}&page=${page}`;
-}
-
-function parseTagTotalPages(document) {
-  if (!document.querySelector("#paginator a.next_page")) return 1;
-  const links = Array.from(document.querySelectorAll("#paginator > div > a")).map(textOf);
-  const pageToken = links.length >= 2 ? links[links.length - 2] : "";
-  return /^\d+$/.test(pageToken) ? Number(pageToken) : 1;
-}
-
-async function crawlTagPosts(baseUrl, quality, tagName, tagHref, expectedImages, perTagProgress) {
-  const tagUrl = resolveUrl(tagHref, baseUrl);
-  const joiner = tagUrl.includes("?") ? "&" : "?";
-  const perImageProgress = expectedImages > 0 ? perTagProgress / expectedImages : 0.0;
-  let postPage = 1;
-  let downloaded = 0;
-  while (true) {
-    const pageUrl = `${tagUrl}${joiner}page=${postPage}`;
-    const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
-      .map((a) => resolveUrl(a.getAttribute("href"), finalUrl))
-      .filter(Boolean);
-    if (hrefs.length === 0) break;
-    for (const href of hrefs) {
-      await processDetailPage(href, finalUrl, quality);
-      downloaded += 1;
-      if (expectedImages > 0 && downloaded <= expectedImages) addProgress(perImageProgress);
-    }
-    postPage += 1;
-  }
-  if (expectedImages <= 0) addProgress(perTagProgress);
-  else if (downloaded < expectedImages) addProgress(perImageProgress * (expectedImages - downloaded));
-  console.log(`[konachan][tag-list] 标签完成: ${tagName}，实际下载 ${downloaded} / 预计 ${expectedImages}`);
-}
-
-async function crawlByTag(baseUrl, quality, vars) {
-  const searchName = trimText(vars.tag);
-  const tagType = coerceStr(vars.mode_tag_type);
-  const tagOrder = coerceStr(vars.mode_tag_order || "name");
-  const skipCount = Math.max(0, Number(vars.mode_tag_skip ?? 0));
-  const firstUrl = buildTagSearchUrl(baseUrl, searchName, tagType, tagOrder, 1);
-  console.log("[konachan][tag-list] 开始标签列表模式");
-  let { document } = await openDocument(firstUrl);
-  const totalTagPages = parseTagTotalPages(document);
-  const skipInFirstPage = skipCount % 50;
-  const startTagPage = Math.floor((skipCount - skipInFirstPage) / 50) + 1;
-  if (startTagPage > totalTagPages) return;
-  const actualPagesToCrawl = totalTagPages - startTagPage + 1;
-  const perPageProgress = actualPagesToCrawl > 0 ? 99.0 / actualPagesToCrawl : 0.0;
-
-  for (let currentPage = startTagPage; currentPage <= totalTagPages; currentPage += 1) {
-    const pageUrl = buildTagSearchUrl(baseUrl, searchName, tagType, tagOrder, currentPage);
-    document = (await openDocument(pageUrl)).document;
-    const rows = Array.from(document.querySelectorAll(".highlightable > tbody > tr"));
-    const pageSkip = currentPage === startTagPage ? skipInFirstPage : 0;
-    if (rows.length === 0 || pageSkip >= rows.length) {
-      addProgress(perPageProgress);
-      continue;
-    }
-    const rowsToProcess = rows.slice(pageSkip);
-    const perTagProgress = perPageProgress / rowsToProcess.length;
-    for (const row of rowsToProcess) {
-      const anchor = row.querySelector("a[href*='tags']");
-      const tagName = textOf(anchor);
-      const tagHref = anchor?.getAttribute("href") || "";
-      const imageCount = parseIntOrZero(textOf(row.querySelector("td:first-of-type")));
-      if (imageCount <= 0) {
-        addProgress(perTagProgress);
-        continue;
-      }
-      await crawlTagPosts(baseUrl, quality, tagName, tagHref, imageCount, perTagProgress);
     }
   }
 }
 
 async function crawlByTags(baseUrl, quality, vars) {
-  const tagsValue = buildTagsValueFromList(vars.mode_tag_value);
-  if (!tagsValue) throw new Error("标签模式需要至少填写一个标签");
+  const tags = tagListOf(vars.mode_tag_value);
+  if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+  const tokens = tags.concat(metaTokensOf(vars));
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
-    const pageUrl = `${baseUrl}/post?tags=${tagsValue}&page=${page}`;
+    const pageUrl = buildPostListUrl(baseUrl, tokens, page);
+    console.log(`[konachan][tags] 打开页面 ${page}/${endPage}: ${pageUrl}`);
     const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
-      .map((a) => resolveUrl(a.getAttribute("href"), finalUrl))
-      .filter(Boolean);
+    const hrefs = collectPostHrefs(document, finalUrl);
     for (const href of hrefs) {
       await processDetailPage(href, finalUrl, quality);
       if (hrefs.length > 0) addProgress(pageProgress / hrefs.length);
+    }
+  }
+}
+
+// ---- 排行榜 ----
+// Moebooru 的人气榜有两类地址（2026-10 实测 yande.re / konachan.net / konachan.com 一致）：
+// - 滚动窗口：/post/popular_recent?period=1d|1w|1m|1y，只有当期；
+// - 自然周期：/post/popular_by_day|week?day=&month=&year=、/post/popular_by_month?month=&year=，
+//   改日期即可看往期（周榜按日期所在的那一周）。
+// 每期只有一页、最多 40 张，page 参数无效，所以要多抓只能往前回溯期数。
+const POPULAR_RECENT_PERIODS = new Set(["1d", "1w", "1m", "1y"]);
+const POPULAR_CALENDAR_SCALES = new Set(["day", "week", "month"]);
+const MAX_POPULAR_PERIODS = 100;
+// 分级过滤的配置值 → Post.register 里的单字母 rating
+const RATING_LETTERS = { safe: "s", questionable: "q", explicit: "e" };
+
+// 留空取本地今天。站点按自己的时区切日，跨日前后几小时「今天」的榜可能还是空的。
+function parsePopularDate(text) {
+  const matched = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimText(text));
+  const base = matched
+    ? new Date(Number(matched[1]), Number(matched[2]) - 1, Number(matched[3]))
+    : new Date();
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate());
+}
+
+// 往前第 k 期（0 = 指定日期所在的那一期）
+function shiftPopularDate(date, scale, k) {
+  if (scale === "day") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - k);
+  if (scale === "week") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7 * k);
+  return new Date(date.getFullYear(), date.getMonth() - k, 1);
+}
+
+function buildPopularUrl(baseUrl, scale, date) {
+  if (POPULAR_RECENT_PERIODS.has(scale)) return `${baseUrl}/post/popular_recent?period=${scale}`;
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  if (scale === "month") return `${baseUrl}/post/popular_by_month?month=${month}&year=${year}`;
+  return `${baseUrl}/post/popular_by_${scale}?day=${date.getDate()}&month=${month}&year=${year}`;
+}
+
+// 榜单页不接受 tags 参数，分级只能在插件里筛。页面脚本里每张图独占一行
+// Post.register({...})，带单字母 rating（s / q / e）。
+function postRatingsOf(html) {
+  const ratings = new Map();
+  for (const matched of coerceStr(html).matchAll(/Post\.register\((\{.*\})\)/g)) {
+    try {
+      const post = JSON.parse(matched[1]);
+      if (post && post.id != null) ratings.set(String(post.id), coerceStr(post.rating));
+    } catch {
+      // 单行解析失败不影响其他行
+    }
+  }
+  return ratings;
+}
+
+function postIdOfHref(href) {
+  const matched = /\/post\/show\/(\d+)/.exec(coerceStr(href));
+  return matched ? matched[1] : "";
+}
+
+async function crawlPopular(baseUrl, quality, vars) {
+  const scale = coerceStr(vars.popular_scale || "day");
+  const recent = POPULAR_RECENT_PERIODS.has(scale);
+  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) throw new Error(`未知的排行榜类型: ${scale}`);
+  // 滚动窗口只有当期，回溯期数对它没有意义
+  const periods = recent
+    ? 1
+    : Math.min(MAX_POPULAR_PERIODS, Math.max(1, Math.floor(Number(vars.popular_periods ?? 1)) || 1));
+  const startDate = parsePopularDate(vars.popular_date);
+  const ratingName = trimText(vars.rating);
+  const ratingLetter = RATING_LETTERS[ratingName] || "";
+  const periodProgress = 90.0 / periods;
+  for (let k = 0; k < periods; k += 1) {
+    const pageUrl = buildPopularUrl(baseUrl, scale, shiftPopularDate(startDate, scale, k));
+    console.log(`[konachan][popular] 打开排行榜 ${k + 1}/${periods}: ${pageUrl}`);
+    const { document, finalUrl, html } = await openDocument(pageUrl);
+    let hrefs = collectPostHrefs(document, finalUrl);
+    if (ratingLetter && hrefs.length > 0) {
+      const ratings = postRatingsOf(html);
+      if (ratings.size === 0) {
+        warn(`[konachan][popular] 页面里没找到作品分级信息，本期不做分级过滤：${finalUrl}`);
+      } else {
+        const before = hrefs.length;
+        // 取不到分级的作品保留，宁可多下也不静默漏掉
+        hrefs = hrefs.filter((href) => {
+          const rating = ratings.get(postIdOfHref(href));
+          return !rating || rating === ratingLetter;
+        });
+        console.log(`[konachan][popular] 分级过滤 ${ratingName}：${before} → ${hrefs.length}`);
+      }
+    }
+    if (hrefs.length === 0) {
+      console.log(`[konachan][popular] 本期没有符合条件的作品：${finalUrl}`);
+      addProgress(periodProgress);
+      continue;
+    }
+    for (const href of hrefs) {
+      await processDetailPage(href, finalUrl, quality);
+      addProgress(periodProgress / hrefs.length);
     }
   }
 }
@@ -351,15 +430,22 @@ async function crawlByTags(baseUrl, quality, vars) {
 export async function crawl(common, custom) {
   const vars = custom || {};
   const baseUrl = resolveBaseUrl(vars.source_site, common?.baseUrl);
+  prepareSite(baseUrl);
   const quality = coerceStr(vars.quality || "high");
   if (vars.crawl_mode === "all") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
-    await crawlQualityAll(baseUrl, quality, Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
-  } else if (vars.crawl_mode === "tag_list") {
-    await crawlByTag(baseUrl, quality, vars);
+    await crawlQualityAll(
+      baseUrl,
+      quality,
+      Number(vars.start_page ?? 1),
+      Number(vars.end_page ?? 1),
+      metaTokensOf(vars),
+    );
   } else if (vars.crawl_mode === "tags") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
     await crawlByTags(baseUrl, quality, vars);
+  } else if (vars.crawl_mode === "popular") {
+    await crawlPopular(baseUrl, quality, vars);
   } else {
     throw new Error(`未知的爬取模式: ${vars.crawl_mode}`);
   }

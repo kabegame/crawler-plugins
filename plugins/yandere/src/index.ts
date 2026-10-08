@@ -1,14 +1,12 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 
-const { addProgress, currentHtml, downloadImage, to } = Kabegame;
+const { addProgress, currentHtml, downloadImage, to, warn } = Kabegame;
 
 const BASE_URL = "https://yande.re";
 
-// 站点是 Moebooru，和 konachan 同一套模板：作品列表每页 40 条、标签表每页 50 行，
-// 未登录时 URL 上没有可用的每页条数参数，所以这两个数是站点写死的硬契约。
-// 标签列表模式最多翻多少页标签表（凑不够目标标签数时的兜底上限）
-const MAX_TAG_LIST_PAGES = 50;
+// 站点是 Moebooru，和 konachan 同一套模板：作品列表每页 40 条，
+// 未登录时 URL 上没有可用的每页条数参数，所以这是站点写死的硬契约。
 // 单帖的收藏者可以有几百上千人，评论也可能很长。元数据会整条进库并参与画册列表查询，
 // 放任不管会把 metadata 撑爆（参见 cocs/crawler/PIXIV_METADATA.md 的教训），这里截断。
 const MAX_FAVORITED = 24;
@@ -32,17 +30,13 @@ function parseHtml(html) {
 
 async function openDocument(url) {
   const finalUrl = await to(url);
-  return { finalUrl, document: parseHtml(await currentHtml()) };
+  const html = await currentHtml();
+  return { finalUrl, document: parseHtml(html), html };
 }
 
 function resolveUrl(url, base) {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
-}
-
-function parseIntOrZero(text) {
-  const token = trimText(text).replace(/,/g, "");
-  return /^\d+$/.test(token) ? Number(token) : 0;
 }
 
 function normalizeTagToken(text) {
@@ -121,6 +115,39 @@ function parseSidebarTags(document, pageUrl) {
       };
     })
     .filter((tag) => tag.name || tag.display);
+}
+
+// 标签画册：侧栏每种颜色是一种 tag 类型（yande.re 有 artist / copyright / character / circle / faults / general），
+// 各自映射到 `yandere/<类型>` 目录下；类型缺失或不合规时按 general 处理（与 description.ejs 一致）。
+// key 用站点自己的 tag 标识（小写、丢弃 key 字符集之外的字符），如 `hatsune_miku`；
+// 派生后为空或超长的直接跳过。metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本
+// （迁移运行在无 import 的裸 V8 里），改这里要同步改那里。
+function tagLabelType(type) {
+  const value = String(type || "").trim().toLowerCase();
+  return /^[a-z0-9_-]{1,64}$/.test(value) ? value : "general";
+}
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromSidebarTags(tags) {
+  const labels = [];
+  for (const tag of tags || []) {
+    const key = tagLabelKey(tag && tag.name);
+    if (!key) continue;
+    labels.push({
+      key,
+      category: `yandere/${tagLabelType(tag.type)}`,
+      name: trimText(tag.display) || key.replace(/_/g, " "),
+    });
+  }
+  return labels;
 }
 
 function parseRelatedPosts(document, pageUrl) {
@@ -254,6 +281,8 @@ async function processDetailPage(href, baseUrl, quality) {
   }
   const opts = { url: finalUrl };
   if (metadataNonEmpty(meta)) opts.metadata = meta;
+  const labels = labelsFromSidebarTags(meta.sidebar_tags);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(imageUrl, opts);
 }
 
@@ -314,94 +343,103 @@ async function crawlByTags(baseUrl, quality, vars) {
   );
 }
 
-function buildTagSearchUrl(baseUrl, name, tagType, tagOrder, page) {
-  return `${baseUrl}/tag?name=${encodeURIComponent(name)}&type=${encodeURIComponent(tagType)}` +
-    `&order=${encodeURIComponent(tagOrder)}&page=${page}`;
+// ---- 排行榜 ----
+// Moebooru 的人气榜有两类地址（2026-10 实测 yande.re / konachan.net / konachan.com 一致）：
+// - 滚动窗口：/post/popular_recent?period=1d|1w|1m|1y，只有当期；
+// - 自然周期：/post/popular_by_day|week?day=&month=&year=、/post/popular_by_month?month=&year=，
+//   改日期即可看往期（周榜按日期所在的那一周）。
+// 每期只有一页、最多 40 张，page 参数无效，所以要多抓只能往前回溯期数。
+const POPULAR_RECENT_PERIODS = new Set(["1d", "1w", "1m", "1y"]);
+const POPULAR_CALENDAR_SCALES = new Set(["day", "week", "month"]);
+const MAX_POPULAR_PERIODS = 100;
+// 分级过滤的配置值 → Post.register 里的单字母 rating
+const RATING_LETTERS = { safe: "s", questionable: "q", explicit: "e" };
+
+// 留空取本地今天。站点按自己的时区切日，跨日前后几小时「今天」的榜可能还是空的。
+function parsePopularDate(text) {
+  const matched = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimText(text));
+  const base = matched
+    ? new Date(Number(matched[1]), Number(matched[2]) - 1, Number(matched[3]))
+    : new Date();
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate());
 }
 
-// 标签表每行：<td>作品数</td><td>? <a href="/post?tags=name">display</a></td><td>类型</td><td>操作</td>
-function parseTagRows(document) {
-  return Array.from(document.querySelectorAll(".highlightable > tbody > tr"))
-    .map((row) => {
-      const anchor = row.querySelector("a[href*='tags']");
-      if (!anchor) return null;
-      const cells = Array.from(row.querySelectorAll("td"));
-      return {
-        name: tagNameFromHref(anchor.getAttribute("href")) || normalizeTagToken(textOf(anchor)),
-        display: textOf(anchor),
-        category: textOf(cells[2]),
-        count: parseIntOrZero(textOf(cells[0])),
-      };
-    })
-    .filter((tag) => tag && tag.name);
+// 往前第 k 期（0 = 指定日期所在的那一期）
+function shiftPopularDate(date, scale, k) {
+  if (scale === "day") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - k);
+  if (scale === "week") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7 * k);
+  return new Date(date.getFullYear(), date.getMonth() - k, 1);
 }
 
-// 单个标签：按页取它的作品，最多 maxPages 页
-async function crawlTagPosts(baseUrl, quality, tag, tokens, maxPages, perTagProgress) {
-  const perPageProgress = perTagProgress / maxPages;
-  let downloaded = 0;
-  for (let page = 1; page <= maxPages; page += 1) {
-    const pageUrl = buildPostListUrl(baseUrl, [tag.name].concat(tokens), page);
-    const { document, finalUrl } = await openDocument(pageUrl);
-    const hrefs = collectPostHrefs(document, finalUrl);
+function buildPopularUrl(baseUrl, scale, date) {
+  if (POPULAR_RECENT_PERIODS.has(scale)) return `${baseUrl}/post/popular_recent?period=${scale}`;
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  if (scale === "month") return `${baseUrl}/post/popular_by_month?month=${month}&year=${year}`;
+  return `${baseUrl}/post/popular_by_${scale}?day=${date.getDate()}&month=${month}&year=${year}`;
+}
+
+// 榜单页不接受 tags 参数，分级只能在插件里筛。页面脚本里每张图独占一行
+// Post.register({...})，带单字母 rating（s / q / e）。
+function postRatingsOf(html) {
+  const ratings = new Map();
+  for (const matched of coerceStr(html).matchAll(/Post\.register\((\{.*\})\)/g)) {
+    try {
+      const post = JSON.parse(matched[1]);
+      if (post && post.id != null) ratings.set(String(post.id), coerceStr(post.rating));
+    } catch {
+      // 单行解析失败不影响其他行
+    }
+  }
+  return ratings;
+}
+
+function postIdOfHref(href) {
+  const matched = /\/post\/show\/(\d+)/.exec(coerceStr(href));
+  return matched ? matched[1] : "";
+}
+
+async function crawlPopular(baseUrl, quality, vars) {
+  const scale = coerceStr(vars.popular_scale || "day");
+  const recent = POPULAR_RECENT_PERIODS.has(scale);
+  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) throw new Error(`未知的排行榜类型: ${scale}`);
+  // 滚动窗口只有当期，回溯期数对它没有意义
+  const periods = recent
+    ? 1
+    : Math.min(MAX_POPULAR_PERIODS, Math.max(1, Math.floor(Number(vars.popular_periods ?? 1)) || 1));
+  const startDate = parsePopularDate(vars.popular_date);
+  const ratingName = trimText(vars.rating);
+  const ratingLetter = RATING_LETTERS[ratingName] || "";
+  const periodProgress = 90.0 / periods;
+  for (let k = 0; k < periods; k += 1) {
+    const pageUrl = buildPopularUrl(baseUrl, scale, shiftPopularDate(startDate, scale, k));
+    console.log(`[yandere][popular] 打开排行榜 ${k + 1}/${periods}: ${pageUrl}`);
+    const { document, finalUrl, html } = await openDocument(pageUrl);
+    let hrefs = collectPostHrefs(document, finalUrl);
+    if (ratingLetter && hrefs.length > 0) {
+      const ratings = postRatingsOf(html);
+      if (ratings.size === 0) {
+        warn(`[yandere][popular] 页面里没找到作品分级信息，本期不做分级过滤：${finalUrl}`);
+      } else {
+        const before = hrefs.length;
+        // 取不到分级的作品保留，宁可多下也不静默漏掉
+        hrefs = hrefs.filter((href) => {
+          const rating = ratings.get(postIdOfHref(href));
+          return !rating || rating === ratingLetter;
+        });
+        console.log(`[yandere][popular] 分级过滤 ${ratingName}：${before} → ${hrefs.length}`);
+      }
+    }
     if (hrefs.length === 0) {
-      addProgress(perPageProgress * (maxPages - page + 1));
-      break;
+      console.log(`[yandere][popular] 本期没有符合条件的作品：${finalUrl}`);
+      addProgress(periodProgress);
+      continue;
     }
     for (const href of hrefs) {
       await processDetailPage(href, finalUrl, quality);
-      downloaded += 1;
-    }
-    addProgress(perPageProgress);
-  }
-  console.log(
-    `[yandere][tag-list] 标签完成: ${tag.name}（${tag.category || "?"}），实际下载 ${downloaded} / 站内共 ${tag.count}`,
-  );
-}
-
-async function crawlByTagList(baseUrl, quality, vars) {
-  const searchName = trimText(vars.tag);
-  // 站点的标签类型参数只认数字（0 general / 1 artist / 3 copyright / 4 character /
-  // 5 circle / 6 faults）。传英文名不会报错，会被当成 0 静默降级成「通用」，
-  // 所以 kbConfig 里的 variable 必须是这些数字。
-  const tagType = coerceStr(vars.mode_tag_type);
-  const tagOrder = coerceStr(vars.mode_tag_order || "count");
-  const skipCount = Math.max(0, Number(vars.mode_tag_skip ?? 0));
-  const tagCount = Math.max(1, Number(vars.mode_tag_count ?? 3));
-  const maxPages = Math.max(1, Number(vars.mode_tag_pages ?? 1));
-  const tokens = metaTokensOf(vars);
-
-  console.log(
-    `[yandere][tag-list] 开始标签列表模式：匹配 ${searchName || "*"}` +
-      `${tagType ? `（类型 ${tagType}）` : ""}，跳过 ${skipCount} 个，取 ${tagCount} 个，每个 ${maxPages} 页`,
-  );
-  const perTagProgress = 99.0 / tagCount;
-
-  // 类型筛选由站点做，但空计数标签会被跳过，页内剩几个可用不定，
-  // 所以用流水计数跳过而不是按页大小取模。
-  let seen = 0;
-  let picked = 0;
-  for (let page = 1; picked < tagCount && page <= MAX_TAG_LIST_PAGES; page += 1) {
-    const pageUrl = buildTagSearchUrl(baseUrl, searchName, tagType, tagOrder, page);
-    const { document } = await openDocument(pageUrl);
-    const rows = parseTagRows(document);
-    if (rows.length === 0) {
-      console.log(`[yandere][tag-list] 第 ${page} 页没有标签，结束`);
-      break;
-    }
-    for (const tag of rows) {
-      if (seen++ < skipCount) continue;
-      if (picked >= tagCount) break;
-      picked += 1;
-      if (tag.count <= 0) {
-        console.log(`[yandere][tag-list] 标签 ${tag.name} 没有作品，跳过`);
-        addProgress(perTagProgress);
-        continue;
-      }
-      await crawlTagPosts(baseUrl, quality, tag, tokens, maxPages, perTagProgress);
+      addProgress(periodProgress / hrefs.length);
     }
   }
-  if (picked === 0) console.warn("[yandere][tag-list] 没有匹配到任何标签，检查匹配式、类型与跳过数量");
 }
 
 export async function crawl(common, custom) {
@@ -416,8 +454,8 @@ export async function crawl(common, custom) {
   } else if (mode === "tags") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
     await crawlByTags(baseUrl, quality, vars);
-  } else if (mode === "tag_list") {
-    await crawlByTagList(baseUrl, quality, vars);
+  } else if (mode === "popular") {
+    await crawlPopular(baseUrl, quality, vars);
   } else {
     throw new Error(`未知的爬取模式: ${mode}`);
   }

@@ -2,7 +2,7 @@
   "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
   "namespace": "plugins.danbooru",
   "name": "entry_provider",
-  // 标签浏览交给应用级标签（danbooru/<分类>），这里只提供站点数值维度。
+  // 标签浏览交给应用级标签（danbooru/<分类>），这里只提供数值与分级维度。
   "list": {
     "score": {
       "provider": "number_range_router",
@@ -13,7 +13,11 @@
       "provider": "number_range_router",
       "properties": { "json_path": "$.fav_count" },
       "meta": { "plain": true }
+    },
+    "rating": {
+      "provider": "rating_router",
+      "meta": { "plain": true }
     }
   },
-  "note": "{\"title\":\"Danbooru\",\"content\":\"Filter by score or favorites. List shows cumulative N+ buckets; a segment also accepts <min>-<max>, <min>+ or -<max>, e.g. score/100+ or favorites/10-50.\"}"
+  "note": "{\"title\":\"Danbooru\",\"content\":\"Filter by score, favorites or rating (General / Sensitive / Questionable / Explicit). Score and favorites list cumulative N+ buckets; a segment also accepts <min>-<max>, <min>+ or -<max>, e.g. score/100+ or favorites/10-50.\"}"
 }

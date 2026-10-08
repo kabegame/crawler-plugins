@@ -117,12 +117,12 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 
 **設定変数**:
 - `source_site`: `danbooru`（全体）または `safebooru`（全年齢のみ）
-- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `crawl_mode`: `tags` / `popular` / `all`
 - `mode_tag_value`: タグ検索モードのタグリスト（未ログイン／一般アカウントは1回の検索でタグ2個まで）
 - `popular_scale`: `day` / `week` / `month`
+- `rating`: `g` / `s` / `q` / `e` のレーティング絞り込み。全体サイトのみ（タグ2個の制限には数えられません）
 - `start_page`、`end_page`: ページ範囲。1回あたり最大100ページ
 - `per_page`: 一覧1ページあたり 20 / 50 / 100 / 200 件
-- `tag`、`mode_tag_type`、`mode_tag_order`、`mode_tag_skip`、`mode_tag_count`、`mode_tag_pages`: タグ一覧モード用
 - `quality`: `high` / `medium`
 
 ---

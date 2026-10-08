@@ -8,7 +8,6 @@
 - **标签（tags）**：按标签组合检索 `/posts?tags=...`，最常用
 - **人气榜（popular）**：日/周/月人气榜 `/explore/posts/popular`
 - **全部（all）**：全站最新作品 `/posts`
-- **标签列表（tag_list）**：先按匹配式浏览标签表 `/tags`，再逐个标签抓它的作品
 
 ## 配置项
 
@@ -17,10 +16,7 @@
 - **人气榜周期（popular_scale）**：日榜 / 周榜 / 月榜
 - **起始页面 / 结束页数（start_page / end_page）**：一次最多 100 页
 - **每页条数（per_page）**：20 / 50 / 100 / 200，越大越省翻页
-- **标签匹配式（tag）**：标签列表模式下的名称匹配，`*` 是通配符，如 `*genshin*`
-- **标签类型（mode_tag_type）**：任意 / 通用 / 作家 / 版权 / 角色 / 元信息
-- **标签排序（mode_tag_order）**：作品数量 / 名称 / 日期
-- **跳过标签数量 / 爬取标签数量 / 每个标签页数**：控制标签列表模式的广度和深度
+- **分级过滤（rating）**：不限 / 全年龄(General) / 敏感(Sensitive) / 存疑(Questionable) / 限制级(Explicit)，只在源站选全站时显示。全部和标签模式把 `rating:g` 这样的元标签拼进搜索串，它**不占**「最多 2 个标签」的名额；人气榜模式由插件按每张图的分级筛选
 - **质量（quality）**：
   - **高（high）**：原图直链（站点上有几十 MB 的超大图，注意磁盘和带宽）
   - **中（medium）**：站点缩放后的 sample；视频帖没有 sample，会自动回落到原文件
@@ -37,7 +33,7 @@
 - `uploader_name` / `uploader_href`、`posted_date_iso`、`source_href`
 - `commentary`：画师原始评论的标题与正文
 
-同时插件注册了 PathQL provider，画廊里可以按 **分数（score）/ 收藏数（favorites）** 筛选已下载的图：列表给出 `5+`、`10+` … `1000+` 等「不低于某值」的档位；路径段也接受区间写法 `100-500`、`100+`、`-50`（两端都包含）。
+同时插件注册了 PathQL provider，画廊里可以按 **分数（score）/ 收藏数（favorites）/ 分级（rating）** 筛选已下载的图，分级按 General / Sensitive / Questionable / Explicit 分组；分数和收藏数列表给出 `5+`、`10+` … `1000+` 等「不低于某值」的档位；路径段也接受区间写法 `100-500`、`100+`、`-50`（两端都包含）。
 
 ## 注意事项
 

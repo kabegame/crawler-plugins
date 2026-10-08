@@ -170,12 +170,12 @@ This repository contains crawler plugins for the Kabegame image collection syste
 
 **Config variables**:
 - `source_site`: `danbooru` (full) or `safebooru` (general rating only)
-- `crawl_mode`: `tags` / `popular` / `all` / `tag_list`
+- `crawl_mode`: `tags` / `popular` / `all`
 - `mode_tag_value`: tag list for the tag search mode (the site allows 2 tags per search for anonymous/basic accounts)
 - `popular_scale`: `day` / `week` / `month`
+- `rating`: `g` / `s` / `q` / `e` rating filter, full site only (does not count toward the 2-tag limit)
 - `start_page`, `end_page`: page range, max 100 pages per run
 - `per_page`: 20 / 50 / 100 / 200 posts per listing page
-- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: tag list mode
 - `quality`: `high` / `medium`
 
 ---

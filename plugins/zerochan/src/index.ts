@@ -207,9 +207,24 @@ async function resolveListBase(baseUrl, mode, keyword) {
   return finalUrl;
 }
 
-function buildListUrl(listBase, sortOrder, page) {
+const SORT_LABELS = { id: "最新", fav: "人气", random: "随机" };
+
+// 首页人气榜的时间范围 t：1 = 近一周，2 = 近三个月。
+// 站点的「全部时间」（t=0，也是不带 t 时的默认）在首页上返回 500（2026-10 实测，
+// 站点自己菜单里的链接同样 500；标签页的 t=0 正常），所以只放这两档，其他值一律回落到 2。
+const POPULAR_RANGES = new Set(["1", "2"]);
+const DEFAULT_POPULAR_RANGE = "2";
+
+function popularRangeOf(mode, sortOrder, vars) {
+  if (mode !== "all" || sortOrder !== "fav") return "";
+  const range = trimText(vars.popular_range);
+  return POPULAR_RANGES.has(range) ? range : DEFAULT_POPULAR_RANGE;
+}
+
+function buildListUrl(listBase, sortOrder, page, timeRange) {
   const url = new URL(listBase);
   url.searchParams.set("s", sortOrder);
+  if (timeRange) url.searchParams.set("t", timeRange);
   url.searchParams.set("p", String(page));
   return url.toString();
 }
@@ -409,6 +424,51 @@ function buildMetadata(document, pageUrl) {
   };
 }
 
+// 标签画册：侧栏每个标签按类型归到 `zerochan/<类型>` 目录下。类型集合与 description.ejs 的
+// TYPE_ORDER 一致，未知类型并入 theme（与 tagTypeOf 的兜底一致），免得目录越长越多。
+// key 用规范名（data-tag，恒为英文）派生：变音符折成基本字母（Töregene → toregene），
+// 撇号直接去掉（Ch’en → chen），其余字符集之外的标点视作分隔换成空格
+// （Fate/Grand Order → fate grand order），再转小写、折叠空白；派生为空或超过 64 字节的跳过。
+// metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本
+// （迁移运行在无 import 的裸 V8 里），改这里要同步改那里。
+const LABEL_TYPES = new Set([
+  "mangaka", "studio", "artist", "series", "movie", "game", "vtuber", "character", "group",
+  "outfit", "theme", "ecchi", "meta", "media", "source-copyright", "source", "artbook",
+]);
+
+function tagLabelType(type) {
+  const value = String(type || "").trim().toLowerCase();
+  return LABEL_TYPES.has(value) ? value : "theme";
+}
+
+function tagLabelKey(name) {
+  const key = String(name || "")
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/['’‘`´]/g, "")
+    .replace(/[^a-z0-9_\-() ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return key && key.length <= 64 ? key : "";
+}
+
+function labelsFromTags(tags) {
+  const labels = [];
+  const seen = new Set();
+  for (const tag of tags || []) {
+    const key = tagLabelKey(tag && tag.tag);
+    if (!key) continue;
+    const category = `zerochan/${tagLabelType(tag.type)}`;
+    // 不同规范名可能派生出同一个 key（Fate/stay night 与 Fate Stay Night），同目录只留一个
+    const id = `${category}\n${key}`;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    labels.push({ key, category, name: trimText(tag.tag) || key });
+  }
+  return labels;
+}
+
 /** 展示名：主标签（角色/作品）+ 画师，跟站点 h1 的构成一致 */
 function pickDisplayName(metadata) {
   const primary = metadata.tags.find((tag) => tag.primary);
@@ -438,6 +498,8 @@ async function processDetailPage(url, quality) {
   const opts = { cookie: true, url: finalUrl, metadata };
   const name = pickDisplayName(metadata);
   if (name) opts.name = name;
+  const labels = labelsFromTags(metadata.tags);
+  if (labels.length > 0) opts.labels = labels;
   await downloadImage(imageUrl, opts);
 }
 
@@ -476,19 +538,21 @@ export async function crawl(common, custom) {
   if (mode !== "all" && mode !== "tag" && mode !== "search") {
     throw new Error(`未知的爬取模式: ${mode}`);
   }
+  if (!SORT_LABELS[sortOrder]) throw new Error(`未知的排序: ${sortOrder}`);
+  const timeRange = popularRangeOf(mode, sortOrder, vars);
   validatePageRange(startPage, endPage);
   const keyword = resolveKeyword(mode, vars);
 
   applyRequestHeaders();
   console.log(
-    `[zerochan] 开始：模式=${mode}${keyword ? `(${keyword})` : ""} 排序=${sortOrder === "fav" ? "人气" : "最新"} 第 ${startPage}~${endPage} 页`,
+    `[zerochan] 开始：模式=${mode}${keyword ? `(${keyword})` : ""} 排序=${SORT_LABELS[sortOrder]}${timeRange ? `(t=${timeRange})` : ""} 第 ${startPage}~${endPage} 页`,
   );
 
   const listBase = await resolveListBase(baseUrl, mode, keyword);
   const totalPages = endPage - startPage + 1;
   const pageProgress = 99.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
-    const listUrl = buildListUrl(listBase, sortOrder, page);
+    const listUrl = buildListUrl(listBase, sortOrder, page, timeRange);
     console.log(`[zerochan] 打开列表页 ${page}/${endPage}: ${listUrl}`);
     const { finalUrl, document } = await fetchDocument(listUrl);
     const hrefs = collectPostHrefs(document, finalUrl);

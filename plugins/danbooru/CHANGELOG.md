@@ -1,5 +1,11 @@
 # Danbooru 更新日志
 
+## 1.2.0
+
+- 新增「分级过滤」配置（全年龄 General / 敏感 Sensitive / 存疑 Questionable / 限制级 Explicit），只在源站选全站 `danbooru.donmai.us` 时显示——`donmai.moe` 只有全年龄内容。全部和标签模式把 `rating:` 元标签拼进搜索串，它不占「每次最多 2 个标签」的名额；人气榜模式由插件按每张图的分级筛选，某一页筛空时继续翻下一页。
+- 画廊插件扩展新增按 **分级 rating** 筛选，按 General / Sensitive / Questionable / Explicit 分组。
+- 移除「标签列表」爬取模式及其推荐配置，只保留标签、人气榜和全部三种模式。按标签抓图请用「标签」模式。之前保存的标签列表运行配置会报「未知的爬取模式」，需要改成其他模式。
+
 ## 1.1.0
 
 - 全年龄源站由 `safebooru.donmai.us` 换成 `donmai.moe`，并设为默认源站（与 konachan 一致，默认只爬全年龄内容）；

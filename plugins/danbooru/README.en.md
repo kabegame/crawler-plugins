@@ -9,7 +9,6 @@ Labels section by category (`danbooru/<category>`), so you can browse them on th
 - **Tags** — tag search via `/posts?tags=...`, the common case
 - **Popular** — daily / weekly / monthly ranking via `/explore/posts/popular`
 - **All** — newest posts site-wide via `/posts`
-- **Tag list** — browse `/tags` by a name pattern first, then crawl posts for each matched tag
 
 ## Options
 
@@ -18,10 +17,7 @@ Labels section by category (`danbooru/<category>`), so you can browse them on th
 - **Popular scale** — day / week / month
 - **Start page / End page** — at most 100 pages per run
 - **Posts per page** — 20 / 50 / 100 / 200
-- **Tag pattern** — name pattern for the tag list mode, `*` is a wildcard (e.g. `*genshin*`)
-- **Tag category** — Any / General / Artist / Copyright / Character / Meta
-- **Tag order** — Count / Name / Date
-- **Skip tag count / Tag count / Pages per tag** — breadth and depth of the tag list mode
+- **Rating filter** — Any / General / Sensitive / Questionable / Explicit, shown only for the full site. All and tags modes add a metatag such as `rating:g` to the search string, which does **not** count toward the 2-tag limit; popular mode filters each post by its rating inside the plugin
 - **Quality**
   - **High** — the original file (some posts are tens of MB)
   - **Medium** — the site's resized sample; video posts have no sample and fall back to the original
@@ -39,7 +35,7 @@ Every image carries metadata parsed from its post page, rendered in the detail s
 - `commentary` — the artist's original commentary title and body
 
 The plugin also registers PathQL providers, so the gallery can filter downloaded images by
-**score / favorites**: the list offers "at least N" buckets (`5+`, `10+` … `1000+`), and a path segment also
+**score / favorites / rating** (rating is grouped as General / Sensitive / Questionable / Explicit); for score and favorites the list offers "at least N" buckets (`5+`, `10+` … `1000+`), and a path segment also
 accepts ranges such as `100-500`, `100+` or `-50` (both ends inclusive).
 
 ## Notes

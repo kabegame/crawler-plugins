@@ -10,6 +10,13 @@ This plugin fetches anime wallpapers from `konachan.net` and adds them to the do
   - **High**: Prefer high-resolution images; falls back to medium if not available.
   - **Medium**: Medium quality (default).
 
+## Ranking mode (popular)
+
+- **Ranking type (popular_scale)**: Daily / Weekly / Monthly follow calendar periods; Last 24 hours / week / month / year are rolling windows up to now
+- **Ranking date (popular_date)**: daily, weekly and monthly rankings can look back to a given date; empty = current period
+- **Periods (popular_periods)**: how many consecutive periods to crawl going back from that date, at most 100 per run. Each period on the site is a single page of at most 40 posts
+- **Rating filter** is applied by the plugin per post in this mode (ranking pages take no search parameters). konachan.net only shows all-ages posts, so the same period usually has fewer posts there than on konachan.com
+
 ## Usage
 
 1. Set the page range (start to end).
