@@ -1,0 +1,136 @@
+<%
+  // 还原 wallhaven 详情页左侧栏：分辨率 / 来源 / 配色条 / TAGS / PROPERTIES。
+  // 站点只有暗色主题，配色照抄 wh-core.css；数据来自 src/index.ts 的 buildMetadata（schema 1）。
+  const m = metadata || {};
+  const BASE = 'https://wallhaven.cc';
+  const up = m.uploader || null;
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  const colors = Array.isArray(m.colors) ? m.colors : [];
+  const PURITY = { sfw: 'SFW', sketchy: 'Sketchy', nsfw: 'NSFW' };
+  function purityClass(p) {
+    const v = String(p || '').toLowerCase();
+    return PURITY[v] ? v : 'sfw';
+  }
+  // API 只给用户组名；类名对应 wh-core.css 的 .usergroup-N 配色
+  function groupColor(g) {
+    const v = String(g || '').toLowerCase();
+    if (v.indexOf('owner') >= 0) return 'wh-g-owner';
+    if (v.indexOf('admin') >= 0) return 'wh-g-admin';
+    if (v.indexOf('developer') >= 0) return 'wh-g-dev';
+    if (v.indexOf('mod') >= 0) return 'wh-g-mod';
+    if (v.indexOf('banned') >= 0 || v.indexOf('deleted') >= 0) return 'wh-g-banned';
+    return 'wh-g-user';
+  }
+  // created_at 是 UTC 的 "YYYY-MM-DD HH:mm:ss"
+  function toDate(s) {
+    const d = new Date(String(s || '').replace(' ', 'T') + 'Z');
+    return isNaN(d) ? null : d;
+  }
+  function fmtAgo(s) {
+    const d = toDate(s);
+    if (!d) return '';
+    let v = Math.round((Date.now() - d.getTime()) / 1000);
+    const steps = [[60, 'second'], [60, 'minute'], [24, 'hour'], [30, 'day'], [12, 'month'], [Infinity, 'year']];
+    for (let i = 0; i < steps.length; i++) {
+      if (Math.abs(v) < steps[i][0]) return new Intl.RelativeTimeFormat('en', { numeric: 'always' }).format(-v, steps[i][1]);
+      v = Math.round(v / steps[i][0]);
+    }
+    return '';
+  }
+  function fmtSize(n) {
+    if (!(n > 0)) return '';
+    if (n >= 1073741824) return (n / 1073741824).toFixed(1) + ' GiB';
+    if (n >= 1048576) return (n / 1048576).toFixed(1) + ' MiB';
+    if (n >= 1024) return (n / 1024).toFixed(1) + ' KiB';
+    return n + ' B';
+  }
+  // 站点只在非 JPEG 时附格式，如 "13.9 MiB - PNG"
+  const fmt = String(m.file_type || '').split('/')[1] || '';
+  const sizeText = fmtSize(m.file_size) + (fmt && fmt !== 'jpeg' && fmt !== 'jpg' ? ' - ' + fmt.toUpperCase() : '');
+  let sourceHost = '';
+  try { sourceHost = m.source ? new URL(m.source).host : ''; } catch (e) { sourceHost = m.source || ''; }
+  const category = String(m.category || '');
+  const pc = purityClass(m.purity);
+  const createdIso = toDate(m.created_at);
+%>
+<style>
+html,body{margin:0;background:#1b1b1b;}
+.wh{font-family:'Source Sans Pro',Arial,sans-serif;font-size:14px;color:#ddd;background:#1b1b1b;padding:1em 1.5em;text-align:center;text-shadow:0 1px 1px #000;}
+.wh a{color:#0cd;text-decoration:none;cursor:pointer;}
+.wh a:hover{text-decoration:underline;}
+.wh-res{margin:0;font-size:2em;font-weight:400;}
+.wh-source{margin:.4em 0 0;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;}
+.wh-source em{color:#ddd;font-size:.9em;}
+.wh-palette{display:flex;margin:1.5em auto .8em;padding:0;list-style:none;}
+.wh-palette li{flex:1;height:15px;}
+.wh-palette a{display:block;height:100%;}
+.wh-section{margin-top:1em;padding:1em 0;font-size:.9em;border-top:1px solid #292929;text-align:left;}
+.wh-section h2{margin:0 0 1em;font-size:.85em;line-height:1.53em;text-transform:uppercase;color:#85aaaf;}
+.wh-tags{margin:0;padding:0;list-style:none;}
+.wh-tag{position:relative;display:inline-block;margin:0 4px 4px 0;background:#293033;box-shadow:1px 1px 3px rgba(0,0,0,.7);border-radius:8px 0;}
+.wh-tag a{display:inline-block;padding:0 .5em;line-height:2em;border-radius:8px 0;color:inherit;transition:.25s color,.25s background;}
+.wh-tag a:hover{text-decoration:none;}
+.wh-tag.sfw{color:#94db94;}
+.wh-tag.sfw a:hover{color:#9f9;background:#3d5c3d;}
+.wh-tag.sketchy{color:#dbdb94;}
+.wh-tag.sketchy a:hover{color:#ff9;background:#5c5c3d;}
+.wh-tag.nsfw{color:#db9494;}
+.wh-tag.nsfw a:hover{color:#f99;background:#5c3d3d;}
+.wh-props{margin:0;}
+.wh-props dt{float:left;clear:left;width:6em;text-align:right;color:#85aaaf;line-height:2em;}
+.wh-props dd{margin-left:7em;line-height:2em;word-break:break-all;}
+.wh-uploader{line-height:1.3em!important;padding:.35em 0;min-height:32px;}
+.wh-avatar{float:left;width:32px;height:32px;margin-right:.4em;object-fit:cover;}
+.wh-purity.sfw{color:#9f9;}
+.wh-purity.sketchy{color:#ff9;}
+.wh-purity.nsfw{color:#f99;}
+.wh-link{display:block;background:#212121;padding:0 .5em;border-radius:2px;color:#ddd;}
+.wh .wh-g-banned{color:#866767;}
+.wh .wh-g-user{color:#08A6F6;}
+.wh .wh-g-mod{color:#2ab559;font-weight:700;}
+.wh .wh-g-dev{color:#edcb43;font-weight:700;}
+.wh .wh-g-admin{color:#ed6743;font-weight:700;}
+.wh .wh-g-owner{color:#b336ed;font-weight:700;}
+</style>
+<div class="wh">
+  <% if (m.dimension_x && m.dimension_y) { %><h3 class="wh-res"><%= m.dimension_x %> x <%= m.dimension_y %></h3><% } %>
+  <p class="wh-source">
+    <% if (m.source) { %><a href="<%= m.source %>" title="<%= m.source %>" target="_blank" rel="noopener noreferrer"><%= sourceHost %></a><% } else { %><em>source not provided</em><% } %>
+  </p>
+  <% if (colors.length) { %>
+  <ul class="wh-palette">
+    <% colors.forEach(function (c) { %><li style="background-color:<%= c %>"><a href="<%= BASE %>/search?colors=<%= String(c).replace('#', '') %>" target="_blank" rel="noopener noreferrer" title="<%= c %>"></a></li><% }); %>
+  </ul>
+  <% } %>
+
+  <% if (tags.length) { %>
+  <div class="wh-section">
+    <h2>Tags</h2>
+    <ul class="wh-tags">
+      <% tags.forEach(function (t) { %><li class="wh-tag <%= purityClass(t.purity) %>"><a href="<%= BASE %>/tag/<%= t.id %>" target="_blank" rel="noopener noreferrer" title="<%= t.category %><%= t.alias ? ' · ' + t.alias : '' %>"><%= t.name %></a></li><% }); %>
+    </ul>
+  </div>
+  <% } %>
+
+  <div class="wh-section">
+    <h2>Properties</h2>
+    <dl class="wh-props">
+      <% if (up && up.username) { %>
+      <dt>Uploader</dt>
+      <dd class="wh-uploader">
+        <% if (up.avatar) { %><a href="<%= BASE %>/user/<%= up.username %>" target="_blank" rel="noopener noreferrer"><img class="wh-avatar" src="<%= up.avatar %>" alt="" referrerpolicy="no-referrer"></a><% } %>
+        <a class="<%= groupColor(up.group) %>" href="<%= BASE %>/user/<%= up.username %>" target="_blank" rel="noopener noreferrer" title="<%= up.group %>"><%= up.username %></a><br>
+        <% if (createdIso) { %><time title="<%= m.created_at %>" datetime="<%= createdIso.toISOString() %>"><%= fmtAgo(m.created_at) %></time><% } %>
+      </dd>
+      <% } else if (createdIso) { %>
+      <dt>Added</dt><dd><time title="<%= m.created_at %>"><%= fmtAgo(m.created_at) %></time></dd>
+      <% } %>
+      <% if (category) { %><dt>Category</dt><dd><%= category.charAt(0).toUpperCase() + category.slice(1) %></dd><% } %>
+      <dt>Purity</dt><dd><span class="wh-purity <%= pc %>"><%= PURITY[pc] %></span></dd>
+      <% if (sizeText) { %><dt>Size</dt><dd><%= sizeText %></dd><% } %>
+      <dt>Views</dt><dd><%= Number(m.views || 0).toLocaleString('en-US') %></dd>
+      <dt>Favorites</dt><dd><a href="<%= m.url || (BASE + '/w/' + m.id) %>" target="_blank" rel="noopener noreferrer"><%= Number(m.favorites || 0).toLocaleString('en-US') %></a></dd>
+      <% if (m.short_url) { %><dt>Link</dt><dd><a class="wh-link" href="<%= m.short_url %>" target="_blank" rel="noopener noreferrer"><%= m.short_url %></a></dd><% } %>
+    </dl>
+  </div>
+</div>

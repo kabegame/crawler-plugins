@@ -1,0 +1,233 @@
+<%#
+  Kabegame 服务器插件的详情模板（源文件）。构建时 scripts/build-template.ts 把 @@EJS_LIB@@ 换成
+  与宿主同一份的 ejs 浏览器版，输出 templates/description.ejs。
+
+  宿主渲染本模板只得到包装过的 metadata：{ server, source: { pluginId, pluginVersion, surfRecordId }, metadata }。
+  来源插件的 description.ejs 文本与 plugin_data 由爬虫存在本插件的 plugin_data 里，这里在 iframe 内
+  读出后按宿主同样的方式执行：ejs.render(tpl, { metadata, plugin_version })，脚本补 nonce 后依次执行，
+  __bridge 的 getPluginData 换成来源插件的数据、getCache/setCache 按来源插件隔离 key；
+  畅游 / 网页收集的页面快照照宿主的做法放进无脚本的 sandbox iframe。
+%>
+<%
+  const m = metadata && typeof metadata === 'object' ? metadata : {};
+  const source = m.source && typeof m.source === 'object' ? m.source : {};
+  const server = typeof m.server === 'string' ? m.server : '';
+  let host = server;
+  try { host = new URL(server).host; } catch (_) {}
+  const pluginId = typeof source.pluginId === 'string' ? source.pluginId : '';
+  const payload = { server: server, source: source, metadata: m.metadata === undefined ? null : m.metadata };
+  // 防止数据里的 </script>、<script 等片段截断 JSON 块或被宿主的 nonce 正则改写
+  const payloadJson = JSON.stringify(payload)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+%>
+<style>
+  .kbs-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    margin: 0 0 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--anime-border, #e5e7eb);
+    border-radius: 8px;
+    font: 12px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--anime-text-secondary, #6b7280);
+  }
+  .kbs-bar a { color: var(--anime-primary, #3b82f6); text-decoration: none; }
+  .kbs-bar a:hover { text-decoration: underline; }
+  .kbs-bar .kbs-plugin {
+    padding: 0 6px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--anime-primary, #3b82f6) 12%, transparent);
+    color: var(--anime-text-primary, #111827);
+  }
+  .kbs-note { font: 12px/1.6 system-ui, sans-serif; color: var(--anime-text-secondary, #6b7280); }
+  .kbs-raw { font: 12px/1.6 system-ui, sans-serif; word-break: break-all; }
+  .kbs-raw .kbs-key { color: var(--anime-text-secondary, #6b7280); }
+  .kbs-snapshot { display: block; width: 100%; height: 80vh; border: 1px solid var(--anime-border, #e5e7eb); border-radius: 6px; background: #fff; }
+</style>
+<div class="kbs-bar">
+  <span id="kbs-from">From</span>
+  <% if (server) { %><a href="<%= server %>" target="_blank"><%= host %></a><% } %>
+  <% if (pluginId) { %><span class="kbs-plugin"><%= pluginId %></span><% } else if (source.surfRecordId) { %><span class="kbs-plugin">surf</span><% } %>
+</div>
+<div id="kbs-root"></div>
+<script type="application/json" id="kbs-payload"><%- payloadJson %></script>
+<script>
+  (function () {
+    var module = { exports: {} };
+    var exports = module.exports;
+    @@EJS_LIB@@
+    window.__kbsEjs = module.exports;
+  })();
+</script>
+<script>
+  (function () {
+    var NONCE = (document.currentScript && document.currentScript.nonce) || 'kabegame-ejs-bridge';
+    var root = document.getElementById('kbs-root');
+    var payload = JSON.parse(document.getElementById('kbs-payload').textContent || '{}');
+    var source = payload.source || {};
+    var pluginId = typeof source.pluginId === 'string' ? source.pluginId : '';
+    var meta = payload.metadata;
+    var origBridge = window.__bridge;
+
+    var TEXT = {
+      zh: { from: '来自', noTemplate: '服务器上没有该插件的详情模板，以下为原始元数据。', failed: '来源插件的详情模板渲染失败：' },
+      zhtw: { from: '來自', noTemplate: '伺服器上沒有該外掛的詳情模板，以下為原始元資料。', failed: '來源外掛的詳情模板渲染失敗：' },
+      en: { from: 'From', noTemplate: 'The server has no detail template for this plugin; raw metadata below.', failed: 'Failed to render the source plugin template: ' },
+      ja: { from: '取得元', noTemplate: 'サーバーにこのプラグインの詳細テンプレートがないため、元のメタデータを表示します。', failed: '取得元プラグインのテンプレートの描画に失敗しました：' },
+      ko: { from: '출처', noTemplate: '서버에 이 플러그인의 상세 템플릿이 없어 원본 메타데이터를 표시합니다.', failed: '출처 플러그인 템플릿 렌더링 실패: ' },
+    };
+    var text = TEXT.en;
+    if (origBridge && origBridge.getLocale) {
+      origBridge.getLocale().then(function (loc) {
+        text = TEXT[loc] || TEXT[String(loc || '').split('-')[0]] || TEXT.en;
+        var el = document.getElementById('kbs-from');
+        if (el) el.textContent = text.from;
+      }).catch(function () {});
+    }
+
+    // 与宿主 ImagePluginDescriptionPanel 的 isRenderableMetadata 一致
+    function isRenderable(v) {
+      if (v == null) return false;
+      if (Array.isArray(v)) return v.length > 0;
+      if (typeof v === 'object') return Object.keys(v).length > 0;
+      return true;
+    }
+
+    function note(msg) {
+      var p = document.createElement('p');
+      p.className = 'kbs-note';
+      p.textContent = msg;
+      root.appendChild(p);
+    }
+
+    // 与宿主一致：只有畅游（无 plugin id、有 surf 记录）或内建网页收集的快照才按快照展示
+    var isSnapshotSource = (!pluginId && !!source.surfRecordId) || pluginId === 'webpage';
+    if (isSnapshotSource && meta && typeof meta === 'object' && typeof meta.pageHtml === 'string') {
+      var CSP = "default-src 'none'; img-src http: https: data:; media-src http: https: data:; style-src 'unsafe-inline'; font-src data:; form-action 'none'";
+      var frame = document.createElement('iframe');
+      frame.className = 'kbs-snapshot';
+      frame.setAttribute('sandbox', '');
+      frame.setAttribute('referrerpolicy', 'no-referrer');
+      frame.srcdoc = '<meta http-equiv="Content-Security-Policy" content="' + CSP + '">' + meta.pageHtml;
+      root.appendChild(frame);
+      return;
+    }
+    if (!pluginId || !isRenderable(meta)) return;
+
+    // 与宿主「无模板时显示原始 metadata」一致
+    function renderRaw() {
+      if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return;
+      note(text.noTemplate);
+      var box = document.createElement('div');
+      box.className = 'kbs-raw';
+      Object.keys(meta).forEach(function (k) {
+        var v = meta[k];
+        var row = document.createElement('div');
+        var key = document.createElement('span');
+        key.className = 'kbs-key';
+        key.textContent = k + '：';
+        var val = document.createElement('span');
+        val.textContent = v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+        row.appendChild(key);
+        row.appendChild(val);
+        box.appendChild(row);
+      });
+      root.appendChild(box);
+    }
+
+    function findEntry(store) {
+      var servers = (store && store.servers) || {};
+      var own = servers[payload.server] && servers[payload.server].plugins && servers[payload.server].plugins[pluginId];
+      if (own && own.template) return own;
+      // 换过服务器地址时退回任一服务器上同 id 插件中最新的模板
+      var best = own || null;
+      Object.keys(servers).forEach(function (k) {
+        var e = servers[k] && servers[k].plugins && servers[k].plugins[pluginId];
+        if (e && e.template && (!best || !best.template || (e.updatedAt || 0) > (best.updatedAt || 0))) best = e;
+      });
+      return best;
+    }
+
+    // 来源模板看到的 __bridge：plugin_data 是来源插件在服务器上的数据，缓存 key 按来源插件隔离
+    function installBridge(entry) {
+      if (!origBridge) return;
+      var prefix = 'src:' + pluginId + ':';
+      var shim = {};
+      Object.keys(origBridge).forEach(function (k) { shim[k] = origBridge[k]; });
+      shim.getPluginData = function () {
+        return Promise.resolve(JSON.parse(JSON.stringify(entry.data || {})));
+      };
+      shim.getCache = function (key) { return origBridge.getCache(prefix + String(key)); };
+      shim.setCache = function (key, data) { return origBridge.setCache(prefix + String(key), data); };
+      window.__bridge = shim;
+    }
+
+    // 模板 HTML 里的脚本按文档顺序逐个重建执行（外链脚本等加载完再继续），补上 nonce
+    function mount(html) {
+      var tpl = document.createElement('template');
+      tpl.innerHTML = html;
+      root.appendChild(tpl.content);
+      var scripts = Array.prototype.slice.call(root.querySelectorAll('script'));
+      var i = 0;
+      function next() {
+        if (i >= scripts.length) return finish();
+        var old = scripts[i++];
+        var s = document.createElement('script');
+        for (var a = 0; a < old.attributes.length; a++) {
+          var attr = old.attributes[a];
+          if (attr.name !== 'nonce') s.setAttribute(attr.name, attr.value);
+        }
+        s.setAttribute('nonce', NONCE);
+        if (!old.src) s.text = old.textContent;
+        var wait = !!old.src;
+        if (wait) {
+          s.onload = s.onerror = function () { next(); };
+        }
+        old.parentNode.replaceChild(s, old);
+        if (!wait) next();
+      }
+      // 宿主里模板脚本在文档解析期执行；这里已过了那个时机，补发生命周期事件给只监听事件的模板
+      function finish() {
+        document.dispatchEvent(new Event('DOMContentLoaded', { bubbles: true }));
+        if (document.readyState === 'complete') window.dispatchEvent(new Event('load'));
+      }
+      next();
+    }
+
+    function whenParsed(fn) {
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
+      else fn();
+    }
+
+    if (!origBridge || !origBridge.getPluginData || !window.__kbsEjs) return;
+    origBridge.getPluginData().then(function (store) {
+      var entry = findEntry(store);
+      if (!entry || typeof entry.template !== 'string' || !entry.template.trim()) {
+        renderRaw();
+        return;
+      }
+      var html;
+      try {
+        html = window.__kbsEjs.render(
+          entry.template,
+          { metadata: meta, plugin_version: typeof source.pluginVersion === 'number' ? source.pluginVersion : 0 },
+          { rmWhitespace: false },
+        );
+      } catch (e) {
+        note(text.failed + (e && e.message ? e.message : String(e)));
+        renderRaw();
+        return;
+      }
+      installBridge(entry);
+      whenParsed(function () { mount(html); });
+    }).catch(function (e) {
+      note(text.failed + (e && e.message ? e.message : String(e)));
+    });
+  })();
+</script>

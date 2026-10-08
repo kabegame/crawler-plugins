@@ -19,7 +19,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 | --- | --- | --- |
 | 追 Pixiv 画师、榜单或收藏 | [Pixiv](#pixiv) | 排行榜、收藏、画师、关键词一站齐全 |
 | 发掘高质量 AI 插画 | [PixAI](#pixai) | 能按作品、模型、LoRA、标签和作者一路深挖 |
-| 精确收你推的角色或作品 | [anime-pictures](#anime-pictures)、[anihonet](#anihonet-wallpaper)、[2dwallpapers](#2dwallpapers) | 标签、作品分类和站内搜索更直接 |
+| 精确收你推的角色或作品 | [anime-pictures](#anime-pictures)、[anihonet](#anihonet-wallpaper) | 标签、作品分类和站内搜索更直接 |
 | 收原神、崩铁、绝区零等同人图 | [米游社](#米游社)、[Pixiv](#pixiv)、[ziworld](#ziworld) | 社区新图、专业插画和精选壁纸各有所长 |
 | 从小红书保存图片、视频或 Live Photo | [小红书](#小红书怎么选) | 单作品/推荐用轻量版，作者/搜索/收藏用 WebView 版 |
 | 从社区帖子连评论区一起收图 | [小黑盒](#小黑盒)、[米游社](#米游社) | 正文之外还能发现评论区里的隐藏好图 |
@@ -108,6 +108,8 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 [查看插件目录](plugins/anihonet-wallpaper/) · [使用说明](plugins/anihonet-wallpaper/README.md)
 
 #### 2dwallpapers
+
+> ⚠️ **站点已下线，暂停收集。** 2dwallpapers.com 约自 2026 年 4 月起无法访问，新建任务会直接报错；插件保留，已收集的图片继续按插件索引、显示详情。
 
 **适合你，如果：** 你只想围绕某一部动漫或游戏找壁纸，并希望按热度、收藏或新旧程度筛选。
 
@@ -225,6 +227,14 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 它和 WallpapersCraft 都适合通用壁纸，但 Wallspic 更强调专辑、热门排序和设备预设；iPhone、Android、宽屏与 Ultra HD 都有现成入口。
 
 [查看插件目录](plugins/wallspic/) · [使用说明](plugins/wallspic/README.md)
+
+#### wallhaven
+
+**适合你，如果：** 你想跟进 wallhaven 每天新上传的高分辨率壁纸，并且希望每张图都带上标签和来源。
+
+可在插件表单中配置关键词、分类、分级、排序、最低分辨率与比例，也可直接粘贴站点搜索页 URL；URL 中的分页参数会被忽略，实际页码由插件的起止页控制。每张图都会保存原图、标签、上传者、配色和来源等元数据，标签也会写进应用的标签画册。站点 API 每分钟最多 45 次请求，每页大约要 40 秒；中国大陆访问通常需要代理。
+
+[查看插件目录](plugins/wallhaven/) · [使用说明](plugins/wallhaven/README.md)
 
 找不到想要的插件？请提一个issue吧，或者等待将来陆续推出！
 

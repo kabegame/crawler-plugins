@@ -1,0 +1,26 @@
+{
+  "name": "月度排行榜",
+  "name.en": "Toplist (last month)",
+  "name.ja": "月間トップリスト",
+  "name.ko": "월간 순위",
+  "name.zhtw": "月度排行榜",
+  "description": "与站点 Toplist 页一致：综合 + 动漫、SFW，近 1 个月排行，抓前 3 页。",
+  "description.en": "Same as the site's Toplist page: General + Anime, SFW, top of the last month, first 3 pages.",
+  "description.ja": "サイトの Toplist ページと同じ：一般＋アニメ、SFW、直近 1 か月のランキングで最初の 3 ページ。",
+  "description.ko": "사이트의 Toplist 페이지와 같습니다: 일반+애니메이션, SFW, 최근 1개월 순위, 처음 3페이지.",
+  "description.zhtw": "與站點 Toplist 頁一致：綜合 + 動漫、SFW，近 1 個月排行，抓前 3 頁。",
+  "userConfig": {
+    "mode": "search",
+    "q": "",
+    "categories": ["general", "anime"],
+    "purity": ["sfw"],
+    "sorting": "toplist",
+    "order": "desc",
+    "top_range": "1M",
+    "min_resolution": "any",
+    "orientation": [],
+    "ratios": [],
+    "start_page": 1,
+    "end_page": 3
+  }
+}

@@ -4,6 +4,10 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
+## 【4.5.1】
+### Deprecated
+- twodwallpapers（0.2.5）：2dwallpapers.com 已下线（域名无 A 记录、原源站不可达），任务入口直接报错；插件保留，用于已有图片的索引与详情模板。
+
 ## 【4.5.0】
 
 ## 【4.1.0】

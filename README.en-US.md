@@ -127,8 +127,10 @@ This repository contains crawler plugins for the Kabegame image collection syste
 
 ### 6. twodwallpapers
 
+> ⚠️ **Site offline, crawling suspended.** 2dwallpapers.com has been unreachable since around April 2026; new tasks fail immediately. The plugin is kept so already collected images stay indexed and their details still render.
+
 **名称**: 2dwallpapers二次元壁纸  
-**版本**: 0.1.0  
+**版本**: 0.2.5  
 **描述**: 2dwallpapers 壁纸网站爬虫  
 **作者**: Kabegame
 

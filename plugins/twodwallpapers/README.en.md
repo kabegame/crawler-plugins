@@ -1,5 +1,8 @@
 # 2dwallpaper Plugin Guide
 
+> ⚠️ **The site is offline and this plugin no longer crawls.** 2dwallpapers.com has been unreachable since around April 2026 (no DNS record, origin server down), so new tasks fail immediately.
+> The plugin is kept installed so images you already collected stay indexed under it and their detail panel still renders. It will be re-enabled if the site comes back.
+
 Fetches wallpapers from [2dwallpapers.com](https://2dwallpapers.com). A task now only needs a **work**, **start page**, **end page**, and **sort order**.
 
 ## Work

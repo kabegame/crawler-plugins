@@ -1,0 +1,233 @@
+{
+  "name": "kabegame-server",
+  "version": "0.2.0",
+  "private": true,
+  "name.zh": "Kabegame 服务器",
+  "name.en": "Kabegame Server",
+  "name.ja": "Kabegame サーバー",
+  "name.ko": "Kabegame 서버",
+  "name.zhtw": "Kabegame 伺服器",
+  "description": "从其它 Kabegame 的 Web 服务（Web 版或桌面端 Web 服务器）复制图片，连同元数据、标签与帖子地址",
+  "description.zh": "从其它 Kabegame 的 Web 服务（Web 版或桌面端 Web 服务器）复制图片，连同元数据、标签与帖子地址",
+  "description.en": "Copy images from another Kabegame web service (the web edition or a desktop web server), together with their metadata, labels and post URLs",
+  "description.ja": "別の Kabegame の Web サービス（Web 版またはデスクトップの Web サーバー）から、メタデータ・タグ・投稿 URL ごと画像をコピーします",
+  "description.ko": "다른 Kabegame 웹 서비스(웹 버전 또는 데스크톱 웹 서버)에서 메타데이터, 태그, 게시물 URL과 함께 이미지를 복사합니다",
+  "description.zhtw": "從其它 Kabegame 的 Web 服務（Web 版或桌面端 Web 伺服器）複製圖片，連同元資料、標籤與貼文網址",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build && deno run --allow-read --allow-write scripts/build-template.ts"
+  },
+  "kbBaseUrl": "https://demo.kabegame.com",
+  "kbLabels": [
+    {
+      "id": "content.nsfw"
+    },
+    {
+      "id": "content.type.video"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "name": "Mode",
+      "name.zh": "模式",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "Whole gallery: page through every image on the server in the chosen order. Filter: paste a PathQL query.",
+      "descripts.zh": "全站：按所选排序翻页复制服务器上的全部图片。过滤：粘贴 PathQL 查询。",
+      "descripts.ja": "全体：サーバー上の全画像を選んだ順でページ送り。フィルター：PathQL クエリを貼り付けます。",
+      "descripts.ko": "전체: 서버의 모든 이미지를 선택한 순서로 페이지 단위 복사. 필터: PathQL 쿼리를 붙여 넣습니다.",
+      "descripts.zhtw": "全站：依所選排序翻頁複製伺服器上的全部圖片。過濾：貼上 PathQL 查詢。",
+      "default": "site",
+      "options": [
+        {
+          "name": "Whole gallery",
+          "name.zh": "全站",
+          "name.ja": "全体",
+          "name.ko": "전체",
+          "name.zhtw": "全站",
+          "variable": "site"
+        },
+        {
+          "name": "Filter",
+          "name.zh": "过滤",
+          "name.ja": "フィルター",
+          "name.ko": "필터",
+          "name.zhtw": "過濾",
+          "variable": "filter"
+        }
+      ]
+    },
+    {
+      "key": "server_url",
+      "type": "string",
+      "name": "Server URL",
+      "name.zh": "服务器地址",
+      "name.ja": "サーバー URL",
+      "name.ko": "서버 주소",
+      "name.zhtw": "伺服器位址",
+      "descripts": "Root URL of a Kabegame web service, e.g. https://demo.kabegame.com or http://127.0.0.1:7490 (desktop web server).",
+      "descripts.zh": "Kabegame Web 服务的根地址，例如 https://demo.kabegame.com，或桌面端 Web 服务器 http://127.0.0.1:7490。",
+      "descripts.ja": "Kabegame Web サービスのルート URL。例：https://demo.kabegame.com、またはデスクトップの Web サーバー http://127.0.0.1:7490。",
+      "descripts.ko": "Kabegame 웹 서비스의 루트 주소입니다. 예: https://demo.kabegame.com 또는 데스크톱 웹 서버 http://127.0.0.1:7490.",
+      "descripts.zhtw": "Kabegame Web 服務的根位址，例如 https://demo.kabegame.com，或桌面端 Web 伺服器 http://127.0.0.1:7490。",
+      "default": "https://demo.kabegame.com"
+    },
+    {
+      "key": "pathql",
+      "type": "string",
+      "name": "PathQL query",
+      "name.zh": "PathQL 查询",
+      "name.ja": "PathQL クエリ",
+      "name.ko": "PathQL 쿼리",
+      "name.zhtw": "PathQL 查詢",
+      "descripts": "Copy the Path from the Advanced query dialog on the source server (web edition or the desktop app), e.g. images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1. Its sort order is kept; the trailing page number is replaced by the pages below.",
+      "descripts.zh": "在源服务器（Web 版或桌面端）的「高级查询」弹窗里复制「路径」，例如 images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。保留其中的排序，末尾页码换成下面的分页。",
+      "descripts.ja": "取得元サーバー（Web 版またはデスクトップ）の「高度な検索」ダイアログで「パス」をコピーします。例：images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。並び順はそのまま使い、末尾のページ番号は下のページ設定に置き換えます。",
+      "descripts.ko": "원본 서버(웹 버전 또는 데스크톱)의 「고급 검색」 대화상자에서 「경로」를 복사합니다. 예: images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1. 정렬은 그대로 쓰고 끝의 페이지 번호는 아래 페이지 설정으로 바꿉니다.",
+      "descripts.zhtw": "在來源伺服器（Web 版或桌面端）的「進階查詢」對話框裡複製「路徑」，例如 images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。保留其中的排序，末尾頁碼換成下面的分頁。",
+      "default": "",
+      "when": {
+        "mode": [
+          "filter"
+        ]
+      }
+    },
+    {
+      "key": "sort",
+      "type": "options",
+      "name": "Sort",
+      "name.zh": "排序",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "Random (default): a fresh shuffle on every run, stable across the pages of one run. Time: newest first. ID ascending: oldest image id first.",
+      "descripts.zh": "随机（默认）：每次运行重新打乱，同一次运行的各页之间不重复。时间：最新在前。ID 升序：按图片 id 从小到大。",
+      "descripts.ja": "ランダム（既定）：実行ごとにシャッフルし、同じ実行内のページ間では重複しません。時間：新しい順。ID 昇順：画像 id の小さい順。",
+      "descripts.ko": "무작위(기본): 실행할 때마다 새로 섞으며 한 번의 실행 안에서는 페이지끼리 겹치지 않습니다. 시간: 최신순. ID 오름차순: 이미지 id 작은 순.",
+      "descripts.zhtw": "隨機（預設）：每次執行重新打亂，同一次執行的各頁之間不重複。時間：最新在前。ID 升冪：依圖片 id 由小到大。",
+      "default": "random",
+      "when": {
+        "mode": [
+          "site"
+        ]
+      },
+      "options": [
+        {
+          "name": "Random",
+          "name.zh": "随机",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "random"
+        },
+        {
+          "name": "Time",
+          "name.zh": "时间",
+          "name.ja": "時間",
+          "name.ko": "시간",
+          "name.zhtw": "時間",
+          "variable": "time"
+        },
+        {
+          "name": "ID ascending",
+          "name.zh": "ID 升序",
+          "name.ja": "ID 昇順",
+          "name.ko": "ID 오름차순",
+          "name.zhtw": "ID 升冪",
+          "variable": "id"
+        }
+      ],
+      "width": 2
+    },
+    {
+      "key": "include_hidden",
+      "type": "boolean",
+      "name": "Include hidden images",
+      "name.zh": "包含隐藏图片",
+      "name.ja": "非表示の画像を含める",
+      "name.ko": "숨긴 이미지 포함",
+      "name.zhtw": "包含隱藏圖片",
+      "descripts": "Off by default: images hidden on the server are skipped and do not take up page slots.",
+      "descripts.zh": "默认关闭：跳过服务器上被隐藏的图片，它们也不占分页名额。",
+      "descripts.ja": "既定はオフ：サーバーで非表示の画像はスキップし、ページの件数にも含めません。",
+      "descripts.ko": "기본값은 꺼짐: 서버에서 숨긴 이미지는 건너뛰며 페이지 개수에도 포함하지 않습니다.",
+      "descripts.zhtw": "預設關閉：略過伺服器上被隱藏的圖片，它們也不佔分頁名額。",
+      "default": false,
+      "width": 2,
+      "when": {
+        "mode": [
+          "site"
+        ]
+      }
+    },
+    {
+      "key": "page_size",
+      "type": "int",
+      "name": "Page size",
+      "name.zh": "每页数量",
+      "name.ja": "1 ページの件数",
+      "name.ko": "페이지당 개수",
+      "name.zhtw": "每頁數量",
+      "descripts": "Images per page, at most 100.",
+      "descripts.zh": "每页图片数，最多 100。",
+      "descripts.ja": "1 ページあたりの画像数。最大 100。",
+      "descripts.ko": "페이지당 이미지 수입니다. 최대 100.",
+      "descripts.zhtw": "每頁圖片數，最多 100。",
+      "default": 20,
+      "min": 1,
+      "max": 100,
+      "width": 2
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "Start page",
+      "name.zh": "起始页",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "default": 1,
+      "min": 1,
+      "width": 1
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "End page",
+      "name.zh": "结束页",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "At most 10 pages per run (end − start + 1 ≤ 10), otherwise the task is refused; pages past the last one on the server are skipped.",
+      "descripts.zh": "一次最多 10 页（结束页 − 起始页 + 1 ≤ 10），超过则拒绝执行；超过服务器最后一页的部分会被跳过。",
+      "descripts.ja": "1 回の実行で最大 10 ページ（終了 − 開始 + 1 ≤ 10）。超えると実行を拒否します。サーバーの最終ページを超える分はスキップします。",
+      "descripts.ko": "한 번에 최대 10페이지(끝 − 시작 + 1 ≤ 10)이며, 넘으면 실행을 거부합니다. 서버의 마지막 페이지를 넘는 부분은 건너뜁니다.",
+      "descripts.zhtw": "一次最多 10 頁（結束頁 − 起始頁 + 1 ≤ 10），超過則拒絕執行；超過伺服器最後一頁的部分會被略過。",
+      "default": 1,
+      "min": 1,
+      "width": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md",
+    "en": "README.en.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

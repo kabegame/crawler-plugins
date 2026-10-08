@@ -1,0 +1,617 @@
+{
+  "name": "wallhaven",
+  "version": "0.3.0",
+  "private": true,
+  "name.zh": "wallhaven",
+  "name.en": "wallhaven",
+  "name.ja": "wallhaven",
+  "name.ko": "wallhaven",
+  "name.zhtw": "wallhaven",
+  "description": "wallhaven.cc 壁纸站收集源插件",
+  "description.zh": "wallhaven.cc 壁纸站收集源插件",
+  "description.en": "Crawler plugin for the wallhaven.cc wallpaper site",
+  "description.ja": "壁紙サイト wallhaven.cc の収集プラグイン",
+  "description.ko": "배경화면 사이트 wallhaven.cc 수집 플러그인",
+  "description.zhtw": "wallhaven.cc 桌布站收集源外掛",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.3.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://wallhaven.cc",
+  "kbLabels": [
+    {
+      "id": "auth.needProxy"
+    },
+    {
+      "id": "content.res.desktop"
+    },
+    {
+      "id": "content.nsfw"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "name": "Mode",
+      "name.zh": "模式",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "Search filters: configure each condition in the form. Search URL: paste a search page URL configured on the site.",
+      "descripts.zh": "搜索条件：在表单中逐项配置。搜索 URL：粘贴在站点上设置好的搜索页地址。",
+      "descripts.ja": "検索条件：フォームで各条件を設定します。検索 URL：サイトで設定した検索ページの URL を貼り付けます。",
+      "descripts.ko": "검색 조건: 폼에서 각 조건을 설정합니다. 검색 URL: 사이트에서 설정한 검색 페이지 URL을 붙여 넣습니다.",
+      "descripts.zhtw": "搜尋條件：在表單中逐項設定。搜尋 URL：貼上在站點設定好的搜尋頁網址。",
+      "default": "search",
+      "options": [
+        {
+          "name": "Search filters",
+          "name.zh": "搜索条件",
+          "name.ja": "検索条件",
+          "name.ko": "검색 조건",
+          "name.zhtw": "搜尋條件",
+          "variable": "search"
+        },
+        {
+          "name": "Search URL",
+          "name.zh": "搜索 URL",
+          "name.ja": "検索 URL",
+          "name.ko": "검색 URL",
+          "name.zhtw": "搜尋 URL",
+          "variable": "url"
+        }
+      ]
+    },
+    {
+      "key": "search_url",
+      "type": "string",
+      "name": "Search URL",
+      "name.zh": "搜索 URL",
+      "name.ja": "検索 URL",
+      "name.ko": "검색 URL",
+      "name.zhtw": "搜尋 URL",
+      "descripts": "Set filters and sorting on https://wallhaven.cc/search, then paste the address bar URL here. The page parameter in the URL is ignored; pages follow the start/end page settings below.",
+      "descripts.zh": "在 https://wallhaven.cc/search 设置好筛选与排序后，把地址栏的 URL 粘贴到这里；URL 中的 page 参数会被忽略，页码以下方起止页为准。",
+      "descripts.ja": "https://wallhaven.cc/search で絞り込みと並び順を設定し、アドレスバーの URL を貼り付けてください。URL の page パラメータは無視され、ページは下の開始/終了ページに従います。",
+      "descripts.ko": "https://wallhaven.cc/search 에서 필터와 정렬을 설정한 뒤 주소창의 URL을 붙여 넣으세요. URL의 page 매개변수는 무시되며 페이지는 아래 시작/끝 페이지를 따릅니다.",
+      "descripts.zhtw": "在 https://wallhaven.cc/search 設定好篩選與排序後，把網址列的 URL 貼到這裡；URL 中的 page 參數會被忽略，頁碼以下方起止頁為準。",
+      "default": "",
+      "when": {
+        "mode": [
+          "url"
+        ]
+      }
+    },
+    {
+      "key": "q",
+      "type": "string",
+      "name": "Keyword",
+      "name.zh": "关键词",
+      "name.ja": "キーワード",
+      "name.ko": "키워드",
+      "name.zhtw": "關鍵字",
+      "descripts": "Same as the site search box. Keywords are fuzzy-matched against tag names and tag aliases, and +tag only requires a match in that fuzzy sense (e.g. +anime also hits the \"car\" tag, whose aliases include \"Anime Cars\"). For an exact tag use id:<tag id> (open the tag on the site; the number in /tag/<id>, e.g. anime is id:1); it cannot be combined with other keywords. Also supports -tag (exclude), @username, type:png, like:<wallpaper id>. Leave empty to list everything.",
+      "descripts.zh": "与站点搜索框相同。关键词按标签名和标签别名模糊匹配，+标签也只是在这个范围内「必须命中」（例如 +anime 也会搜到 car 标签的图，因为它的别名里有「Anime Cars」）。要精确按标签搜请用 id:<标签 ID>（站点上打开标签页，地址 /tag/<ID> 里的数字，如 anime 是 id:1），不能与其他关键词组合。另支持 -标签（排除）、@用户名、type:png、like:<壁纸 ID>。留空则不按关键词筛选。",
+      "descripts.ja": "サイトの検索欄と同じです。キーワードはタグ名とタグの別名にあいまい一致し、+タグもその範囲での「必須」にすぎません（例：+anime は別名に「Anime Cars」を持つ car タグの画像にも一致します）。タグを厳密に指定するには id:<タグ ID>（サイトでタグを開いたときの /tag/<ID> の数字。anime は id:1）を使い、他のキーワードとは組み合わせられません。-タグ（除外）、@ユーザー名、type:png、like:<壁紙 ID> にも対応します。空欄ならキーワードで絞り込みません。",
+      "descripts.ko": "사이트 검색창과 같습니다. 키워드는 태그 이름과 태그 별칭에 모호하게 일치하며, +태그도 그 범위 안에서의 \"필수\"일 뿐입니다(예: +anime은 별칭에 \"Anime Cars\"가 있는 car 태그 이미지도 찾습니다). 태그를 정확히 지정하려면 id:<태그 ID>(사이트에서 태그를 열었을 때 /tag/<ID>의 숫자, anime은 id:1)를 쓰며 다른 키워드와 함께 쓸 수 없습니다. -태그(제외), @사용자명, type:png, like:<배경화면 ID>도 지원합니다. 비워 두면 키워드로 거르지 않습니다.",
+      "descripts.zhtw": "與站點搜尋框相同。關鍵字依標籤名稱和標籤別名模糊比對，+標籤也只是在這個範圍內「必須命中」（例如 +anime 也會搜到 car 標籤的圖，因為它的別名裡有「Anime Cars」）。要精確依標籤搜尋請用 id:<標籤 ID>（在站點打開標籤頁，網址 /tag/<ID> 裡的數字，如 anime 是 id:1），不能與其他關鍵字組合。另支援 -標籤（排除）、@使用者名稱、type:png、like:<桌布 ID>。留空則不依關鍵字篩選。",
+      "default": "",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "categories",
+      "type": "checkbox",
+      "name": "Categories",
+      "name.zh": "分类",
+      "name.ja": "カテゴリ",
+      "name.ko": "카테고리",
+      "name.zhtw": "分類",
+      "descripts": "Leave all unchecked to search every category (the API default).",
+      "descripts.zh": "全不勾选时按全部分类搜索（与 API 行为一致）。",
+      "descripts.ja": "すべて未選択の場合は全カテゴリで検索します（API と同じ挙動）。",
+      "descripts.ko": "모두 선택하지 않으면 전체 카테고리로 검색합니다(API 동작과 동일).",
+      "descripts.zhtw": "全不勾選時依全部分類搜尋（與 API 行為一致）。",
+      "default": [
+        "general",
+        "anime"
+      ],
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "General",
+          "name.zh": "综合",
+          "name.ja": "一般",
+          "name.ko": "일반",
+          "name.zhtw": "綜合",
+          "variable": "general"
+        },
+        {
+          "name": "Anime",
+          "name.zh": "动漫",
+          "name.ja": "アニメ",
+          "name.ko": "애니메이션",
+          "name.zhtw": "動漫",
+          "variable": "anime"
+        },
+        {
+          "name": "People",
+          "name.zh": "人物",
+          "name.ja": "人物",
+          "name.ko": "인물",
+          "name.zhtw": "人物",
+          "variable": "people"
+        }
+      ]
+    },
+    {
+      "key": "purity",
+      "type": "checkbox",
+      "name": "Purity",
+      "name.zh": "分级",
+      "name.ja": "レーティング",
+      "name.ko": "등급",
+      "name.zhtw": "分級",
+      "descripts": "NSFW needs a logged-in API key and is not offered. Leaving both unchecked falls back to SFW (the site does the same).",
+      "descripts.zh": "NSFW 需要登录后的 API key，暂不提供。两项都不勾选时，站点会退回只搜 SFW，插件与之一致。",
+      "descripts.ja": "NSFW はログイン済みの API キーが必要なため未対応です。両方とも未選択の場合、サイトは SFW のみの検索に戻り、プラグインも同じ動作になります。",
+      "descripts.ko": "NSFW는 로그인한 API 키가 필요해 제공하지 않습니다. 둘 다 선택하지 않으면 사이트는 SFW만 검색하며 플러그인도 같습니다.",
+      "descripts.zhtw": "NSFW 需要登入後的 API key，暫不提供。兩項都不勾選時，站點會退回只搜 SFW，外掛與之一致。",
+      "default": [
+        "sfw"
+      ],
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "SFW",
+          "name.zh": "SFW",
+          "name.ja": "SFW",
+          "name.ko": "SFW",
+          "name.zhtw": "SFW",
+          "variable": "sfw"
+        },
+        {
+          "name": "Sketchy",
+          "name.zh": "擦边",
+          "name.ja": "きわどい",
+          "name.ko": "선정적",
+          "name.zhtw": "擦邊",
+          "variable": "sketchy"
+        }
+      ]
+    },
+    {
+      "key": "sorting",
+      "type": "options",
+      "name": "Sort by",
+      "name.zh": "排序",
+      "name.ja": "並べ替え",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "Relevance only makes sense with a keyword. Random is kept stable across pages with the seed returned by the site.",
+      "descripts.zh": "「相关度」需要填关键词才有意义；「随机」翻页时沿用站点返回的随机种子，各页不会重复。",
+      "descripts.ja": "「関連度」はキーワードがある場合のみ意味があります。「ランダム」はサイトが返すシードをページ間で引き継ぐため重複しません。",
+      "descripts.ko": "\"관련도\"는 키워드가 있을 때만 의미가 있습니다. \"무작위\"는 사이트가 돌려준 시드를 페이지 간에 이어 써서 중복되지 않습니다.",
+      "descripts.zhtw": "「相關度」需要填關鍵字才有意義；「隨機」翻頁時沿用站點回傳的隨機種子，各頁不會重複。",
+      "default": "date_added",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "Date added",
+          "name.zh": "上传时间",
+          "name.ja": "追加日",
+          "name.ko": "업로드 시간",
+          "name.zhtw": "上傳時間",
+          "variable": "date_added"
+        },
+        {
+          "name": "Relevance",
+          "name.zh": "相关度",
+          "name.ja": "関連度",
+          "name.ko": "관련도",
+          "name.zhtw": "相關度",
+          "variable": "relevance"
+        },
+        {
+          "name": "Random",
+          "name.zh": "随机",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "random"
+        },
+        {
+          "name": "Views",
+          "name.zh": "浏览数",
+          "name.ja": "閲覧数",
+          "name.ko": "조회수",
+          "name.zhtw": "瀏覽數",
+          "variable": "views"
+        },
+        {
+          "name": "Favorites",
+          "name.zh": "收藏数",
+          "name.ja": "お気に入り数",
+          "name.ko": "즐겨찾기 수",
+          "name.zhtw": "收藏數",
+          "variable": "favorites"
+        },
+        {
+          "name": "Toplist",
+          "name.zh": "排行榜",
+          "name.ja": "トップリスト",
+          "name.ko": "순위",
+          "name.zhtw": "排行榜",
+          "variable": "toplist"
+        },
+        {
+          "name": "Hot",
+          "name.zh": "热门",
+          "name.ja": "人気",
+          "name.ko": "인기",
+          "name.zhtw": "熱門",
+          "variable": "hot"
+        }
+      ]
+    },
+    {
+      "key": "order",
+      "type": "options",
+      "name": "Order",
+      "name.zh": "顺序",
+      "name.ja": "順序",
+      "name.ko": "순서",
+      "name.zhtw": "順序",
+      "default": "desc",
+      "width": 2,
+      "when": {
+        "mode": [
+          "search"
+        ],
+        "sorting": [
+          "date_added",
+          "relevance",
+          "views",
+          "favorites",
+          "toplist",
+          "hot"
+        ]
+      },
+      "options": [
+        {
+          "name": "Descending",
+          "name.zh": "降序",
+          "name.ja": "降順",
+          "name.ko": "내림차순",
+          "name.zhtw": "降序",
+          "variable": "desc"
+        },
+        {
+          "name": "Ascending",
+          "name.zh": "升序",
+          "name.ja": "昇順",
+          "name.ko": "오름차순",
+          "name.zhtw": "升序",
+          "variable": "asc"
+        }
+      ]
+    },
+    {
+      "key": "top_range",
+      "type": "options",
+      "name": "Toplist range",
+      "name.zh": "排行范围",
+      "name.ja": "集計期間",
+      "name.ko": "순위 기간",
+      "name.zhtw": "排行範圍",
+      "default": "1M",
+      "width": 2,
+      "when": {
+        "mode": [
+          "search"
+        ],
+        "sorting": [
+          "toplist"
+        ]
+      },
+      "options": [
+        {
+          "name": "Last day",
+          "name.zh": "1 天",
+          "name.ja": "1 日",
+          "name.ko": "1일",
+          "name.zhtw": "1 天",
+          "variable": "1d"
+        },
+        {
+          "name": "Last 3 days",
+          "name.zh": "3 天",
+          "name.ja": "3 日",
+          "name.ko": "3일",
+          "name.zhtw": "3 天",
+          "variable": "3d"
+        },
+        {
+          "name": "Last week",
+          "name.zh": "1 周",
+          "name.ja": "1 週間",
+          "name.ko": "1주",
+          "name.zhtw": "1 週",
+          "variable": "1w"
+        },
+        {
+          "name": "Last month",
+          "name.zh": "1 个月",
+          "name.ja": "1 か月",
+          "name.ko": "1개월",
+          "name.zhtw": "1 個月",
+          "variable": "1M"
+        },
+        {
+          "name": "Last 3 months",
+          "name.zh": "3 个月",
+          "name.ja": "3 か月",
+          "name.ko": "3개월",
+          "name.zhtw": "3 個月",
+          "variable": "3M"
+        },
+        {
+          "name": "Last 6 months",
+          "name.zh": "6 个月",
+          "name.ja": "6 か月",
+          "name.ko": "6개월",
+          "name.zhtw": "6 個月",
+          "variable": "6M"
+        },
+        {
+          "name": "Last year",
+          "name.zh": "1 年",
+          "name.ja": "1 年",
+          "name.ko": "1년",
+          "name.zhtw": "1 年",
+          "variable": "1y"
+        }
+      ]
+    },
+    {
+      "key": "min_resolution",
+      "type": "options",
+      "name": "Minimum resolution",
+      "name.zh": "最低分辨率",
+      "name.ja": "最低解像度",
+      "name.ko": "최소 해상도",
+      "name.zhtw": "最低解析度",
+      "descripts": "Computed from the chosen ratios: 2K is 2560×1440 for landscape, 1440×2560 for portrait and 1440 on the short side for square; 4K is 3840×2160 and so on. With several ratios the smallest bound per side is used; with none, only the short side is checked.",
+      "descripts.zh": "按所选比例自动换算：2K 在横屏为 2560×1440、竖屏为 1440×2560、方形为短边 1440；4K 依此类推为 3840×2160 等。选了多个比例时每条边取最小值；未选比例时只要求短边达标。",
+      "descripts.ja": "選んだ比率から自動計算します。2K は横長で 2560×1440、縦長で 1440×2560、スクエアで短辺 1440。4K も同様に 3840×2160 などです。複数の比率を選ぶと各辺の最小値を使い、比率未選択なら短辺のみを条件にします。",
+      "descripts.ko": "선택한 비율로 자동 계산합니다. 2K는 가로 2560×1440, 세로 1440×2560, 정사각형은 짧은 변 1440이며 4K도 같은 방식으로 3840×2160 등입니다. 비율을 여러 개 고르면 변마다 최솟값을, 고르지 않으면 짧은 변만 따집니다.",
+      "descripts.zhtw": "依所選比例自動換算：2K 在橫向為 2560×1440、直向為 1440×2560、方形為短邊 1440；4K 依此類推為 3840×2160 等。選了多個比例時每條邊取最小值；未選比例時只要求短邊達標。",
+      "default": "any",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "Any",
+          "name.zh": "任意",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "任意",
+          "variable": "any"
+        },
+        {
+          "name": "2K",
+          "name.zh": "2K",
+          "name.ja": "2K",
+          "name.ko": "2K",
+          "name.zhtw": "2K",
+          "variable": "2k"
+        },
+        {
+          "name": "4K",
+          "name.zh": "4K",
+          "name.ja": "4K",
+          "name.ko": "4K",
+          "name.zhtw": "4K",
+          "variable": "4k"
+        }
+      ]
+    },
+    {
+      "key": "orientation",
+      "type": "checkbox",
+      "name": "Aspect",
+      "name.zh": "画面方向",
+      "name.ja": "向き",
+      "name.ko": "화면 방향",
+      "name.zhtw": "畫面方向",
+      "descripts": "Landscape = the site's All Wide (wide + ultrawide), portrait = All Portrait; both also cover ratios outside the table (4:3, 3:4…). Square = 1:1, 3:2, 4:3, 5:4. Combined with square or exact ratios, the site only honours exact ratios, so landscape/portrait then shrink to the table's Wide+Ultrawide / Portrait columns.",
+      "descripts.zh": "横屏即站点的 All Wide（宽 + 超宽），竖屏即 All Portrait，二者也会包含表外比例（4:3、3:4 等）；方形为 1:1、3:2、4:3、5:4。与方形或精确比例同时勾选时，站点只认精确比例，横屏/竖屏会收窄为表中的宽 + 超宽列 / 竖屏列。",
+      "descripts.ja": "横長はサイトの All Wide（ワイド＋ウルトラワイド）、縦長は All Portrait で、表にない比率（4:3、3:4 など）も含みます。スクエアは 1:1・3:2・4:3・5:4。スクエアや個別比率と併用すると、サイトは個別比率しか見ないため、横長/縦長は表のワイド＋ウルトラワイド列 / 縦長列に絞られます。",
+      "descripts.ko": "가로는 사이트의 All Wide(와이드+울트라와이드), 세로는 All Portrait이며 표에 없는 비율(4:3, 3:4 등)도 포함합니다. 정사각형은 1:1, 3:2, 4:3, 5:4입니다. 정사각형이나 정확한 비율과 함께 고르면 사이트가 정확한 비율만 인식하므로 가로/세로는 표의 와이드+울트라와이드 열 / 세로 열로 좁혀집니다.",
+      "descripts.zhtw": "橫向即站點的 All Wide（寬 + 超寬），直向即 All Portrait，二者也會包含表外比例（4:3、3:4 等）；方形為 1:1、3:2、4:3、5:4。與方形或精確比例同時勾選時，站點只認精確比例，橫向/直向會收窄為表中的寬 + 超寬欄 / 直向欄。",
+      "default": [],
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "Landscape",
+          "name.zh": "横屏",
+          "name.ja": "横長",
+          "name.ko": "가로",
+          "name.zhtw": "橫向",
+          "variable": "landscape"
+        },
+        {
+          "name": "Portrait",
+          "name.zh": "竖屏",
+          "name.ja": "縦長",
+          "name.ko": "세로",
+          "name.zhtw": "直向",
+          "variable": "portrait"
+        },
+        {
+          "name": "Square",
+          "name.zh": "方形",
+          "name.ja": "スクエア",
+          "name.ko": "정사각형",
+          "name.zhtw": "方形",
+          "variable": "square"
+        }
+      ]
+    },
+    {
+      "key": "ratios",
+      "type": "checkbox",
+      "name": "Exact ratios",
+      "name.zh": "精确比例",
+      "name.ja": "個別の比率",
+      "name.ko": "정확한 비율",
+      "name.zhtw": "精確比例",
+      "descripts": "The site's ratio table; merged with the aspect choices above.",
+      "descripts.zh": "站点比例表中的原始选项，与上面的画面方向取并集。",
+      "descripts.ja": "サイトの比率表そのままの選択肢で、上の向きと合算されます。",
+      "descripts.ko": "사이트 비율 표의 원래 항목이며 위의 화면 방향과 합쳐집니다.",
+      "descripts.zhtw": "站點比例表中的原始選項，與上面的畫面方向取聯集。",
+      "default": [],
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "options": [
+        {
+          "name": "16 × 9",
+          "variable": "16x9"
+        },
+        {
+          "name": "16 × 10",
+          "variable": "16x10"
+        },
+        {
+          "name": "21 × 9",
+          "variable": "21x9"
+        },
+        {
+          "name": "32 × 9",
+          "variable": "32x9"
+        },
+        {
+          "name": "48 × 9",
+          "variable": "48x9"
+        },
+        {
+          "name": "9 × 16",
+          "variable": "9x16"
+        },
+        {
+          "name": "10 × 16",
+          "variable": "10x16"
+        },
+        {
+          "name": "9 × 18",
+          "variable": "9x18"
+        },
+        {
+          "name": "1 × 1",
+          "variable": "1x1"
+        },
+        {
+          "name": "3 × 2",
+          "variable": "3x2"
+        },
+        {
+          "name": "4 × 3",
+          "variable": "4x3"
+        },
+        {
+          "name": "5 × 4",
+          "variable": "5x4"
+        }
+      ]
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "Start page",
+      "name.zh": "起始页",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁",
+      "descripts": "First page to crawl (24 wallpapers per page).",
+      "descripts.zh": "从第几页开始抓取（每页 24 张）。",
+      "descripts.ja": "何ページ目から取得するか（1 ページ 24 枚）。",
+      "descripts.ko": "몇 번째 페이지부터 수집할지(페이지당 24장).",
+      "descripts.zhtw": "從第幾頁開始抓取（每頁 24 張）。",
+      "default": 1,
+      "width": 2,
+      "min": 1
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "End page",
+      "name.zh": "结束页",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁",
+      "descripts": "Last page to crawl; capped by the site's page count.",
+      "descripts.zh": "抓到第几页为止，超过站点总页数时自动截断。",
+      "descripts.ja": "何ページ目まで取得するか。サイトの総ページ数を超える場合は切り詰めます。",
+      "descripts.ko": "몇 번째 페이지까지 수집할지. 사이트 전체 페이지 수를 넘으면 잘라냅니다.",
+      "descripts.zhtw": "抓到第幾頁為止，超過站點總頁數時自動截斷。",
+      "default": 1,
+      "width": 2,
+      "min": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  },
+  "kbRecommendedConfigs": [
+    "configs/latest.json",
+    "configs/toplist.json"
+  ]
+}

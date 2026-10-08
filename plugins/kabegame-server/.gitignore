@@ -1,0 +1,4 @@
+dist/*
+*.map
+# 由 scripts/build-template.ts 从 description.src.ejs 生成（内嵌 ejs 浏览器版）
+templates/description.ejs

@@ -1,0 +1,25 @@
+{
+  "name": "最新",
+  "name.en": "Latest",
+  "name.ja": "新着",
+  "name.ko": "최신",
+  "name.zhtw": "最新",
+  "description": "与站点 Latest 页一致：综合 + 动漫、SFW，按上传时间从新到旧，抓前 3 页。",
+  "description.en": "Same as the site's Latest page: General + Anime, SFW, newest uploads first, first 3 pages.",
+  "description.ja": "サイトの Latest ページと同じ：一般＋アニメ、SFW、アップロードの新しい順で最初の 3 ページ。",
+  "description.ko": "사이트의 Latest 페이지와 같습니다: 일반+애니메이션, SFW, 업로드 최신순, 처음 3페이지.",
+  "description.zhtw": "與站點 Latest 頁一致：綜合 + 動漫、SFW，依上傳時間由新到舊，抓前 3 頁。",
+  "userConfig": {
+    "mode": "search",
+    "q": "",
+    "categories": ["general", "anime"],
+    "purity": ["sfw"],
+    "sorting": "date_added",
+    "order": "desc",
+    "min_resolution": "any",
+    "orientation": [],
+    "ratios": [],
+    "start_page": 1,
+    "end_page": 3
+  }
+}

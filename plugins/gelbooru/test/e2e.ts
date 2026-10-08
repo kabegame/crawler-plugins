@@ -53,6 +53,19 @@ await defineCases("gelbooru", [
     expect: expectFiles({ total: 42 }),
   },
   {
+    // 全部 + 排序：搜索串只能是 sort:…，不能和占位的 all 并列（all 会被当成真实标签，结果为 0）。
+    name: "all-sort-updated",
+    vars: {
+      crawl_mode: "all",
+      sort_order: "sort:updated:desc",
+      start_page: 1,
+      end_page: 1,
+      quality: "medium",
+    },
+    timeout: 1200,
+    expect: expectFiles({ minTotal: 30 }),
+  },
+  {
     // sort: 元标签拼进搜索串，验证排序选项真的改了结果集。
     // 高分榜里混着视频帖（要走 FFmpeg 转兼容副本），慢且偶有失败，所以只断言下限。
     name: "tags-sort-score",

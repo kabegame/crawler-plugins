@@ -5,6 +5,12 @@ const { addProgress, currentHtml, downloadImage, to, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://2dwallpapers.com";
 
+// 站点已下线（约 2026-04 起）：域名仍在注册但无 A 记录，原源站 45.154.14.62 全球不可达。
+// 在 crawl 入口直接报错，避免用户看到含义不明的 TLS/连接错误；站点恢复后删掉这一段即可。
+const SITE_OFFLINE_MESSAGE =
+  "2dwallpapers.com 已下线（域名无解析、原源站不可达），本插件暂停使用。" +
+  " / 2dwallpapers.com is offline (no DNS record, origin unreachable); this plugin is suspended.";
+
 function coerceStr(value) {
   return value == null ? "" : String(value);
 }
@@ -170,6 +176,8 @@ async function crawlMatchedSubcategory(label, listUrl, startPage, endPage, pctBu
 }
 
 export async function crawl(common, custom) {
+  throw new Error(SITE_OFFLINE_MESSAGE);
+
   const vars = custom || {};
   const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
   const startPage = Number(vars.start_page ?? 1);

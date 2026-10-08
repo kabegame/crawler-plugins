@@ -1986,6 +1986,15 @@
           ]
         }
       },
+      "plugins/kabegame-server": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/kemono": {
         "packageJson": {
           "dependencies": [
@@ -2032,6 +2041,15 @@
         }
       },
       "plugins/twodwallpapers": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/wallhaven": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",

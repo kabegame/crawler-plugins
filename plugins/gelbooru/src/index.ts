@@ -373,8 +373,10 @@ function sortTokenOf(vars) {
   return sort ? [sort] : [];
 }
 
+// tags=all 只是空搜索的占位，和其它 token 并列时会被当成真实标签 all 去搜（结果为 0），
+// 所以这里只放排序 token，空时由 buildPostListUrl 回落到 all
 async function crawlAll(baseUrl, quality, vars) {
-  const tokens = ["all"].concat(sortTokenOf(vars));
+  const tokens = sortTokenOf(vars);
   await crawlListPages(
     (page) => buildPostListUrl(baseUrl, tokens, page),
     quality,
