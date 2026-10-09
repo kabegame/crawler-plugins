@@ -9,6 +9,7 @@ and post pages are structurally identical to the konachan plugin's.
 - **All** — newest posts site-wide (`/post?page=N`)
 - **Tags** — search by a tag combination (`/post?tags=a+b&page=N`)
 - **Ranking** — the site's popular rankings. Daily / Weekly / Monthly (`/post/popular_by_day|week|month`) can look back by date; Last 24 hours / week / month / year (`/post/popular_recent`) are rolling windows with only the current period. Each period is a single page of at most 40 posts
+- **ID range** — search by a post ID range (`/post?tags=id:A..B+order:id&page=N`), crawling the whole range in ascending ID order
 
 ## Options
 
@@ -19,6 +20,7 @@ and post pages are structurally identical to the konachan plugin's.
   i.e. the site's `order:` metatag
 - **Start page / End page** — at most 100 pages per run; **40 posts per page**
 - **Ranking type / Ranking date / Periods** — for ranking mode. An empty date means the current period; periods is how many consecutive periods to crawl going back from that date, at most 100 per run
+- **Start ID / End ID (id_start / id_end)** — for ID range mode: an inclusive post ID range (the number in `/post/show/<id>`), **at most 5000 apart**, otherwise the run is refused. No page numbers needed; missing IDs cost nothing, and deleted posts the site still lists have no image and are skipped with a warning
 - **Quality**
   - **High** — the original-file link behind "View larger version"; falls back automatically
     when a post has no larger version

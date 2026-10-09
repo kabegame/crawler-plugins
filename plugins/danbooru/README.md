@@ -8,6 +8,7 @@
 - **标签（tags）**：按标签组合检索 `/posts?tags=...`，最常用
 - **人气榜（popular）**：日/周/月人气榜 `/explore/posts/popular`
 - **全部（all）**：全站最新作品 `/posts`
+- **id 范围（id_range）**：按作品 id 区间检索 `/posts?tags=id:A..B order:id -status:deleted`，按 id 从小到大抓完整个区间
 
 ## 配置项
 
@@ -17,6 +18,7 @@
 - **起始页面 / 结束页数（start_page / end_page）**：一次最多 100 页
 - **每页条数（per_page）**：20 / 50 / 100 / 200，越大越省翻页
 - **分级过滤（rating）**：不限 / 全年龄(General) / 敏感(Sensitive) / 存疑(Questionable) / 限制级(Explicit)，只在源站选全站时显示。全部和标签模式把 `rating:g` 这样的元标签拼进搜索串，它**不占**「最多 2 个标签」的名额；人气榜模式由插件按每张图的分级筛选
+- **起始 id / 结束 id（id_start / id_end）**：id 范围模式用，作品 id 闭区间（作品页地址 `/posts/<id>` 里的数字），**最多相差 5000**，否则拒绝爬取。不用填页数，已删除的作品在搜索端就排除了；`id:`、`order:`、`status:` 元标签都不占「最多 2 个标签」的名额。每页条数和分级过滤同样适用；源站为 `donmai.moe` 时固定只取全年龄
 - **质量（quality）**：
   - **高（high）**：原图直链（站点上有几十 MB 的超大图，注意磁盘和带宽）
   - **中（medium）**：站点缩放后的 sample；视频帖没有 sample，会自动回落到原文件

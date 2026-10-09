@@ -1,6 +1,6 @@
 {
   "name": "konachan",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
@@ -70,11 +70,11 @@
       "name.ja": "クロールモード",
       "name.ko": "크롤 모드",
       "name.zhtw": "爬取模式",
-      "descripts": "爬取模式，分为全部、标签和排行榜",
-      "descripts.en": "Crawl mode, divided into all, tags and ranking",
-      "descripts.ja": "クロールモード、全部・タグ・ランキングに分かれています",
-      "descripts.ko": "크롤 모드, 전체·태그·랭킹으로 나뉩니다",
-      "descripts.zhtw": "爬取模式，分為全部、標籤和排行榜",
+      "descripts": "爬取模式，分为全部、标签、排行榜和 id 范围",
+      "descripts.en": "Crawl mode: all, tags, ranking or ID range",
+      "descripts.ja": "クロールモード、全部・タグ・ランキング・ID 範囲に分かれています",
+      "descripts.ko": "크롤 모드, 전체·태그·랭킹·ID 범위로 나뉩니다",
+      "descripts.zhtw": "爬取模式，分為全部、標籤、排行榜和 id 範圍",
       "default": "all",
       "options": [
         {
@@ -100,6 +100,14 @@
           "name.ko": "랭킹",
           "name.zhtw": "排行榜",
           "variable": "popular"
+        },
+        {
+          "name": "id 范围",
+          "name.en": "ID range",
+          "name.ja": "ID 範囲",
+          "name.ko": "ID 범위",
+          "name.zhtw": "id 範圍",
+          "variable": "id_range"
         }
       ]
     },
@@ -111,11 +119,11 @@
       "name.ja": "レーティング絞り込み",
       "name.ko": "등급 필터",
       "name.zhtw": "分級過濾",
-      "descripts": "按站点分级过滤。全部和标签模式把 rating: 元标签拼进搜索串，排行榜模式在插件里按每张图的分级筛选。只有 R18 站（konachan.com）有存疑与限制级内容",
-      "descripts.en": "Filter by site rating. All and tags modes add the rating: metatag to the search string; ranking mode filters each post by its rating inside the plugin. Only the R18 site (konachan.com) has Questionable and Explicit content",
-      "descripts.ja": "サイトのレーティングで絞り込みます。全部・タグモードは rating: メタタグを検索文字列に付加し、ランキングモードはプラグイン内で各作品のレーティングを見て絞り込みます。際どい・露骨なコンテンツは R18 サイト（konachan.com）にのみあります",
-      "descripts.ko": "사이트 등급으로 필터링합니다. 전체·태그 모드는 rating: 메타태그를 검색 문자열에 추가하고, 랭킹 모드는 플러그인 안에서 작품별 등급으로 거릅니다. 애매함·노골적 콘텐츠는 R18 사이트(konachan.com)에만 있습니다",
-      "descripts.zhtw": "依站台分級過濾。全部和標籤模式把 rating: 元標籤拼進搜尋串，排行榜模式在插件裡依每張圖的分級篩選。只有 R18 站（konachan.com）有存疑與限制級內容",
+      "descripts": "按站点分级过滤。全部、标签和 id 范围模式把 rating: 元标签拼进搜索串，排行榜模式在插件里按每张图的分级筛选。只有 R18 站（konachan.com）有存疑与限制级内容",
+      "descripts.en": "Filter by site rating. All, tags and ID range modes add the rating: metatag to the search string; ranking mode filters each post by its rating inside the plugin. Only the R18 site (konachan.com) has Questionable and Explicit content",
+      "descripts.ja": "サイトのレーティングで絞り込みます。全部・タグ・ID 範囲モードは rating: メタタグを検索文字列に付加し、ランキングモードはプラグイン内で各作品のレーティングを見て絞り込みます。際どい・露骨なコンテンツは R18 サイト（konachan.com）にのみあります",
+      "descripts.ko": "사이트 등급으로 필터링합니다. 전체·태그·ID 범위 모드는 rating: 메타태그를 검색 문자열에 추가하고, 랭킹 모드는 플러그인 안에서 작품별 등급으로 거릅니다. 애매함·노골적 콘텐츠는 R18 사이트(konachan.com)에만 있습니다",
+      "descripts.zhtw": "依站台分級過濾。全部、標籤和 id 範圍模式把 rating: 元標籤拼進搜尋串，排行榜模式在插件裡依每張圖的分級篩選。只有 R18 站（konachan.com）有存疑與限制級內容",
       "default": "",
       "options": [
         {
@@ -227,6 +235,52 @@
       "when": {
         "crawl_mode": [
           "tags"
+        ]
+      }
+    },
+    {
+      "key": "id_start",
+      "type": "int",
+      "name": "起始 id",
+      "name.en": "Start ID",
+      "name.ja": "開始 ID",
+      "name.ko": "시작 ID",
+      "name.zhtw": "起始 id",
+      "descripts": "作品 id 下限（含），即作品页地址 /post/show/<id> 里的数字",
+      "descripts.en": "Lowest post ID (inclusive) — the number in the post URL /post/show/<id>",
+      "descripts.ja": "作品 ID の下限（含む）。作品ページ URL /post/show/<id> の数字です",
+      "descripts.ko": "작품 ID 하한(포함). 작품 페이지 주소 /post/show/<id> 의 숫자입니다",
+      "descripts.zhtw": "作品 id 下限（含），即作品頁網址 /post/show/<id> 裡的數字",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "id_end",
+      "type": "int",
+      "name": "结束 id",
+      "name.en": "End ID",
+      "name.ja": "終了 ID",
+      "name.ko": "끝 ID",
+      "name.zhtw": "結束 id",
+      "descripts": "作品 id 上限（含），与起始 id 最多相差 5000，否则拒绝爬取。按 id 从小到大抓取，区间里已删除的作品会跳过",
+      "descripts.en": "Highest post ID (inclusive); at most 5000 above the start ID, otherwise the run is refused. Posts are crawled in ascending ID order; deleted posts in the range are skipped",
+      "descripts.ja": "作品 ID の上限（含む）。開始 ID との差は最大 5000 で、超えると実行を拒否します。ID の昇順で取得し、範囲内の削除済み作品は飛ばします",
+      "descripts.ko": "작품 ID 상한(포함). 시작 ID와의 차이는 최대 5000이며 초과하면 실행을 거부합니다. ID 오름차순으로 수집하고 범위 안의 삭제된 작품은 건너뜁니다",
+      "descripts.zhtw": "作品 id 上限（含），與起始 id 最多相差 5000，否則拒絕爬取。依 id 由小到大抓取，區間裡已刪除的作品會跳過",
+      "default": 1000,
+      "options": null,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "id_range"
         ]
       }
     },

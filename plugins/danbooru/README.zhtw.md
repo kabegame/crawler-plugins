@@ -8,6 +8,7 @@
 - **標籤（tags）**：按標籤組合檢索 `/posts?tags=...`，最常用
 - **人氣榜（popular）**：日/週/月人氣榜 `/explore/posts/popular`
 - **全部（all）**：全站最新作品 `/posts`
+- **id 範圍（id_range）**：依作品 id 區間檢索 `/posts?tags=id:A..B order:id -status:deleted`，依 id 由小到大抓完整個區間
 
 ## 設定項
 
@@ -17,6 +18,7 @@
 - **起始頁面 / 結束頁數（start_page / end_page）**：一次最多 100 頁
 - **每頁條數（per_page）**：20 / 50 / 100 / 200，越大越省翻頁
 - **分級過濾（rating）**：不限 / 全年齡(General) / 敏感(Sensitive) / 存疑(Questionable) / 限制級(Explicit)，只在來源站選全站時顯示。全部和標籤模式把 `rating:g` 這樣的元標籤拼進搜尋串，它**不佔**「最多 2 個標籤」的名額；人氣榜模式由外掛依每張圖的分級篩選
+- **起始 id / 結束 id（id_start / id_end）**：id 範圍模式用，作品 id 閉區間（作品頁網址 `/posts/<id>` 裡的數字），**最多相差 5000**，否則拒絕爬取。不用填頁數，已刪除的作品在搜尋端就排除了；`id:`、`order:`、`status:` 元標籤都不佔「最多 2 個標籤」的名額。每頁條數和分級過濾同樣適用；來源站為 `donmai.moe` 時固定只取全年齡
 - **畫質（quality）**：
   - **高（high）**：原圖直鏈（站點上有數十 MB 的超大圖，注意磁碟與頻寬）
   - **中（medium）**：站點縮放後的 sample；影片貼文沒有 sample，會自動回落到原檔案

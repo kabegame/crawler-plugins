@@ -438,6 +438,75 @@ async function crawlByTags(baseUrl, quality, vars) {
   );
 }
 
+// ---- id 范围 ----
+// id:A..B 元标签按作品 id 闭区间过滤，配 order:id 升序翻页（2026-10 实测 danbooru.donmai.us）。
+// 列表页 HTML 不渲染已删除作品，但计数和服务端分页都算它们，所以搜索串里加 -status:deleted，
+// 让 /counts/posts.json 的总数与页面上实际出现的作品一一对应。id:、order:、status:、rating:
+// 都不占普通账号「最多 2 个标签」的名额。
+const MAX_ID_SPAN = 5000;
+
+function parsePostId(value, label) {
+  const text = trimText(value);
+  const id = /^\d+$/.test(text) ? Number(text) : NaN;
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  return id;
+}
+
+function parseIdRange(vars) {
+  const startId = parsePostId(vars.id_start, "起始 id");
+  const endId = parsePostId(vars.id_end, "结束 id");
+  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  if (endId - startId > MAX_ID_SPAN) {
+    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+  }
+  return { startId, endId };
+}
+
+// 总数只用来摊进度和判断抓满；取不到（如 donmai.moe 未过验证）就翻到空页为止
+async function countPosts(baseUrl, tagsValue) {
+  try {
+    const response = await fetch(`${baseUrl}/counts/posts.json?tags=${encodeURIComponent(tagsValue)}`);
+    if (!response.ok) return null;
+    const count = (await response.json())?.counts?.posts;
+    return Number.isSafeInteger(count) ? count : null;
+  } catch {
+    return null;
+  }
+}
+
+async function crawlByIdRange(baseUrl, quality, vars) {
+  const { startId, endId } = parseIdRange(vars);
+  // donmai.moe 的列表页只渲染 General，但计数照算其他分级，同样要在搜索串里显式限定
+  const idTags = `id:${startId}..${endId} order:id -status:deleted`;
+  const tagsValue = site.host === "donmai.moe" ? `${idTags} rating:g` : withRatingToken(idTags, vars);
+  const perPage = normalizePerPage(vars.per_page);
+  const total = await countPosts(baseUrl, tagsValue);
+  console.log(`[danbooru][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  if (total === 0) return;
+  // 总数未知时按区间宽度估页数，进度可能提前到顶，不影响抓取
+  const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / perPage));
+  const pageProgress = 90.0 / estimatedPages;
+  // 每页至少有一个区间内的新 id，所以页数不可能超过区间宽度；这只是防止站点忽略 page 参数时死循环
+  const maxPages = endId - startId + 1;
+  let previousFirst = "";
+  let seen = 0;
+  for (let page = 1; page <= maxPages; page += 1) {
+    const pageUrl = buildPostsUrl(baseUrl, tagsValue, perPage, page);
+    console.log(`[danbooru][id] 打开页面 ${page}/${total == null ? "?" : estimatedPages}: ${pageUrl}`);
+    const { document, finalUrl } = await openDocument(pageUrl);
+    const hrefs = collectPostHrefs(document, finalUrl);
+    if (hrefs.length === 0 || hrefs[0] === previousFirst) break;
+    previousFirst = hrefs[0];
+    for (const href of hrefs) {
+      await processDetailPage(href, finalUrl, quality);
+      addProgress(pageProgress / hrefs.length);
+    }
+    seen += hrefs.length;
+    // 总数已知时抓满即停，省掉最后一次空页请求
+    if (total != null && seen >= total) break;
+  }
+}
+
 async function crawlPopular(baseUrl, quality, vars) {
   const scale = coerceStr(vars.popular_scale || "day");
   const startPage = Number(vars.start_page ?? 1);
@@ -468,6 +537,8 @@ export async function crawl(common, custom) {
   } else if (mode === "popular") {
     validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
     await crawlPopular(baseUrl, quality, vars);
+  } else if (mode === "id_range") {
+    await crawlByIdRange(baseUrl, quality, vars);
   } else {
     throw new Error(`未知的爬取模式: ${mode}`);
   }

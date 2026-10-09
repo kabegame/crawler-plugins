@@ -8,6 +8,7 @@
 - **全部（all）**：全站最新作品（`/post?page=N`）
 - **标签（tags）**：按标签组合检索（`/post?tags=a+b&page=N`）
 - **排行榜（popular）**：站点的人气榜。日榜 / 周榜 / 月榜（`/post/popular_by_day|week|month`）可以按日期看往期；最近 24 小时 / 一周 / 一个月 / 一年（`/post/popular_recent`）是滚动窗口，只有当期。每期只有一页、最多 40 张
+- **id 范围（id_range）**：按作品 id 区间检索（`/post?tags=id:A..B+order:id&page=N`），按 id 从小到大抓完整个区间
 
 ## 配置项
 
@@ -17,6 +18,7 @@
 - **排序（sort_order）**：最新发布 / 高分优先 / 分辨率优先 / 随机，对应站点的 `order:` 元标签
 - **起始页面 / 结束页数（start_page / end_page）**：一次最多 100 页，**每页固定 40 张**
 - **排行榜类型 / 排行榜日期 / 回溯期数（popular_scale / popular_date / popular_periods）**：排行榜模式用。日期留空为当期，回溯期数是从该日期起往前连抓多少期，一次最多 100 期
+- **起始 id / 结束 id（id_start / id_end）**：id 范围模式用，作品 id 闭区间（作品页地址 `/post/show/<id>` 里的数字），**最多相差 5000**，否则拒绝爬取。不用填页数；区间里的空号不占名额，站点保留在列表里的已删除作品取不到图，会记一条警告后跳过
 - **质量（quality）**：
   - **高（high）**：Options 区「View larger version」的原文件直链，没有原文件时自动降级。
     原文件普遍 4~8MB、大图几十 MB，走代理时可能传不完，表现为下载失败

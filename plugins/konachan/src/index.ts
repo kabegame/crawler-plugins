@@ -328,6 +328,72 @@ async function crawlByTags(baseUrl, quality, vars) {
   }
 }
 
+// ---- id 范围 ----
+// 站点的 id:A..B 元标签按作品 id 闭区间过滤（2026-10 实测 konachan.net），配 order:id 升序翻页，
+// 每页 40 张。区间内的空号是已删除的作品，所以实际张数通常远少于区间宽度。
+const MAX_ID_SPAN = 5000;
+
+function parsePostId(value, label) {
+  const text = trimText(value);
+  if (!/^\d+$/.test(text)) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  const id = Number(text);
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  return id;
+}
+
+function parseIdRange(vars) {
+  const startId = parsePostId(vars.id_start, "起始 id");
+  const endId = parsePostId(vars.id_end, "结束 id");
+  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  if (endId - startId > MAX_ID_SPAN) {
+    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+  }
+  return { startId, endId };
+}
+
+// post.xml 的根节点带结果总数，只用来摊进度；取不到（如 konachan.com 未过验证）就按每页均摊
+async function countPosts(baseUrl, tokens) {
+  const query = tokens.map((token) => encodeURIComponent(token)).join("+");
+  try {
+    const response = await fetch(`${baseUrl}/post.xml?tags=${query}&limit=1`);
+    if (!response.ok) return null;
+    const matched = /<posts\b[^>]*\bcount="(\d+)"/.exec(await response.text());
+    return matched ? Number(matched[1]) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function crawlByIdRange(baseUrl, quality, vars) {
+  const { startId, endId } = parseIdRange(vars);
+  const tokens = [`id:${startId}..${endId}`, "order:id"].concat(metaTokensOf(vars));
+  const total = await countPosts(baseUrl, tokens);
+  console.log(`[konachan][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  if (total === 0) return;
+  // 总数未知时按区间宽度估页数，进度可能提前到顶，不影响抓取
+  const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / 40));
+  const pageProgress = 90.0 / estimatedPages;
+  // 每页至少有一个区间内的新 id，所以页数不可能超过区间宽度；这只是防止站点忽略 page 参数时死循环
+  const maxPages = endId - startId + 1;
+  let previousFirst = "";
+  let seen = 0;
+  for (let page = 1; page <= maxPages; page += 1) {
+    const pageUrl = buildPostListUrl(baseUrl, tokens, page);
+    console.log(`[konachan][id] 打开页面 ${page}/${total == null ? "?" : estimatedPages}: ${pageUrl}`);
+    const { document, finalUrl } = await openDocument(pageUrl);
+    const hrefs = collectPostHrefs(document, finalUrl);
+    if (hrefs.length === 0 || hrefs[0] === previousFirst) break;
+    previousFirst = hrefs[0];
+    for (const href of hrefs) {
+      await processDetailPage(href, finalUrl, quality);
+      addProgress(pageProgress / hrefs.length);
+    }
+    seen += hrefs.length;
+    // 总数已知时抓满即停，省掉最后一次空页请求
+    if (total != null && seen >= total) break;
+  }
+}
+
 // ---- 排行榜 ----
 // Moebooru 的人气榜有两类地址（2026-10 实测 yande.re / konachan.net / konachan.com 一致）：
 // - 滚动窗口：/post/popular_recent?period=1d|1w|1m|1y，只有当期；
@@ -446,6 +512,8 @@ export async function crawl(common, custom) {
     await crawlByTags(baseUrl, quality, vars);
   } else if (vars.crawl_mode === "popular") {
     await crawlPopular(baseUrl, quality, vars);
+  } else if (vars.crawl_mode === "id_range") {
+    await crawlByIdRange(baseUrl, quality, vars);
   } else {
     throw new Error(`未知的爬取模式: ${vars.crawl_mode}`);
   }

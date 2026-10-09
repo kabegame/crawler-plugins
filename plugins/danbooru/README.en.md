@@ -9,6 +9,7 @@ Labels section by category (`danbooru/<category>`), so you can browse them on th
 - **Tags** — tag search via `/posts?tags=...`, the common case
 - **Popular** — daily / weekly / monthly ranking via `/explore/posts/popular`
 - **All** — newest posts site-wide via `/posts`
+- **ID range** — search by a post ID range via `/posts?tags=id:A..B order:id -status:deleted`, crawling the whole range in ascending ID order
 
 ## Options
 
@@ -18,6 +19,7 @@ Labels section by category (`danbooru/<category>`), so you can browse them on th
 - **Start page / End page** — at most 100 pages per run
 - **Posts per page** — 20 / 50 / 100 / 200
 - **Rating filter** — Any / General / Sensitive / Questionable / Explicit, shown only for the full site. All and tags modes add a metatag such as `rating:g` to the search string, which does **not** count toward the 2-tag limit; popular mode filters each post by its rating inside the plugin
+- **Start ID / End ID** — for ID range mode: an inclusive post ID range (the number in `/posts/<id>`), **at most 5000 apart**, otherwise the run is refused. No page numbers needed; deleted posts are excluded by the search itself, and the `id:` / `order:` / `status:` metatags do not count toward the 2-tag limit. Posts per page and the rating filter apply too; on `donmai.moe` only General posts are crawled
 - **Quality**
   - **High** — the original file (some posts are tens of MB)
   - **Medium** — the site's resized sample; video posts have no sample and fall back to the original

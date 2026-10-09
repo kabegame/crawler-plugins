@@ -17,6 +17,12 @@ This plugin fetches anime wallpapers from `konachan.net` and adds them to the do
 - **Periods (popular_periods)**: how many consecutive periods to crawl going back from that date, at most 100 per run. Each period on the site is a single page of at most 40 posts
 - **Rating filter** is applied by the plugin per post in this mode (ranking pages take no search parameters). konachan.net only shows all-ages posts, so the same period usually has fewer posts there than on konachan.com
 
+## ID range mode (id_range)
+
+- **Start ID / End ID (id_start / id_end)**: inclusive post ID range — the number in the post URL `/post/show/<id>`. Both must be positive integers, the end ID must not be below the start ID, and they may differ by **at most 5000**, otherwise the run is refused
+- Crawls every post in the range in ascending ID order; no page numbers needed. Deleted IDs are skipped, so the actual count is usually well below the range width
+- **Rating filter** is added to the site search string, as in the All and Tags modes
+
 ## Usage
 
 1. Set the page range (start to end).

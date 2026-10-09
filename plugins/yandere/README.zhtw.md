@@ -8,6 +8,7 @@
 - **全部（all）**：全站最新作品（`/post?page=N`）
 - **標籤（tags）**：依標籤組合檢索（`/post?tags=a+b&page=N`）
 - **排行榜（popular）**：站台的人氣榜。日榜 / 週榜 / 月榜（`/post/popular_by_day|week|month`）可以依日期看往期；最近 24 小時 / 一週 / 一個月 / 一年（`/post/popular_recent`）是滾動區間，只有當期。每期只有一頁、最多 40 張
+- **id 範圍（id_range）**：依作品 id 區間檢索（`/post?tags=id:A..B+order:id&page=N`），依 id 由小到大抓完整個區間
 
 ## 設定項
 
@@ -17,6 +18,7 @@
 - **排序（sort_order）**：最新發布 / 高分優先 / 解析度優先 / 隨機，對應站台的 `order:` 元標籤
 - **起始頁面 / 結束頁數（start_page / end_page）**：一次最多 100 頁，**每頁固定 40 張**
 - **排行榜類型 / 排行榜日期 / 回溯期數（popular_scale / popular_date / popular_periods）**：排行榜模式用。日期留空為當期，回溯期數是從該日期起往前連抓多少期，一次最多 100 期
+- **起始 id / 結束 id（id_start / id_end）**：id 範圍模式用，作品 id 閉區間（作品頁網址 `/post/show/<id>` 裡的數字），**最多相差 5000**，否則拒絕爬取。不用填頁數；區間裡的空號不佔名額，站台保留在列表裡的已刪除作品取不到圖，會記一條警告後跳過
 - **畫質（quality）**：
   - **高（high）**：Options 區「View larger version」的原檔直連，沒有原檔時自動降級
   - **中（medium）**：站台縮放後的 `#image` sample
