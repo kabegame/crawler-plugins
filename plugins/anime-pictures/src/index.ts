@@ -1,6 +1,7 @@
 // @ts-nocheck
 // anime-pictures V8 crawler: parse host HTML with DOMParser and store schema 1 metadata.
 import { resolveUrl as resolveSdkUrl, sleep } from "@kabegame/plugin-sdk";
+import { searchTextsFromMetadata } from "./search-texts";
 
 const {
   addProgress,
@@ -398,7 +399,10 @@ async function crawlDetail(url, pageWeight) {
     url: finalUrl,
   };
   if (displayName) opts.name = displayName;
-  if (metadata) opts.metadata = metadata;
+  if (metadata) {
+    opts.metadata = metadata;
+    opts.searchTexts = searchTextsFromMetadata(metadata);
+  }
   const labels = labelsFromTagGroups(metadata?.tagGroups);
   if (labels.length > 0) opts.labels = labels;
   await downloadImage(downloadUrl, opts);

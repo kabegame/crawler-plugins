@@ -196,6 +196,33 @@ function labelsFromTags(tags) {
   return labels;
 }
 
+// 元数据搜索片段覆盖 description.ejs 面板里的文字：标签（规范名 + 展示名）、Id、Uploader、Source、
+// Rating、Score、Favorites、Original、Artist Commentary；不含标签帖数、冒号、Date 和 Size 两行。
+// 每张图只写一个 `danbooru`；每个有值的字段只写一个裸字段名标记词（如 `tags`，表示「有这一项」，
+// 可配合「非」找没有标签的图），值本身不带前缀，原因同 konachan：逐值加前缀会让含 "danbooru" 的词条
+// 膨胀到几十万行映射，搜索变慢。metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，
+// 改这里要同步改那里。
+function searchTextsFromMetadata(meta) {
+  const out = ["danbooru"];
+  const field = (key, values) => {
+    const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
+    if (list.length) out.push(key, ...list);
+  };
+  field(
+    "tags",
+    (meta.tags || []).flatMap((tag) => [tag?.name, tag?.display]),
+  );
+  field("id", [meta.post_id]);
+  field("uploader", [meta.uploader_name]);
+  field("source", [meta.source_text, meta.source_href]);
+  field("rating", [meta.rating]);
+  field("score", [meta.score]);
+  field("favorites", [meta.fav_count]);
+  field("original", [meta.original_href]);
+  field("commentary", [meta.commentary?.title, meta.commentary?.body]);
+  return [...new Set(out)];
+}
+
 function buildTagsString(tags) {
   const ordered = [];
   for (const category of TAG_CATEGORY_ORDER) {
@@ -316,7 +343,10 @@ async function processDetailPage(href, baseUrl, quality) {
     return;
   }
   const opts = { url: finalUrl };
-  if (metadataNonEmpty(meta)) opts.metadata = meta;
+  if (metadataNonEmpty(meta)) {
+    opts.metadata = meta;
+    opts.searchTexts = searchTextsFromMetadata(meta);
+  }
   const labels = labelsFromTags(meta.tags);
   if (labels.length > 0) opts.labels = labels;
   clearSiteHeaders();

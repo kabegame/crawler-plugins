@@ -1,6 +1,6 @@
 {
   "name": "bilibili",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",
@@ -403,7 +403,11 @@
     "post-url.jpg",
     "src-bilibili.png"
   ],
+  "kbMetadataMigration": "dist/migrate.js",
   "kbDescriptionTemplate": "templates/description.ejs",
+  "dependencies": {
+    "tiny-pinyin": "^1.3.2"
+  },
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
     "@kabegame/types": "file:../../../packages/kabegame-types",

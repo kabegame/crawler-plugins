@@ -3,6 +3,7 @@
 // 失败回退正则抠 bfs 链接；关联到 cv 时复用专栏的 metadata / 评论链路。
 import { buildArticleMetadata, signViewUrl } from "./article";
 import { OPUS_DETAIL_API } from "./consts";
+import { labelsFromMetadata, searchTextsFromMetadata } from "./metadata-derived";
 import { fetchArticleReplies } from "./replies";
 import {
   checkBilibiliRisk, coerceStr, collectImageUrlsFromContent, ensureHttpsBfs, fetchJson, fetchWith509Retry,
@@ -134,17 +135,22 @@ export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
     ? buildArticleMetadata(vd, cvId, "", repliesData, pics.length, opusId)
     : { source: "bilibili_opus", opus_id: opusId, total_image_count: pics.length };
   // 同篇多图共享一份 metadata：先建一次，下载时只传 metadata_id。
-  const metadataId = Number(createImageMetadata(metadata, null));
+  const metadataId = Number(createImageMetadata(metadata, { searchTexts: searchTextsFromMetadata(metadata) }));
+  const labels = labelsFromMetadata(metadata);
   const base = coerceStr(vd?.title) || `图文 ${opusId}`;
   // 进度按实际文件数分摊：实况图的视频轨算一个独立文件（gallery-dl 同样输出两个文件）。
   const liveCount = livePhoto ? pics.filter((p) => p.liveUrl).length : 0;
   const perFile = perTotal / (pics.length + liveCount);
   for (let index = 0; index < pics.length; index += 1) {
     const name = pics.length > 1 ? `${base}(${index + 1})` : base;
-    await downloadImage(pics[index].url, { name, metadata_id: metadataId, url: pageUrl });
+    const opts = { name, metadata_id: metadataId, url: pageUrl };
+    if (labels.length > 0) opts.labels = labels;
+    await downloadImage(pics[index].url, opts);
     addProgress(perFile);
     if (livePhoto && pics[index].liveUrl) {
-      await downloadImage(pics[index].liveUrl, { name: `${name}(live)`, metadata_id: metadataId, url: pageUrl });
+      const liveOpts = { name: `${name}(live)`, metadata_id: metadataId, url: pageUrl };
+      if (labels.length > 0) liveOpts.labels = labels;
+      await downloadImage(pics[index].liveUrl, liveOpts);
       addProgress(perFile);
     }
   }

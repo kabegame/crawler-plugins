@@ -31,26 +31,25 @@ export function provideLabels(input) {
   return labels;
 }
 
+// 每张图只写一个 `konachan`，每个有值的字段只写一个裸字段名标记词，值本身不带前缀（原因见 src/index.ts）。
 export function provideSearchTextList(input) {
   const meta = JSON.parse(input);
   const s = meta.stats || {};
-  const out = [];
-  for (const tag of meta.sidebar_tags || []) {
-    const name = String(tag?.name || "").trim();
-    const display = String(tag?.display || "").trim();
-    out.push(name && `konachan_tags_${name}`);
-    if (display && display !== name) out.push(display);
-  }
-  out.push(
-    s.post_id && `konachan_id_${s.post_id}`,
-    meta.posted_by_name && `konachan_posted_${meta.posted_by_name}`,
-    s.size && `konachan_size_${s.size}`,
-    meta.source_href && `konachan_source_${meta.source_href}`,
-    s.rating && `konachan_rating_${s.rating}`,
-    meta.score && `konachan_score_${meta.score}`,
+  const out = ["konachan"];
+  const field = (key, values) => {
+    const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
+    if (list.length) out.push(key, ...list);
+  };
+  field(
+    "tags",
+    (meta.sidebar_tags || []).flatMap((tag) => [tag?.name, tag?.display]),
   );
-  for (const fav of s.favorited || []) {
-    out.push(fav?.name && `konachan_favorited_by_${fav.name}`);
-  }
-  return out.map((value) => String(value || "").trim()).filter(Boolean);
+  field("id", [s.post_id]);
+  field("posted", [meta.posted_by_name]);
+  field("size", [s.size]);
+  field("source", [meta.source_href]);
+  field("rating", [s.rating]);
+  field("score", [meta.score]);
+  field("favorited_by", (s.favorited || []).map((fav) => fav?.name));
+  return [...new Set(out)];
 }

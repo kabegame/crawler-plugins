@@ -224,3 +224,36 @@ export function provideLabels(input) {
   }
   return labels;
 }
+
+function searchText(value) {
+  return value == null ? "" : String(value).trim();
+}
+
+function searchGroupMarker(name) {
+  const value = searchText(name).toLowerCase();
+  // 搜索词按约定保留 `anthor` 这一词面。
+  return value === "author" ? "anthor" : value;
+}
+
+// 历史图片重建元数据搜索词：与 src/search-texts.ts 保持同步。
+export function provideSearchTextList(input) {
+  const m = JSON.parse(input);
+  const groups = Array.isArray(m && m.tagGroups) ? m.tagGroups : [];
+  const out = ["anime-picture", "anime", "picture"];
+
+  for (const group of groups) {
+    const marker = searchGroupMarker(group && group.name);
+    if (marker) out.push(marker);
+  }
+  if (m && m.rating && (m.rating.label || m.rating.count)) out.push("votes");
+
+  for (const group of groups) {
+    if (!Array.isArray(group && group.tags)) continue;
+    for (const tag of group.tags) {
+      const name = searchText(tag && tag.name);
+      if (name) out.push(name);
+    }
+  }
+
+  return [...new Set(out)];
+}

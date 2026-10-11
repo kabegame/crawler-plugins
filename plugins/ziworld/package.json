@@ -1,6 +1,6 @@
 {
   "name": "ziworld",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "name.zh": "ziworld高质量壁纸",
   "name.en": "ziworld high-quality wallpapers",
@@ -91,6 +91,9 @@
     "ko": "README.ko.md",
     "default": "README.md",
     "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
   },
   "kbPathQLProviders": [
     "providers/directory_provider.json5",

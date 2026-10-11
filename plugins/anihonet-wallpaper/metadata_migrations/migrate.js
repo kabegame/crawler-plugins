@@ -75,6 +75,39 @@ function splitLegacyTags(source) {
   return { categories, tags };
 }
 
+function trim(value) {
+  return value == null ? "" : String(value).trim();
+}
+
+function displayDate(value) {
+  const raw = trim(value);
+  return raw.indexOf("T") >= 0 ? raw.split("T", 1)[0] : raw;
+}
+
+function prefixedNames(values) {
+  return arrayOrEmpty(values)
+    .map((item) => trim(item && item.name))
+    .filter(Boolean)
+    .map((name) => `#${name}`);
+}
+
+// 与 src/search-texts.ts 保持同步；插件升级时为历史 metadata 重建同样的搜索词。
+export function provideSearchTextList(input) {
+  const metadata = JSON.parse(input);
+  const out = ["anihonet"];
+  const postId = trim(metadata.post_id);
+  const field = (label, values) => {
+    const list = values.map(trim).filter(Boolean);
+    if (list.length > 0) out.push(label, ...list);
+  };
+
+  field("投稿日", [displayDate(metadata.date)]);
+  field("源帖", [postId ? `#${postId}` : ""]);
+  field("目录", prefixedNames(metadata.categories));
+  field("标签", prefixedNames(metadata.tags));
+  return [...new Set(out)];
+}
+
 export function migrate(input) {
   const metadata = JSON.parse(input);
   if (declaredSchema(metadata) === "5") return input;

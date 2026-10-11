@@ -1,6 +1,6 @@
 {
   "name": "e-shuushuu",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "name.zh": "e-shuushuu",
   "name.en": "e-shuushuu",
@@ -191,6 +191,7 @@
     "default": "CHANGELOG.md"
   },
   "kbDescriptionTemplate": "templates/description.ejs",
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
   "devDependencies": {
     "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
     "@kabegame/types": "file:../../../packages/kabegame-types",

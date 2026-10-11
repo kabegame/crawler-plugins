@@ -1,6 +1,6 @@
 {
   "name": "twodwallpapers",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "name.zh": "2dwallpapers二次元壁纸",
   "name.en": "2dwallpapers anime wallpapers",
@@ -140,6 +140,9 @@
     "ko": "README.ko.md",
     "default": "README.md",
     "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
   },
   "kbAssets": [
     "images/work-entry.png",

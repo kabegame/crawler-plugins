@@ -2,6 +2,7 @@
 // 传统专栏（cv）：view 接口取正文、正则抠图、评论入 metadata、逐图入库。
 // buildArticleMetadata 同时被 opus 复用（opus 关联到 cv 时共享同一套元数据结构）。
 import { VIEW_API } from "./consts";
+import { labelsFromMetadata, searchTextsFromMetadata } from "./metadata-derived";
 import { fetchArticleReplies } from "./replies";
 import {
   checkBilibiliRisk, coerceStr, collectImageUrlsFromContent, fetchWith509Retry,
@@ -74,14 +75,17 @@ export async function processOneCv(cvId, img, sub, perCv, searchDesc) {
   const subject = coerceStr(vd?.title);
   const metadata = buildArticleMetadata(vd, cvId, searchDesc, repliesData, imgs.length, "");
   // 同篇多图共享一份 metadata：先建一次，下载时只传 metadata_id。
-  const metadataId = Number(createImageMetadata(metadata, null));
+  const metadataId = Number(createImageMetadata(metadata, { searchTexts: searchTextsFromMetadata(metadata) }));
+  const labels = labelsFromMetadata(metadata);
   const perImage = perCv / imgs.length;
   const cvPageUrl = `https://www.bilibili.com/read/cv${cvId}`;
   for (let index = 0; index < imgs.length; index += 1) {
     const name = imgs.length > 1
       ? `${subject || `cv${cvId}`}(${index + 1})`
       : (subject || `cv${cvId}`);
-    await downloadImage(imgs[index], { name, metadata_id: metadataId, url: cvPageUrl });
+    const opts = { name, metadata_id: metadataId, url: cvPageUrl };
+    if (labels.length > 0) opts.labels = labels;
+    await downloadImage(imgs[index], opts);
     addProgress(perImage);
   }
 }

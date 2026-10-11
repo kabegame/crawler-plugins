@@ -186,27 +186,28 @@ function labelsFromSidebarTags(tags) {
 }
 
 // 元数据搜索片段要尽量覆盖 description.ejs 展示的原文；迁移脚本有一份同规则副本，改这里要同步改那里。
+// 每张图只写一个 `konachan`；每个有值的字段只写一个裸字段名标记词（如 `tags`，表示「有这一项」，
+// 可配合「非」找没有标签的图），值本身不带前缀。不要退回逐值加前缀（`konachan_tags_<名>`）：
+// 那样每张图多出几十个含 "konachan" / "tags" 的词条，搜这类词时要展开几十万行映射，查询慢一倍。
 function searchTextsFromMetadata(meta) {
   const s = meta.stats || {};
-  const out = [];
-  for (const tag of meta.sidebar_tags || []) {
-    const name = String(tag?.name || "").trim();
-    const display = String(tag?.display || "").trim();
-    out.push(name && `konachan_tags_${name}`);
-    if (display && display !== name) out.push(display);
-  }
-  out.push(
-    s.post_id && `konachan_id_${s.post_id}`,
-    meta.posted_by_name && `konachan_posted_${meta.posted_by_name}`,
-    s.size && `konachan_size_${s.size}`,
-    meta.source_href && `konachan_source_${meta.source_href}`,
-    s.rating && `konachan_rating_${s.rating}`,
-    meta.score && `konachan_score_${meta.score}`,
+  const out = ["konachan"];
+  const field = (key, values) => {
+    const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
+    if (list.length) out.push(key, ...list);
+  };
+  field(
+    "tags",
+    (meta.sidebar_tags || []).flatMap((tag) => [tag?.name, tag?.display]),
   );
-  for (const fav of s.favorited || []) {
-    out.push(fav?.name && `konachan_favorited_by_${fav.name}`);
-  }
-  return out.map((value) => String(value || "").trim()).filter(Boolean);
+  field("id", [s.post_id]);
+  field("posted", [meta.posted_by_name]);
+  field("size", [s.size]);
+  field("source", [meta.source_href]);
+  field("rating", [s.rating]);
+  field("score", [meta.score]);
+  field("favorited_by", (s.favorited || []).map((fav) => fav?.name));
+  return [...new Set(out)];
 }
 
 function parseRelatedPosts(document, pageUrl) {

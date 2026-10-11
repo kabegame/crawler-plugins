@@ -9,14 +9,4 @@
   "query": {
    "where": "COALESCE((EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_im.data) THEN CASE ${properties.tag_kind} WHEN 'category' THEN COALESCE(json_extract(plugin_im.data, '$.categories'), json('[]')) WHEN 'tag' THEN COALESCE(json_extract(plugin_im.data, '$.tags'), json('[]')) ELSE json('[]') END ELSE json('[]') END) AS tag WHERE COALESCE(NULLIF(TRIM(CAST(json_extract(tag.value, '$.name') AS TEXT)), ''), NULLIF(TRIM(CAST(json_extract(tag.value, '$.href') AS TEXT)), '')) = ${properties.tag_name})), 0)"
   },
-  "list": {
-    "${out.name}": {
-          "child_var": "out",
-          "delegate": {
-              "provider": "kabegame.paginate100_provider",
-          },
-          "provider": "${out.provider}",
-          "meta": "${out.meta}"
-      }
-  },
 }

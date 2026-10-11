@@ -102,6 +102,32 @@ function buildMetadata(image, pageUrl, comments) {
   };
 }
 
+// 元数据搜索片段覆盖 description.ejs 面板里的文字：上传者名与头衔、日期（年 / 月 / 日三词）、标签、
+// ID、Favorites、Source、评论作者与正文；不含标签分类标题、冒号和 "No comments yet." 这类占位文案。
+// 每张图只写一个 `e-shuushuu`；每个有值的字段只写一个裸字段名标记词，值本身不带前缀
+// （逐值加前缀会让含 "e-shuushuu" 的词条膨胀到几十万行映射，搜索变慢）。
+// metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，改这里要同步改那里。
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function searchTextsFromMetadata(meta) {
+  const out = ["e-shuushuu"];
+  const field = (key, values) => {
+    const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
+    if (list.length) out.push(key, ...list);
+  };
+  const up = meta.uploader || {};
+  field("uploader", [up.username, up.user_title]);
+  // 日期拆成年、月（英文全名）、日三个词，与详情页显示的 "September 17, 2026" 对应；取 date_added 的 UTC 日期串
+  const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(meta.date_added || ""));
+  if (ymd) field("date", [ymd[1], MONTHS[Number(ymd[2]) - 1], String(Number(ymd[3]))]);
+  field("tags", (meta.tags || []).map((tag) => tag?.title));
+  field("id", [meta.image_id]);
+  field("favorites", [meta.favorites ?? 0]);
+  field("source", [meta.source_url]);
+  const comments = (meta.comments || []).filter((c) => c && !c.deleted);
+  field("comments", comments.flatMap((c) => [c.user?.username, c.post_text]));
+  return [...new Set(out)];
+}
+
 // 展示名：角色优先，其次作品；都没有就退回图片编号。
 function displayName(image) {
   const tags = image.tags || [];
@@ -184,6 +210,7 @@ async function downloadOne(baseUrl, image, rawComments) {
   }
   const pageUrl = `${baseUrl}/images/${image.image_id}`;
   const opts = { name: displayName(image), url: pageUrl, metadata: buildMetadata(image, pageUrl, pickComments(rawComments)) };
+  opts.searchTexts = searchTextsFromMetadata(opts.metadata);
   const labels = labelsFromTags(image.tags);
   if (labels.length > 0) opts.labels = labels;
   await downloadImage(image.url, opts);
