@@ -1,0 +1,93 @@
+<%
+  // 还原 ManyACG 作品详情页右侧信息栏：标题 → 作者 / 来源按钮 → 简介 → 标签，外加发布时间与各图尺寸。
+  // 站点本身是暗色主题，这里取亮色版配色；数据来自 src/index.ts 的 buildMetadata（schema 1）。
+  const m = metadata || {};
+  const BASE = 'https://manyacg.top';
+  const artist = m.artist || {};
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  const pictures = (Array.isArray(m.pictures) ? m.pictures : []).slice().sort(function (a, b) { return (a.index || 0) - (b.index || 0); });
+  const pageUrl = m.page_url || (m.artwork_id ? BASE + '/artwork/' + m.artwork_id : '');
+  const artistUrl = artist.id ? BASE + '/artist/' + artist.id : '';
+  const sourceType = String(m.source_type || '').toLowerCase();
+  // 来源按钮文案与站点一致（「→ pixiv」）；作者在来源平台上的主页另给一个小链接。
+  const profileUrl = sourceType === 'pixiv' && artist.uid ? 'https://www.pixiv.net/users/' + artist.uid
+    : sourceType === 'twitter' && artist.username ? 'https://x.com/' + artist.username : '';
+  // 简介里常带 FANBOX / 站外链接：按 URL 切段，链接段用 <a>，其余原样转义输出。
+  function segments(text) {
+    const out = [];
+    const re = /https?:\/\/[^\s　，。、）)」』]+/g;
+    let last = 0, hit;
+    while ((hit = re.exec(text)) !== null) {
+      if (hit.index > last) out.push({ text: text.slice(last, hit.index) });
+      out.push({ text: hit[0], url: hit[0] });
+      last = hit.index + hit[0].length;
+    }
+    if (last < text.length) out.push({ text: text.slice(last) });
+    return out;
+  }
+  const descSegs = m.description ? segments(String(m.description)) : [];
+  function sizeText(p) { return p.width && p.height ? p.width + ' × ' + p.height : ''; }
+  const likes = Number(m.like_count) || 0;
+%>
+<style>
+.mc{
+  --mc-fg:#1f2328;--mc-muted:#656d76;--mc-border:#d0d7de;--mc-chip:#f6f8fa;--mc-primary:#3a7afe;--mc-danger:#e5484d;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:14px;line-height:1.55;color:var(--mc-fg);overflow-wrap:anywhere;
+}
+.mc a{color:var(--mc-primary);text-decoration:none;}
+.mc a:hover{text-decoration:underline;}
+.mc-title{margin:0 0 .75rem;font-size:1.25rem;font-weight:700;line-height:1.35;}
+.mc-badge{display:inline-block;margin-left:.4rem;padding:0 .4rem;border-radius:4px;background:var(--mc-danger);color:#fff;font-size:.7rem;font-weight:700;vertical-align:middle;}
+.mc-btns{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.9rem;}
+.mc-btn{flex:1 1 7rem;min-width:0;display:flex;align-items:center;justify-content:center;gap:.3rem;padding:.45rem .75rem;border:1px solid var(--mc-border);border-radius:6px;background:var(--mc-chip);color:var(--mc-fg)!important;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mc-btn:hover{border-color:var(--mc-primary);text-decoration:none!important;}
+.mc-profile{margin:-.4rem 0 .9rem;font-size:.8rem;color:var(--mc-muted);}
+.mc-desc{margin:0 0 1rem;white-space:pre-wrap;}
+.mc-h{margin:0 0 .5rem;font-size:.8rem;font-weight:600;color:var(--mc-muted);}
+.mc-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;}
+.mc-tag{display:inline-block;max-width:100%;padding:.15rem .6rem;border:1px solid var(--mc-border);border-radius:6px;background:var(--mc-chip);color:var(--mc-fg)!important;font-size:.85rem;}
+.mc-tag:hover{border-color:var(--mc-primary);text-decoration:none!important;}
+.mc-info{width:100%;border-collapse:collapse;font-size:.85rem;}
+.mc-info th{width:5.5rem;padding:.3rem .5rem .3rem 0;text-align:left;font-weight:600;color:var(--mc-muted);vertical-align:top;white-space:nowrap;}
+.mc-info td{padding:.3rem 0;}
+.mc-info tr+tr th,.mc-info tr+tr td{border-top:1px solid var(--mc-border);}
+</style>
+<div class="mc">
+  <h2 class="mc-title"><%= m.title || '(无标题)' %><% if (m.r18) { %><span class="mc-badge">R-18</span><% } %></h2>
+
+  <div class="mc-btns">
+    <% if (artist.name) { %>
+      <% if (artistUrl) { %><a class="mc-btn" href="<%= artistUrl %>" target="_blank" rel="noreferrer noopener" title="<%= artist.name %>">👤 <%= artist.name %></a>
+      <% } else { %><span class="mc-btn">👤 <%= artist.name %></span><% } %>
+    <% } %>
+    <% if (m.source_url) { %><a class="mc-btn" href="<%= m.source_url %>" target="_blank" rel="noreferrer noopener" title="<%= m.source_url %>">→ <%= sourceType || '来源' %></a><% } %>
+  </div>
+  <% if (profileUrl) { %>
+    <div class="mc-profile">在 <%= sourceType %> 上：<a href="<%= profileUrl %>" target="_blank" rel="noreferrer noopener"><%= sourceType === 'twitter' ? '@' + artist.username : 'UID ' + artist.uid %></a></div>
+  <% } %>
+
+  <% if (descSegs.length > 0) { %>
+    <div class="mc-desc"><% descSegs.forEach(function (s) { if (s.url) { %><a href="<%= s.url %>" target="_blank" rel="noreferrer noopener"><%= s.text %></a><% } else { %><%= s.text %><% } }); %></div>
+  <% } %>
+
+  <% if (tags.length > 0) { %>
+    <div class="mc-h">标签</div>
+    <div class="mc-tags">
+      <% tags.forEach(function (t) { %><a class="mc-tag" href="<%= BASE %>/tag/<%= encodeURIComponent(t) %>" target="_blank" rel="noreferrer noopener"><%= t %></a><% }); %>
+    </div>
+  <% } %>
+
+  <table class="mc-info">
+    <% if (m.created_at) { %><tr><th>入库时间</th><td><%= m.created_at %></td></tr><% } %>
+    <% if (pictures.length > 0) { %>
+      <tr><th>图片</th><td>
+        <% if (pictures.length === 1) { %><%= sizeText(pictures[0]) || '1 张' %>
+        <% } else { %><%= pictures.length %> 张<% pictures.forEach(function (p, i) { %><br><span style="color:var(--mc-muted)">#<%= i + 1 %></span> <%= sizeText(p) %><% }); %>
+        <% } %>
+      </td></tr>
+    <% } %>
+    <% if (likes > 0) { %><tr><th>点赞</th><td><%= likes %></td></tr><% } %>
+    <% if (pageUrl) { %><tr><th>作品页</th><td><a href="<%= pageUrl %>" target="_blank" rel="noreferrer noopener">在 ManyACG 打开</a></td></tr><% } %>
+  </table>
+</div>

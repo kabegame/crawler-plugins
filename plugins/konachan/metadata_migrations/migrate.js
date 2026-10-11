@@ -1,5 +1,5 @@
-// Konachan metadata 迁移脚本：只提供 provideLabels，给历史图片补标签，不改写 metadata。
-// 规则与 src/index.ts 的 labelsFromSidebarTags 一致（此处无法 import，保持两份同步）。
+// Konachan metadata 迁移脚本：给历史图片补标签与元数据搜索片段，不改写 metadata。
+// 规则与 src/index.ts 保持两份同步（此处运行在无 import 的裸 V8 里）。
 
 function tagLabelType(type) {
   const value = String(type || "").trim().toLowerCase();
@@ -29,4 +29,28 @@ export function provideLabels(input) {
     });
   }
   return labels;
+}
+
+export function provideSearchTextList(input) {
+  const meta = JSON.parse(input);
+  const s = meta.stats || {};
+  const out = [];
+  for (const tag of meta.sidebar_tags || []) {
+    const name = String(tag?.name || "").trim();
+    const display = String(tag?.display || "").trim();
+    out.push(name && `konachan_tags_${name}`);
+    if (display && display !== name) out.push(display);
+  }
+  out.push(
+    s.post_id && `konachan_id_${s.post_id}`,
+    meta.posted_by_name && `konachan_posted_${meta.posted_by_name}`,
+    s.size && `konachan_size_${s.size}`,
+    meta.source_href && `konachan_source_${meta.source_href}`,
+    s.rating && `konachan_rating_${s.rating}`,
+    meta.score && `konachan_score_${meta.score}`,
+  );
+  for (const fav of s.favorited || []) {
+    out.push(fav?.name && `konachan_favorited_by_${fav.name}`);
+  }
+  return out.map((value) => String(value || "").trim()).filter(Boolean);
 }

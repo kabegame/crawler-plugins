@@ -185,6 +185,30 @@ function labelsFromSidebarTags(tags) {
   return labels;
 }
 
+// 元数据搜索片段要尽量覆盖 description.ejs 展示的原文；迁移脚本有一份同规则副本，改这里要同步改那里。
+function searchTextsFromMetadata(meta) {
+  const s = meta.stats || {};
+  const out = [];
+  for (const tag of meta.sidebar_tags || []) {
+    const name = String(tag?.name || "").trim();
+    const display = String(tag?.display || "").trim();
+    out.push(name && `konachan_tags_${name}`);
+    if (display && display !== name) out.push(display);
+  }
+  out.push(
+    s.post_id && `konachan_id_${s.post_id}`,
+    meta.posted_by_name && `konachan_posted_${meta.posted_by_name}`,
+    s.size && `konachan_size_${s.size}`,
+    meta.source_href && `konachan_source_${meta.source_href}`,
+    s.rating && `konachan_rating_${s.rating}`,
+    meta.score && `konachan_score_${meta.score}`,
+  );
+  for (const fav of s.favorited || []) {
+    out.push(fav?.name && `konachan_favorited_by_${fav.name}`);
+  }
+  return out.map((value) => String(value || "").trim()).filter(Boolean);
+}
+
 function parseRelatedPosts(document, pageUrl) {
   const heading = Array.from(document.querySelectorAll("h5")).find((el) =>
     /Related Posts/i.test(textOf(el)),
@@ -274,7 +298,10 @@ async function processDetailPage(href, baseUrl, quality) {
   }
   if (!imageUrl) return;
   const opts = { url: finalUrl };
-  if (metadataNonEmpty(meta)) opts.metadata = meta;
+  if (metadataNonEmpty(meta)) {
+    opts.metadata = meta;
+    opts.searchTexts = searchTextsFromMetadata(meta);
+  }
   const labels = labelsFromSidebarTags(meta.sidebar_tags);
   if (labels.length > 0) opts.labels = labels;
   await downloadImage(imageUrl, opts);

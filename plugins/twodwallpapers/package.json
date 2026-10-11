@@ -1,6 +1,6 @@
 {
   "name": "twodwallpapers",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "private": true,
   "name.zh": "2dwallpapers二次元壁纸",
   "name.en": "2dwallpapers anime wallpapers",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.3.0"
+    "kabegame": ">=4.5.1"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

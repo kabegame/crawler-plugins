@@ -4,7 +4,7 @@
   "name": "entry_provider",
   "list": {
     "${game.name}": {
-      "sql": "SELECT CASE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) WHEN '1' THEN '崩坏冲击3' WHEN '2' THEN '原神' WHEN '3' THEN '崩坏学园2' WHEN '4' THEN '未定事件簿' WHEN '5' THEN '大别野' WHEN '6' THEN '崩坏：星穹铁道' WHEN '8' THEN '绝区零' END AS name, CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) AS game_id, COUNT(*) AS image_count FROM (${composed}) AS source WHERE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) IN ('1', '2', '3', '4', '5', '6', '8') GROUP BY game_id, name ORDER BY CAST(game_id AS INTEGER) ASC",
+      "sql": "SELECT CASE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) WHEN '1' THEN '崩坏冲击3' WHEN '2' THEN '原神' WHEN '3' THEN '崩坏学园2' WHEN '4' THEN '未定事件簿' WHEN '5' THEN '大别野' WHEN '6' THEN '崩坏：星穹铁道' WHEN '8' THEN '绝区零' END AS name, CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) AS game_id, COUNT(*) AS image_count FROM (SELECT c.*, pm.data AS plugin_metadata FROM (${composed}) AS c JOIN metadata AS pm ON pm.id = c.metadata_id) AS source WHERE CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) IN ('1', '2', '3', '4', '5', '6', '8') GROUP BY game_id, name ORDER BY CAST(game_id AS INTEGER) ASC",
       "data_var": "game",
       "provider": "game_provider",
       "properties": {

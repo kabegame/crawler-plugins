@@ -6,7 +6,7 @@
     "rating": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.rating') AS TEXT)), '') = ${properties.rating}"
+    "where": "COALESCE((NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_im.data) THEN plugin_im.data ELSE '{}' END, '$.rating') AS TEXT)), '') = ${properties.rating}), 0)"
   },
   "list": {
     "${out.name}": {

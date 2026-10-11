@@ -1,6 +1,6 @@
 {
   "name": "pixai",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "name.zh": "PixAI",
   "name.en": "PixAI",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.5.0"
+    "kabegame": ">=4.5.1"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

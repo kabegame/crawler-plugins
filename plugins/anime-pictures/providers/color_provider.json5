@@ -6,7 +6,7 @@
     "color_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.details') AS detail WHERE json_extract(detail.value, '$.color') IS NOT NULL AND NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') = ${properties.color_name})"
+    "where": "COALESCE((EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_im.data) THEN plugin_im.data ELSE '{}' END, '$.details') AS detail WHERE json_extract(detail.value, '$.color') IS NOT NULL AND NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') = ${properties.color_name})), 0)"
   },
   "list": {
     "${out.name}": {

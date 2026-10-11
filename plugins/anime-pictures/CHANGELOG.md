@@ -1,5 +1,9 @@
 # anime-pictures 更新日志
 
+## 0.6.0
+
+- 配合应用 4.5.1 调整「细分筛选」的内部写法：不再依赖应用投影的 `plugin_metadata` 列，细分条件可以用在高级查询的「或 / 非」组合里。需要应用 4.5.1 及以上。
+
 ## 0.5.0
 
 - 下载时把作品、角色、画师、参考、物体标签写入应用的「标签」分区（`anime-pictures/copyright`、`anime-pictures/character`、`anime-pictures/artist`、`anime-pictures/reference`、`anime-pictures/object`），可在画册页浏览、在搜索里按标签筛选。

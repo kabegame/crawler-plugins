@@ -6,7 +6,7 @@
     "game_id": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.game_id') AS TEXT) = ${properties.game_id}"
+    "where": "COALESCE((CAST(json_extract(CASE WHEN json_valid(plugin_im.data) THEN plugin_im.data ELSE '{}' END, '$.game_id') AS TEXT) = ${properties.game_id}), 0)"
   },
   "list": {
     "${out.name}": {

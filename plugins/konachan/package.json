@@ -1,6 +1,6 @@
 {
   "name": "konachan",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.5.0"
+    "kabegame": ">=4.5.1"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

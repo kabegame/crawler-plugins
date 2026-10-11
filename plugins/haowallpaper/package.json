@@ -1,6 +1,6 @@
 {
   "name": "haowallpaper",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "name.zh": "哲风壁纸",
   "name.en": "Haowallpaper",
   "name.ja": "哲風壁紙",
@@ -15,7 +15,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.5.0"
+    "kabegame": ">=4.5.1"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

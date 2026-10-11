@@ -3,42 +3,24 @@
   "namespace": "plugins.anihonet-wallpaper",
   "name": "entry_provider",
   "list": {
-    "quality": {
+    "category": {
       "provider": "tag_category_provider",
       "properties": {
-        "tag_category": "quality"
+        "tag_kind": "category"
       },
       "meta": {
         "plain": true,
       }
     },
-    "work": {
+    "tag": {
       "provider": "tag_category_provider",
       "properties": {
-        "tag_category": "work"
-      },
-      "meta": {
-        "plain": true,
-      }
-    },
-    "character": {
-      "provider": "tag_category_provider",
-      "properties": {
-        "tag_category": "character"
-      },
-      "meta": {
-        "plain": true,
-      }
-    },
-    "type": {
-      "provider": "tag_category_provider",
-      "properties": {
-        "tag_category": "type"
+        "tag_kind": "tag"
       },
       "meta": {
         "plain": true,
       }
     }
   },
-  "note": "{\"title\":\"anihonet tags\",\"content\":\"Group anihonet images by quality and character tags from image metadata.\"}"
+  "note": "{\"title\":\"anihonet taxonomy\",\"content\":\"Group anihonet images by the source site's category and tag relationships.\"}"
 }

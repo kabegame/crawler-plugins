@@ -6,7 +6,7 @@
     "directory_name": { "type": "string", "default": "", "optional": false },
   },
   "query": {
-    "where": "NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') = ${properties.directory_name}",
+    "where": "COALESCE((NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_im.data) THEN plugin_im.data ELSE '{}' END, '$.category') AS TEXT)), '') = ${properties.directory_name}), 0)",
   },
   "list": {
     "${out.name}": {

@@ -2013,6 +2013,16 @@
           ]
         }
       },
+      "plugins/manyacg": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:tiny-pinyin@^1.3.2",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/miyoushe": {
         "packageJson": {
           "dependencies": [

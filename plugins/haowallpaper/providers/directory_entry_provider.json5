@@ -4,7 +4,7 @@
   "name": "directory_entry_provider",
   "list": {
     "${directory.directory_name}": {
-      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') AS directory_name, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, plugin_metadata FROM (${composed}) AS composed_result) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') AS directory_name, COUNT(DISTINCT source.id) AS image_count FROM (SELECT composed_result.id, pm.data AS plugin_metadata FROM (${composed}) AS composed_result JOIN metadata AS pm ON pm.id = composed_result.metadata_id) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY directory_name ORDER BY image_count DESC, directory_name ASC",
       "data_var": "directory",
       "provider": "directory_provider",
       "properties": {

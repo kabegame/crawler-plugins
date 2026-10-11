@@ -5,7 +5,7 @@
   // 站点详情里带 color 字段的那一项是主色：links[0].text 为颜色名（如 palevioletred），按颜色名分组。
   "list": {
     "${color.color_name}": {
-      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') AS color_name, COUNT(DISTINCT source.id) AS image_count FROM (SELECT id, plugin_metadata FROM (${composed}) AS composed_result) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.details') AS detail WHERE json_extract(detail.value, '$.color') IS NOT NULL AND NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') IS NOT NULL GROUP BY 1 ORDER BY image_count DESC, color_name ASC",
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') AS color_name, COUNT(DISTINCT source.id) AS image_count FROM (SELECT composed_result.id, pm.data AS plugin_metadata FROM (${composed}) AS composed_result JOIN metadata AS pm ON pm.id = composed_result.metadata_id) AS source JOIN json_each(CASE WHEN json_valid(source.plugin_metadata) THEN source.plugin_metadata ELSE '{}' END, '$.details') AS detail WHERE json_extract(detail.value, '$.color') IS NOT NULL AND NULLIF(TRIM(CAST(json_extract(detail.value, '$.links[0].text') AS TEXT)), '') IS NOT NULL GROUP BY 1 ORDER BY image_count DESC, color_name ASC",
       "data_var": "color",
       "provider": "color_provider",
       "properties": {

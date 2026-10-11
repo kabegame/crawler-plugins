@@ -1,6 +1,6 @@
 {
   "name": "ziworld",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "name.zh": "ziworld高质量壁纸",
   "name.en": "ziworld high-quality wallpapers",
@@ -14,7 +14,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.5.0"
+    "kabegame": ">=4.5.1"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

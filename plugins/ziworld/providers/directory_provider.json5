@@ -6,7 +6,7 @@
     "directory_name": { "type": "string", "default": "", "optional": false }
   },
   "query": {
-    "where": "json_valid(plugin_metadata) AND NULLIF(TRIM(CAST(json_extract(plugin_metadata, '$.category') AS TEXT)), '') = ${properties.directory_name}"
+    "where": "COALESCE((json_valid(plugin_im.data) AND NULLIF(TRIM(CAST(json_extract(plugin_im.data, '$.category') AS TEXT)), '') = ${properties.directory_name}), 0)"
   },
   "list": {
     "${out.name}": {

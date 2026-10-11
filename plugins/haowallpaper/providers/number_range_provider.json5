@@ -10,7 +10,7 @@
     "max": { "type": "number", "default": 9007199254740991, "optional": true },
   },
   "query": {
-    "where": "CAST(REPLACE(NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, ${properties.json_path}) AS TEXT)), ''), ',', '') AS INTEGER) BETWEEN ${properties.min} AND ${properties.max}",
+    "where": "COALESCE((CAST(REPLACE(NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_im.data) THEN plugin_im.data ELSE '{}' END, ${properties.json_path}) AS TEXT)), ''), ',', '') AS INTEGER) BETWEEN ${properties.min} AND ${properties.max}), 0)",
   },
   "list": {
     "${out.name}": {

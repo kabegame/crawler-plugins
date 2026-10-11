@@ -4,7 +4,7 @@
   "name": "entry_provider",
   "list": {
     "${category.category_name}": {
-      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') AS category_name, COUNT(*) AS image_count FROM (SELECT plugin_metadata FROM (${composed}) AS composed_result GROUP BY plugin_metadata) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY category_name ORDER BY image_count DESC, category_name ASC",
+      "sql": "SELECT NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') AS category_name, COUNT(*) AS image_count FROM (SELECT pm.data AS plugin_metadata FROM (SELECT DISTINCT metadata_id FROM (${composed}) AS composed_result) AS d JOIN metadata AS pm ON pm.id = d.metadata_id) AS source WHERE NULLIF(TRIM(CAST(json_extract(CASE WHEN json_valid(plugin_metadata) THEN plugin_metadata ELSE '{}' END, '$.category') AS TEXT)), '') IS NOT NULL GROUP BY category_name ORDER BY image_count DESC, category_name ASC",
       "data_var": "category",
       "provider": "category_provider",
       "properties": {
