@@ -4,6 +4,7 @@
 import { MEDIA_API_BASE } from "./consts";
 import { fetchPixaiArtworkDetail, fetchPixaiComments } from "./api";
 import { labelsFromArtworkDetail } from "./labels";
+import { searchTextsFromDetail } from "./search-texts";
 import { arrayValue, coerceStr, log } from "./util";
 
 const { addProgress, createImageMetadata: createImageMetadataRow, downloadImage } = Kabegame;
@@ -37,7 +38,7 @@ function pickArtworkDownloadUrl(defaultUrl, node, artworkDetail) {
 }
 
 function createImageMetadata(metadata) {
-  return Number(createImageMetadataRow(metadata, null));
+  return Number(createImageMetadataRow(metadata, { searchTexts: searchTextsFromDetail(metadata.v2) }));
 }
 
 async function downloadArtwork(finalDownloadUrl, artworkDetail, displayName, pixaiUrl) {

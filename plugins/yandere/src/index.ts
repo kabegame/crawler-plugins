@@ -244,6 +244,33 @@ function buildYandereMetadata(document, pageUrl) {
   };
 }
 
+// 元数据搜索片段："yandere"、有标签时写 "tags"、作品 ID、每个标签（侧栏显示名与站点标识各一条，
+// 如 "hatsune miku" / "hatsune_miku"）、rating、上传者名称、喜欢者昵称、评论者名称、评论内容。
+// 规则在 src/index.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
+function searchTextsFromMetadata(meta) {
+  const out = ["yandere"];
+  const push = (value) => {
+    const text = String(value ?? "").trim();
+    if (text) out.push(text);
+  };
+  const tags = Array.isArray(meta?.sidebar_tags) ? meta.sidebar_tags : [];
+  const stats = meta?.stats || {};
+  if (tags.some((tag) => String(tag?.display || tag?.name || "").trim())) out.push("tags");
+  push(stats.post_id);
+  for (const tag of tags) {
+    push(tag?.display);
+    push(tag?.name);
+  }
+  push(stats.rating);
+  push(meta?.posted_by_name);
+  for (const user of Array.isArray(stats.favorited) ? stats.favorited : []) push(user?.name);
+  for (const comment of Array.isArray(meta?.comments) ? meta.comments : []) {
+    push(comment?.author_name);
+    push(comment?.body);
+  }
+  return [...new Set(out)];
+}
+
 function metadataNonEmpty(meta) {
   return !!(
     meta.posted_by_name ||
@@ -280,7 +307,10 @@ async function processDetailPage(href, baseUrl, quality) {
     return;
   }
   const opts = { url: finalUrl };
-  if (metadataNonEmpty(meta)) opts.metadata = meta;
+  if (metadataNonEmpty(meta)) {
+    opts.metadata = meta;
+    opts.searchTexts = searchTextsFromMetadata(meta);
+  }
   const labels = labelsFromSidebarTags(meta.sidebar_tags);
   if (labels.length > 0) opts.labels = labels;
   await downloadImage(imageUrl, opts);

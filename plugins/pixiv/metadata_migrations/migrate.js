@@ -1,5 +1,6 @@
-// Pixiv metadata 迁移脚本：只提供 provideLabels，给历史图片补标签，不改写 metadata。
-// 规则与 src/index.ts 的 labelsFromIllustBody 一致（此处无法 import，保持两份同步）。
+// Pixiv metadata 迁移脚本：提供 provideLabels 与 provideSearchTextList，给历史图片补标签和搜索片段，
+// 不改写 metadata。规则与 src/index.ts 的 labelsFromIllustBody / pixivSearchTexts 一致
+// （此处无法 import，保持两份同步）。
 
 function coerceStr(value) {
   return value == null ? "" : String(value);
@@ -289,4 +290,48 @@ export function provideLabels(input) {
     });
   }
   return labels;
+}
+
+// 元数据搜索片段："pixiv"、作者名、作者 ID、每个标签加 # 前缀（原始名与英文翻译各一条）、
+// 投稿日期（"2026年5月21日"）；有评论时再写 "comments" 与每条评论的评论者名称、评论内容。
+// 日期取 uploadDate（缺失回落 createDate，与详情模板一致），按 Pixiv 所在的日本时区（UTC+9，无夏令时）
+// 取日，结果不随运行设备的时区变化。
+// 规则在 src/index.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
+function pixivDateText(value) {
+  const ms = Date.parse(coerceStr(value));
+  if (!Number.isFinite(ms)) return "";
+  const jst = new Date(ms + 9 * 60 * 60 * 1000);
+  return `${jst.getUTCFullYear()}年${jst.getUTCMonth() + 1}月${jst.getUTCDate()}日`;
+}
+
+export function provideSearchTextList(input) {
+  const metadata = JSON.parse(input);
+  const body = metadata && typeof metadata.body === "object" &&
+      !Array.isArray(metadata.body)
+    ? metadata.body
+    : {};
+  const out = ["pixiv"];
+  const push = (value) => {
+    const text = coerceStr(value).trim();
+    if (text) out.push(text);
+  };
+  push(body.userName);
+  push(body.userId || body.tags?.authorId);
+  const tags = Array.isArray(body.tags?.tags) ? body.tags.tags : [];
+  for (const tag of tags) {
+    for (const name of [tag?.tag, tag?.translation?.en]) {
+      const text = coerceStr(name).trim();
+      if (text) out.push(`#${text}`);
+    }
+  }
+  push(pixivDateText(body.uploadDate ?? body.createDate));
+  const comments = Array.isArray(metadata?.comments) ? metadata.comments : [];
+  if (comments.length > 0) {
+    out.push("comments");
+    for (const comment of comments) {
+      push(comment?.userName);
+      push(comment?.comment);
+    }
+  }
+  return [...new Set(out)];
 }

@@ -20,7 +20,6 @@ const DEFAULT_SITE = "https://manyacg.top";
 const PAGE_SIZE = 50;
 const RANDOM_MAX = 200;
 const REQUEST_ATTEMPTS = 3;
-const SEARCH_TEXT_DESC_MAX = 500;
 
 // 标签画册：站点没有标签分类，所有标签归 tag，作者单独一类。
 const LABEL_TAG = "manyacg/tag";
@@ -186,13 +185,20 @@ function buildMetadata(art, pageUrl) {
   };
 }
 
-// 搜索片段覆盖模板里展示给用户的原文：标题、作者、标签、简介（截断），外加按字段精确筛选的前缀条目。
-function buildSearchTexts(art) {
-  const texts = [str(art.title), str(art.artist?.name), ...(art.tags || []).map(str)];
-  const desc = str(art.description);
-  if (desc) texts.push(desc.length > SEARCH_TEXT_DESC_MAX ? desc.slice(0, SEARCH_TEXT_DESC_MAX) : desc);
-  if (art.artist?.name) texts.push(`manyacg_artist_${str(art.artist.name)}`);
-  if (art.source_type) texts.push(`manyacg_source_${str(art.source_type)}`);
+// 元数据搜索片段：manyacg、全部标签、作品名、作者名、平台名（pixiv / twitter 等）、平台作者名（去掉 @）、入库日期。
+// metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，改这里要同步改那里。
+function searchTextsFromMetadata(meta) {
+  const artist = meta.artist || {};
+  const texts = [
+    "manyacg",
+    ...(meta.tags || []).map(str),
+    str(meta.title),
+    str(artist.name),
+    str(meta.source_type || artist.type).toLowerCase(),
+    str(artist.username).replace(/^@+/, ""),
+    // 入库日期，取 created_at（"2025-02-12 14:45:50"）开头的 YYYY-MM-DD，与详情页显示的原串一致
+    /^\d{4}-\d{2}-\d{2}/.exec(str(meta.created_at))?.[0] ?? "",
+  ];
   return [...new Set(texts.filter(Boolean))];
 }
 
@@ -213,7 +219,8 @@ async function downloadArtwork(art, siteBase) {
   }
   const pageUrl = `${siteBase}/artwork/${art.id}`;
   // 一个作品的多张图共用同一行 metadata。
-  const metadataId = Number(createImageMetadata(buildMetadata(art, pageUrl), { searchTexts: buildSearchTexts(art) }));
+  const metadata = buildMetadata(art, pageUrl);
+  const metadataId = Number(createImageMetadata(metadata, { searchTexts: searchTextsFromMetadata(metadata) }));
   const labels = buildLabels(art);
   for (const [index, picture] of pictures.entries()) {
     const opts = { name: displayName(art, index, pictures.length), url: pageUrl, metadata_id: metadataId };
