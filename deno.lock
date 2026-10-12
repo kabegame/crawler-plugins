@@ -1941,6 +1941,16 @@
           ]
         }
       },
+      "plugins/bluedafeiyu": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:tiny-pinyin@^1.3.2",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/danbooru": {
         "packageJson": {
           "dependencies": [

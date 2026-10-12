@@ -1,0 +1,89 @@
+<%
+const m = metadata || {};
+const characters = Array.isArray(m.characters) ? m.characters : [];
+const types = Array.isArray(m.types) ? m.types : [];
+const tags = Array.isArray(m.tags) ? m.tags : [];
+const media = m.media || {};
+const author = m.author || {};
+const source = m.source || {};
+const license = m.license || {};
+const rights = license.rights || {};
+const stats = m.stats || {};
+const safeLink = (value) => /^https?:\/\//i.test(String(value || "")) ? String(value) : "";
+const pageUrl = safeLink(m.page_url);
+const originalUrl = safeLink(media.original_url);
+const sourceUrl = safeLink(source.url);
+const formatBytes = (value) => {
+  const bytes = Number(value) || 0;
+  if (!bytes) return media.formatted_size || "—";
+  const units = ["B", "KB", "MB", "GB"];
+  let size = bytes;
+  let unit = 0;
+  while (size >= 1024 && unit < units.length - 1) { size /= 1024; unit += 1; }
+  return `${size >= 10 || unit === 0 ? size.toFixed(0) : size.toFixed(1)} ${units[unit]}`;
+};
+%>
+<style>
+  :root { color: #18365e; background: #f4f9ff; font: 14px/1.65 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 14px; }
+  .sheet { border: 2px solid #244b7c; background: #fff; box-shadow: 4px 4px 0 #244b7c; }
+  .head { padding: 20px; border-bottom: 1px solid #bed2e8; background-image: linear-gradient(#dbe9f7 1px, transparent 1px), linear-gradient(90deg, #dbe9f7 1px, transparent 1px); background-size: 24px 24px; }
+  .roles, .types, .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .role, .type, .tag { display: inline-flex; align-items: center; min-height: 28px; padding: 3px 9px; border: 1px solid #244b7c; background: #eef6ff; color: #18365e; text-decoration: none; }
+  .role::before { content: ""; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: #3479d9; }
+  h1 { margin: 12px 0 8px; font-size: 27px; line-height: 1.2; text-decoration: underline 6px #b9dcff; text-underline-offset: -2px; }
+  .types { margin-top: 10px; }
+  .type { min-height: 24px; padding: 1px 7px; border-style: dashed; background: #fff; }
+  .body { padding: 18px 20px 22px; }
+  .commentary { margin: 0 0 14px; padding: 14px 16px; border: 2px dashed #2a568b; background: #edf6ff; }
+  .commentary b { display: block; margin-bottom: 5px; color: #3479d9; font-size: 12px; }
+  .description { margin: 0 0 16px; white-space: pre-wrap; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+  .button { padding: 8px 12px; border: 2px solid #244b7c; border-radius: 7px; color: #18365e; background: #fff; font-weight: 700; text-decoration: none; box-shadow: 2px 2px 0 #244b7c; }
+  .button.primary { color: #fff; background: #3479d9; }
+  dl { margin: 18px 0; border-top: 1px solid #bed2e8; }
+  dl div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid #d7e4f1; }
+  dt { color: #557394; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  .credit { margin: 13px 0; padding-left: 12px; border-left: 4px solid #8dbce9; }
+  .tags { margin-top: 16px; }
+  .tag { min-height: 24px; padding: 1px 7px; }
+  .tag::before { content: "#"; margin-right: 2px; color: #3479d9; }
+  .muted { color: #6a819b; }
+</style>
+<article class="sheet">
+  <header class="head">
+    <% if (characters.length) { %>
+      <div class="roles">
+        <% for (const character of characters) { %><span class="role"><%= character.name || character.id %></span><% } %>
+      </div>
+    <% } %>
+    <h1><%= m.title || m.slug || "蓝色大肥鱼作品" %></h1>
+    <% if (types.length) { %>
+      <div class="types"><% for (const type of types) { %><span class="type"><%= type.name || type.id %></span><% } %></div>
+    <% } %>
+  </header>
+  <div class="body">
+    <% if (m.commentary) { %><div class="commentary"><b>大肥鱼说</b><%= m.commentary %></div><% } %>
+    <% if (m.description) { %><p class="description"><%= m.description %></p><% } %>
+    <% if (pageUrl || originalUrl || sourceUrl) { %>
+      <div class="actions">
+        <% if (originalUrl) { %><a class="button primary" href="<%= originalUrl %>" target="_blank">下载原图</a><% } %>
+        <% if (pageUrl) { %><a class="button" href="<%= pageUrl %>" target="_blank">查看源站详情</a><% } %>
+        <% if (sourceUrl) { %><a class="button" href="<%= sourceUrl %>" target="_blank">原始来源</a><% } %>
+      </div>
+    <% } %>
+    <dl>
+      <div><dt>来源作者</dt><dd><%= author.name || author.source_author || rights.creator || "原作者未标注" %></dd></div>
+      <div><dt>收录时间</dt><dd><%= m.collected_at || "—" %></dd></div>
+      <div><dt>原图</dt><dd><%= media.format || "格式未知" %> · <%= media.width && media.height ? `${media.width} × ${media.height}` : "尺寸未知" %> · <%= formatBytes(media.bytes) %></dd></div>
+      <div><dt>授权状态</dt><dd><%= license.title || license.short || "授权状态不明" %></dd></div>
+      <div><dt>浏览 / 下载</dt><dd><%= stats.available ? `${Number(stats.views || 0).toLocaleString()} / ${Number(stats.downloads || 0).toLocaleString()}` : "统计尚未同步" %></dd></div>
+    </dl>
+    <% if (rights.creditText || rights.copyrightNotice) { %>
+      <p class="credit"><%= rights.creditText || "" %><% if (rights.creditText && rights.copyrightNotice) { %><br><% } %><span class="muted"><%= rights.copyrightNotice || "" %></span></p>
+    <% } %>
+    <% if (tags.length) { %><div class="tags"><% for (const tag of tags) { %><span class="tag"><%= tag %></span><% } %></div><% } %>
+  </div>
+</article>

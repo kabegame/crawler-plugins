@@ -1,0 +1,308 @@
+{
+  "name": "bluedafeiyu",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "蓝色大肥鱼 AI 娘档案",
+  "name.en": "Blue Dafeiyu AI-girl archive",
+  "name.ja": "Blue Dafeiyu AI娘アーカイブ",
+  "name.ko": "Blue Dafeiyu AI 소녀 아카이브",
+  "name.zhtw": "藍色大肥魚 AI 娘檔案",
+  "description": "蓝色大肥鱼 AI 娘二创开放档案收集源：按角色、类型和排序一次性拉取原图",
+  "description.zh": "蓝色大肥鱼 AI 娘二创开放档案收集源：按角色、类型和排序一次性拉取原图",
+  "description.en": "Crawler for the Blue Dafeiyu open AI-girl fanwork archive, with character, type and sort filters",
+  "description.ja": "Blue Dafeiyu のAI娘二次創作アーカイブを、キャラクター・種類・並び順で取得します",
+  "description.ko": "Blue Dafeiyu AI 소녀 팬아트 아카이브를 캐릭터, 유형, 정렬 기준으로 수집합니다",
+  "description.zhtw": "藍色大肥魚 AI 娘二創開放檔案收集源：依角色、類型與排序一次拉取原圖",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.1"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://xn--pssy23gqgbz2d718b.com",
+  "kbConfig": [
+    {
+      "key": "character",
+      "type": "options",
+      "name": "Character",
+      "name.zh": "角色",
+      "name.ja": "キャラクター",
+      "name.ko": "캐릭터",
+      "name.zhtw": "角色",
+      "descripts": "The list is fixed to the site's public character taxonomy. Choose All to fetch every character.",
+      "descripts.zh": "选项按源站公开角色表写死；选“全部”时不按角色过滤。",
+      "descripts.ja": "サイト公開のキャラクター分類を固定リスト化しています。「すべて」は絞り込みません。",
+      "descripts.ko": "사이트 공개 캐릭터 분류를 고정 목록으로 제공합니다. '전체'는 필터링하지 않습니다.",
+      "descripts.zhtw": "選項依來源站公開角色表寫死；選「全部」時不依角色篩選。",
+      "default": "",
+      "width": 4,
+      "options": [
+        {
+          "name": "All",
+          "name.zh": "全部",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": ""
+        },
+        {
+          "name": "DeepSeek Chan",
+          "name.zh": "DeepSeek娘",
+          "name.ja": "DeepSeek娘",
+          "name.ko": "DeepSeek娘",
+          "name.zhtw": "DeepSeek娘",
+          "variable": "deepseek"
+        },
+        {
+          "name": "GPT Chan",
+          "name.zh": "GPT娘",
+          "name.ja": "GPT娘",
+          "name.ko": "GPT娘",
+          "name.zhtw": "GPT娘",
+          "variable": "gpt"
+        },
+        {
+          "name": "Claude Chan",
+          "name.zh": "Claude娘",
+          "name.ja": "Claude娘",
+          "name.ko": "Claude娘",
+          "name.zhtw": "Claude娘",
+          "variable": "claude"
+        },
+        {
+          "name": "Kimi Chan",
+          "name.zh": "Kimi娘",
+          "name.ja": "Kimi娘",
+          "name.ko": "Kimi娘",
+          "name.zhtw": "Kimi娘",
+          "variable": "kimi"
+        },
+        {
+          "name": "Qwen Chan",
+          "name.zh": "通义千问娘",
+          "name.ja": "通義千問娘",
+          "name.ko": "Qwen娘",
+          "name.zhtw": "通義千問娘",
+          "variable": "qwen"
+        },
+        {
+          "name": "Other characters",
+          "name.zh": "其他角色",
+          "name.ja": "その他のキャラクター",
+          "name.ko": "기타 캐릭터",
+          "name.zhtw": "其他角色",
+          "variable": "other"
+        },
+        {
+          "name": "Gemini Chan",
+          "name.zh": "Gemini娘",
+          "name.ja": "Gemini娘",
+          "name.ko": "Gemini娘",
+          "name.zhtw": "Gemini娘",
+          "variable": "gemini"
+        },
+        {
+          "name": "Grok Chan",
+          "name.zh": "Grok娘",
+          "name.ja": "Grok娘",
+          "name.ko": "Grok娘",
+          "name.zhtw": "Grok娘",
+          "variable": "grok"
+        },
+        {
+          "name": "GLM Chan",
+          "name.zh": "GLM娘",
+          "name.ja": "GLM娘",
+          "name.ko": "GLM娘",
+          "name.zhtw": "GLM娘",
+          "variable": "glm"
+        },
+        {
+          "name": "Doubao Chan",
+          "name.zh": "豆包娘",
+          "name.ja": "豆包娘",
+          "name.ko": "Doubao娘",
+          "name.zhtw": "豆包娘",
+          "variable": "doubao"
+        },
+        {
+          "name": "Owner picks",
+          "name.zh": "站长自用",
+          "name.ja": "管理人セレクト",
+          "name.ko": "운영자 선택",
+          "name.zhtw": "站長自用",
+          "variable": "owner-picks"
+        },
+        {
+          "name": "Stepfun Chan",
+          "name.zh": "Stepfun娘",
+          "name.ja": "Stepfun娘",
+          "name.ko": "Stepfun娘",
+          "name.zhtw": "Stepfun娘",
+          "variable": "stepfun"
+        },
+        {
+          "name": "MiMo Chan",
+          "name.zh": "MiMo娘",
+          "name.ja": "MiMo娘",
+          "name.ko": "MiMo娘",
+          "name.zhtw": "MiMo娘",
+          "variable": "mimo"
+        }
+      ]
+    },
+    {
+      "key": "type",
+      "type": "options",
+      "name": "Type",
+      "name.zh": "类型",
+      "name.ja": "種類",
+      "name.ko": "유형",
+      "name.zhtw": "類型",
+      "descripts": "The list is fixed to the site's six public work types. Type is exposed through the plugin provider, not label albums.",
+      "descripts.zh": "选项按源站六种作品类型写死；类型通过插件 Provider 筛选，不建立标签画册。",
+      "descripts.ja": "サイト公開の6種類を固定リスト化しています。種類はラベルではなくProviderで絞り込みます。",
+      "descripts.ko": "사이트의 6개 작품 유형을 고정 목록으로 제공합니다. 유형은 라벨이 아닌 Provider로 필터링합니다.",
+      "descripts.zhtw": "選項依來源站六種作品類型寫死；類型透過插件 Provider 篩選，不建立標籤相簿。",
+      "default": "",
+      "width": 2,
+      "options": [
+        {
+          "name": "All",
+          "name.zh": "全部",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": ""
+        },
+        {
+          "name": "Meme",
+          "name.zh": "梗图",
+          "name.ja": "ミーム",
+          "name.ko": "밈",
+          "name.zhtw": "梗圖",
+          "variable": "meme"
+        },
+        {
+          "name": "Illustration",
+          "name.zh": "插画",
+          "name.ja": "イラスト",
+          "name.ko": "일러스트",
+          "name.zhtw": "插畫",
+          "variable": "illustration"
+        },
+        {
+          "name": "Reference sheet",
+          "name.zh": "设定图",
+          "name.ja": "設定画",
+          "name.ko": "설정화",
+          "name.zhtw": "設定圖",
+          "variable": "setting"
+        },
+        {
+          "name": "Comic",
+          "name.zh": "漫画",
+          "name.ja": "漫画",
+          "name.ko": "만화",
+          "name.zhtw": "漫畫",
+          "variable": "comic"
+        },
+        {
+          "name": "Standing art",
+          "name.zh": "立绘",
+          "name.ja": "立ち絵",
+          "name.ko": "스탠딩 일러스트",
+          "name.zhtw": "立繪",
+          "variable": "standing"
+        },
+        {
+          "name": "Other",
+          "name.zh": "其他",
+          "name.ja": "その他",
+          "name.ko": "기타",
+          "name.zhtw": "其他",
+          "variable": "other"
+        }
+      ]
+    },
+    {
+      "key": "sort",
+      "type": "options",
+      "name": "Sort",
+      "name.zh": "排序",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "Popular sorts by views; Downloads sorts by original-image button clicks; Random reshuffles the complete filtered result.",
+      "descripts.zh": "“热度”按浏览量排序，“下载量”按原图按钮点击量排序；“随机”会打乱完整筛选结果。",
+      "descripts.ja": "「人気」は閲覧数、「ダウンロード」は原画像ボタンのクリック数で並べ、ランダムは全結果をシャッフルします。",
+      "descripts.ko": "'인기'는 조회수, '다운로드'는 원본 이미지 버튼 클릭 수로 정렬하며, 무작위는 전체 결과를 섞습니다.",
+      "descripts.zhtw": "「熱度」依瀏覽量排序，「下載量」依原圖按鈕點擊量排序；「隨機」會打亂完整篩選結果。",
+      "default": "latest",
+      "width": 2,
+      "options": [
+        {
+          "name": "Latest",
+          "name.zh": "最新",
+          "name.ja": "最新",
+          "name.ko": "최신",
+          "name.zhtw": "最新",
+          "variable": "latest"
+        },
+        {
+          "name": "Popular",
+          "name.zh": "热度",
+          "name.ja": "人気",
+          "name.ko": "인기",
+          "name.zhtw": "熱度",
+          "variable": "popular"
+        },
+        {
+          "name": "Downloads",
+          "name.zh": "下载量",
+          "name.ja": "ダウンロード",
+          "name.ko": "다운로드",
+          "name.zhtw": "下載量",
+          "variable": "downloads"
+        },
+        {
+          "name": "Random",
+          "name.zh": "随机",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "random"
+        }
+      ]
+    }
+  ],
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbIcon": "icon.png",
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/character_router.json5",
+    "providers/character_provider.json5",
+    "providers/type_router.json5",
+    "providers/type_provider.json5"
+  ],
+  "dependencies": {
+    "tiny-pinyin": "^1.3.2"
+  },
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

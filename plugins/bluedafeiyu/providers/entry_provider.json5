@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.bluedafeiyu",
+  "name": "entry_provider",
+  "list": {
+    "character": {
+      "provider": "character_router",
+      "meta": {
+        "display": "角色",
+        "plain": true,
+      },
+    },
+    "type": {
+      "provider": "type_router",
+      "meta": {
+        "display": "类型",
+        "plain": true,
+      },
+    },
+  },
+  "note": "{\"title\":\"蓝色大肥鱼分类\",\"content\":\"按源站固定角色或作品类型筛选；类型不建立标签画册。\"}",
+}

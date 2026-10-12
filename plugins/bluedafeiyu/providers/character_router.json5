@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.bluedafeiyu",
+  "name": "character_router",
+  // 固定项列表（保持源站顺序、0 张也列出），计数按 metadata.character_ids 展开后对当前 composed 分组。
+  "list": {
+    "${character.character_id}": {
+      "sql": "SELECT f.character_id AS character_id, f.display AS display, COALESCE(g.image_count, 0) AS image_count FROM (SELECT 1 AS ord, 'deepseek' AS character_id, 'DeepSeek娘' AS display UNION ALL SELECT 2 AS ord, 'gpt' AS character_id, 'GPT娘' AS display UNION ALL SELECT 3 AS ord, 'claude' AS character_id, 'Claude娘' AS display UNION ALL SELECT 4 AS ord, 'kimi' AS character_id, 'Kimi娘' AS display UNION ALL SELECT 5 AS ord, 'qwen' AS character_id, '通义千问娘' AS display UNION ALL SELECT 6 AS ord, 'other' AS character_id, '其他角色' AS display UNION ALL SELECT 7 AS ord, 'gemini' AS character_id, 'Gemini娘' AS display UNION ALL SELECT 8 AS ord, 'grok' AS character_id, 'Grok娘' AS display UNION ALL SELECT 9 AS ord, 'glm' AS character_id, 'GLM娘' AS display UNION ALL SELECT 10 AS ord, 'doubao' AS character_id, '豆包娘' AS display UNION ALL SELECT 11 AS ord, 'owner-picks' AS character_id, '站长自用' AS display UNION ALL SELECT 12 AS ord, 'stepfun' AS character_id, 'Stepfun娘' AS display UNION ALL SELECT 13 AS ord, 'mimo' AS character_id, 'MiMo娘' AS display) AS f LEFT JOIN (SELECT CAST(item.value AS TEXT) AS character_id, COUNT(DISTINCT c.id) AS image_count FROM (${composed}) AS c JOIN metadata AS pm ON pm.id = c.metadata_id, json_each(CASE WHEN json_valid(pm.data) THEN COALESCE(json_extract(pm.data, '$.character_ids'), json('[]')) ELSE json('[]') END) AS item GROUP BY 1) AS g ON g.character_id = f.character_id ORDER BY f.ord",
+      "data_var": "character",
+      "provider": "character_provider",
+      "properties": { "character_id": "${character.character_id}" },
+      "meta": {
+        "isLeaf": true,
+        "display": "${character.display}",
+        "image_count": "${character.image_count}",
+      },
+    },
+  },
+  "resolve": {
+    // 只收固定 ID，避免吞掉宿主自动追加在末尾的 filter_comb 段
+    "(deepseek|gpt|claude|kimi|qwen|other|gemini|grok|glm|doubao|owner-picks|stepfun|mimo)": {
+      "provider": "character_provider",
+      "properties": { "character_id": "${capture[1]}" },
+      "meta": { "isLeaf": true },
+    },
+  },
+  "note": "{\"title\":\"角色\",\"content\":\"固定为源站公开的 13 个角色 ID；路径段使用模型英文 ID。\"}",
+}

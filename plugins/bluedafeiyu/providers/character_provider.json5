@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../../src-tauri/kabegame-core/src/providers/dsl/schema.json5",
+  "namespace": "plugins.bluedafeiyu",
+  "name": "character_provider",
+  "properties": {
+    "character_id": { "type": "string", "default": "", "optional": false },
+  },
+  "query": {
+    "where": "COALESCE((EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(plugin_im.data) THEN COALESCE(json_extract(plugin_im.data, '$.character_ids'), json('[]')) ELSE json('[]') END) AS character WHERE CAST(character.value AS TEXT) = ${properties.character_id})), 0)",
+  },
+}
