@@ -245,6 +245,35 @@ This repository contains crawler plugins for the Kabegame image collection syste
 
 ---
 
+### 10. safebooru
+
+**Name**: Safebooru  
+**Version**: 1.0.0
+**Description**: Safebooru (Gelbooru's all-ages board) crawler using the official API, with categorized tags and comments  
+**Author**: Kabegame
+
+**Path**: `plugins/safebooru/`  
+**Documentation**: [plugins/safebooru/README.en.md](plugins/safebooru/README.en.md)
+
+**Features**:
+- Crawl posts from safebooru.org through its anonymous official API (`dapi`). One request per page returns the posts together with every tag and its category, and page numbers match the site's listing.
+- Three modes: tag search, newest site-wide, and tag list
+- Sort by newest / highest score / recently updated / random (the site's `sort:` metatag); metatags such as `width:>=1920` work in the tag list
+- Metadata holds the full categorized tag set, post time, uploader, source, score, and the comment thread for posts that have one. The detail sidebar reproduces the site's post page.
+- Writes tags into the app-level Labels section under `safebooru/<category>`
+- Quality: high (original file) / medium (the site's resized sample)
+
+**Config variables**:
+- `crawl_mode`: `tags` / `all` / `tag_list`
+- `mode_tag_value`: tag list for the tag search mode
+- `sort_order`: empty / `sort:score:desc` / `sort:updated:desc` / `sort:random`
+- `start_page`, `end_page`: page range, 42 posts per page, max 100 pages per run
+- `tag`, `mode_tag_type`, `mode_tag_order`, `mode_tag_skip`, `mode_tag_count`, `mode_tag_pages`: tag list mode
+- `quality`: `high` / `medium`
+- `fetch_comments`: store comments for posts that have them
+
+---
+
 ## 使用方法
 
 ### As Git Submodule

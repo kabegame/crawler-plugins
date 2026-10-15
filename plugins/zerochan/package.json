@@ -1,6 +1,6 @@
 {
   "name": "zerochan",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "name.zh": "Zerochan 动漫图板",
   "name.en": "Zerochan anime image board",
@@ -156,7 +156,7 @@
           "variable": "random"
         }
       ],
-      "width": 1
+      "width": 4
     },
     {
       "key": "popular_range",
@@ -190,7 +190,7 @@
           "variable": "2"
         }
       ],
-      "width": 1,
+      "width": 4,
       "when": {
         "crawl_mode": [
           "all"
@@ -215,7 +215,7 @@
       "descripts.zhtw": "要拉取的起始頁面，每頁 48 條",
       "default": 1,
       "min": 1,
-      "width": 1
+      "width": 2
     },
     {
       "key": "end_page",
@@ -232,7 +232,7 @@
       "descripts.zhtw": "要拉取的結束頁面。請保持最多爬取100頁，降低並發量文明爬取。否則拒絕爬取",
       "default": 2,
       "min": 1,
-      "width": 1
+      "width": 2
     },
     {
       "key": "quality",

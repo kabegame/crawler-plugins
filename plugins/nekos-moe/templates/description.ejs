@@ -1,0 +1,70 @@
+<%
+  // 还原 nekos.moe 详情页（/post/<id>）左栏：Post Info（上传者 / 审核者 / 上传时间 / 画师）、
+  // 点赞与收藏、Tags。配色与尺寸取自站点 CSS（Bulma 主题，primary #96abec，NSFW 图的标签用 danger #ff3860）。
+  // 数据来自 src/index.ts 的 buildMetadata（schema 1）。
+  const m = metadata || {};
+  const BASE = 'https://nekos.moe';
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  function plural(n, word) { return n + ' ' + word + (n !== 1 ? 's' : ''); }
+  // 站点用 toLocaleString() 显示，这里固定成 2018/5/25 13:12:14 的样式
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    if (!iso || isNaN(d)) return '';
+    const p = function (n) { return String(n).padStart(2, '0'); };
+    return d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function userLink(u) { return BASE + '/user/' + encodeURIComponent(u.id || ''); }
+  function tagLink(t) { return BASE + '/search/images?tags=' + encodeURIComponent('"' + t + '"'); }
+%>
+<style>
+.nk{
+  --nk-text:#4a4a4a;--nk-primary:#96abec;--nk-danger:#ff3860;
+  font-family:Nunito,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.5;color:var(--nk-text);
+}
+.nk a{color:var(--nk-primary);text-decoration:none;}
+.nk a:hover{color:#363636;}
+.nk-header{border-bottom:2px solid var(--nk-text);margin-bottom:24px;padding-bottom:4px;}
+.nk-header h2{margin:0;font-size:28px;font-weight:700;line-height:28px;color:#363636;}
+.nk-info p{margin:0;}
+.nk-info strong{color:#363636;}
+.nk-section{margin-bottom:24px;}
+.nk-rel{display:flex;justify-content:space-around;flex-wrap:wrap;gap:8px;color:#363636;}
+.nk-rel span{display:inline-flex;align-items:center;gap:6px;}
+.nk-rel svg{width:22px;height:22px;fill:currentColor;}
+.nk-sub{border-bottom:1px solid var(--nk-text);font-weight:700;margin-bottom:8px;}
+.nk-tags{display:flex;flex-wrap:wrap;margin:-2px;}
+.nk-tag{display:inline-flex;align-items:center;height:2em;margin:2px;padding:0 .75em;border-radius:4px;font-size:.75rem;line-height:1.5;white-space:nowrap;background:var(--nk-primary);color:#fff!important;}
+.nk-tag.nsfw{background:var(--nk-danger);}
+.nk-tag:hover{opacity:.85;}
+.nk-badge{display:inline-block;margin-left:6px;padding:0 .5em;border-radius:4px;font-size:.7rem;font-weight:700;vertical-align:middle;background:var(--nk-danger);color:#fff;}
+.nk-links{font-size:14px;}
+</style>
+<div class="nk">
+  <div class="nk-header"><h2>Post Info<% if (m.nsfw) { %><span class="nk-badge">NSFW</span><% } %></h2></div>
+
+  <div class="nk-info nk-section">
+    <% if (m.uploader) { %><p><strong>Uploader:</strong> <a href="<%= userLink(m.uploader) %>" target="_blank" rel="noopener noreferrer"><%= m.uploader.username %></a></p><% } %>
+    <% if (m.approver) { %><p><strong>Approver:</strong> <a href="<%= userLink(m.approver) %>" target="_blank" rel="noopener noreferrer"><%= m.approver.username %></a></p><% } %>
+    <% if (m.created_at) { %><p><strong>Uploaded:</strong> <%= fmtDate(m.created_at) %></p><% } %>
+    <% if (m.artist) { %><p><strong>Artist:</strong> <%= m.artist %></p><% } %>
+  </div>
+
+  <div class="nk-rel nk-section">
+    <span><svg viewBox="0 0 24 24"><path d="M23 10a2 2 0 0 0-2-2h-6.32l.96-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.58C7.22 7.95 7 8.45 7 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2M1 21h4V9H1v12z"/></svg><%= plural(m.likes || 0, 'Like') %></span>
+    <span><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.08C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.53L12 21.35z"/></svg><%= plural(m.favorites || 0, 'Favorite') %></span>
+  </div>
+
+  <div class="nk-section">
+    <div class="nk-sub">Tags</div>
+    <% if (tags.length) { %>
+    <div class="nk-tags">
+      <% tags.forEach(function (t) { %><a class="nk-tag<%= m.nsfw ? ' nsfw' : '' %>" href="<%= tagLink(t) %>" target="_blank" rel="noopener noreferrer"><%= t %></a><% }); %>
+    </div>
+    <% } else { %>
+    <p>No tags</p>
+    <% } %>
+  </div>
+
+  <% if (m.page_url) { %><div class="nk-links"><a href="<%= m.page_url %>" target="_blank" rel="noopener noreferrer">View on nekos.moe</a></div><% } %>
+</div>

@@ -1,0 +1,25 @@
+{
+  "name": "横屏风景壁纸",
+  "name.en": "Landscape scenery wallpapers",
+  "name.ja": "横長の風景壁紙",
+  "name.ko": "가로형 풍경 배경화면",
+  "name.zhtw": "橫屏風景桌布",
+  "description": "scenery 标签 + 宽 ≥1920、高 ≤1200 的横图，按评分排序抓两页，适合直接当桌面壁纸",
+  "description.en": "scenery tag, width ≥ 1920 and height ≤ 1200 (landscape), ordered by score; two pages ready to use as desktop wallpapers.",
+  "description.ja": "scenery タグ、幅 1920 以上・高さ 1200 以下の横長画像をスコア順に2ページ取得します。そのままデスクトップ壁紙に使えます。",
+  "description.ko": "scenery 태그, 너비 1920 이상·높이 1200 이하의 가로 이미지를 점수순으로 두 페이지 수집합니다. 바로 데스크톱 배경화면으로 쓸 수 있습니다.",
+  "description.zhtw": "scenery 標籤 + 寬 ≥1920、高 ≤1200 的橫圖，按評分排序抓兩頁，適合直接當桌面桌布",
+  "userConfig": {
+    "crawl_mode": "tags",
+    "mode_tag_value": [
+      "scenery",
+      "width:>=1920",
+      "height:<=1200"
+    ],
+    "sort_order": "sort:score:desc",
+    "start_page": 1,
+    "end_page": 2,
+    "quality": "high",
+    "fetch_comments": true
+  }
+}

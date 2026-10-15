@@ -1,0 +1,21 @@
+{
+  "name": "全年龄风景少女",
+  "name.en": "General-rated girl + scenery",
+  "name.ja": "全年齢・少女＋風景",
+  "name.ko": "전체 이용가 소녀 + 풍경",
+  "name.zhtw": "全年齡風景少女",
+  "description": "用 1girl + scenery 两个标签检索全年龄作品，抓第一页（100 条），适合做壁纸",
+  "description.en": "Search General-rated posts tagged 1girl + scenery and crawl the first page (100 posts); good for wallpapers.",
+  "description.ja": "1girl＋scenery の2タグで全年齢作品を検索し、1ページ目（100件）を取得します。壁紙向きです。",
+  "description.ko": "1girl + scenery 두 태그로 전체 이용가 작품을 검색해 첫 페이지(100개)를 수집합니다. 배경화면용으로 적합합니다.",
+  "description.zhtw": "用 1girl + scenery 兩個標籤檢索全年齡作品，抓第一頁（100 條），適合做桌布",
+  "userConfig": {
+    "crawl_mode": "tags",
+    "mode_tag_value": ["1girl", "scenery"],
+    "rating": "g",
+    "start_page": 1,
+    "end_page": 1,
+    "per_page": "100",
+    "quality": "high"
+  }
+}

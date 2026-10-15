@@ -1,0 +1,319 @@
+{
+  "name": "safebooru",
+  "version": "1.0.0",
+  "private": true,
+  "name.zh": "Safebooru 全年龄图库",
+  "name.en": "Safebooru",
+  "name.ja": "Safebooru 全年齢画像掲示板",
+  "name.ko": "Safebooru 전연령 이미지 보드",
+  "name.zhtw": "Safebooru 全年齡圖庫",
+  "description": "Safebooru（Gelbooru 的全年龄站）收集源插件，走官方 API，带分类标签、评论元数据",
+  "description.zh": "Safebooru（Gelbooru 的全年龄站）收集源插件，走官方 API，带分类标签、评论元数据",
+  "description.en": "Safebooru (Gelbooru's all-ages board) crawler using the official API, with categorized tags and comments",
+  "description.ja": "Safebooru（Gelbooru の全年齢版）の収集プラグイン。公式 API を使い、分類付きタグとコメントを保存します",
+  "description.ko": "Safebooru(Gelbooru의 전연령 사이트) 수집 플러그인. 공식 API를 사용하며 분류된 태그와 댓글을 저장합니다",
+  "description.zhtw": "Safebooru（Gelbooru 的全年齡站）收集源外掛，走官方 API，帶分類標籤、留言元資料",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://safebooru.org",
+  "kbLabels": [
+    {
+      "id": "auth.needProxy"
+    },
+    {
+      "id": "content.res.desktop"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "爬取模式，分为标签、全部和 id 范围",
+      "descripts.en": "Crawl mode: tags, all or ID range",
+      "descripts.ja": "クロールモード：タグ・全部・ID 範囲",
+      "descripts.ko": "크롤 모드: 태그·전체·ID 범위",
+      "descripts.zhtw": "爬取模式，分為標籤、全部和 id 範圍",
+      "default": "tags",
+      "options": [
+        {
+          "name": "标签",
+          "name.en": "Tags",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tags"
+        },
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "全部",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "id 范围",
+          "name.en": "ID range",
+          "name.ja": "ID 範囲",
+          "name.ko": "ID 범위",
+          "name.zhtw": "id 範圍",
+          "variable": "id_range"
+        }
+      ]
+    },
+    {
+      "key": "mode_tag_value",
+      "type": "list",
+      "name": "标签组合",
+      "name.en": "Tag combination",
+      "name.ja": "タグ組み合わせ",
+      "name.ko": "태그 조합",
+      "name.zhtw": "標籤組合",
+      "descripts": "输入标签（列表），运行时按站点搜索语法用 + 连接；标签中的空格会自动转为下划线_。支持站点元标签，如 width:>=1920、score:>=100、-1boy",
+      "descripts.en": "Tags as a list; joined with + at runtime and spaces inside a tag become _. Site metatags work too, e.g. width:>=1920, score:>=100, -1boy",
+      "descripts.ja": "タグをリストで入力。実行時に + で連結し、タグ内の空白は _ に変換します。width:>=1920、score:>=100、-1boy などのメタタグも使えます",
+      "descripts.ko": "태그를 목록으로 입력합니다. 실행 시 + 로 결합하며 태그 내 공백은 _ 로 변환됩니다. width:>=1920, score:>=100, -1boy 같은 메타태그도 사용할 수 있습니다",
+      "descripts.zhtw": "輸入標籤（列表），執行時以 + 連接，標籤中的空格會自動轉為下劃線_。支援站點元標籤，如 width:>=1920、score:>=100、-1boy",
+      "default": [
+        "scenery",
+        "width:>=1920"
+      ],
+      "options": null,
+      "when": {
+        "crawl_mode": [
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "sort_order",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort order",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "descripts": "列表的排序方式，会作为 sort: 元标签拼进搜索串",
+      "descripts.en": "Listing order; appended to the search query as a sort: metatag",
+      "descripts.ja": "一覧の並び順。sort: メタタグとして検索文字列に付加されます",
+      "descripts.ko": "목록 정렬 방식. sort: 메타태그로 검색어에 추가됩니다",
+      "descripts.zhtw": "列表的排序方式，會作為 sort: 元標籤拼進搜尋串",
+      "default": "",
+      "options": [
+        {
+          "name": "最新发布",
+          "name.en": "Newest",
+          "name.ja": "新着",
+          "name.ko": "최신",
+          "name.zhtw": "最新發布",
+          "variable": ""
+        },
+        {
+          "name": "高分优先",
+          "name.en": "Highest score",
+          "name.ja": "高スコア順",
+          "name.ko": "높은 점수순",
+          "name.zhtw": "高分優先",
+          "variable": "sort:score:desc"
+        },
+        {
+          "name": "最近更新",
+          "name.en": "Recently updated",
+          "name.ja": "更新順",
+          "name.ko": "최근 업데이트순",
+          "name.zhtw": "最近更新",
+          "variable": "sort:updated:desc"
+        },
+        {
+          "name": "随机",
+          "name.en": "Random",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "sort:random"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面，每页 42 张，与网页列表的页码一一对应",
+      "descripts.en": "Start page; 42 posts per page, matching the site's own listing pages",
+      "descripts.ja": "取得開始ページ。1ページ42件で、サイトの一覧ページと一致します",
+      "descripts.ko": "가져올 시작 페이지. 페이지당 42개로 사이트 목록 페이지와 일치합니다",
+      "descripts.zhtw": "要拉取的起始頁面，每頁 42 張，與網頁列表的頁碼一一對應",
+      "default": 1,
+      "min": 1,
+      "max": null,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面，一次最多 100 页。站点 API 直接翻页只到第 4762 页；「最新发布」排序会自动用 id 游标继续往后翻，其他排序超过这一页会报错",
+      "descripts.en": "End page, at most 100 pages per run. The site API pages directly only up to page 4762; with the Newest order the plugin continues past it using an id cursor, while other orders stop with an error.",
+      "descripts.ja": "終了ページ。1回あたり100ページまで。サイト API で直接たどれるのは 4762 ページまでです。「新着」順なら id カーソルで自動的にその先へ進みますが、その他の並び順ではエラーになります。",
+      "descripts.ko": "끝 페이지. 실행당 최대 100페이지입니다. 사이트 API로 바로 넘길 수 있는 것은 4762페이지까지이며, '최신' 정렬은 id 커서로 자동으로 그 이후까지 이어 가고 다른 정렬은 오류로 중단됩니다.",
+      "descripts.zhtw": "要拉取的結束頁面，一次最多 100 頁。站點 API 直接翻頁只到第 4762 頁；「最新發布」排序會自動用 id 游標繼續往後翻，其他排序超過這一頁會報錯",
+      "default": 2,
+      "min": 1,
+      "max": null,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "id_start",
+      "type": "int",
+      "name": "起始 id",
+      "name.en": "Start ID",
+      "name.ja": "開始 ID",
+      "name.ko": "시작 ID",
+      "name.zhtw": "起始 id",
+      "descripts": "帖子 id 下限（含），即帖子页地址里 id= 后面的数字",
+      "descripts.en": "Lowest post ID (inclusive) — the number after id= in the post URL",
+      "descripts.ja": "投稿 ID の下限（含む）。投稿ページ URL の id= の後の数字です",
+      "descripts.ko": "게시물 ID 하한(포함). 게시물 페이지 주소의 id= 뒤 숫자입니다",
+      "descripts.zhtw": "貼文 id 下限（含），即貼文頁網址裡 id= 後面的數字",
+      "default": 1,
+      "min": 1,
+      "max": null,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "id_end",
+      "type": "int",
+      "name": "结束 id",
+      "name.en": "End ID",
+      "name.ja": "終了 ID",
+      "name.ko": "끝 ID",
+      "name.zhtw": "結束 id",
+      "descripts": "帖子 id 上限（含），与起始 id 最多相差 5000，否则拒绝爬取。按 id 从小到大抓取，区间里已删除的帖子会跳过",
+      "descripts.en": "Highest post ID (inclusive); at most 5000 above the start ID, otherwise the run is refused. Posts are crawled in ascending ID order; deleted posts in the range are skipped",
+      "descripts.ja": "投稿 ID の上限（含む）。開始 ID との差は最大 5000 で、超えると実行を拒否します。ID の昇順で取得し、範囲内の削除済み投稿は飛ばします",
+      "descripts.ko": "게시물 ID 상한(포함). 시작 ID와의 차이는 최대 5000이며 초과하면 실행을 거부합니다. ID 오름차순으로 수집하고 범위 안의 삭제된 게시물은 건너뜁니다",
+      "descripts.zhtw": "貼文 id 上限（含），與起始 id 最多相差 5000，否則拒絕爬取。依 id 由小到大抓取，區間裡已刪除的貼文會跳過",
+      "default": 1000,
+      "min": 1,
+      "max": null,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "name": "质量",
+      "name.en": "Quality",
+      "name.ja": "画質",
+      "name.ko": "화질",
+      "name.zhtw": "畫質",
+      "descripts": "高=原图直链，中=站点缩放后的 sample（长边约 850px）；没有 sample 的小图两档都取原图",
+      "descripts.en": "High = original file, Medium = the site's resized sample (~850px). Small posts without a sample always use the original.",
+      "descripts.ja": "高＝オリジナル、中＝サイトのリサイズ版 sample（約850px）。sample のない小さな画像はどちらでもオリジナルを取得します。",
+      "descripts.ko": "고화질 = 원본 파일, 중간 = 사이트가 축소한 sample(약 850px). sample이 없는 작은 이미지는 항상 원본을 받습니다.",
+      "descripts.zhtw": "高＝原圖直鏈，中＝站點縮放後的 sample（長邊約 850px）；沒有 sample 的小圖兩檔都取原圖",
+      "default": "high",
+      "options": [
+        {
+          "name": "高",
+          "name.en": "High",
+          "name.ja": "高",
+          "name.ko": "고화질",
+          "name.zhtw": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "name.en": "Medium",
+          "name.ja": "中",
+          "name.ko": "중간",
+          "name.zhtw": "中",
+          "variable": "medium"
+        }
+      ]
+    },
+    {
+      "key": "fetch_comments",
+      "type": "boolean",
+      "name": "抓取评论",
+      "name.en": "Fetch comments",
+      "name.ja": "コメントを取得",
+      "name.ko": "댓글 가져오기",
+      "name.zhtw": "抓取留言",
+      "descripts": "有评论的帖子额外打开一次详情页，把评论存进元数据（大多数帖子没有评论，不会多发请求）",
+      "descripts.en": "For posts that have comments, open the post page once more and store the comments in metadata (most posts have none, so no extra requests).",
+      "descripts.ja": "コメントのある投稿だけ詳細ページを追加で開き、コメントをメタデータに保存します（大半の投稿はコメントがないため追加リクエストは発生しません）。",
+      "descripts.ko": "댓글이 있는 게시물만 상세 페이지를 한 번 더 열어 댓글을 메타데이터에 저장합니다(대부분의 게시물은 댓글이 없어 추가 요청이 없습니다).",
+      "descripts.zhtw": "有留言的貼文額外打開一次詳情頁，把留言存進元資料（大多數貼文沒有留言，不會多發請求）",
+      "default": true
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md",
+    "en": "README.en.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/scenery-desktop.json",
+    "configs/top-score.json"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

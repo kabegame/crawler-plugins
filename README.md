@@ -18,7 +18,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 | 你想做什么 | 优先看看 | 为什么 |
 | --- | --- | --- |
 | 追 Pixiv 画师、榜单或收藏 | [Pixiv](#pixiv) | 排行榜、收藏、画师、关键词一站齐全 |
-| 发掘高质量 AI 插画 | [PixAI](#pixai) | 能按作品、模型、LoRA、标签和作者一路深挖 |
+| 发掘高质量 AI 插画 | [PixAI](#pixai)、[AIBooru](#aibooru) | PixAI 能按作品、模型、LoRA、标签和作者一路深挖；AIBooru 每张图带社区标签和生成参数 |
 | 精确收你推的角色或作品 | [anime-pictures](#anime-pictures)、[anihonet](#anihonet-wallpaper) | 标签、作品分类和站内搜索更直接 |
 | 收原神、崩铁、绝区零等同人图 | [米游社](#米游社)、[Pixiv](#pixiv)、[ziworld](#ziworld) | 社区新图、专业插画和精选壁纸各有所长 |
 | 从小红书保存图片、视频或 Live Photo | [小红书](#小红书怎么选) | 单作品/推荐用轻量版，作者/搜索/收藏用 WebView 版 |
@@ -28,7 +28,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 | 找适配手机、桌面或特定分辨率的壁纸 | [WallpapersCraft](#wallpaperscraft)、[Wallspic](#wallspic)、[哲风壁纸](#哲风壁纸) | 分类完整，设备与尺寸筛选清楚 |
 | 随便逛逛，让好图自己找上门 | [Konachan](#konachan)、[PixAI](#pixai)、[ziworld](#ziworld) | 标签池、趋势榜和精选目录都适合“淘图” |
 | 收超高分辨率扫图做多屏壁纸 | [yande.re](#yandere)、[Konachan](#konachan) | 同一套 Moebooru，yande.re 偏向七八千像素的大图 |
-| 攒一份带完整标签的图库（AI 生图素材） | [Danbooru](#danbooru)、[Gelbooru](#gelbooru) | 每张图都存下全量标签，详情页可一键复制成 prompt |
+| 攒一份带完整标签的图库（AI 生图素材） | [Danbooru](#danbooru)、[Gelbooru](#gelbooru)、[Safebooru](#safebooru) | 每张图都存下全量标签，详情页可一键复制成 prompt |
 | 想知道每张图的原始出处在哪 | [Zerochan](#zerochan) | 人工整理的分类标签 + 原作发布页 URL，都存进元数据 |
 
 ## 插件全览
@@ -82,6 +82,22 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 它同样把详情页的全量标签写进每张图的元数据（作家 / 角色 / 版权 / 元信息 / 通用），图片详情侧栏按站点原样的配色渲染，可一键复制成 prompt；这些标签也会进入应用级标签画册，供浏览和筛选。抓取支持标签组合、全站最新和「先浏览标签表再逐个标签抓」三种模式，排序可选最新 / 高分 / 最近更新 / 随机，质量可选原图直链或站点 sample，视频帖直接取原 mp4。注意站点每页固定 42 张（未登录时无法调整）；站内有成人内容，通常需要代理网络。
 
 [查看插件目录](plugins/gelbooru/) · [使用说明](plugins/gelbooru/README.md)
+
+#### Safebooru
+
+**适合你，如果：** 你想要 Gelbooru 那样的大体量标签图库，但只要**全年龄**内容，不想在图库里撞见成人图。
+
+Safebooru 是 Gelbooru 的全年龄站，插件走站点匿名可用的官方 API：一页一次请求就拿到帖子和带分类的全量标签，比逐个打开详情页快得多，页码也和网页列表一一对应。抓取支持标签组合、全站最新和「先浏览标签表再逐个标签抓」三种模式，排序可选最新 / 高分 / 最近更新 / 随机；标签组合里可以直接写 `width:>=1920`、`score:>=100` 这类元标签，按分辨率挑壁纸很方便。元数据含全量标签、发布时间、上传者、来源、评分，有评论的帖子还会附带评论区；图片详情侧栏按站点详情页的样子渲染，标签按分类写入应用的标签分区。直连很慢，通常需要代理网络。
+
+[查看插件目录](plugins/safebooru/) · [使用说明](plugins/safebooru/README.md)
+
+#### AIBooru
+
+**适合你，如果：** 你在收 AI 插画，而且想知道**每张图是怎么生成的**——用的什么模型、prompt 怎么写、种子和采样器是多少。
+
+AIBooru 是基于 Danbooru 的 AI 生成图图库，插件走站点公开的 JSON 接口，一页一次请求就拿到帖子、上传者、作者评论、评论区和 **AI 生成参数**（prompt、负面词、采样器、种子、步数、CFG、模型）。标签按 作家 / 模型 / 版权 / 角色 / 通用 / 元信息 分类写入应用的标签分区，其中「模型」一类能直接按生成模型浏览；prompt 和模型名也能被元数据搜索搜到。抓取支持标签组合、日/周/月人气榜、全站最新和 id 范围四种模式，质量可选原图（PNG 原图常带完整生成参数）或站点 sample。站内 R-18 内容占比很高，分级过滤默认只抓全年龄；匿名每次检索最多 4 个标签。
+
+[查看插件目录](plugins/aibooru/) · [使用说明](plugins/aibooru/README.md)
 
 #### yande.re
 

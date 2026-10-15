@@ -1,6 +1,6 @@
 {
   "name": "konachan",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
@@ -181,7 +181,7 @@
       "default": 1,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "all",
@@ -205,7 +205,7 @@
       "default": 5,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "all",
@@ -254,7 +254,7 @@
       "default": 1,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "id_range"
@@ -277,7 +277,7 @@
       "default": 1000,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "id_range"
@@ -433,7 +433,7 @@
       "descripts.ja": "画像の画質",
       "descripts.ko": "이미지 화질",
       "descripts.zhtw": "圖片畫質，此站畫質都挺高",
-      "default": "medium",
+      "default": "high",
       "options": [
         {
           "name": "高",

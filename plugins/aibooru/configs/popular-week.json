@@ -1,0 +1,21 @@
+{
+  "name": "周榜全年龄（第一页）",
+  "name.en": "Weekly popular, General only (first page)",
+  "name.ja": "週間人気・全年齢のみ（1ページ目）",
+  "name.ko": "주간 인기·전체 이용가만(첫 페이지)",
+  "name.zhtw": "週榜全年齡（第一頁）",
+  "description": "抓取周榜第一页里分级为全年龄的作品。周榜里全年龄只占一小部分，每次约十张左右，适合每周定时补新图",
+  "description.en": "Crawl the General-rated posts on the first page of the weekly ranking. Only a small share is General, usually around ten per run; good as a weekly refill.",
+  "description.ja": "週間ランキング1ページ目のうち全年齢の作品を取得します。全年齢は一部だけで、1回あたり10枚前後です。毎週の追加に向いています。",
+  "description.ko": "주간 순위 첫 페이지에서 전체 이용가 작품만 수집합니다. 전체 이용가는 일부라 보통 회당 10장 안팎이며, 매주 채우기에 적합합니다.",
+  "description.zhtw": "抓取週榜第一頁裡分級為全年齡的作品。週榜裡全年齡只佔一小部分，每次約十張左右，適合每週定時補新圖",
+  "userConfig": {
+    "crawl_mode": "popular",
+    "popular_scale": "week",
+    "rating": "g",
+    "start_page": 1,
+    "end_page": 1,
+    "per_page": "100",
+    "quality": "high"
+  }
+}

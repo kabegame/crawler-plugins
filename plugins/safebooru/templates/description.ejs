@@ -1,0 +1,110 @@
+<% const m = metadata || {}; %>
+<% const tags = Array.isArray(m.tags) ? m.tags : []; %>
+<% const comments = Array.isArray(m.comments) ? m.comments : []; %>
+<% /* 分组顺序与站点详情页侧栏一致：Copyright / Character / Artist / General / Meta */ %>
+<% const CATEGORY_ORDER = ['copyright', 'character', 'artist', 'general', 'metadata']; %>
+<% const CATEGORY_LABELS = { copyright: 'Copyright', character: 'Character', artist: 'Artist', general: 'General', metadata: 'Meta' }; %>
+<%
+  const base = (/^(https?:\/\/[^/]+)/.exec(String(m.post_url || '')) || [])[1] || 'https://safebooru.org';
+  const grouped = {};
+  tags.forEach(function (t) {
+    if (!t || !t.name) return;
+    const ty = CATEGORY_LABELS[t.type] ? t.type : 'general';
+    (grouped[ty] || (grouped[ty] = [])).push(t);
+  });
+  const categories = CATEGORY_ORDER.filter(function (c) { return grouped[c] && grouped[c].length; });
+  const tagHref = function (name) { return base + '/index.php?page=post&s=list&tags=' + encodeURIComponent(name); };
+  const wikiHref = function (name) { return base + '/index.php?page=wiki&s=list&search=' + encodeURIComponent(name); };
+  const userHref = function (name) { return base + '/index.php?page=account&s=profile&uname=' + encodeURIComponent(name); };
+  /* created_at 存的是带站点时区的 ISO（2018-09-20T23:30:03+02:00），站点页面显示的就是前面这段本地时间 */
+  const posted = String(m.created_at || '').slice(0, 19).replace('T', ' ');
+  const rating = m.rating ? String(m.rating).charAt(0).toUpperCase() + String(m.rating).slice(1) : '';
+  const sourceShort = String(m.source || '').replace(/^https?:\/\/(www\.)?/, '');
+  const isLink = /^https?:\/\//.test(String(m.source || ''));
+%>
+<style>
+/* 配色来自 safebooru.org/css/desktop.css：正文 verdana，链接 #006FFA、悬停 #33CFFF，
+   标题 h5 1.2em。站点 CSS 里写了 tag-type-* 的分类色，但被后面的 a:link 覆盖，
+   实际页面上标签一律是链接蓝，这里照实际渲染效果来。评论分隔线 hr.light 为浅灰。
+   正文色走宿主注入的 --anime-text-primary，避免和面板背景打架。 */
+.sb {
+  font-family: verdana, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--anime-text-primary, #000);
+}
+.sb a { color: #006FFA; text-decoration: none; }
+.sb a:hover { color: #33CFFF; }
+.sb h5 { font-size: 1.2em; font-weight: bold; margin: 12px 0 2px; }
+.sb ul { list-style: none; margin: 0; padding: 0; }
+.sb li { margin: 0; overflow-wrap: anywhere; }
+.sb .cat { font-weight: bold; margin-top: 2px; }
+.sb .count { margin-left: 2px; }
+.sb .comments { margin-top: 14px; }
+.sb .comment { margin-bottom: 1em; }
+.sb .comment .no { font-size: 11px; color: #8f8f8f; }
+.sb .comment .info { font-weight: bold; }
+.sb .comment .body { margin-top: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.sb .comment hr { border: 0; border-top: 1px solid #aaa; margin: 6px 0 0; }
+</style>
+<div class="sb">
+  <% if (categories.length) { %>
+  <ul>
+    <% categories.forEach(function (cat) { %>
+    <li class="cat"><%= CATEGORY_LABELS[cat] %></li>
+    <% grouped[cat].forEach(function (t) { %>
+    <li class="tag-type-<%= cat %>">
+      <a href="<%= wikiHref(t.name) %>" target="_blank" rel="noopener noreferrer">?</a>
+      <a href="<%= tagHref(t.name) %>" target="_blank" rel="noopener noreferrer"><%= String(t.name).replace(/_/g, ' ') %></a>
+      <% if (t.count) { %><span class="count"><%= t.count %></span><% } %>
+    </li>
+    <% }); %>
+    <% }); %>
+  </ul>
+  <% } %>
+
+  <h5>Statistics</h5>
+  <ul>
+    <% if (m.post_id) { %><li>Id: <%= m.post_id %></li><% } %>
+    <% if (posted || m.owner) { %>
+    <li>
+      <% if (posted) { %>Posted: <%= posted %><br><% } %>
+      <% if (m.owner) { %>by <a href="<%= userHref(m.owner) %>" target="_blank" rel="noopener noreferrer"><%= m.owner %></a><% } %>
+    </li>
+    <% } %>
+    <% if (m.width && m.height) { %><li>Size: <%= m.width %>x<%= m.height %></li><% } %>
+    <% if (m.source) { %>
+    <li>Source: <% if (isLink) { %><a href="<%= m.source %>" target="_blank" rel="noopener noreferrer"><%= sourceShort %></a><% } else { %><%= m.source %><% } %></li>
+    <% } %>
+    <% if (rating) { %><li>Rating: <%= rating %></li><% } %>
+    <li>Score: <%= m.score || 0 %></li>
+  </ul>
+
+  <% if (m.file_url || m.post_url) { %>
+  <h5>Options</h5>
+  <ul>
+    <% if (m.file_url) { %><li><a href="<%= m.file_url %>" target="_blank" rel="noopener noreferrer" style="font-weight: bold;">Original image</a></li><% } %>
+    <% if (m.post_url) { %><li><a href="<%= m.post_url %>" target="_blank" rel="noopener noreferrer">View on Safebooru</a></li><% } %>
+  </ul>
+  <% } %>
+
+  <% if (comments.length) { %>
+  <div class="comments">
+    <div><%= comments.length %> comments</div>
+    <br>
+    <% comments.forEach(function (c) { %>
+    <div class="comment">
+      <div>
+        <% if (c.user) { %><a href="<%= c.user_href || userHref(c.user) %>" target="_blank" rel="noopener noreferrer"><%= c.user %></a><% } %>
+        <span class="no">&gt;&gt; #<%= c.id %></span>
+      </div>
+      <div class="info">
+        <% if (c.posted_at) { %>Posted on <%= c.posted_at %> <% } %>Score: <%= c.score || 0 %>
+      </div>
+      <div class="body"><%= c.body %></div>
+      <hr>
+    </div>
+    <% }); %>
+  </div>
+  <% } %>
+</div>

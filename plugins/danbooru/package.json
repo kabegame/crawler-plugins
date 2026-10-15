@@ -1,6 +1,6 @@
 {
   "name": "danbooru",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "name.zh": "Danbooru 二次元图库",
   "name.en": "Danbooru image board",
@@ -167,7 +167,7 @@
       "default": 1,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "id_range"
@@ -190,7 +190,7 @@
       "default": 1000,
       "options": null,
       "min": 1,
-      "width": 1,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "id_range"
@@ -321,6 +321,7 @@
       "default": 1,
       "min": 1,
       "max": null,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "all",
@@ -345,6 +346,7 @@
       "default": 2,
       "min": 1,
       "max": null,
+      "width": 2,
       "when": {
         "crawl_mode": [
           "all",

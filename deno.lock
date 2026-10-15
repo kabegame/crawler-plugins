@@ -1904,6 +1904,15 @@
       ]
     },
     "members": {
+      "plugins/aibooru": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/anihonet-wallpaper": {
         "packageJson": {
           "dependencies": [
@@ -2043,6 +2052,15 @@
           ]
         }
       },
+      "plugins/nekos-moe": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
       "plugins/pixai": {
         "packageJson": {
           "dependencies": [
@@ -2053,6 +2071,15 @@
         }
       },
       "plugins/pixiv": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/safebooru": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
