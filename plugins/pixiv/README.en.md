@@ -1,6 +1,6 @@
 # Pixiv Crawler - Plugin Guide
 
-This plugin fetches illustrations from Pixiv. It supports four modes: rankings, bookmarks, artist works, and keyword search.
+This plugin fetches illustrations from Pixiv. It supports five modes: rankings, bookmarks, artist works, keyword search, and third-party API.
 
 ![home](./banners/home.jpg)
 
@@ -27,6 +27,8 @@ The string of digits in the middle or at the end of the URL, highlighted by the 
 | Artist works (R18) | Required |
 | Keyword search (non-R18) | Optional |
 | Keyword search (R18) | Required |
+| Third-party API (general) | Not needed |
+| Third-party API (R18 / mixed) | Required |
 
 ## Crawl Types
 
@@ -34,6 +36,7 @@ The string of digits in the middle or at the end of the URL, highlighted by the 
 - **Bookmarks**: Download your public bookmarks.
 - **Artist works**: Download public works of a given artist.
 - **Keyword search**: Search by keyword and download.
+- **Third-party API**: Get artwork ids from a third-party API, then download details and originals from pixiv by id (currently Lolicon API).
 
 ## Config Fields
 
@@ -43,10 +46,11 @@ Fields depend on the selected mode:
 - **Bookmarks**: User UID.
 - **Artist**: User UID, artist UID.
 - **Keyword**: Search keyword, search mode (safe / R18 / all), sort (by date / by popularity). **Keyword + sort lets you target exactly what you want.**
+- **Third-party API**: After choosing the API, its own fields appear. Lolicon: age rating, orientation, tags, artist UIDs, artwork count, exclude AI, upload date range.
 
 ## Max artworks (`num_artworks`)
 
-Integer **1–1000**, used in **all four modes**. The cap counts **artworks** (one illustration entry), not final image files; **multi-page works** still download each page, so **file count can exceed** `num_artworks`.
+Integer **1–1000**, used by **rankings, bookmarks and keyword search** (artist works use a page range; third-party APIs have their own count). The cap counts **artworks** (one illustration entry), not final image files; **multi-page works** still download each page, so **file count can exceed** `num_artworks`.
 
 The script is **streaming**: it requests list APIs **page by page**, and for each `illust_id` it immediately calls `ajax/illust/{id}/pages` and downloads originals. When `num_artworks` is reached it **stops**—it does **not** precompute a fixed page count from the cap, avoiding empty-page **404**s.
 
@@ -127,6 +131,26 @@ One request to `https://www.pixiv.net/ajax/user/87654321/profile/all?lang=zh`, t
 ---
 
 These four examples map to the four `source` values. **Common rule:** cap is `num_artworks`; modes with paged lists are **streaming**.
+
+## Third-party API mode
+
+The third-party API only supplies artwork ids. Details, comments, tags and **originals of every page** are still downloaded from pixiv exactly like the other modes, so pixiv must be reachable. While calling the third-party API the plugin temporarily blanks pixiv's `Referer`, `Origin` and `Cookie`, so your pixiv login is never sent to the third party.
+
+### Lolicon API
+
+[Lolicon API](https://docs.api.lolicon.app/#/setu) returns **random** pixiv works from its collection. It has no pagination, so each task makes a single request.
+
+| Field | API parameter | Notes |
+|-------|---------------|-------|
+| Age rating `lolicon_r18` | `r18` | General / R18 / Mixed. This is Lolicon's own classification and General can still return works pixiv tags as R-18, so the plugin also drops `R-18` / `R-18G` tagged works locally. R18 and Mixed need a pixiv login in Surf |
+| Orientation `lolicon_orientation` | `aspectRatio` | Any / landscape (`gt1`) / portrait (`lt1`) |
+| Tags `lolicon_tags` | `tag` | Items are ANDed (max 3); separate alternatives inside one item with `\|` for OR (max 20). Matches tags, author names and titles, e.g. `原神\|鸣潮` |
+| Artist UIDs `lolicon_uids` | `uid` | Up to 20 |
+| Artworks `lolicon_count` | `num` | 1–20; narrow filters may return fewer, with a warning |
+| Exclude AI `lolicon_exclude_ai` | `excludeAI` | On by default; only drops works pixiv explicitly marks as AI |
+| Upload date range | `dateAfter` / `dateBefore` | Whole days by pixiv upload time (JST), both inclusive |
+
+Different pages of the same work are merged into one artwork and every page is downloaded, so the file count may exceed the artwork count. Lolicon is rate limited; when throttled the plugin waits 15 seconds and retries, up to 3 times.
 
 ## Notes
 

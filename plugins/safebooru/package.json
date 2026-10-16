@@ -1,6 +1,6 @@
 {
   "name": "safebooru",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "name.zh": "Safebooru 全年龄图库",
   "name.en": "Safebooru",
@@ -36,6 +36,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "クロールモード",
@@ -77,6 +78,7 @@
     {
       "key": "mode_tag_value",
       "type": "list",
+      "required": true,
       "name": "标签组合",
       "name.en": "Tag combination",
       "name.ja": "タグ組み合わせ",
@@ -204,6 +206,7 @@
     {
       "key": "id_start",
       "type": "int",
+      "required": true,
       "name": "起始 id",
       "name.en": "Start ID",
       "name.ja": "開始 ID",
@@ -227,6 +230,7 @@
     {
       "key": "id_end",
       "type": "int",
+      "required": true,
       "name": "结束 id",
       "name.en": "End ID",
       "name.ja": "終了 ID",
@@ -250,6 +254,7 @@
     {
       "key": "quality",
       "type": "options",
+      "required": true,
       "name": "质量",
       "name.en": "Quality",
       "name.ja": "画質",

@@ -1,6 +1,6 @@
 {
   "name": "xhs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "小红书",
   "name.en": "XiaoHongShu",
@@ -33,6 +33,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "取得モード",
@@ -76,7 +77,7 @@
       "descripts.ja": "explore / discovery/item / user/profile のノートリンクと xhslink.com 短縮リンクに対応。複数はスペースか改行で区切ります",
       "descripts.ko": "explore / discovery/item / user/profile 노트 링크와 xhslink.com 단축 링크 지원; 여러 개는 공백 또는 줄바꿈으로 구분",
       "descripts.zhtw": "支援 explore / discovery/item / user/profile 作品連結與 xhslink.com 短連結；多個連結用空格或換行分隔",
-      "default": "",
+      "required": true,
       "when": { "crawl_mode": ["note"] }
     },
     {
@@ -117,6 +118,7 @@
     },
     {
       "key": "image_format",
+      "required": true,
       "type": "options",
       "name": "图片格式",
       "name.en": "Image format",

@@ -9,7 +9,7 @@ Copies images from another Kabegame web service: either the web edition (default
     - **Random** (default): a fresh shuffle on every run; pages within one run never repeat each other;
     - **Time**: newest first;
     - **ID ascending**: smallest image id first.
-  - **Filter**: paste a PathQL query and copy only the matching images. On the source server (web edition or desktop app), open the Advanced query dialog in the gallery, an album or a task, set the conditions, then copy the Path at the bottom, for example `images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1`. Its sort order is kept; the trailing page number is replaced by the page settings below.
+  - **Filter**: paste a PathQL query and copy only the matching images. On the source server (web edition or desktop app), open the Advanced query dialog in the gallery, an album or a task, set the conditions, then copy the Path at the bottom, for example `images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1`. Its sort order is kept; the trailing page number is replaced by the page settings below.
 - **Server URL**: root URL of the web service; the plugin reads the gallery through its `/rpc` endpoint.
 - **Include hidden images** (whole gallery only): off by default; images hidden on the server are skipped and do not take up page slots. In filter mode the path decides (paths from the dialog usually start with `hide/`).
 - **Page size**: 20 by default, at most 100.

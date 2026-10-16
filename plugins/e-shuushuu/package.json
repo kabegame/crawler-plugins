@@ -1,6 +1,6 @@
 {
   "name": "e-shuushuu",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "name.zh": "e-shuushuu",
   "name.en": "e-shuushuu",
@@ -36,6 +36,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -77,6 +78,7 @@
     {
       "key": "top_period",
       "type": "options",
+      "required": true,
       "name": "Ranking range",
       "name.zh": "排行范围",
       "name.ja": "ランキング期間",
@@ -141,7 +143,7 @@
       "descripts.ja": "https://e-shuushuu.net/search で絞り込みと並び順を設定し、アドレスバーの URL を貼り付けてください。ページは下の開始/終了ページに従います。",
       "descripts.ko": "https://e-shuushuu.net/search 에서 필터와 정렬을 설정한 뒤 주소창의 URL을 붙여 넣으세요. 페이지는 아래 시작/끝 페이지를 따릅니다.",
       "descripts.zhtw": "在 https://e-shuushuu.net/search 設定好篩選與排序後，把網址列的 URL 貼到這裡；頁碼以下方起止頁為準。",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "search"

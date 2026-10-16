@@ -1,0 +1,204 @@
+<%#
+  数据来源：src/post.ts processPost 写入的 metadata（schema 1）
+  - mid / mblogid / url / created_at(ISO) / text（纯文本，长文已补全）/ region / app_source
+  - user {id, name, avatar, verified, verified_type}，retweeted_by {id, name, avatar}（经转发抓到时）
+  - counts {reposts, comments, likes}，topics[]，super_topics[{id, name}]，pics[{pid, type, width, height}]
+  - comments[{id, floor, user, text, created_at, region, likes, pics[], reply_count, replies[]}]
+    （爬取时按热度的评论快照；replies 是接口附带的楼中楼预览，结构同评论但没有 reply_count / replies）
+  配色取自 weibo.com 前端样式：品牌橙 #ff8200、链接蓝 #507daf、次要文字 #939393。
+%>
+<%
+  const m = metadata || {};
+  const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
+  const arr = (v) => (Array.isArray(v) ? v : []);
+  const user = obj(m.user);
+  const rt = obj(m.retweeted_by);
+  const counts = obj(m.counts);
+  const pics = arr(m.pics);
+  const comments = arr(m.comments);
+  const superTopics = arr(m.super_topics);
+  const topics = arr(m.topics);
+
+  // 微博按北京时间展示
+  function cnTime(iso) {
+    const d = new Date(String(iso || ''));
+    if (isNaN(d.getTime())) return '';
+    const c = new Date(d.getTime() + 8 * 3600 * 1000);
+    const p = (n) => String(n).padStart(2, '0');
+    return c.getUTCFullYear() + '-' + p(c.getUTCMonth() + 1) + '-' + p(c.getUTCDate()) + ' ' + p(c.getUTCHours()) + ':' + p(c.getUTCMinutes());
+  }
+  function num(n) {
+    n = Number(n) || 0;
+    if (n >= 1e8) return (n / 1e8).toFixed(1).replace(/\.0$/, '') + '亿';
+    if (n >= 1e4) return (n / 1e4).toFixed(1).replace(/\.0$/, '') + '万';
+    return String(n);
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  // 正文里的 #话题#、#xx[超话]#、@用户 着色；其余转义输出
+  function richText(text, picLink) {
+    const re = /(#[^#\n]{1,60}#|@[一-龥A-Za-z0-9_\-]{1,30}|https?:\/\/[^\s<>"'）]+)/g;
+    const out = [];
+    let last = 0;
+    let mt;
+    const s = String(text || '');
+    while ((mt = re.exec(s)) !== null) {
+      if (mt.index > last) out.push(esc(s.slice(last, mt.index)));
+      const tok = mt[1];
+      if (/^https?:/.test(tok)) {
+        // 评论配图在正文里是一条 t.cn 短链，换成「图片」字样
+        const label = picLink ? '[图片]' : '网页链接';
+        out.push('<a class="wb-link" target="_blank" href="' + esc(tok) + '">' + label + '</a>');
+      } else if (tok[0] === '#') {
+        const isSuper = /\[超话\]#$/.test(tok);
+        const name = tok.slice(1, -1).replace(/\[超话\]$/, '');
+        const href = 'https://s.weibo.com/weibo?q=' + encodeURIComponent('#' + name + '#');
+        out.push('<a class="wb-link" target="_blank" href="' + esc(href) + '">' + (isSuper ? '<span class="wb-super-ico">超</span>' + esc(name) : esc(tok)) + '</a>');
+      } else {
+        out.push('<a class="wb-link" target="_blank" href="https://weibo.com/n/' + esc(encodeURIComponent(tok.slice(1))) + '">' + esc(tok) + '</a>');
+      }
+      last = re.lastIndex;
+    }
+    if (last < s.length) out.push(esc(s.slice(last)));
+    return out.join('');
+  }
+  // verified_type：0 个人认证（橙 V），1–7 机构认证（蓝 V），其余不显示
+  const vType = Number(user.verified_type);
+  const vClass = user.verified ? (vType === 0 ? 'wb-v-person' : vType > 0 && vType < 8 ? 'wb-v-org' : '') : '';
+  const gifCount = pics.filter((p) => p && p.type === 'gif').length;
+  const liveCount = pics.filter((p) => p && p.type === 'livephoto').length;
+  const userHref = user.id ? 'https://weibo.com/u/' + encodeURIComponent(user.id) : '';
+  const metaLine = [cnTime(m.created_at), m.app_source ? '来自 ' + m.app_source : '', m.region ? '发布于 ' + m.region : ''].filter(Boolean).join('　');
+%>
+<style>
+  .wb, .wb * { box-sizing: border-box; }
+  .wb { font: 14px/1.6 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; color: #333; }
+  .wb a { text-decoration: none; }
+  .wb-card { background: #fff; border-radius: 8px; padding: 14px 14px 10px; box-shadow: 0 0 0 1px #f2f2f2; }
+  .wb-head { display: flex; gap: 10px; align-items: center; }
+  .wb-ava { position: relative; flex: none; width: 40px; height: 40px; }
+  .wb-ava img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #f2f2f2; }
+  .wb-v { position: absolute; right: -2px; bottom: -2px; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; color: #fff; font: 700 9px/11px Arial, sans-serif; text-align: center; }
+  .wb-v-person { background: #ff8200; }
+  .wb-v-org { background: #2d9cf0; }
+  .wb-name { font-weight: 700; color: #333; font-size: 15px; word-break: break-all; }
+  .wb-sub { color: #939393; font-size: 12px; line-height: 1.5; }
+  .wb-rt { margin-top: 8px; color: #939393; font-size: 12px; }
+  .wb-rt a { color: #507daf; }
+  .wb-text { margin-top: 10px; white-space: pre-wrap; word-break: break-word; }
+  .wb-link { color: #507daf; }
+  .wb-super-ico { display: inline-block; margin: 0 2px 0 1px; padding: 0 3px; border-radius: 3px; background: #ff8200; color: #fff; font-size: 11px; line-height: 15px; vertical-align: 1px; }
+  .wb-chips { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .wb-chip { padding: 1px 8px; border-radius: 10px; font-size: 12px; line-height: 20px; background: #f6f6f6; color: #507daf; }
+  .wb-chip-super { background: #fff7ef; color: #ff8200; }
+  .wb-pics { margin-top: 10px; color: #939393; font-size: 12px; }
+  .wb-foot { margin-top: 10px; padding-top: 8px; border-top: 1px solid #f2f2f2; display: flex; color: #636363; font-size: 13px; }
+  .wb-foot span { flex: 1; text-align: center; }
+  .wb-foot b { font-weight: 400; color: #333; margin-left: 4px; }
+  .wb-cmts { margin-top: 10px; background: #fff; border-radius: 8px; padding: 6px 14px; box-shadow: 0 0 0 1px #f2f2f2; }
+  .wb-cmts-title { padding: 6px 0; font-weight: 700; font-size: 13px; }
+  .wb-cmt { display: flex; gap: 8px; padding: 8px 0; border-top: 1px solid #f2f2f2; }
+  .wb-cmt img { flex: none; width: 28px; height: 28px; border-radius: 50%; object-fit: cover; background: #f2f2f2; }
+  .wb-cmt-body { min-width: 0; flex: 1; }
+  .wb-cmt-text { white-space: pre-wrap; word-break: break-word; }
+  .wb-cmt-text a.wb-cmt-name { color: #507daf; margin-right: 2px; }
+  .wb-cmt-meta { display: flex; flex-wrap: wrap; gap: 0 10px; color: #939393; font-size: 12px; }
+  .wb-cmt-meta .wb-like { margin-left: auto; }
+  .wb-cmt-pics { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+  .wb-cmt-pics img { width: 88px; height: 88px; border-radius: 4px; object-fit: cover; background: #f2f2f2; }
+  .wb .wb-cmt-name { color: #507daf; }
+  .wb-reps { margin-top: 6px; padding: 6px 8px; background: #f7f7f7; border-radius: 4px; font-size: 13px; }
+  .wb-rep { word-break: break-word; }
+  .wb-rep-text { white-space: pre-wrap; }
+  .wb-rep + .wb-rep { margin-top: 4px; }
+  .wb-rep-meta { color: #939393; font-size: 12px; margin-left: 6px; white-space: nowrap; }
+  .wb-rep-more { margin-top: 4px; color: #507daf; font-size: 12px; }
+  .wb-open { display: block; margin-top: 8px; text-align: center; color: #ff8200; font-size: 13px; }
+</style>
+<div class="wb">
+  <div class="wb-card">
+    <div class="wb-head">
+      <a class="wb-ava" target="_blank" href="<%= userHref %>">
+        <img data-wb-src="<%= user.avatar || '' %>" alt="" />
+        <% if (vClass) { %><span class="wb-v <%= vClass %>">V</span><% } %>
+      </a>
+      <div>
+        <a class="wb-name" target="_blank" href="<%= userHref %>"><%= user.name || user.id || '微博用户' %></a>
+        <% if (metaLine) { %><div class="wb-sub"><%= metaLine %></div><% } %>
+      </div>
+    </div>
+    <% if (rt.name) { %>
+      <div class="wb-rt">由 <a target="_blank" href="https://weibo.com/u/<%= encodeURIComponent(rt.id || '') %>">@<%= rt.name %></a> 转发</div>
+    <% } %>
+    <% if (m.text) { %><div class="wb-text"><%- richText(m.text) %></div><% } %>
+    <% if (superTopics.length || topics.length) { %>
+      <div class="wb-chips">
+        <% superTopics.forEach(function (t) { %>
+          <a class="wb-chip wb-chip-super" target="_blank" href="https://weibo.com/p/<%= t.id %>/super_index"><%= t.name %>超话</a>
+        <% }) %>
+        <% topics.forEach(function (t) { %>
+          <a class="wb-chip" target="_blank" href="https://s.weibo.com/weibo?q=<%= encodeURIComponent('#' + t + '#') %>">#<%= t %>#</a>
+        <% }) %>
+      </div>
+    <% } %>
+    <% if (pics.length) { %>
+      <div class="wb-pics">共 <%= pics.length %> 张图<% if (gifCount) { %> · <%= gifCount %> 张动图<% } %><% if (liveCount) { %> · <%= liveCount %> 张实况<% } %></div>
+    <% } %>
+    <div class="wb-foot">
+      <span>转发<b><%= num(counts.reposts) %></b></span>
+      <span>评论<b><%= num(counts.comments) %></b></span>
+      <span>赞<b><%= num(counts.likes) %></b></span>
+    </div>
+  </div>
+
+  <% if (comments.length) { %>
+    <div class="wb-cmts">
+      <div class="wb-cmts-title">热门评论</div>
+      <% comments.forEach(function (c) { const cu = obj(c.user); const reps = arr(c.replies); %>
+        <div class="wb-cmt">
+          <img data-wb-src="<%= cu.avatar || '' %>" alt="" />
+          <div class="wb-cmt-body">
+            <div class="wb-cmt-text"><a class="wb-cmt-name" target="_blank" href="https://weibo.com/u/<%= encodeURIComponent(cu.id || '') %>"><%= cu.name || '用户' %></a>：<%- richText(c.text, arr(c.pics).length > 0) %></div>
+            <% if (arr(c.pics).length) { %>
+              <div class="wb-cmt-pics"><% arr(c.pics).forEach(function (p) { %><img data-wb-src="https://wx1.sinaimg.cn/bmiddle/<%= p.pid %>.jpg" alt="" /><% }) %></div>
+            <% } %>
+            <div class="wb-cmt-meta">
+              <% if (c.floor) { %><span><%= c.floor %> 楼</span><% } %>
+              <span><%= cnTime(c.created_at) %></span>
+              <% if (c.region) { %><span>来自<%= c.region %></span><% } %>
+              <span class="wb-like">♥ <%= num(c.likes) %></span>
+            </div>
+            <% if (reps.length) { %>
+              <div class="wb-reps">
+                <% reps.forEach(function (r) { const ru = obj(r.user); %>
+                  <div class="wb-rep"><a class="wb-cmt-name" target="_blank" href="https://weibo.com/u/<%= encodeURIComponent(ru.id || '') %>"><%= ru.name || '用户' %></a>：<span class="wb-rep-text"><%- richText(r.text, arr(r.pics).length > 0) %></span><span class="wb-rep-meta"><%= cnTime(r.created_at) %><% if (r.region) { %> 来自<%= r.region %><% } %><% if (Number(r.likes) > 0) { %> ♥ <%= num(r.likes) %><% } %></span><% if (arr(r.pics).length) { %><div class="wb-cmt-pics"><% arr(r.pics).forEach(function (p) { %><img data-wb-src="https://wx1.sinaimg.cn/bmiddle/<%= p.pid %>.jpg" alt="" /><% }) %></div><% } %></div>
+                <% }) %>
+                <% if (Number(c.reply_count) > reps.length) { %><div class="wb-rep-more">共 <%= num(c.reply_count) %> 条回复</div><% } %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if (m.url) { %><a class="wb-open" target="_blank" href="<%= m.url %>">在微博中查看</a><% } %>
+</div>
+<script>
+  // sinaimg 对带 Sec-Fetch 头的跨站图片请求返回 403，iframe 里不能直接 <img src>；
+  // 经 __bridge.fetch 由宿主带 weibo.com 的 Referer 拉取，转成 data URL。
+  (function () {
+    var bridge = window.__bridge;
+    var imgs = document.querySelectorAll('img[data-wb-src]');
+    for (var i = 0; i < imgs.length; i++) {
+      (function (img) {
+        var url = img.getAttribute('data-wb-src');
+        if (!url || !bridge || !bridge.fetch) return;
+        bridge.fetch(url, { headers: { Referer: 'https://weibo.com/' } }).then(function (res) {
+          if (res && res.base64) img.src = 'data:' + (res.contentType || 'image/jpeg') + ';base64,' + res.base64;
+        }).catch(function () {});
+      })(imgs[i]);
+    }
+  })();
+</script>

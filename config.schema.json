@@ -52,6 +52,7 @@
         "type": { "const": "int" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": { "type": "integer", "description": "默认值" },
         "min": { "type": "integer", "description": "最小值" },
         "max": { "type": "integer", "description": "最大值" },
@@ -68,6 +69,7 @@
         "type": { "const": "float" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": { "type": "number", "description": "默认值" },
         "min": { "type": "number", "description": "最小值" },
         "max": { "type": "number", "description": "最大值" },
@@ -84,6 +86,7 @@
         "type": { "const": "string" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": { "type": "string", "description": "默认值" },
         "width": { "$ref": "#/$defs/Width" },
         "when": { "$ref": "#/$defs/WhenCondition" }
@@ -98,7 +101,8 @@
         "type": { "const": "date" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
-        "default": { "type": "string", "description": "默认值，与 format 一致；常用空字符串" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
+        "default": { "type": "string", "description": "默认值，与 format 一致" },
         "format": {
           "type": "string",
           "description": "dayjs 格式：提交给脚本/后端的日期字符串，如 YYYYMMDD；省略则 YYYY-MM-DD"
@@ -124,6 +128,7 @@
         "type": { "const": "boolean" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": { "type": "boolean", "description": "默认值" },
         "width": { "$ref": "#/$defs/Width" },
         "when": { "$ref": "#/$defs/WhenCondition" }
@@ -138,6 +143,7 @@
         "type": { "const": "options" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": { "type": "string", "description": "默认选中的 variable 值" },
         "options": {
           "description": "选项列表，推荐 { name, variable }，兼容纯字符串",
@@ -171,6 +177,7 @@
         "type": { "const": "list" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": {
           "type": "array",
           "items": { "type": "string" },
@@ -194,6 +201,7 @@
         "type": { "const": "checkbox" },
         "name": { "type": "string", "description": "展示名称" },
         "descripts": { "type": "string", "description": "说明" },
+        "required": { "type": "boolean", "description": "可见时是否必填；缺省为 false" },
         "default": {
           "description": "默认勾选：string[] 表示勾选项，或 object { variable: bool }",
           "oneOf": [

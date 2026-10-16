@@ -1,6 +1,6 @@
 {
   "name": "manyacg",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "name.zh": "ManyACG 二次元图库",
   "name.en": "ManyACG anime gallery",
@@ -33,6 +33,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -81,6 +82,7 @@
     },
     {
       "key": "r18",
+      "required": true,
       "type": "options",
       "name": "Content rating",
       "name.zh": "内容分级",
@@ -133,7 +135,6 @@
       "descripts.ja": "タグ名を完全一致で1つだけ指定します（例：原神、genshin_impact）。複数指定すると結果が出ません。空欄ならタグで絞り込みません。",
       "descripts.ko": "태그 이름을 정확히 하나만 입력하세요(예: 原神, genshin_impact). 여러 개를 쓰면 결과가 없습니다. 비워 두면 태그로 거르지 않습니다.",
       "descripts.zhtw": "完整的標籤名，只能填一個（如 原神、genshin_impact）。填多個標籤會搜不到結果。留空表示不依標籤篩選。",
-      "default": "",
       "when": {
         "mode": [
           "filter"
@@ -153,7 +154,6 @@
       "descripts.ja": "作者ページのリンク（manyacg.top/artist/…）または24文字の作者IDを貼り付けます。Pixiv / Twitter のユーザーIDは使えません。空欄なら作者で絞り込みません。",
       "descripts.ko": "작가 페이지 링크(manyacg.top/artist/…) 또는 24자리 작가 ID를 붙여 넣으세요. Pixiv / Twitter 사용자 ID는 사용할 수 없습니다. 비워 두면 작가로 거르지 않습니다.",
       "descripts.zhtw": "貼上作者頁連結（manyacg.top/artist/…）或 24 位作者 ID。Pixiv / Twitter 的使用者 ID 不能用。留空表示不依作者篩選。",
-      "default": "",
       "when": {
         "mode": [
           "filter"
@@ -173,7 +173,6 @@
       "descripts.ja": "絞り込みではタイトル・説明・タグに一致し、空欄でも構いません。セマンティック検索では必須です。",
       "descripts.ko": "필터 모드에서는 제목·설명·태그와 일치하며 비워 둘 수 있고, 의미 검색 모드에서는 필수입니다.",
       "descripts.zhtw": "篩選模式下比對標題、簡介和標籤，可留空；語意搜尋模式下必填。",
-      "default": "",
       "when": {
         "mode": [
           "filter",
@@ -194,7 +193,7 @@
       "descripts.ja": "作品ページのリンク（manyacg.top/artwork/…）または24文字の作品IDを貼り付け、類似作品を探します。必須です。",
       "descripts.ko": "작품 페이지 링크(manyacg.top/artwork/…) 또는 24자리 작품 ID를 붙여 넣어 비슷한 작품을 찾습니다. 필수입니다.",
       "descripts.zhtw": "貼上作品頁連結（manyacg.top/artwork/…）或 24 位作品 ID，尋找與它相似的作品。必填。",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "similar"

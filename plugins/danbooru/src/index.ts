@@ -559,13 +559,13 @@ export async function crawl(common, custom) {
   const mode = coerceStr(vars.crawl_mode);
 
   if (mode === "all") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlAll(baseUrl, quality, vars);
   } else if (mode === "tags") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlByTags(baseUrl, quality, vars);
   } else if (mode === "popular") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlPopular(baseUrl, quality, vars);
   } else if (mode === "id_range") {
     await crawlByIdRange(baseUrl, quality, vars);

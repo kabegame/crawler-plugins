@@ -1,6 +1,6 @@
 {
   "name": "kemono",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "name.zh": "Kemono创作者内容",
   "name.en": "Kemonocreator content",
@@ -38,6 +38,7 @@
     {
       "key": "source",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Source mode",
       "name.ja": "取得モード",
@@ -90,6 +91,7 @@
     {
       "key": "link",
       "type": "string",
+      "required": true,
       "name": "作者或帖子链接",
       "name.en": "Creator or post URL",
       "name.ja": "クリエイターまたは投稿 URL",
@@ -110,6 +112,7 @@
     {
       "key": "service",
       "type": "options",
+      "required": true,
       "name": "作者服务",
       "name.en": "Creator service",
       "name.ja": "クリエイターサービス",
@@ -200,6 +203,7 @@
     {
       "key": "creator_id",
       "type": "string",
+      "required": true,
       "name": "作者 ID",
       "name.en": "Creator ID",
       "name.ja": "クリエイター ID",
@@ -317,7 +321,7 @@
       "name.ja": "タグ",
       "name.ko": "태그",
       "name.zhtw": "標籤",
-      "default": "",
+      "required": true,
       "descripts": "按站点标签爬取全站帖子，例如 nsfw、wip、comic、nude。标签区分大小写，需与站点上的写法一致；填错会提示该标签没有帖子。可在 kemono.cr/posts/tags 查看全部标签。",
       "descripts.en": "Crawl site-wide posts by tag, e.g. nsfw, wip, comic, nude. Tags are case-sensitive and must match the site. See kemono.cr/posts/tags for the full list.",
       "descripts.ja": "サイト全体のタグで取得します（例：nsfw、wip、comic、nude）。タグは大文字小文字を区別します。一覧は kemono.cr/posts/tags を参照。",
@@ -379,6 +383,7 @@
     {
       "key": "image_source",
       "type": "options",
+      "required": true,
       "name": "图片来源",
       "name.en": "Image source",
       "name.ja": "画像ソース",

@@ -1,0 +1,500 @@
+{
+  "name": "weibo",
+  "name.zh": "微博",
+  "version": "0.1.1",
+  "private": true,
+  "name.en": "Weibo",
+  "name.ja": "Weibo（微博）",
+  "name.ko": "웨이보",
+  "name.zhtw": "微博",
+  "description": "微博图片：用户相册/时间线、超话、关键词搜索与单条微博，支持 GIF 与实况图",
+  "description.zh": "微博图片：用户相册/时间线、超话、关键词搜索与单条微博，支持 GIF 与实况图",
+  "description.en": "Weibo images: user album/timeline, super topics, keyword search and single posts, with GIF and LivePhoto support",
+  "description.ja": "Weibo の画像：ユーザーアルバム/タイムライン、超話、キーワード検索、単一投稿。GIF とライブフォトに対応",
+  "description.ko": "웨이보 이미지: 사용자 앨범/타임라인, 초화, 키워드 검색, 단일 게시물. GIF와 라이브 포토 지원",
+  "description.zhtw": "微博圖片：使用者相簿/時間線、超話、關鍵字搜尋與單條微博，支援 GIF 與實況圖",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.4.0"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://weibo.com",
+  "kbLabels": [
+    {
+      "id": "auth.needCookie"
+    },
+    {
+      "id": "content.type.video"
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "required": true,
+      "name": "模式",
+      "name.en": "Mode",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "按用户相册/时间线、超话、关键词搜索批量收图，或只收单条微博。所有模式都需要先在畅游登录 weibo.com",
+      "descripts.en": "Bulk-collect by user album/timeline, super topic or keyword search, or collect a single post. All modes require signing in to weibo.com in Surf first",
+      "descripts.ja": "ユーザーのアルバム/タイムライン、超話、キーワード検索で一括収集、または単一投稿を収集。全モードで先に畅游（Surf）で weibo.com にログインしてください",
+      "descripts.ko": "사용자 앨범/타임라인, 초화(超话), 키워드 검색으로 일괄 수집하거나 단일 게시물을 수집합니다. 모든 모드는 먼저 서핑(畅游)에서 weibo.com에 로그인해야 합니다",
+      "descripts.zhtw": "依使用者相簿/時間線、超話、關鍵字搜尋批次收圖，或只收單條微博。所有模式都需要先在暢遊登入 weibo.com",
+      "default": "supertopic",
+      "options": [
+        {
+          "name": "用户相册",
+          "name.en": "User album",
+          "name.ja": "ユーザーアルバム",
+          "name.ko": "사용자 앨범",
+          "name.zhtw": "使用者相簿",
+          "variable": "album"
+        },
+        {
+          "name": "用户微博",
+          "name.en": "User timeline",
+          "name.ja": "ユーザータイムライン",
+          "name.ko": "사용자 타임라인",
+          "name.zhtw": "使用者微博",
+          "variable": "timeline"
+        },
+        {
+          "name": "超话",
+          "name.en": "Super topic",
+          "name.ja": "超話",
+          "name.ko": "초화",
+          "name.zhtw": "超話",
+          "variable": "supertopic"
+        },
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "name.zhtw": "關鍵字搜尋",
+          "variable": "search"
+        },
+        {
+          "name": "单条微博",
+          "name.en": "Single post",
+          "name.ja": "単一投稿",
+          "name.ko": "단일 게시물",
+          "name.zhtw": "單條微博",
+          "variable": "single"
+        }
+      ]
+    },
+    {
+      "key": "user",
+      "type": "string",
+      "name": "用户",
+      "name.en": "User",
+      "name.ja": "ユーザー",
+      "name.ko": "사용자",
+      "name.zhtw": "使用者",
+      "descripts": "UID、主页链接（weibo.com/u/123…、weibo.com/个性域名）或昵称",
+      "descripts.en": "UID, profile URL (weibo.com/u/123…, weibo.com/custom-name) or screen name",
+      "descripts.ja": "UID、プロフィール URL（weibo.com/u/123…、weibo.com/カスタムドメイン）またはニックネーム",
+      "descripts.ko": "UID, 프로필 URL(weibo.com/u/123…, weibo.com/개인 도메인) 또는 닉네임",
+      "descripts.zhtw": "UID、主頁連結（weibo.com/u/123…、weibo.com/個性網域）或暱稱",
+      "required": true,
+      "when": {
+        "mode": [
+          "album",
+          "timeline"
+        ]
+      }
+    },
+    {
+      "key": "timeline_filter",
+      "required": true,
+      "type": "options",
+      "name": "微博范围",
+      "name.en": "Posts",
+      "name.ja": "対象",
+      "name.ko": "범위",
+      "name.zhtw": "微博範圍",
+      "default": "original",
+      "when": {
+        "mode": [
+          "timeline"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "すべて",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "原创",
+          "name.en": "Original",
+          "name.ja": "オリジナル",
+          "name.ko": "원본",
+          "name.zhtw": "原創",
+          "variable": "original"
+        },
+        {
+          "name": "图片",
+          "name.en": "With images",
+          "name.ja": "画像",
+          "name.ko": "이미지",
+          "name.zhtw": "圖片",
+          "variable": "pic"
+        }
+      ]
+    },
+    {
+      "key": "include_retweets",
+      "type": "boolean",
+      "name": "包含转发",
+      "name.en": "Include reposts",
+      "name.ja": "リポストを含む",
+      "name.ko": "리포스트 포함",
+      "name.zhtw": "包含轉發",
+      "descripts": "收转发微博里原帖的图片，详情里会标出转发者",
+      "descripts.en": "Collect images of reposted originals; the detail view notes who reposted",
+      "descripts.ja": "リポスト元の画像も収集し、詳細にリポストした人を表示します",
+      "descripts.ko": "리포스트된 원본의 이미지도 수집하며, 상세에 리포스트한 사람을 표시합니다",
+      "descripts.zhtw": "收轉發微博裡原帖的圖片，詳情中會標出轉發者",
+      "default": false,
+      "when": {
+        "mode": [
+          "timeline"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "supertopic",
+      "type": "string",
+      "required": true,
+      "name": "超话",
+      "name.en": "Super topic",
+      "name.ja": "超話",
+      "name.ko": "초화",
+      "name.zhtw": "超話",
+      "descripts": "超话名（如：原神）或超话链接（weibo.com/p/100808…）",
+      "descripts.en": "Super topic name (e.g. 原神) or URL (weibo.com/p/100808…)",
+      "descripts.ja": "超話名（例：原神）または URL（weibo.com/p/100808…）",
+      "descripts.ko": "초화 이름(예: 原神) 또는 URL(weibo.com/p/100808…)",
+      "descripts.zhtw": "超話名（如：原神）或超話連結（weibo.com/p/100808…）",
+      "default": "原神",
+      "when": {
+        "mode": [
+          "supertopic"
+        ]
+      }
+    },
+    {
+      "key": "supertopic_channel",
+      "required": true,
+      "type": "options",
+      "name": "频道",
+      "name.en": "Channel",
+      "name.ja": "チャンネル",
+      "name.ko": "채널",
+      "name.zhtw": "頻道",
+      "default": "soul",
+      "when": {
+        "mode": [
+          "supertopic"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "热门",
+          "name.en": "Hot",
+          "name.ja": "人気",
+          "name.ko": "인기",
+          "name.zhtw": "熱門",
+          "variable": "hot"
+        },
+        {
+          "name": "最新发帖",
+          "name.en": "Newest posts",
+          "name.ja": "新着投稿",
+          "name.ko": "최신 글",
+          "name.zhtw": "最新發帖",
+          "variable": "latest"
+        },
+        {
+          "name": "最新评论",
+          "name.en": "Latest replies",
+          "name.ja": "最新コメント",
+          "name.ko": "최신 댓글",
+          "name.zhtw": "最新評論",
+          "variable": "reply"
+        },
+        {
+          "name": "精华",
+          "name.en": "Featured",
+          "name.ja": "精選",
+          "name.ko": "정화",
+          "name.zhtw": "精華",
+          "variable": "soul"
+        },
+        {
+          "name": "标签频道",
+          "name.en": "Tag channel",
+          "name.ja": "タグチャンネル",
+          "name.ko": "태그 채널",
+          "name.zhtw": "標籤頻道",
+          "variable": "tag"
+        }
+      ]
+    },
+    {
+      "key": "supertopic_tag",
+      "type": "string",
+      "required": true,
+      "name": "标签频道名",
+      "name.en": "Tag channel name",
+      "name.ja": "タグチャンネル名",
+      "name.ko": "태그 채널 이름",
+      "name.zhtw": "標籤頻道名",
+      "descripts": "超话页上的频道标题，如「同人」「原摄」；填错时会列出可选频道",
+      "descripts.en": "Channel title on the super topic page, e.g. 同人; a wrong name lists the available ones",
+      "descripts.ja": "超話ページのチャンネル名（例：同人）。間違えると候補を表示します",
+      "descripts.ko": "초화 페이지의 채널 제목(예: 同人). 틀리면 선택 가능한 채널을 보여줍니다",
+      "descripts.zhtw": "超話頁上的頻道標題，如「同人」「原攝」；填錯時會列出可選頻道",
+      "default": "同人",
+      "when": {
+        "mode": [
+          "supertopic"
+        ],
+        "supertopic_channel": [
+          "tag"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Keyword",
+      "name.ja": "キーワード",
+      "name.ko": "키워드",
+      "name.zhtw": "搜尋關鍵字",
+      "descripts": "与 s.weibo.com 搜索一致，只取含图片的微博；加 # 号即按话题搜（#原神#）",
+      "descripts.en": "Same as s.weibo.com search, image posts only; wrap in # to search a topic (#原神#)",
+      "descripts.ja": "s.weibo.com の検索と同じで、画像付き投稿のみ。# で囲むと話題検索（#原神#）",
+      "descripts.ko": "s.weibo.com 검색과 같으며 이미지 게시물만 수집합니다. #로 감싸면 화제 검색(#原神#)",
+      "descripts.zhtw": "與 s.weibo.com 搜尋一致，只取含圖片的微博；加 # 號即按話題搜（#原神#）",
+      "required": true,
+      "when": {
+        "mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "search_sort",
+      "type": "options",
+      "name": "排序",
+      "name.en": "Sort",
+      "name.ja": "並び順",
+      "name.ko": "정렬",
+      "name.zhtw": "排序",
+      "default": "",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2,
+      "options": [
+        {
+          "name": "综合（时间）",
+          "name.en": "Default (time)",
+          "name.ja": "標準（時間）",
+          "name.ko": "기본(시간)",
+          "name.zhtw": "綜合（時間）",
+          "variable": ""
+        },
+        {
+          "name": "热门",
+          "name.en": "Hot",
+          "name.ja": "人気",
+          "name.ko": "인기",
+          "name.zhtw": "熱門",
+          "variable": "hot"
+        }
+      ]
+    },
+    {
+      "key": "search_original",
+      "type": "boolean",
+      "name": "只看原创",
+      "name.en": "Original only",
+      "name.ja": "オリジナルのみ",
+      "name.ko": "원본만",
+      "name.zhtw": "只看原創",
+      "default": false,
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "start_date",
+      "type": "date",
+      "name": "起始日期",
+      "name.en": "From",
+      "name.ja": "開始日",
+      "name.ko": "시작일",
+      "name.zhtw": "起始日期",
+      "dateMax": "today",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "end_date",
+      "type": "date",
+      "name": "结束日期",
+      "name.en": "To",
+      "name.ja": "終了日",
+      "name.ko": "종료일",
+      "name.zhtw": "結束日期",
+      "dateMax": "today",
+      "when": {
+        "mode": [
+          "search"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "post_url",
+      "type": "string",
+      "name": "微博链接",
+      "name.en": "Post URL",
+      "name.ja": "投稿 URL",
+      "name.ko": "게시물 URL",
+      "name.zhtw": "微博連結",
+      "descripts": "weibo.com/<UID>/<微博ID>、m.weibo.cn/detail/<ID> 或微博 ID；转发会收原帖的图",
+      "descripts.en": "weibo.com/<UID>/<post id>, m.weibo.cn/detail/<id> or a post id; for a repost the original's images are collected",
+      "descripts.ja": "weibo.com/<UID>/<投稿ID>、m.weibo.cn/detail/<ID> または投稿 ID。リポストは元投稿の画像を収集",
+      "descripts.ko": "weibo.com/<UID>/<게시물 ID>, m.weibo.cn/detail/<ID> 또는 게시물 ID. 리포스트는 원본 이미지를 수집합니다",
+      "descripts.zhtw": "weibo.com/<UID>/<微博ID>、m.weibo.cn/detail/<ID> 或微博 ID；轉發會收原帖的圖",
+      "required": true,
+      "when": {
+        "mode": [
+          "single"
+        ]
+      }
+    },
+    {
+      "key": "max_posts",
+      "type": "int",
+      "name": "最多微博条数",
+      "name.en": "Max posts",
+      "name.ja": "最大投稿数",
+      "name.ko": "최대 게시물 수",
+      "name.zhtw": "最多微博條數",
+      "descripts": "本次最多收几条带图微博（每条可能有多张图）；无图微博不计数",
+      "descripts.en": "Cap on image posts this run (each may have several images); posts without images are not counted",
+      "descripts.ja": "今回収集する画像付き投稿の上限（1 件に複数枚あり得ます）。画像なしは数えません",
+      "descripts.ko": "이번 실행에서 수집할 이미지 게시물 상한(게시물당 여러 장 가능). 이미지 없는 게시물은 세지 않습니다",
+      "descripts.zhtw": "本次最多收幾條帶圖微博（每條可能有多張圖）；無圖微博不計數",
+      "default": 20,
+      "min": 1,
+      "max": 2000,
+      "when": {
+        "mode": [
+          "album",
+          "timeline",
+          "supertopic",
+          "search"
+        ]
+      },
+      "width": 2
+    },
+    {
+      "key": "max_comments",
+      "type": "int",
+      "name": "保存评论数",
+      "name.en": "Comments to keep",
+      "name.ja": "保存するコメント数",
+      "name.ko": "저장할 댓글 수",
+      "name.zhtw": "保存評論數",
+      "descripts": "每条微博按热度保存前几条评论（含楼中楼预览）到详情；0 表示不拉评论，也就不会下载评论图",
+      "descripts.en": "Top comments (with reply previews) saved into the detail view per post; 0 skips comments and comment images",
+      "descripts.ja": "投稿ごとに人気順の上位コメント（返信プレビュー付き）を詳細に保存。0 でコメントもコメント画像も取得しません",
+      "descripts.ko": "게시물마다 인기순 상위 댓글(답글 미리보기 포함)을 상세에 저장합니다. 0이면 댓글과 댓글 이미지를 가져오지 않습니다",
+      "descripts.zhtw": "每條微博按熱度保存前幾條評論（含樓中樓預覽）到詳情；0 表示不拉評論，也就不會下載評論圖",
+      "default": 20,
+      "min": 0,
+      "max": 200,
+      "width": 2
+    },
+    {
+      "key": "comment_images",
+      "type": "boolean",
+      "name": "下载评论区图片",
+      "name.en": "Download comment images",
+      "name.ja": "コメント画像を保存",
+      "name.ko": "댓글 이미지 저장",
+      "name.zhtw": "下載評論區圖片",
+      "descripts": "把已保存评论（含楼中楼）里贴的图也下载下来，文件名带 [comment_楼层]",
+      "descripts.en": "Also download images posted in the saved comments (and replies); names end with [comment_<floor>]",
+      "descripts.ja": "保存したコメント（返信含む）に貼られた画像も保存します。名前に [comment_階] が付きます",
+      "descripts.ko": "저장한 댓글(답글 포함)에 올라온 이미지도 저장합니다. 이름에 [comment_층]이 붙습니다",
+      "descripts.zhtw": "把已保存評論（含樓中樓）裡貼的圖也下載下來，檔名帶 [comment_樓層]",
+      "default": true,
+      "width": 2
+    },
+    {
+      "key": "live_photo",
+      "type": "boolean",
+      "name": "下载实况图视频",
+      "name.en": "Download live photos",
+      "name.ja": "ライブフォトの動画を保存",
+      "name.ko": "라이브 포토 영상 저장",
+      "name.zhtw": "下載實況圖影片",
+      "descripts": "实况图（LivePhoto）除静态图外再收一段短视频，文件名带 (live)",
+      "descripts.en": "For LivePhotos, also save the short video next to the still (name ends with (live))",
+      "descripts.ja": "ライブフォトは静止画に加えて短い動画も保存します（名前に (live)）",
+      "descripts.ko": "라이브 포토는 정지 이미지와 함께 짧은 영상도 저장합니다(이름에 (live))",
+      "descripts.zhtw": "實況圖（LivePhoto）除靜態圖外再收一段短影片，檔名帶 (live)",
+      "default": true
+    }
+  ],
+  "dependencies": {
+    "tiny-pinyin": "^1.3.2"
+  },
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

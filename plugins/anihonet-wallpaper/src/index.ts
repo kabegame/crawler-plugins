@@ -17,6 +17,8 @@ const { addProgress } = Kabegame;
 
 export async function crawl(common, custom) {
   const vars = custom || {};
+  // 模式下拉被清空时（null）按默认的排行榜模式处理
+  const mode = vars.crawl_mode ?? "ranking";
   const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
   const type = vars.wallpaper_type === "img-pc" ? "imgpc" : coerceStr(vars.wallpaper_type || "all");
   if (!["all", "sp", "image", "imgpc", "pc"].includes(type)) {
@@ -24,7 +26,7 @@ export async function crawl(common, custom) {
     return;
   }
 
-  if (vars.crawl_mode === "single_work") {
+  if (mode === "single_work") {
     const workSlug = coerceStr(vars.selected_work);
     if (!workSlug) {
       addProgress(100.0);
@@ -40,7 +42,7 @@ export async function crawl(common, custom) {
       vars.work_end_page == null ? 0 : Number(vars.work_end_page),
       baseUrl,
     );
-  } else if (vars.crawl_mode === "search") {
+  } else if (mode === "search") {
     await crawlSearch(
       vars.search_query,
       vars.search_order,
@@ -49,7 +51,7 @@ export async function crawl(common, custom) {
       Number(vars.search_end_page ?? 1),
       baseUrl,
     );
-  } else if (vars.crawl_mode === "ranking") {
+  } else if (mode === "ranking") {
     await crawlKind(
       type,
       Number(vars.start_page ?? 1),

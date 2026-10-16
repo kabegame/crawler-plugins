@@ -1,6 +1,6 @@
 {
   "name": "heybox",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name.zh": "小黑盒",
   "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
   "author": "Kabegame",
@@ -21,6 +21,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl Mode",
       "name.ja": "クロールモード",
@@ -50,7 +51,7 @@
       "name.en": "Post Share URL",
       "name.ja": "投稿共有 URL",
       "name.ko": "포스트 공유 URL",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "single_post"

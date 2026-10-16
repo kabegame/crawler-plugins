@@ -1,6 +1,6 @@
 {
   "name": "wallpapers-craft",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "name.zh": "wallpapers-craft 壁纸",
   "name.en": "wallpapers-craft wallpapers",
@@ -26,6 +26,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -70,6 +71,7 @@
       "descripts.ko": "카탈로그 모드에서 사용하는 카테고리입니다.",
       "descripts.zhtw": "目錄模式下的目錄。",
       "default": "anime",
+      "required": true,
       "when": {
         "mode": [
           "catalog"
@@ -309,6 +311,7 @@
     {
       "key": "orderby",
       "type": "options",
+      "required": true,
       "name": "Sort order",
       "name.zh": "排序方式",
       "name.ja": "並び順",
@@ -350,6 +353,7 @@
     {
       "key": "res_type",
       "type": "options",
+      "required": true,
       "name": "Resolution category",
       "name.zh": "分辨率类别",
       "name.ja": "解像度の種類",
@@ -407,6 +411,7 @@
     {
       "key": "res_mobile",
       "type": "options",
+      "required": true,
       "name": "Mobile resolution",
       "name.zh": "移动分辨率",
       "name.ja": "モバイル解像度",
@@ -560,6 +565,7 @@
     {
       "key": "res_apple",
       "type": "options",
+      "required": true,
       "name": "Apple resolution",
       "name.zh": "苹果分辨率",
       "name.ja": "Apple 解像度",
@@ -633,6 +639,7 @@
     {
       "key": "res_fullscreen",
       "type": "options",
+      "required": true,
       "name": "Fullscreen resolution",
       "name.zh": "全屏分辨率",
       "name.ja": "フルスクリーン解像度",
@@ -698,6 +705,7 @@
     {
       "key": "res_widescreen",
       "type": "options",
+      "required": true,
       "name": "Widescreen resolution",
       "name.zh": "宽屏分辨率",
       "name.ja": "ワイドスクリーン解像度",

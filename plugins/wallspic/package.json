@@ -1,6 +1,6 @@
 {
   "name": "wallspic",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "name.zh": "wallspic 壁纸",
   "name.en": "wallspic wallpapers",
@@ -26,6 +26,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -59,6 +60,7 @@
     {
       "key": "album",
       "type": "options",
+      "required": true,
       "name": "Album category",
       "name.zh": "专辑分类",
       "name.ja": "アルバムカテゴリ",
@@ -342,6 +344,7 @@
     {
       "key": "resolution_mode",
       "type": "options",
+      "required": true,
       "name": "Resolution mode",
       "name.zh": "分辨率模式",
       "name.ja": "解像度モード",
@@ -391,6 +394,7 @@
     {
       "key": "resolution_group",
       "type": "options",
+      "required": true,
       "name": "Resolution preset group",
       "name.zh": "具体分辨率分组",
       "name.ja": "解像度プリセットグループ",
@@ -440,6 +444,7 @@
     {
       "key": "res_ultra_hd",
       "type": "options",
+      "required": true,
       "name": "Ultra HD",
       "name.zh": "超高清",
       "name.ja": "ウルトラHD",
@@ -476,6 +481,7 @@
     {
       "key": "res_apple",
       "type": "options",
+      "required": true,
       "name": "Apple",
       "name.zh": "Apple",
       "name.ja": "Apple",
@@ -528,6 +534,7 @@
     {
       "key": "res_android",
       "type": "options",
+      "required": true,
       "name": "Android device",
       "name.zh": "安卓设备",
       "name.ja": "Android端末",
@@ -580,6 +587,7 @@
     {
       "key": "res_widescreen",
       "type": "options",
+      "required": true,
       "name": "Widescreen",
       "name.zh": "宽屏",
       "name.ja": "ワイドスクリーン",

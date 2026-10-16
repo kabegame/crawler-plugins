@@ -1,6 +1,6 @@
 {
   "name": "anihonet-wallpaper",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "private": true,
   "name.zh": "anihonet动漫壁纸",
   "name.en": "anihonet anime wallpapers",
@@ -30,6 +30,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "取得モード",
@@ -71,6 +72,7 @@
     {
       "key": "ranking_period",
       "type": "options",
+      "required": true,
       "name": "排行榜周期",
       "name.en": "Ranking period",
       "name.ja": "ランキング期間",
@@ -138,6 +140,7 @@
       "descripts.ko": "수집할 애니메이션/게임 작품 선택(사이트 images/·category/·tag/ 경로에 대응하는 고정 목록)",
       "descripts.zhtw": "選擇要爬取的動漫/遊戲作品（固定清單，對應網站 images/、category/ 或 tag/ 路徑）",
       "default": "images/%E3%82%A2%E3%82%A4%E3%82%AB%E3%83%84%E5%A3%81%E7%B4%99",
+      "required": true,
       "options": [
         {
           "name": "アイカツ(偶像活动)",
@@ -3335,7 +3338,7 @@
       "descripts.ja": "サイト内検索 URL の s パラメータ。作品名やキャラクター名などを入力します",
       "descripts.ko": "작품명이나 캐릭터명 등 사이트 검색 URL의 s 매개변수 값",
       "descripts.zhtw": "作為站內搜尋 URL 的 s 參數，可輸入作品名、角色名等",
-      "default": "",
+      "required": true,
       "width": 2,
       "when": {
         "crawl_mode": [
@@ -3346,6 +3349,7 @@
     {
       "key": "search_order",
       "type": "options",
+      "required": true,
       "name": "排列方向",
       "name.en": "Direction",
       "name.ja": "並び方向",
@@ -3385,6 +3389,7 @@
     {
       "key": "search_orderby",
       "type": "options",
+      "required": true,
       "name": "排序方式",
       "name.en": "Sort by",
       "name.ja": "並び順",
@@ -3424,6 +3429,7 @@
     {
       "key": "wallpaper_type",
       "type": "options",
+      "required": true,
       "name": "排行榜子类",
       "name.en": "Ranking category",
       "name.ja": "ランキング種別",

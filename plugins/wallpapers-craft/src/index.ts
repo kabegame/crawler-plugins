@@ -37,12 +37,16 @@ function getSelectedRes(vars) {
 }
 
 function buildPageUrl(vars, baseUrl, page, selectedRes) {
-  const basePath = vars.mode === "tag"
+  // 下拉被清空（null）或随模式隐藏（undefined）时回落到清单默认值，避免把 null/undefined 拼进 URL
+  const mode = vars.mode ?? "catalog";
+  const category = coerceStr(vars.category) || "anime";
+  const orderby = coerceStr(vars.orderby) || "default";
+  const basePath = mode === "tag"
     ? (coerceStr(vars.tag).trim()
       ? `${baseUrl}/tag/${encodeURIComponent(coerceStr(vars.tag).trim())}`
       : `${baseUrl}/all`)
-    : `${baseUrl}/catalog/${vars.category}`;
-  const sortPath = vars.orderby === "default" ? "" : `/${vars.orderby}`;
+    : `${baseUrl}/catalog/${category}`;
+  const sortPath = orderby === "default" ? "" : `/${orderby}`;
   const resPath = selectedRes ? `/${selectedRes}` : "";
   return `${basePath}${sortPath}${resPath}/page${page}`;
 }

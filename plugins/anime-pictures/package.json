@@ -1,6 +1,6 @@
 {
   "name": "anime-pictures",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "private": true,
   "name.zh": "anime-pictures动漫图库",
   "name.en": "anime-pictures anime gallery",
@@ -38,8 +38,7 @@
       "descripts.en": "Tag to filter (empty = all)",
       "descripts.ja": "フィルター用タグ（空欄で全件）",
       "descripts.ko": "필터 태그 (비우면 전체)",
-      "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）",
-      "default": ""
+      "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）"
     },
     {
       "key": "startPage",

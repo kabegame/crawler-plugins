@@ -527,16 +527,16 @@ export async function crawl(common, custom) {
   prepareSite(baseUrl);
   const quality = coerceStr(vars.quality || "high");
   if (vars.crawl_mode === "all") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlQualityAll(
       baseUrl,
       quality,
       Number(vars.start_page ?? 1),
-      Number(vars.end_page ?? 1),
+      Number(vars.end_page ?? vars.start_page ?? 1),
       metaTokensOf(vars),
     );
   } else if (vars.crawl_mode === "tags") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlByTags(baseUrl, quality, vars);
   } else if (vars.crawl_mode === "popular") {
     await crawlPopular(baseUrl, quality, vars);

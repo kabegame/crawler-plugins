@@ -53,8 +53,68 @@ interface PluginResult {
 interface PluginPackageJson {
   name?: string;
   kbPackageVersion?: number;
+  kbConfig?: unknown;
   main?: string;
   scripts?: Record<string, string>;
+}
+
+function validateVarDefs(pkg: PluginPackageJson): void {
+  if (pkg.kbConfig === undefined) return;
+  if (!Array.isArray(pkg.kbConfig)) throw new Error("kbConfig 必须是数组");
+  const defs = pkg.kbConfig as Array<Record<string, unknown>>;
+  const indexes = new Map<string, number>();
+  for (const [index, def] of defs.entries()) {
+    const key = typeof def?.key === "string" ? def.key : "";
+    if (!key) throw new Error(`kbConfig[${index}] 缺少 key`);
+    if (indexes.has(key)) throw new Error(`变量 key \`${key}\` 重复`);
+    indexes.set(key, index);
+
+    if (def.type === "options" || def.type === "checkbox") {
+      const seen = new Set<string>();
+      for (const option of Array.isArray(def.options) ? def.options : []) {
+        const variable = typeof option === "string" ? option : (option as Record<string, unknown>)?.variable;
+        if (typeof variable !== "string") continue;
+        if (seen.has(variable)) throw new Error(`变量 \`${key}\` 的选项 variable \`${variable}\` 重复`);
+        seen.add(variable);
+      }
+    }
+  }
+
+  const edges = defs.map(() => [] as number[]);
+  const addWhen = (owner: number, when: unknown) => {
+    if (!when || typeof when !== "object" || Array.isArray(when)) return;
+    for (const depKey of Object.keys(when)) {
+      const dep = indexes.get(depKey);
+      if (dep !== undefined) edges[owner].push(dep);
+    }
+  };
+  for (const [index, def] of defs.entries()) {
+    addWhen(index, def.when);
+    for (const option of Array.isArray(def.options) ? def.options : []) {
+      if (option && typeof option === "object") addWhen(index, (option as Record<string, unknown>).when);
+    }
+    edges[index] = [...new Set(edges[index])];
+  }
+
+  const states = defs.map(() => 0);
+  const stack: number[] = [];
+  const visit = (node: number): void => {
+    states[node] = 1;
+    stack.push(node);
+    for (const next of edges[node]) {
+      if (states[next] === 0) visit(next);
+      else if (states[next] === 1) {
+        const start = stack.indexOf(next);
+        const path = [...stack.slice(start), next].map((item) => String(defs[item].key));
+        throw new Error(`when 依赖成环: ${path.join(" -> ")}`);
+      }
+    }
+    stack.pop();
+    states[node] = 2;
+  };
+  for (let index = 0; index < defs.length; index += 1) {
+    if (states[index] === 0) visit(index);
+  }
 }
 
 function validatePluginId(pluginId: string): void {
@@ -417,6 +477,7 @@ async function packagePlugin(
       if (typeof pkg?.name === "string") {
         validatePluginId(pkg.name);
       }
+      if (pkg) validateVarDefs(pkg);
       validatePluginId(path.basename(outputFile, ".kgpg"));
       if (isV3PluginPackage(pkg)) {
         const main = pkg?.main;

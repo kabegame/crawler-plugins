@@ -1,0 +1,20 @@
+{
+  "name": "第三方 API · Lolicon 随机横图（排除 AI）",
+  "name.en": "Third-party API · Lolicon random landscape (no AI)",
+  "name.ja": "サードパーティ API・Lolicon ランダム横長（AI 除外）",
+  "name.ko": "서드파티 API · Lolicon 랜덤 가로(AI 제외)",
+  "name.zhtw": "第三方 API · Lolicon 隨機橫圖（排除 AI）",
+  "description": "从 Lolicon API 随机抽 20 个全年龄横图作品，排除 AI，原图从 pixiv 下载。适合做桌面壁纸的每日自动任务。不需要 Cookie。",
+  "description.en": "Randomly picks 20 general-rated landscape artworks from the Lolicon API, excluding AI; originals are downloaded from pixiv. Good as a daily wallpaper task. No cookie needed.",
+  "description.ja": "Lolicon API から全年齢・横長の作品を 20 件ランダムに取得（AI 除外）、原画は pixiv から取得。毎日の壁紙タスク向け。Cookie 不要。",
+  "description.ko": "Lolicon API에서 전연령 가로 작품 20개를 랜덤으로 가져오고(AI 제외) 원본은 pixiv에서 받습니다. 매일 배경화면 작업용. Cookie 불필요.",
+  "description.zhtw": "從 Lolicon API 隨機抽 20 個全年齡橫圖作品，排除 AI，原圖從 pixiv 下載。適合桌面桌布的每日自動任務。不需要 Cookie。",
+  "userConfig": {
+    "source": "third_party",
+    "third_party_api": "lolicon",
+    "lolicon_r18": "safe",
+    "lolicon_orientation": "landscape",
+    "lolicon_count": 20,
+    "lolicon_exclude_ai": true
+  }
+}

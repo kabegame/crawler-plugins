@@ -1,6 +1,6 @@
 {
   "name": "pixiv",
-  "version": "1.4.3",
+  "version": "1.5.1",
   "name.zh": "Pixiv",
   "name.en": "Pixiv",
   "name.ja": "ピクシブ",
@@ -30,6 +30,7 @@
     {
       "key": "source",
       "type": "options",
+      "required": true,
       "name": "爬取类型",
       "name.en": "Source type",
       "name.ja": "取得タイプ",
@@ -68,6 +69,14 @@
           "name.ko": "키워드 검색",
           "name.zhtw": "關鍵字搜尋",
           "variable": "keyword"
+        },
+        {
+          "name": "第三方 API",
+          "name.en": "Third-party API",
+          "name.ja": "サードパーティ API",
+          "name.ko": "서드파티 API",
+          "name.zhtw": "第三方 API",
+          "variable": "third_party"
         }
       ]
     },
@@ -79,7 +88,6 @@
       "name.ja": "ユーザー UID",
       "name.ko": "사용자 UID",
       "name.zhtw": "用戶 UID",
-      "default": "",
       "descripts": "何时必填：收藏＝被爬取用户 UID（仅拼 URL，不发 x-user-id）；画师＝你登录账号 UID（x-user-id，必填）；排行榜且年龄向选 R18＝你登录账号 UID（x-user-id，必填，并需在高级设置填 Cookie）。排行榜（全年龄）、关键词可不填。",
       "descripts.en": "When required: Bookmarks = target user UID (URL only, no x-user-id). Artist = your account UID (x-user-id, required). Ranking + R18 age = your account UID (x-user-id, required; Cookie in Advanced). Safe ranking and keyword: optional.",
       "descripts.ja": "必須になる場合：ブックマーク＝対象 UID（URL のみ）。作家＝ログイン UID（x-user-id 必須）。ランキング＋R18＝ログイン UID（x-user-id 必須・Cookie 要）。全年齢ランキング・キーワードは任意。",
@@ -90,6 +98,7 @@
     {
       "key": "content_mode",
       "type": "options",
+      "required": true,
       "name": "内容类型",
       "name.en": "Content type",
       "name.ja": "コンテンツタイプ",
@@ -139,6 +148,7 @@
     {
       "key": "ranking_mode",
       "type": "options",
+      "required": true,
       "name": "榜序",
       "name.en": "Ranking order",
       "name.ja": "ランキング順",
@@ -271,6 +281,7 @@
     {
       "key": "age_mode",
       "type": "options",
+      "required": true,
       "name": "年龄向",
       "name.en": "Age rating",
       "name.ja": "年齢区分",
@@ -330,7 +341,6 @@
       "descripts.ja": "空欄は最新期。YYYYMMDD：日間はその日、週間・月間はその日を含む期間。",
       "descripts.ko": "비우면 최신 기간. YYYYMMDD: 일간은 해당일, 주간·월간은 해당일 기준 기간.",
       "descripts.zhtw": "留空為最新一期；填寫為 YYYYMMDD。日榜為當日；週榜、月榜以該日為基準向前一週或一月。",
-      "default": "",
       "width": 2,
       "when": {
         "source": [
@@ -341,6 +351,7 @@
     {
       "key": "artist_id",
       "type": "string",
+      "required": true,
       "name": "画师 UID",
       "name.en": "Artist UID",
       "name.ja": "作家 UID",
@@ -405,6 +416,7 @@
     {
       "key": "keyword",
       "type": "string",
+      "required": true,
       "name": "搜索关键词",
       "name.en": "Search keyword",
       "name.ja": "検索キーワード",
@@ -424,6 +436,7 @@
     {
       "key": "search_mode",
       "type": "options",
+      "required": true,
       "name": "搜索模式",
       "name.en": "Search mode",
       "name.ja": "検索モード",
@@ -466,6 +479,7 @@
     {
       "key": "keyword_order",
       "type": "options",
+      "required": true,
       "name": "排序方式",
       "name.en": "Sort order",
       "name.ja": "並び順",
@@ -499,6 +513,282 @@
       "when": {
         "source": [
           "keyword"
+        ]
+      }
+    },
+    {
+      "key": "third_party_api",
+      "type": "options",
+      "required": true,
+      "name": "第三方 API",
+      "name.en": "Third-party API",
+      "name.ja": "サードパーティ API",
+      "name.ko": "서드파티 API",
+      "name.zhtw": "第三方 API",
+      "descripts": "只从第三方 API 取作品 id，详情、标签与原图仍从 pixiv 下载（需能访问 pixiv）。",
+      "descripts.en": "Only artwork ids come from the third-party API; details, tags and originals are still downloaded from pixiv (pixiv must be reachable).",
+      "descripts.ja": "作品 ID のみサードパーティ API から取得し、詳細・タグ・原画は pixiv から取得します（pixiv への接続が必要）。",
+      "descripts.ko": "작품 ID만 서드파티 API에서 가져오고 상세·태그·원본은 pixiv에서 받습니다(pixiv 접속 필요).",
+      "descripts.zhtw": "只從第三方 API 取作品 id，詳情、標籤與原圖仍從 pixiv 下載（需能連上 pixiv）。",
+      "default": "lolicon",
+      "options": [
+        {
+          "name": "Lolicon API（随机）",
+          "name.en": "Lolicon API (random)",
+          "name.ja": "Lolicon API（ランダム）",
+          "name.ko": "Lolicon API (랜덤)",
+          "name.zhtw": "Lolicon API（隨機）",
+          "variable": "lolicon"
+        }
+      ],
+      "when": {
+        "source": [
+          "third_party"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_r18",
+      "type": "options",
+      "required": true,
+      "name": "年龄向",
+      "name.en": "Age rating",
+      "name.ja": "年齢区分",
+      "name.ko": "연령",
+      "name.zhtw": "年齡向",
+      "descripts": "按 lolicon 库内分类筛选；全年龄会再排除带 R-18 / R-18G 标签的作品。R18 与混合需在畅游登录 pixiv。",
+      "descripts.en": "Filters by lolicon's own classification; General additionally drops works tagged R-18 / R-18G. R18 and Mixed need a pixiv login in Surf.",
+      "descripts.ja": "lolicon の分類で絞り込み、全年齢では R-18 / R-18G タグ付き作品も除外します。R18 と混合は畅游で pixiv にログインが必要です。",
+      "descripts.ko": "lolicon 분류로 필터링하며 전연령은 R-18 / R-18G 태그 작품도 제외합니다. R18과 혼합은 서핑에서 pixiv 로그인이 필요합니다.",
+      "descripts.zhtw": "依 lolicon 庫內分類篩選；全年齡會再排除帶 R-18 / R-18G 標籤的作品。R18 與混合需在暢遊登入 pixiv。",
+      "default": "safe",
+      "options": [
+        {
+          "name": "全年龄",
+          "name.en": "General",
+          "name.ja": "全年齢",
+          "name.ko": "전연령",
+          "name.zhtw": "全年齡",
+          "variable": "safe"
+        },
+        {
+          "name": "R18",
+          "name.en": "R18",
+          "name.ja": "R18",
+          "name.ko": "R18",
+          "name.zhtw": "R18",
+          "variable": "r18"
+        },
+        {
+          "name": "混合",
+          "name.en": "Mixed",
+          "name.ja": "混合",
+          "name.ko": "혼합",
+          "name.zhtw": "混合",
+          "variable": "all"
+        }
+      ],
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_orientation",
+      "type": "options",
+      "required": true,
+      "name": "方向",
+      "name.en": "Orientation",
+      "name.ja": "向き",
+      "name.ko": "방향",
+      "name.zhtw": "方向",
+      "default": "any",
+      "options": [
+        {
+          "name": "不限",
+          "name.en": "Any",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "不限",
+          "variable": "any"
+        },
+        {
+          "name": "横图",
+          "name.en": "Landscape",
+          "name.ja": "横長",
+          "name.ko": "가로",
+          "name.zhtw": "橫圖",
+          "variable": "landscape"
+        },
+        {
+          "name": "竖图",
+          "name.en": "Portrait",
+          "name.ja": "縦長",
+          "name.ko": "세로",
+          "name.zhtw": "直圖",
+          "variable": "portrait"
+        }
+      ],
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_tags",
+      "type": "list",
+      "name": "标签",
+      "name.en": "Tags",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "descripts": "每一项之间为「且」，最多 3 项；一项内用 | 分隔表示「或」，最多 20 个。同时匹配标签、作者名与标题，例如「原神|鸣潮」「白丝|黑丝」。",
+      "descripts.en": "Items are ANDed (max 3); separate alternatives inside an item with | for OR (max 20). Matches tags, author names and titles, e.g. 「原神|鸣潮」.",
+      "descripts.ja": "項目同士は AND（最大 3）。1 項目内は | 区切りで OR（最大 20）。タグ・作者名・タイトルに一致します。例：「原神|鸣潮」。",
+      "descripts.ko": "항목끼리는 AND(최대 3개), 한 항목 안에서 | 로 구분하면 OR(최대 20개). 태그·작가명·제목에 매칭됩니다. 예: 「原神|鸣潮」.",
+      "descripts.zhtw": "每一項之間為「且」，最多 3 項；一項內用 | 分隔表示「或」，最多 20 個。同時匹配標籤、作者名與標題。",
+      "options": null,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_uids",
+      "type": "list",
+      "name": "画师 UID",
+      "name.en": "Artist UIDs",
+      "name.ja": "作家 UID",
+      "name.ko": "작가 UID",
+      "name.zhtw": "畫師 UID",
+      "descripts": "只返回这些画师的作品，最多 20 个。",
+      "descripts.en": "Only works by these artists, up to 20.",
+      "descripts.ja": "これらの作家の作品のみ（最大 20）。",
+      "descripts.ko": "이 작가들의 작품만(최대 20명).",
+      "descripts.zhtw": "只回傳這些畫師的作品，最多 20 個。",
+      "options": null,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_count",
+      "type": "int",
+      "name": "作品数",
+      "name.en": "Artworks",
+      "name.ja": "作品数",
+      "name.ko": "작품 수",
+      "name.zhtw": "作品數",
+      "descripts": "单次请求的作品数（1～20）。lolicon 随机抽取，没有分页；多页作品会下载全部页。",
+      "descripts.en": "Artworks per request (1–20). lolicon picks randomly with no pagination; multi-page works download every page.",
+      "descripts.ja": "1 回のリクエストの作品数（1〜20）。ランダム抽出でページングなし。複数ページ作品は全ページ取得します。",
+      "descripts.ko": "요청당 작품 수(1~20). 랜덤 추출이며 페이지가 없습니다. 다페이지 작품은 모든 페이지를 받습니다.",
+      "descripts.zhtw": "單次請求的作品數（1～20）。隨機抽取，沒有分頁；多頁作品會下載全部頁。",
+      "default": 20,
+      "min": 1,
+      "max": 20,
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_exclude_ai",
+      "type": "boolean",
+      "name": "排除 AI 作品",
+      "name.en": "Exclude AI works",
+      "name.ja": "AI 作品を除外",
+      "name.ko": "AI 작품 제외",
+      "name.zhtw": "排除 AI 作品",
+      "descripts": "只能排除 pixiv 明确标记为 AI 的作品，未标记的老作品不受影响。",
+      "descripts.en": "Only excludes works pixiv explicitly marks as AI; unmarked older works are unaffected.",
+      "descripts.ja": "pixiv が AI と明示した作品のみ除外します。",
+      "descripts.ko": "pixiv가 AI로 명시한 작품만 제외합니다.",
+      "descripts.zhtw": "只能排除 pixiv 明確標記為 AI 的作品。",
+      "default": true,
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_date_after",
+      "type": "date",
+      "format": "YYYY-MM-DD",
+      "dateMin": "2007-09-01",
+      "dateMax": "today",
+      "name": "投稿起始日期",
+      "name.en": "Uploaded from",
+      "name.ja": "投稿開始日",
+      "name.ko": "투고 시작일",
+      "name.zhtw": "投稿起始日期",
+      "descripts": "按 pixiv 投稿日期（日本时间）筛选，含当天；留空不限。",
+      "descripts.en": "pixiv upload date (JST), inclusive; empty = no limit.",
+      "descripts.ja": "pixiv の投稿日（日本時間）で絞り込み、当日を含む。空欄は制限なし。",
+      "descripts.ko": "pixiv 투고일(일본 시간) 기준, 당일 포함. 비우면 제한 없음.",
+      "descripts.zhtw": "依 pixiv 投稿日期（日本時間）篩選，含當天；留空不限。",
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
+        ]
+      }
+    },
+    {
+      "key": "lolicon_date_before",
+      "type": "date",
+      "format": "YYYY-MM-DD",
+      "dateMin": "2007-09-01",
+      "dateMax": "today",
+      "name": "投稿结束日期",
+      "name.en": "Uploaded until",
+      "name.ja": "投稿終了日",
+      "name.ko": "투고 종료일",
+      "name.zhtw": "投稿結束日期",
+      "descripts": "含当天；留空不限。",
+      "descripts.en": "Inclusive; empty = no limit.",
+      "descripts.ja": "当日を含む。空欄は制限なし。",
+      "descripts.ko": "당일 포함. 비우면 제한 없음.",
+      "descripts.zhtw": "含當天；留空不限。",
+      "width": 2,
+      "when": {
+        "source": [
+          "third_party"
+        ],
+        "third_party_api": [
+          "lolicon"
         ]
       }
     },
@@ -553,7 +843,8 @@
     "configs/ranking-daily-illust.json",
     "configs/ranking-daily-r18.json",
     "configs/ranking-weekly-all.json",
-    "configs/ranking-weekly-r18.json"
+    "configs/ranking-weekly-r18.json",
+    "configs/lolicon-landscape.json"
   ],
   "kbPathQLProviders": [
     "providers/entry_provider.json5",

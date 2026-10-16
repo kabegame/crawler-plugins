@@ -57,6 +57,7 @@ const config = {
     {
       key: "crawl_mode",
       type: "options",
+      required: true,
       name: "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "取得モード",
@@ -98,6 +99,7 @@ const config = {
     {
       key: "ranking_period",
       type: "options",
+      required: true,
       name: "排行榜周期",
       "name.en": "Ranking period",
       "name.ja": "ランキング期間",
@@ -133,6 +135,7 @@ const config = {
       "descripts.ko": "수집할 애니메이션/게임 작품 선택(사이트 images/·category/·tag/ 경로에 대응하는 고정 목록)",
       "descripts.zhtw": "選擇要爬取的動漫/遊戲作品（固定清單，對應網站 images/、category/ 或 tag/ 路徑）",
       default: workOptions[0]?.variable ?? "",
+      required: true,
       options: workOptions,
       when: { crawl_mode: ["single_work"] },
     },
@@ -189,7 +192,7 @@ const config = {
       "descripts.ja": "サイト内検索 URL の s パラメータ。作品名やキャラクター名などを入力します",
       "descripts.ko": "작품명이나 캐릭터명 등 사이트 검색 URL의 s 매개변수 값",
       "descripts.zhtw": "作為站內搜尋 URL 的 s 參數，可輸入作品名、角色名等",
-      default: "",
+      required: true,
       options: null,
       min: null,
       max: null,
@@ -199,6 +202,7 @@ const config = {
     {
       key: "search_order",
       type: "options",
+      required: true,
       name: "排列方向",
       "name.en": "Direction",
       "name.ja": "並び方向",
@@ -220,6 +224,7 @@ const config = {
     {
       key: "search_orderby",
       type: "options",
+      required: true,
       name: "排序方式",
       "name.en": "Sort by",
       "name.ja": "並び順",
@@ -319,6 +324,7 @@ const config = {
     {
       key: "wallpaper_type",
       type: "options",
+      required: true,
       name: "排行榜子类",
       "name.en": "Ranking category",
       "name.ja": "ランキング種別",

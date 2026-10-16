@@ -1,6 +1,6 @@
 {
   "name": "gelbooru",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "name.zh": "Gelbooru 二次元图库",
   "name.en": "Gelbooru image board",
@@ -45,6 +45,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "クロールモード",
@@ -86,6 +87,7 @@
     {
       "key": "mode_tag_value",
       "type": "list",
+      "required": true,
       "name": "标签组合",
       "name.en": "Tag combination",
       "name.ja": "タグ組み合わせ",
@@ -303,6 +305,7 @@
     {
       "key": "mode_tag_order",
       "type": "options",
+      "required": true,
       "name": "标签排序",
       "name.en": "Tag order",
       "name.ja": "タグ順序",
@@ -415,6 +418,7 @@
     {
       "key": "quality",
       "type": "options",
+      "required": true,
       "name": "质量",
       "name.en": "Quality",
       "name.ja": "画質",

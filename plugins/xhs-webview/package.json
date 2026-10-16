@@ -1,6 +1,6 @@
 {
   "name": "xhs-webview",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "小红书（WebView）",
   "name.en": "Xiaohongshu (WebView)",
@@ -39,6 +39,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "取得モード",
@@ -122,7 +123,7 @@
       "descripts.ja": "作者プロフィールの完全な URL、または URL 内の userId を入力します。コレクションと「いいね」ではクローラーウィンドウ内でのログインが必要です。",
       "descripts.ko": "전체 작성자 프로필 URL 또는 URL의 userId를 입력합니다. 컬렉션과 좋아요 모드는 크롤러 창에서 로그인해야 합니다.",
       "descripts.zhtw": "填寫完整作者主頁連結，或只填寫連結中的 userId。收藏和按讚模式需要先在爬蟲視窗登入。",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "author_post",
@@ -144,7 +145,7 @@
       "descripts.ja": "完全な /board/ URL、またはボード id のみを入力します。",
       "descripts.ko": "전체 /board/ URL 또는 보드 id만 입력합니다.",
       "descripts.zhtw": "填寫完整的 /board/ 連結，或只填寫專輯 id。",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "board"
@@ -164,7 +165,7 @@
       "descripts.ja": "小紅書の検索結果ページから投稿タイプの結果を取得します。",
       "descripts.ko": "샤오홍슈 검색 결과 페이지에서 게시물 유형 결과를 수집합니다.",
       "descripts.zhtw": "在小紅書搜尋結果頁中抓取筆記類型結果。",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "search"
@@ -184,7 +185,7 @@
       "descripts.ja": "複数の投稿 URL を空白または改行で区切って入力します。小紅書の詳細ページと xhslink.com 短縮 URL に対応します。",
       "descripts.ko": "여러 게시물 URL을 공백이나 줄바꿈으로 구분해 입력합니다. 샤오홍슈 상세 페이지와 xhslink.com 단축 URL을 지원합니다.",
       "descripts.zhtw": "可填寫多個作品連結，使用空格或換行分隔；支援小紅書詳情頁與 xhslink.com 短連結。",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "note"
@@ -302,6 +303,7 @@
     {
       "key": "image_format",
       "type": "options",
+      "required": true,
       "name": "图片格式",
       "name.en": "Image format",
       "name.ja": "画像形式",

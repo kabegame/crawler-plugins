@@ -42,7 +42,9 @@ function getBasePath(vars, baseUrl) {
     const tag = trim(vars.tag);
     return tag ? `${baseUrl}/tag/${encodeURIComponent(tag)}` : baseUrl;
   }
-  return vars.album === "all" ? `${baseUrl}/album` : `${baseUrl}/album/${vars.album}`;
+  // 画册下拉被清空（null）或模式被清空导致画册隐藏（undefined）时按「全部」处理
+  const album = coerceStr(vars.album) || "all";
+  return album === "all" ? `${baseUrl}/album` : `${baseUrl}/album/${album}`;
 }
 
 function buildPageUrl(vars, baseUrl, page) {

@@ -1,6 +1,6 @@
 {
   "name": "bilibili-video",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "name.zh": "bilibili视频",
   "name.en": "Bilibili Videos",
@@ -39,6 +39,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "模式",
       "name.en": "Mode",
       "name.ja": "モード",
@@ -100,7 +101,7 @@
       "name.zhtw": "番劇連結或編號",
       "descripts": "单集 ep21495、整季 ss26801、剧集页 md24097891，或对应完整链接（bilibili.com/bangumi/play/ep21495 等）。ss/md 按正片列表批量下载",
       "descripts.en": "Single episode (ep21495), whole season (ss26801), media page (md24097891), or the full URL. ss/md bulk-download the main episode list",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "bangumi"
@@ -135,7 +136,7 @@
       "name.zhtw": "影片 ID 或連結",
       "descripts": "BV 号（BV13x41117TL）、av 号（av1074402）或完整链接（https://www.bilibili.com/video/BV13x41117TL）",
       "descripts.en": "BV id (BV13x41117TL), av id (av1074402) or full URL",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "single"
@@ -152,7 +153,7 @@
       "name.zhtw": "UP 主 UID 或主頁連結",
       "descripts": "纯数字 UID（3985676）或主页链接（https://space.bilibili.com/3985676）",
       "descripts.en": "Numeric UID (3985676) or space URL",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "space"
@@ -169,7 +170,7 @@
       "name.zhtw": "列表頁連結",
       "descripts": "粘贴完整链接，自动识别类型：合集 space.bilibili.com/<UID>/lists/<ID>；系列 同址加 ?type=series；收藏夹 space.bilibili.com/<UID>/favlist?fid=<ID> 或 bilibili.com/medialist/detail/ml<ID>",
       "descripts.en": "Paste the full URL; the type is detected automatically (collection / series / favorites)",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "list"
@@ -186,7 +187,7 @@
       "name.zhtw": "搜尋關鍵字",
       "descripts": "与 search.bilibili.com 的视频 Tab 一致",
       "descripts.en": "Same as the video tab on search.bilibili.com",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "search"
@@ -195,6 +196,7 @@
     },
     {
       "key": "search_order",
+      "required": true,
       "type": "options",
       "name": "搜索排序",
       "name.en": "Search sort",
@@ -255,6 +257,7 @@
     },
     {
       "key": "duration",
+      "required": true,
       "type": "options",
       "name": "时长筛选",
       "name.en": "Duration filter",
@@ -315,6 +318,7 @@
     },
     {
       "key": "order",
+      "required": true,
       "type": "options",
       "name": "排序",
       "name.en": "Sort",
@@ -420,6 +424,7 @@
     },
     {
       "key": "max_quality",
+      "required": true,
       "type": "options",
       "name": "画质上限",
       "name.en": "Max quality",

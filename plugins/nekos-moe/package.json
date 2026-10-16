@@ -1,6 +1,6 @@
 {
   "name": "nekos-moe",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "nekos.moe 猫娘图库",
   "name.en": "nekos.moe catgirls",
@@ -33,6 +33,7 @@
     {
       "key": "sort",
       "type": "options",
+      "required": true,
       "name": "Sort order",
       "name.zh": "排序",
       "name.ja": "並び順",
@@ -74,6 +75,7 @@
     {
       "key": "nsfw",
       "type": "options",
+      "required": true,
       "name": "NSFW",
       "name.zh": "NSFW 内容",
       "name.ja": "NSFW コンテンツ",

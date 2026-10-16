@@ -1,6 +1,6 @@
 {
   "name": "bluedafeiyu",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "蓝色大肥鱼 AI 娘档案",
   "name.en": "Blue Dafeiyu AI-girl archive",
@@ -231,6 +231,7 @@
     },
     {
       "key": "sort",
+      "required": true,
       "type": "options",
       "name": "Sort",
       "name.zh": "排序",

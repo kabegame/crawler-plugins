@@ -355,7 +355,7 @@ async function crawlAll(baseUrl, quality, vars) {
     (page) => buildPostListUrl(baseUrl, metaTokensOf(vars), page),
     quality,
     Number(vars.start_page ?? 1),
-    Number(vars.end_page ?? 1),
+    Number(vars.end_page ?? vars.start_page ?? 1),
     "all",
   );
 }
@@ -368,7 +368,7 @@ async function crawlByTags(baseUrl, quality, vars) {
     (page) => buildPostListUrl(baseUrl, tokens, page),
     quality,
     Number(vars.start_page ?? 1),
-    Number(vars.end_page ?? 1),
+    Number(vars.end_page ?? vars.start_page ?? 1),
     "tags",
   );
 }
@@ -544,10 +544,10 @@ export async function crawl(common, custom) {
   const mode = coerceStr(vars.crawl_mode);
 
   if (mode === "all") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlAll(baseUrl, quality, vars);
   } else if (mode === "tags") {
-    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? 1));
+    validatePageRange(Number(vars.start_page ?? 1), Number(vars.end_page ?? vars.start_page ?? 1));
     await crawlByTags(baseUrl, quality, vars);
   } else if (mode === "popular") {
     await crawlPopular(baseUrl, quality, vars);

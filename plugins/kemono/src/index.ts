@@ -346,6 +346,8 @@ function slicePages(list, range) {
 }
 
 function positiveInteger(value, fallback) {
+  // 清空的数字字段收到 null；Number(null) === 0 会被误当成「填了 0」，先按未填写回落
+  if (value == null || value === "") return fallback;
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? Math.floor(number) : fallback;
 }
@@ -353,7 +355,8 @@ function positiveInteger(value, fallback) {
 // 起止页，1 基，每页 PAGE_SIZE 条。结束页填 0 表示一直翻到最后一页。
 function pageRange(vars, startKey, endKey, label) {
   const start = Math.max(1, positiveInteger(vars[startKey], 1));
-  const rawEnd = positiveInteger(vars[endKey], 0);
+  // 结束页留空（null）不等同于填 0（翻到最后一页），按只爬起始页处理
+  const rawEnd = positiveInteger(vars[endKey], start);
   const end = rawEnd <= 0 ? Number.MAX_SAFE_INTEGER : rawEnd;
   if (end < start) throw new Error(`${label}：结束页（${rawEnd}）不能小于起始页（${start}）`);
   return { start, end };

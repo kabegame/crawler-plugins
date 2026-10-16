@@ -9,6 +9,10 @@
 - safebooru（1.0.0）：safebooru.org 全年龄图库，走站点官方 dapi，一页一次请求拿到带分类的全量标签；支持标签 / 全部 / 标签列表三种模式与评论元数据。
 - aibooru（1.0.0）：aibooru.online（Danbooru 分支的 AI 生成图图库），走 JSON API 一页一次请求拿齐标签、AI 生成参数、作者评论与评论区；支持标签 / 人气榜 / 全部 / id 范围四种模式，分级默认只抓全年龄，标签新增 `model` 分类。
 
+## 【4.5.1.4】
+### Added
+- pixiv 新增第三方api模式，目前支持lolicon api。
+
 ## 【4.5.1】
 ### Deprecated
 - twodwallpapers（0.2.5）：2dwallpapers.com 已下线（域名无 A 记录、原源站不可达），任务入口直接报错；插件保留，用于已有图片的索引与详情模板。

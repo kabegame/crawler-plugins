@@ -1,6 +1,6 @@
 {
   "name": "yandere",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "private": true,
   "name.zh": "yande.re 动漫壁纸",
   "name.en": "yande.re anime wallpapers",
@@ -37,6 +37,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "クロールモード",
@@ -86,6 +87,7 @@
     {
       "key": "mode_tag_value",
       "type": "list",
+      "required": true,
       "name": "标签组合",
       "name.en": "Tag combination",
       "name.ja": "タグ組み合わせ",
@@ -110,6 +112,7 @@
     {
       "key": "id_start",
       "type": "int",
+      "required": true,
       "name": "起始 id",
       "name.en": "Start ID",
       "name.ja": "開始 ID",
@@ -133,6 +136,7 @@
     {
       "key": "id_end",
       "type": "int",
+      "required": true,
       "name": "结束 id",
       "name.en": "End ID",
       "name.ja": "終了 ID",
@@ -156,6 +160,7 @@
     {
       "key": "popular_scale",
       "type": "options",
+      "required": true,
       "name": "排行榜类型",
       "name.en": "Ranking type",
       "name.ja": "ランキングの種類",
@@ -247,7 +252,6 @@
       "descripts.ja": "空欄は当期。日間はその日、週間はその日を含む週、月間はその日を含む月です",
       "descripts.ko": "비우면 현재 기간. 일간은 해당일, 주간은 해당일이 속한 주, 월간은 해당일이 속한 달입니다",
       "descripts.zhtw": "留空為當期。日榜取這一天，週榜取這一天所在的那一週，月榜取這一天所在的月份",
-      "default": "",
       "width": 1,
       "when": {
         "crawl_mode": [
@@ -444,6 +448,7 @@
     {
       "key": "quality",
       "type": "options",
+      "required": true,
       "name": "质量",
       "name.en": "Quality",
       "name.ja": "画質",

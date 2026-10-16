@@ -1,8 +1,10 @@
 // @ts-nocheck
 // Kabegame 服务器 V8 爬虫：经另一个 Kabegame 的 Web 服务（Web 版 / 桌面端 Web 服务器）的
-// JSON-RPC `POST /rpc` 复制图片。两种模式都是「一条 images:// 路径 + /x<N>x/<页>」分页：
-//   - 全站：`gallery/[hide/]sort/<by-id | by-time/desc | random-<种子>>`，种子每次运行生成；
+// JSON-RPC `POST /rpc` 复制图片。两种模式都是「一条 images:// 路径 + 分页尾」：
+//   - 全站：`gallery/[hide/]sort/<by-id | by-time/<倒序> | random-<种子>>`，种子每次运行生成；
 //   - 过滤：用户粘贴「高级查询」弹窗的路径，剥掉末尾分页、保留排序。
+// 服务器 4.5.1 起画廊续接段改名（`_kb_fc` / `_kb_desc` / `_kb_x<N>x`），旧写法不再识别；
+// 运行前先探测服务器方言，路径一律按探测结果拼。
 // 图片字节、元数据、标签、帖子地址都从服务器原样搬过来：
 //   - 媒体：Web 版的 local_path 已是 CDN 直链；桌面 Web 服务器返回本地路径，经同端口 `/file?path=` 读取；
 //   - 元数据：`get_image_metadata_full`，按服务器 metadata 行共用一行本地 metadata（多图帖子不重复存）；
@@ -40,17 +42,38 @@ function normalizeServer(raw) {
   return `${u.origin}${u.pathname}`.replace(/\/+$/, "");
 }
 
+// 服务器画廊续接段的两种方言：4.5.1 起全局化为 `_kb_*`，之前是裸段名。
+const DIALECTS = {
+  kb: { name: "_kb_*（4.5.1+）", fc: "_kb_fc", desc: "_kb_desc", page: (n, p) => `_kb_x${n}x/${p}` },
+  legacy: { name: "旧版（<4.5.1）", fc: "filter_comb", desc: "desc", page: (n, p) => `x${n}x/${p}` },
+};
+
+// 各取一张图试两种分页尾；先试新语法。两种都失败时把两条错误一起报出来。
+async function detectDialect(server) {
+  const errors = [];
+  for (const d of [DIALECTS.kb, DIALECTS.legacy]) {
+    try {
+      await rpc(server, "pathql_fetch", { path: `images://gallery/all/${d.page(1, 1)}` });
+      return d;
+    } catch (e) {
+      errors.push(`${d.name}：${errText(e)}`);
+    }
+  }
+  throw new Error(`无法识别服务器的 PathQL 分页语法（${errors.join("；")}）`);
+}
+
 // 全站模式的排序段。随机种子每次运行生成一次，同一次运行的各页共用同一个排列，翻页不重复；
 // 服务器的 random-<seed> 只接受 1–18 位数字。
-function siteSortSegment(sort) {
-  if (sort === "time") return "sort/by-time/desc";
+function siteSortSegment(sort, dialect) {
+  if (sort === "time") return `sort/by-time/${dialect.desc}`;
   if (sort === "id") return "sort/by-id";
   // 默认随机
   return `sort/random-${1 + Math.floor(Math.random() * 1e15)}`;
 }
 
-// 过滤模式：接受「高级查询」弹窗里复制的路径（`images://gallery/…/sort/by-time/desc/2`）。
-// 只剥末尾分页 `[x<N>x/]<页码>`，排序与 desc 原样保留；省略 scheme 时按画廊路径补全。
+// 过滤模式：接受「高级查询」弹窗里复制的路径（`images://gallery/…/sort/by-time/_kb_desc/_kb_x100x/2`，
+// 旧版服务器是 `…/sort/by-time/desc/x100x/2`）。只剥末尾分页 `[(_kb_)x<N>x/]<页码>`，排序与倒序
+// 原样保留；省略 scheme 时按画廊路径补全。
 function normalizeFilterPath(raw) {
   let s = String(raw ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
   if (!s) throw new Error("过滤模式需要填写 PathQL 查询");
@@ -59,14 +82,25 @@ function normalizeFilterPath(raw) {
   const segs = s.slice("images://".length).split("/").filter(Boolean);
   if (segs.length > 1 && /^[1-9][0-9]*$/.test(segs[segs.length - 1])) {
     segs.pop();
-    if (segs.length > 1 && /^x[1-9][0-9]*x$/.test(segs[segs.length - 1])) segs.pop();
+    if (segs.length > 1 && /^(_kb_)?x[1-9][0-9]*x$/.test(segs[segs.length - 1])) segs.pop();
   }
   // 只剩根节点时取全部，根节点本身不能分页
   if (segs.length === 1) segs.push("all");
   return `images://${segs.join("/")}`;
 }
 
+// 把另一方言的组合 / 倒序段改写成服务器方言：粘贴的路径可能来自另一版本的服务器。
+// 只作为原样路径解析失败后的候选，避免把恰好叫 `desc` 的搜索词误改。
+function translateFilterPath(path, dialect) {
+  const other = dialect === DIALECTS.kb ? DIALECTS.legacy : DIALECTS.kb;
+  const segs = path.slice("images://".length).split("/");
+  const out = segs.map((seg) => (seg === other.fc ? dialect.fc : seg === other.desc ? dialect.desc : seg));
+  return `images://${out.join("/")}`;
+}
+
 function clampInt(v, def, min, max) {
+  // 清空的数字字段收到 null；Number(null) === 0 会被夹到下限（如每页 1 张），先按未填写回落
+  if (v == null || v === "") return def;
   const n = Math.floor(Number(v));
   if (!Number.isFinite(n)) return def;
   return Math.min(max, Math.max(min, n));
@@ -220,18 +254,7 @@ export async function crawl(common, custom) {
   if (endPage - startPage + 1 > MAX_PAGES_PER_RUN) {
     throw new Error(`一次最多复制 ${MAX_PAGES_PER_RUN} 页，当前为第 ${startPage}-${endPage} 页，请分几次运行`);
   }
-  const filterMode = vars.mode === "filter";
-  let basePath;
-  if (filterMode) {
-    basePath = normalizeFilterPath(vars.pathql);
-    log(`服务器 ${server}，过滤 ${basePath}，每页 ${pageSize}，第 ${startPage}-${endPage} 页`);
-  } else {
-    const includeHidden = vars.include_hidden === true;
-    basePath = `images://gallery/${includeHidden ? "" : "hide/"}${siteSortSegment(vars.sort)}`;
-    log(`服务器 ${server}，全站 ${basePath}，每页 ${pageSize}，第 ${startPage}-${endPage} 页，${includeHidden ? "包含" : "跳过"}隐藏图片`);
-  }
-
-  // 先连通性检查，再取总数：两步分开，过滤路径写错时不会被误报成连不上服务器
+  // 先连通性检查，再探测语法、取总数：分开做，过滤路径写错时不会被误报成连不上服务器
   try {
     await rpc(server, "pathql_entry", { path: "images://gallery" });
   } catch (e) {
@@ -239,13 +262,37 @@ export async function crawl(common, custom) {
       `无法访问 ${server}/rpc（${errText(e)}）。请确认地址正确；桌面端需在「设置 → 高级」开启 Web 服务器。`,
     );
   }
-  let total = null;
-  try {
-    const entry = await rpc(server, "pathql_entry", { path: basePath });
-    total = typeof entry?.total === "number" ? entry.total : null;
-  } catch (e) {
-    throw new Error(`服务器无法解析查询 ${basePath}：${errText(e)}`);
+  const dialect = await detectDialect(server);
+
+  const filterMode = vars.mode === "filter";
+  let candidates;
+  if (filterMode) {
+    const raw = normalizeFilterPath(vars.pathql);
+    candidates = [...new Set([raw, translateFilterPath(raw, dialect)])];
+  } else {
+    const includeHidden = vars.include_hidden === true;
+    candidates = [`images://gallery/${includeHidden ? "" : "hide/"}${siteSortSegment(vars.sort, dialect)}`];
   }
+
+  let basePath = null;
+  let total = null;
+  let firstError = null;
+  for (const path of candidates) {
+    try {
+      const entry = await rpc(server, "pathql_entry", { path });
+      basePath = path;
+      total = typeof entry?.total === "number" ? entry.total : null;
+      break;
+    } catch (e) {
+      firstError ??= e;
+    }
+  }
+  if (basePath == null) throw new Error(`服务器无法解析查询 ${candidates[0]}：${errText(firstError)}`);
+  log(
+    `服务器 ${server}（${dialect.name} 语法），${filterMode ? "过滤" : "全站"} ${basePath}，每页 ${pageSize}，` +
+      `第 ${startPage}-${endPage} 页` +
+      (filterMode ? "" : `，${vars.include_hidden === true ? "包含" : "跳过"}隐藏图片`),
+  );
   const lastPage = total == null ? endPage : Math.max(1, Math.ceil(total / pageSize));
   const finalPage = Math.min(endPage, lastPage);
   log(`服务器共 ${total ?? "?"} 张，最后一页为第 ${lastPage} 页`);
@@ -262,7 +309,7 @@ export async function crawl(common, custom) {
   for (let page = startPage; page <= finalPage; page++) {
     let rows;
     try {
-      rows = await rpc(server, "pathql_fetch", { path: `${basePath}/x${pageSize}x/${page}` });
+      rows = await rpc(server, "pathql_fetch", { path: `${basePath}/${dialect.page(pageSize, page)}` });
     } catch (e) {
       warn(`[${PLUGIN_ID}] 第 ${page} 页读取失败：${errText(e)}`);
       addProgress(perPage);

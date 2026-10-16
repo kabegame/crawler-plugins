@@ -1,6 +1,6 @@
 {
   "name": "miyoushe",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "name.en": "HoYoLAB",
   "name.ja": "HoYoLAB",
@@ -26,6 +26,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl Mode",
       "name.ja": "クロールモード",
@@ -62,7 +63,7 @@
       "name.en": "Post URL",
       "name.ja": "投稿 URL",
       "name.ko": "포스트 URL",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_mode": [
           "single_post"
@@ -72,6 +73,7 @@
     {
       "key": "user_uid",
       "type": "string",
+      "required": true,
       "name": "作者 UID",
       "name.en": "Author UID",
       "name.ja": "投稿者 UID",

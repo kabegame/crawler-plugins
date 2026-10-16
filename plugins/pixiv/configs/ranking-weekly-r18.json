@@ -13,8 +13,6 @@
     "source": "ranking",
     "ranking_mode": "weekly",
     "age_mode": "r18",
-    "user_id": "",
-    "ranking_date": "",
     "num_artworks": 60
   }
 }

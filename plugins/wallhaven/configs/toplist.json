@@ -11,15 +11,12 @@
   "description.zhtw": "與站點 Toplist 頁一致：綜合 + 動漫、SFW，近 1 個月排行，抓前 3 頁。",
   "userConfig": {
     "mode": "search",
-    "q": "",
     "categories": ["general", "anime"],
     "purity": ["sfw"],
     "sorting": "toplist",
     "order": "desc",
     "top_range": "1M",
     "min_resolution": "any",
-    "orientation": [],
-    "ratios": [],
     "start_page": 1,
     "end_page": 3
   }

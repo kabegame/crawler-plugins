@@ -25,6 +25,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 | 从社区帖子连评论区一起收图 | [小黑盒](#小黑盒)、[米游社](#米游社) | 正文之外还能发现评论区里的隐藏好图 |
 | 下载 B 站内容 | [bilibili 专栏](#bilibili-专栏)、[bilibili 视频](#bilibili-视频) | 图文收原图，视频收 MP4 |
 | 整理自己订阅的创作者内容 | [Patreon](#patreonwebview)、[Kemono](#kemono) | 面向创作者帖子、图片和附件 |
+| 追 X（推特）画师的新图 | [X 画师媒体](#xtwitter画师媒体webview) | 原图与视频一起收，开增量后每次只补新发的 |
 | 找适配手机、桌面或特定分辨率的壁纸 | [WallpapersCraft](#wallpaperscraft)、[Wallspic](#wallspic)、[哲风壁纸](#哲风壁纸) | 分类完整，设备与尺寸筛选清楚 |
 | 随便逛逛，让好图自己找上门 | [Konachan](#konachan)、[PixAI](#pixai)、[ziworld](#ziworld) | 标签池、趋势榜和精选目录都适合“淘图” |
 | 收超高分辨率扫图做多屏壁纸 | [yande.re](#yandere)、[Konachan](#konachan) | 同一套 Moebooru，yande.re 偏向七八千像素的大图 |
@@ -200,6 +201,14 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 [查看插件目录](plugins/patreon-webview/) · [使用说明](plugins/patreon-webview/README.md)
 
+#### X（Twitter）媒体（WebView）
+
+**适合你，如果：** 你关注的画师主要在 X 上发图，想把他们「媒体」里的原图和视频定期收进 Kabegame；或者想按话题、关键词收集 X 上的图，把自己的书签、点赞里的图收进来。
+
+五种模式：画师主页的「媒体」、搜索结果（支持 `#话题 min_faves:1000`、`from:画师 since:… until:…` 等高级语法）、单条推文链接，以及自己的书签和点赞。在真实网页里打开页面并自动滚动，截获页面自己加载的数据：图片取原图，视频取码率最高的 MP4，推文正文、发布时间、互动数和评论区回复一起保存（评论区图片可选下载），话题标签和画师挂成标签画册。开启「只补充上次之后的新推文」后，适合配成定时任务。需要先在畅游里登录 x.com，中国大陆需要代理。
+
+[查看插件目录](plugins/x-webview/) · [使用说明](plugins/x-webview/README.md)
+
 ### 视频
 
 #### bilibili 视频
@@ -293,4 +302,4 @@ pnpm run generate-index
 pnpm run release
 ```
 
-欢迎提交新插件、修复现有来源，或改进用户文档。开发前请阅读 Kabegame 主仓库中的 [插件开发指南](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) 与 [API 文档](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md)。
+欢迎提交新插件、修复现有来源，或改进用户文档。开发前请阅读 Kabegame 文档站的 [插件开发](https://kabegame.com/dev/overview/) 一节（V8 / WebView 脚本、插件格式、打包与发布），以及 [Kabegame API 字典](https://kabegame.com/reference/kabegame-api/)。

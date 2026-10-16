@@ -1,5 +1,5 @@
 // Pixiv metadata 迁移脚本：提供 provideLabels 与 provideSearchTextList，给历史图片补标签和搜索片段，
-// 不改写 metadata。规则与 src/index.ts 的 labelsFromIllustBody / pixivSearchTexts 一致
+// 不改写 metadata。规则与 src/illust.ts 的 labelsFromIllustBody / pixivSearchTexts 一致
 // （此处无法 import，保持两份同步）。
 
 function coerceStr(value) {
@@ -296,7 +296,7 @@ export function provideLabels(input) {
 // 投稿日期（"2026年5月21日"）；有评论时再写 "comments" 与每条评论的评论者名称、评论内容。
 // 日期取 uploadDate（缺失回落 createDate，与详情模板一致），按 Pixiv 所在的日本时区（UTC+9，无夏令时）
 // 取日，结果不随运行设备的时区变化。
-// 规则在 src/index.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
+// 规则在 src/illust.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
 function pixivDateText(value) {
   const ms = Date.parse(coerceStr(value));
   if (!Number.isFinite(ms)) return "";

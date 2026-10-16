@@ -11,14 +11,11 @@
   "description.zhtw": "與站點 Latest 頁一致：綜合 + 動漫、SFW，依上傳時間由新到舊，抓前 3 頁。",
   "userConfig": {
     "mode": "search",
-    "q": "",
     "categories": ["general", "anime"],
     "purity": ["sfw"],
     "sorting": "date_added",
     "order": "desc",
     "min_resolution": "any",
-    "orientation": [],
-    "ratios": [],
     "start_page": 1,
     "end_page": 3
   }

@@ -1,6 +1,6 @@
 {
   "name": "ziworld",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "name.zh": "ziworld高质量壁纸",
   "name.en": "ziworld high-quality wallpapers",
@@ -34,6 +34,7 @@
     {
       "key": "category",
       "type": "checkbox",
+      "required": true,
       "name": "目录",
       "name.en": "Category",
       "name.ja": "カテゴリ",

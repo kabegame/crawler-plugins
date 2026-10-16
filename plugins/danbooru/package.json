@@ -1,6 +1,6 @@
 {
   "name": "danbooru",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "private": true,
   "name.zh": "Danbooru 二次元图库",
   "name.en": "Danbooru image board",
@@ -48,6 +48,7 @@
     {
       "key": "source_site",
       "type": "options",
+      "required": true,
       "name": "源站",
       "name.en": "Source site",
       "name.ja": "ソースサイト",
@@ -81,6 +82,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "クロールモード",
@@ -130,6 +132,7 @@
     {
       "key": "mode_tag_value",
       "type": "list",
+      "required": true,
       "name": "标签组合",
       "name.en": "Tag combination",
       "name.ja": "タグ組み合わせ",
@@ -154,6 +157,7 @@
     {
       "key": "id_start",
       "type": "int",
+      "required": true,
       "name": "起始 id",
       "name.en": "Start ID",
       "name.ja": "開始 ID",
@@ -177,6 +181,7 @@
     {
       "key": "id_end",
       "type": "int",
+      "required": true,
       "name": "结束 id",
       "name.en": "End ID",
       "name.ja": "終了 ID",
@@ -200,6 +205,7 @@
     {
       "key": "popular_scale",
       "type": "options",
+      "required": true,
       "name": "人气榜周期",
       "name.en": "Popular scale",
       "name.ja": "人気ランキング期間",
@@ -358,6 +364,7 @@
     {
       "key": "per_page",
       "type": "options",
+      "required": true,
       "name": "每页条数",
       "name.en": "Posts per page",
       "name.ja": "1ページあたりの件数",
@@ -398,6 +405,7 @@
     {
       "key": "quality",
       "type": "options",
+      "required": true,
       "name": "质量",
       "name.en": "Quality",
       "name.ja": "画質",

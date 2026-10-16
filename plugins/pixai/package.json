@@ -1,6 +1,6 @@
 {
   "name": "pixai",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "private": true,
   "name.zh": "PixAI",
   "name.en": "PixAI",
@@ -30,6 +30,7 @@
     {
       "key": "crawl_type",
       "type": "options",
+      "required": true,
       "name": "爬取种类",
       "name.en": "Crawl Type",
       "name.ja": "取得種類",
@@ -76,6 +77,7 @@
     {
       "key": "rank_type",
       "type": "options",
+      "required": true,
       "name": "榜单类型",
       "name.en": "Rank Type",
       "name.ja": "ランキング種類",
@@ -120,6 +122,7 @@
     {
       "key": "rank_period",
       "type": "options",
+      "required": true,
       "name": "榜单范围",
       "name.en": "Rank Period",
       "name.ja": "ランキング期間",
@@ -177,6 +180,7 @@
     {
       "key": "model_sort",
       "type": "options",
+      "required": true,
       "name": "模型排序",
       "name.en": "Model Sort",
       "name.ja": "モデル並び順",
@@ -275,6 +279,7 @@
     {
       "key": "artwork_sort",
       "type": "options",
+      "required": true,
       "name": "作品排序",
       "name.en": "Artwork Sort",
       "name.ja": "作品並び順",
@@ -351,7 +356,7 @@
       "descripts.en": "Enter PixAI user ID (numeric string, can be found in user profile URL)",
       "descripts.ja": "PixAI ユーザー ID（数字文字列）を入力。ユーザーページ URL で確認できます",
       "descripts.ko": "PixAI 사용자 ID(숫자 문자열)를 입력하세요. 사용자 페이지 URL에서 확인할 수 있습니다",
-      "default": "",
+      "required": true,
       "when": {
         "crawl_type": [
           "author"
@@ -361,6 +366,7 @@
     {
       "key": "author_artwork_type",
       "type": "options",
+      "required": true,
       "name": "爬取类型",
       "name.en": "Artwork Type",
       "name.ja": "取得タイプ",
@@ -462,6 +468,7 @@
         "honkai_star_rail",
         "stella_sora"
       ],
+      "required": true,
       "options": null,
       "when": {
         "crawl_type": [

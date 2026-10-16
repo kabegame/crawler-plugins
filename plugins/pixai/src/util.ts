@@ -18,6 +18,8 @@ export function coerceStr(value) {
 }
 
 export function toInt(value, fallback) {
+  // 清空的数字字段收到 null；Number(null) === 0 会被当成有效值，这里先按未填写回落
+  if (value == null || value === "") return fallback;
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
 }

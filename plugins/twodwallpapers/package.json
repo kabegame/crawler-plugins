@@ -1,6 +1,6 @@
 {
   "name": "twodwallpapers",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "name.zh": "2dwallpapers二次元壁纸",
   "name.en": "2dwallpapers anime wallpapers",
@@ -35,8 +35,7 @@
       "descripts.en": "Leave empty to crawl the uncategorized section; enter a work name to match and crawl that work's paginated list",
       "descripts.ja": "空欄なら未分類カテゴリを取得します。作品名を入力すると一致した作品のページ付き一覧を取得します",
       "descripts.ko": "비워두면 미분류 섹션을 수집합니다. 작품 이름을 입력하면 일치하는 작품의 페이지 목록을 수집합니다",
-      "descripts.zhtw": "不填則抓取未分類目錄；填寫作品名稱則匹配並抓取該作品的分頁列表",
-      "default": ""
+      "descripts.zhtw": "不填則抓取未分類目錄；填寫作品名稱則匹配並抓取該作品的分頁列表"
     },
     {
       "key": "start_page",
@@ -75,6 +74,7 @@
     {
       "key": "orderby",
       "type": "options",
+      "required": true,
       "name": "排序方式",
       "name.en": "Sort by",
       "name.ja": "並び順",

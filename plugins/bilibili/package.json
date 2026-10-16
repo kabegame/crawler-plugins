@@ -1,6 +1,6 @@
 {
   "name": "bilibili",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",
@@ -31,6 +31,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "模式",
       "name.en": "Mode",
       "name.ja": "モード",
@@ -90,7 +91,7 @@
       "descripts.ja": "数字の UID（3985676）またはマイページ URL（https://space.bilibili.com/3985676）。その投稿者の画像投稿（opus）を取得します",
       "descripts.ko": "숫자 UID(3985676) 또는 홈 URL(https://space.bilibili.com/3985676). 해당 업로더의 이미지 게시물(opus)을 수집합니다",
       "descripts.zhtw": "純數字 UID（3985676）或主頁連結（https://space.bilibili.com/3985676）。抓取其全部圖文動態（opus）",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "space"
@@ -146,7 +147,7 @@
       "descripts.ja": "従来のコラム：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（cv の数字 ID のみでも可）。画像付き投稿：https://www.bilibili.com/opus/… または 15 桁以上の数字 ID",
       "descripts.ko": "기존 칼럼: https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1 (cv 숫자 ID만 입력해도 됨); 이미지 게시물: https://www.bilibili.com/opus/… 또는 15자리 이상의 숫자 ID",
       "descripts.zhtw": "傳統專欄：https://www.bilibili.com/read/cv…/?from=search&…&opus_fallback=1（也可只填 cv 數字 ID）；圖文：https://www.bilibili.com/opus/… 或 15 位以上純數字",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "single"
@@ -156,6 +157,7 @@
     {
       "key": "keyword",
       "type": "string",
+      "required": true,
       "name": "搜索关键词",
       "name.en": "Search keyword",
       "name.ja": "検索キーワード",
@@ -175,6 +177,7 @@
     },
     {
       "key": "order",
+      "required": true,
       "type": "options",
       "name": "排序",
       "name.en": "Sort",
@@ -238,6 +241,7 @@
     },
     {
       "key": "category_id",
+      "required": true,
       "type": "options",
       "name": "分区",
       "name.en": "Category",

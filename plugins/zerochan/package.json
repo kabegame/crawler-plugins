@@ -1,6 +1,6 @@
 {
   "name": "zerochan",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "name.zh": "Zerochan 动漫图板",
   "name.en": "Zerochan anime image board",
@@ -38,6 +38,7 @@
     {
       "key": "crawl_mode",
       "type": "options",
+      "required": true,
       "name": "爬取模式",
       "name.en": "Crawl mode",
       "name.ja": "クロールモード",
@@ -79,6 +80,7 @@
     {
       "key": "tag",
       "type": "string",
+      "required": true,
       "name": "标签",
       "name.en": "Tag",
       "name.ja": "タグ",
@@ -99,6 +101,7 @@
     {
       "key": "search_query",
       "type": "string",
+      "required": true,
       "name": "搜索词",
       "name.en": "Search query",
       "name.ja": "検索キーワード",
@@ -119,6 +122,7 @@
     {
       "key": "sort_order",
       "type": "options",
+      "required": true,
       "name": "排序",
       "name.en": "Sort",
       "name.ja": "並べ替え",
@@ -161,6 +165,7 @@
     {
       "key": "popular_range",
       "type": "options",
+      "required": true,
       "name": "人气时间范围",
       "name.en": "Popular time range",
       "name.ja": "人気の期間",
@@ -237,6 +242,7 @@
     {
       "key": "quality",
       "type": "options",
+      "required": true,
       "name": "质量",
       "name.en": "Quality",
       "name.ja": "画質",

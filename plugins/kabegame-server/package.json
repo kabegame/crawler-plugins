@@ -1,6 +1,6 @@
 {
   "name": "kabegame-server",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "private": true,
   "name.zh": "Kabegame 服务器",
   "name.en": "Kabegame Server",
@@ -36,6 +36,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -89,12 +90,12 @@
       "name.ja": "PathQL クエリ",
       "name.ko": "PathQL 쿼리",
       "name.zhtw": "PathQL 查詢",
-      "descripts": "Copy the Path from the Advanced query dialog on the source server (web edition or the desktop app), e.g. images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1. Its sort order is kept; the trailing page number is replaced by the pages below.",
-      "descripts.zh": "在源服务器（Web 版或桌面端）的「高级查询」弹窗里复制「路径」，例如 images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。保留其中的排序，末尾页码换成下面的分页。",
-      "descripts.ja": "取得元サーバー（Web 版またはデスクトップ）の「高度な検索」ダイアログで「パス」をコピーします。例：images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。並び順はそのまま使い、末尾のページ番号は下のページ設定に置き換えます。",
-      "descripts.ko": "원본 서버(웹 버전 또는 데스크톱)의 「고급 검색」 대화상자에서 「경로」를 복사합니다. 예: images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1. 정렬은 그대로 쓰고 끝의 페이지 번호는 아래 페이지 설정으로 바꿉니다.",
-      "descripts.zhtw": "在來源伺服器（Web 版或桌面端）的「進階查詢」對話框裡複製「路徑」，例如 images://gallery/hide/plugin/pixiv/filter_comb/sort/by-time/desc/1。保留其中的排序，末尾頁碼換成下面的分頁。",
-      "default": "",
+      "descripts": "Copy the Path from the Advanced query dialog on the source server (web edition or the desktop app), e.g. images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1. Its sort order is kept; the trailing page number is replaced by the pages below.",
+      "descripts.zh": "在源服务器（Web 版或桌面端）的「高级查询」弹窗里复制「路径」，例如 images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1。保留其中的排序，末尾页码换成下面的分页。",
+      "descripts.ja": "取得元サーバー（Web 版またはデスクトップ）の「高度な検索」ダイアログで「パス」をコピーします。例：images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1。並び順はそのまま使い、末尾のページ番号は下のページ設定に置き換えます。",
+      "descripts.ko": "원본 서버(웹 버전 또는 데스크톱)의 「고급 검색」 대화상자에서 「경로」를 복사합니다. 예: images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1. 정렬은 그대로 쓰고 끝의 페이지 번호는 아래 페이지 설정으로 바꿉니다.",
+      "descripts.zhtw": "在來源伺服器（Web 版或桌面端）的「進階查詢」對話框裡複製「路徑」，例如 images://gallery/hide/plugin/pixiv/_kb_fc/sort/by-time/_kb_desc/_kb_x100x/1。保留其中的排序，末尾頁碼換成下面的分頁。",
+      "required": true,
       "when": {
         "mode": [
           "filter"
@@ -104,6 +105,7 @@
     {
       "key": "sort",
       "type": "options",
+      "required": true,
       "name": "Sort",
       "name.zh": "排序",
       "name.ja": "並び順",

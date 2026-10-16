@@ -383,7 +383,8 @@ export async function crawl(_common: unknown, custom: Record<string, any>): Prom
   const mode = str(cfg.crawl_mode) || "note";
   if (mode === "recommend") {
     const rounds = Math.max(1, Number(cfg.refresh_rounds) || 5);
-    const maxItems = Math.max(0, Number(cfg.max_items) || 0);
+    // 留空（null）按默认 100 处理；只有显式填 0 才表示不限
+    const maxItems = Math.max(0, Number(cfg.max_items ?? 100) || 0);
     log(`模式：首页推荐，刷新 ${rounds} 轮，上限 ${maxItems || "不限"} 个作品`);
     await crawlRecommend(rounds, maxItems, vars);
     return;

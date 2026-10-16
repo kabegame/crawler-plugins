@@ -1,6 +1,6 @@
 {
   "name": "patreon-webview",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "Patreon创作者内容（WebView）",
   "name.en": "Patreon creator content (WebView)",
@@ -33,6 +33,7 @@
     {
       "key": "creator",
       "type": "string",
+      "required": true,
       "name": "创作者或合集",
       "name.en": "Creator or collection",
       "name.ja": "クリエイターまたはコレクション",
@@ -48,6 +49,7 @@
     {
       "key": "direction",
       "type": "options",
+      "required": true,
       "name": "爬取顺序",
       "name.en": "Crawl order",
       "name.ja": "取得順序",
@@ -91,7 +93,6 @@
       "descripts.ja": "時間範囲の下限（その日を含む）。空の場合は前回の記録があればそれを使い（=新着のみ）、無ければ取得できる最古の投稿まで遡ります。",
       "descripts.ko": "시간 범위의 하한(해당일 포함). 비우면 지난 실행 기록이 있으면 그것을 사용하고(=신규만), 없으면 가장 오래된 게시물까지 거슬러 올라갑니다.",
       "descripts.zhtw": "時間範圍下界（含當天）。留空時：有上次爬取記錄就用它（即只補新增），沒有就一直翻到能扒到的最舊貼文。",
-      "default": "",
       "format": "YYYY-MM-DD",
       "dateMax": "today"
     },
@@ -108,7 +109,6 @@
       "descripts.ja": "時間範囲の上限（その日の 23:59:59 まで含む）。空なら取得できる最新の投稿まで。",
       "descripts.ko": "시간 범위의 상한(해당일 23:59:59까지 포함). 비우면 가장 새로운 게시물까지.",
       "descripts.zhtw": "時間範圍上界（含當天，算到當天 23:59:59）。留空表示一直到能爬取的最新貼文。",
-      "default": "",
       "format": "YYYY-MM-DD",
       "dateMax": "today"
     },
@@ -154,8 +154,7 @@
       "descripts.en": "Some creators encrypt attachments and put the password in the post body. Leave empty for unencrypted archives.",
       "descripts.ja": "添付ファイルを暗号化し、本文にパスワードを書くクリエイターがいます。暗号化されていない場合は空のままに。",
       "descripts.ko": "일부 크리에이터는 첨부를 암호화하고 본문에 비밀번호를 적습니다. 암호화되지 않았다면 비워 두세요.",
-      "descripts.zhtw": "部分創作者會為附件加密並把密碼寫在貼文內文裡。留空表示不加密。",
-      "default": ""
+      "descripts.zhtw": "部分創作者會為附件加密並把密碼寫在貼文內文裡。留空表示不加密。"
     },
     {
       "key": "include_post_images",

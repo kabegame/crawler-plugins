@@ -1,6 +1,6 @@
 {
   "name": "haowallpaper",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "name.zh": "哲风壁纸",
   "name.en": "Haowallpaper",
   "name.ja": "哲風壁紙",
@@ -73,6 +73,7 @@
     {
       "key": "wallpaperType",
       "type": "options",
+      "required": true,
       "name": "壁纸类型",
       "name.en": "Wallpaper type",
       "name.ja": "壁紙タイプ",
@@ -118,6 +119,7 @@
       "descripts.ko": "수집할 벽지 형식 선택",
       "descripts.zhtw": "勾選要爬取的壁紙格式",
       "default": ["image", "video"],
+      "required": true,
       "width": 2,
       "options": [
         {
@@ -151,7 +153,6 @@
       "descripts.ja": "サイト検索でこれらのタグの壁紙を取得（複数タグは OR）。空欄なら全体一覧を取得",
       "descripts.ko": "사이트 검색으로 이 태그들의 벽지를 수집 (여러 태그는 OR); 비우면 전체 목록 수집",
       "descripts.zhtw": "用站點搜尋定向拉取這些標籤的壁紙，多個標籤取聯集；留空則按全站列表拉取",
-      "default": [],
       "options": ["二次元", "少女", "动漫"],
       "width": 2
     }

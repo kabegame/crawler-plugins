@@ -1,6 +1,6 @@
 {
   "name": "wallhaven",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "name.zh": "wallhaven",
   "name.en": "wallhaven",
@@ -39,6 +39,7 @@
     {
       "key": "mode",
       "type": "options",
+      "required": true,
       "name": "Mode",
       "name.zh": "模式",
       "name.ja": "モード",
@@ -82,7 +83,7 @@
       "descripts.ja": "https://wallhaven.cc/search で絞り込みと並び順を設定し、アドレスバーの URL を貼り付けてください。URL の page パラメータは無視され、ページは下の開始/終了ページに従います。",
       "descripts.ko": "https://wallhaven.cc/search 에서 필터와 정렬을 설정한 뒤 주소창의 URL을 붙여 넣으세요. URL의 page 매개변수는 무시되며 페이지는 아래 시작/끝 페이지를 따릅니다.",
       "descripts.zhtw": "在 https://wallhaven.cc/search 設定好篩選與排序後，把網址列的 URL 貼到這裡；URL 中的 page 參數會被忽略，頁碼以下方起止頁為準。",
-      "default": "",
+      "required": true,
       "when": {
         "mode": [
           "url"
@@ -102,7 +103,6 @@
       "descripts.ja": "サイトの検索欄と同じです。キーワードはタグ名とタグの別名にあいまい一致し、+タグもその範囲での「必須」にすぎません（例：+anime は別名に「Anime Cars」を持つ car タグの画像にも一致します）。タグを厳密に指定するには id:<タグ ID>（サイトでタグを開いたときの /tag/<ID> の数字。anime は id:1）を使い、他のキーワードとは組み合わせられません。-タグ（除外）、@ユーザー名、type:png、like:<壁紙 ID> にも対応します。空欄ならキーワードで絞り込みません。",
       "descripts.ko": "사이트 검색창과 같습니다. 키워드는 태그 이름과 태그 별칭에 모호하게 일치하며, +태그도 그 범위 안에서의 \"필수\"일 뿐입니다(예: +anime은 별칭에 \"Anime Cars\"가 있는 car 태그 이미지도 찾습니다). 태그를 정확히 지정하려면 id:<태그 ID>(사이트에서 태그를 열었을 때 /tag/<ID>의 숫자, anime은 id:1)를 쓰며 다른 키워드와 함께 쓸 수 없습니다. -태그(제외), @사용자명, type:png, like:<배경화면 ID>도 지원합니다. 비워 두면 키워드로 거르지 않습니다.",
       "descripts.zhtw": "與站點搜尋框相同。關鍵字依標籤名稱和標籤別名模糊比對，+標籤也只是在這個範圍內「必須命中」（例如 +anime 也會搜到 car 標籤的圖，因為它的別名裡有「Anime Cars」）。要精確依標籤搜尋請用 id:<標籤 ID>（在站點打開標籤頁，網址 /tag/<ID> 裡的數字，如 anime 是 id:1），不能與其他關鍵字組合。另支援 -標籤（排除）、@使用者名稱、type:png、like:<桌布 ID>。留空則不依關鍵字篩選。",
-      "default": "",
       "when": {
         "mode": [
           "search"
@@ -203,6 +203,7 @@
     {
       "key": "sorting",
       "type": "options",
+      "required": true,
       "name": "Sort by",
       "name.zh": "排序",
       "name.ja": "並べ替え",
@@ -282,6 +283,7 @@
     {
       "key": "order",
       "type": "options",
+      "required": true,
       "name": "Order",
       "name.zh": "顺序",
       "name.ja": "順序",
@@ -324,6 +326,7 @@
     {
       "key": "top_range",
       "type": "options",
+      "required": true,
       "name": "Toplist range",
       "name.zh": "排行范围",
       "name.ja": "集計期間",
@@ -401,6 +404,7 @@
     {
       "key": "min_resolution",
       "type": "options",
+      "required": true,
       "name": "Minimum resolution",
       "name.zh": "最低分辨率",
       "name.ja": "最低解像度",
@@ -457,7 +461,6 @@
       "descripts.ja": "横長はサイトの All Wide（ワイド＋ウルトラワイド）、縦長は All Portrait で、表にない比率（4:3、3:4 など）も含みます。スクエアは 1:1・3:2・4:3・5:4。スクエアや個別比率と併用すると、サイトは個別比率しか見ないため、横長/縦長は表のワイド＋ウルトラワイド列 / 縦長列に絞られます。",
       "descripts.ko": "가로는 사이트의 All Wide(와이드+울트라와이드), 세로는 All Portrait이며 표에 없는 비율(4:3, 3:4 등)도 포함합니다. 정사각형은 1:1, 3:2, 4:3, 5:4입니다. 정사각형이나 정확한 비율과 함께 고르면 사이트가 정확한 비율만 인식하므로 가로/세로는 표의 와이드+울트라와이드 열 / 세로 열로 좁혀집니다.",
       "descripts.zhtw": "橫向即站點的 All Wide（寬 + 超寬），直向即 All Portrait，二者也會包含表外比例（4:3、3:4 等）；方形為 1:1、3:2、4:3、5:4。與方形或精確比例同時勾選時，站點只認精確比例，橫向/直向會收窄為表中的寬 + 超寬欄 / 直向欄。",
-      "default": [],
       "when": {
         "mode": [
           "search"
@@ -503,7 +506,6 @@
       "descripts.ja": "サイトの比率表そのままの選択肢で、上の向きと合算されます。",
       "descripts.ko": "사이트 비율 표의 원래 항목이며 위의 화면 방향과 합쳐집니다.",
       "descripts.zhtw": "站點比例表中的原始選項，與上面的畫面方向取聯集。",
-      "default": [],
       "when": {
         "mode": [
           "search"
