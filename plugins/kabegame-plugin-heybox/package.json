@@ -1,0 +1,199 @@
+{
+  "name": "kabegame-plugin-heybox",
+  "version": "0.2.2",
+  "name.zh": "小黑盒",
+  "description": "小黑盒图片爬虫，各种好看的图片等你来发现！",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://www.xiaoheihe.cn/app/bbs/home",
+  "kbLabels": [
+    { "id": "auth.needCookie" }
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "required": true,
+      "name": "爬取模式",
+      "name.en": "Crawl Mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "default": "search",
+      "options": [
+        {
+          "name": "关键词搜索",
+          "name.en": "Keyword Search",
+          "name.ja": "キーワード検索",
+          "name.ko": "키워드 검색",
+          "variable": "search"
+        },
+        {
+          "name": "单帖子 URL",
+          "name.en": "Single Post URL",
+          "name.ja": "単一投稿 URL",
+          "name.ko": "단일 포스트 URL",
+          "variable": "single_post"
+        }
+      ]
+    },
+    {
+      "key": "post_share_url",
+      "type": "string",
+      "name": "帖子分享 URL",
+      "name.en": "Post Share URL",
+      "name.ja": "投稿共有 URL",
+      "name.ko": "포스트 공유 URL",
+      "required": true,
+      "when": {
+        "crawl_mode": [
+          "single_post"
+        ]
+      }
+    },
+    {
+      "key": "search_keyword",
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      },
+      "type": "string",
+      "name": "搜索关键词",
+      "name.en": "Search Keyword",
+      "name.ja": "検索キーワード",
+      "name.ko": "검색어",
+      "default": "美图"
+    },
+    {
+      "key": "auto_comment",
+      "type": "boolean",
+      "name": "自动评论",
+      "name.en": "Auto Comment",
+      "name.ja": "自動コメント",
+      "name.ko": "자동 댓글",
+      "descripts": "给每个爬到的帖子点个赞，并自动发一条评论；仅当帖子已抓到的评论里没有完全相同的内容时才发送评论（点赞是幂等的，照点）。需要先在畅游登录小黑盒。",
+      "descripts.en": "Like every crawled post and post one comment; the comment is only sent when no crawled comment has identical content (liking is idempotent and always runs). Requires signing in to Heybox in Surf first.",
+      "descripts.ja": "クロールした各投稿にいいねを付け、コメントを1件投稿します。コメントは取得済みコメントに全く同じ内容が無い場合のみ送信します（いいねは冪等なので毎回実行）。事前に Surf で小黑盒へログインが必要です。",
+      "descripts.ko": "크롤링한 게시물마다 좋아요를 누르고 댓글을 하나 등록합니다. 댓글은 수집된 댓글에 완전히 같은 내용이 없을 때만 전송합니다(좋아요는 멱등이라 항상 실행). 먼저 Surf에서 샤오헤이허에 로그인해야 합니다.",
+      "default": false,
+      "width": 1
+    },
+    {
+      "key": "auto_comment_text",
+      "type": "string",
+      "name": "评论内容",
+      "name.en": "Comment Text",
+      "name.ja": "コメント本文",
+      "name.ko": "댓글 내용",
+      "default": "我用 kabegame 把美图拿走喽，谢谢！",
+      "width": 3,
+      "when": {
+        "auto_comment": [
+          "true"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页（从 1 起）",
+      "name.en": "Start Page (1-based)",
+      "name.ja": "開始ページ（1 から）",
+      "name.ko": "시작 페이지(1부터)",
+      "default": 1,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页（含）",
+      "name.en": "End Page (inclusive)",
+      "name.ja": "終了ページ（含む）",
+      "name.ko": "끝 페이지(포함)",
+      "default": 1,
+      "min": 1,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "page_size",
+      "type": "int",
+      "name": "每页条数",
+      "name.en": "Page Size",
+      "name.ja": "1ページあたり件数",
+      "name.ko": "페이지당 개수",
+      "default": 5,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "search"
+        ]
+      }
+    },
+    {
+      "key": "fetch_comment_images",
+      "type": "boolean",
+      "name": "下载评论区图片",
+      "name.en": "Download Comment Images",
+      "name.ja": "コメント画像をダウンロード",
+      "name.ko": "댓글 이미지 다운로드",
+      "default": true,
+      "width": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbAssets": [
+    "captcha.png",
+    "downloading.png",
+    "params.jpg",
+    "banners/search.jpg",
+    "banners/images.jpg",
+    "banners/image-preview.jpg",
+    "mode-keyword.png",
+    "share-btn.png",
+    "src-xhh.png",
+    "url-image-preview.png",
+    "url-images.png",
+    "url-paste.png"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/tag_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

@@ -10,11 +10,11 @@ node_modules*/
 Thumbs.db
 
 # 本地探测下载（try_download_images_probe.py）
-plugins/bilibili/tools/_probe_downloads/
+plugins/kabegame-plugin-bilibili/tools/_probe_downloads/
 
 __pycache__/
 
 # 本地 B 站 Cookie（fetch_reply_sample.py）
-plugins/bilibili/.bili_cookie.local
+plugins/kabegame-plugin-bilibili/.bili_cookie.local
 
 dist

@@ -13,8 +13,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: anihonet 애니메이션 벽지 수집 플러그인  
 **제작**: Kabegame
 
-**경로**: `plugins/anihonet-wallpaper/`  
-**문서**: [plugins/anihonet-wallpaper/README.md](plugins/anihonet-wallpaper/README.md)
+**경로**: `plugins/kabegame-plugin-anihonet-wallpaper/`  
+**문서**: [plugins/kabegame-plugin-anihonet-wallpaper/README.md](plugins/kabegame-plugin-anihonet-wallpaper/README.md)
 
 **기능**:
 - anihonetwallpaper.com에서 애니메이션 벽지 수집
@@ -36,8 +36,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: anime-pictures 애니메이션 갤러리 수집 플러그인(태그 검색 가능)  
 **제작**: Kabegame
 
-**경로**: `plugins/anime-pictures/`  
-**사용자 문서**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
+**경로**: `plugins/kabegame-plugin-anime-pictures/`  
+**사용자 문서**: [plugins/kabegame-plugin-anime-pictures/README.md](plugins/kabegame-plugin-anime-pictures/README.md)
 
 **기능**:
 - [anime-pictures.net](https://anime-pictures.net)에서 태그·페이지 범위로 벽지 일괄 다운로드
@@ -59,7 +59,7 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: konachan 애니메이션 벽지 수집 플러그인  
 **제작**: Kabegame
 
-**경로**: `plugins/konachan/`
+**경로**: `plugins/kabegame-plugin-konachan/`
 
 **기능**:
 - konachan.net에서 애니메이션 벽지 수집
@@ -82,8 +82,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: ziworld 고품질 벽지 수집 플러그인  
 **제작**: Kabegame
 
-**경로**: `plugins/ziworld/`  
-**사용자 문서**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
+**경로**: `plugins/kabegame-plugin-ziworld/`  
+**사용자 문서**: [plugins/kabegame-plugin-ziworld/README.md](plugins/kabegame-plugin-ziworld/README.md)
 
 **기능**:
 - [ziworld](https://t.ziworld.top/date.json)에서 벽지 수집
@@ -103,8 +103,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: Danbooru 이미지 보드 수집 플러그인 (전체 태그 메타데이터 포함)  
 **작성자**: Kabegame
 
-**경로**: `plugins/danbooru/`  
-**문서**: [plugins/danbooru/README.ko.md](plugins/danbooru/README.ko.md)
+**경로**: `plugins/kabegame-plugin-danbooru/`  
+**문서**: [plugins/kabegame-plugin-danbooru/README.ko.md](plugins/kabegame-plugin-danbooru/README.ko.md)
 
 **기능**:
 - danbooru.donmai.us(또는 전체 이용가 전용 safebooru.donmai.us)에서 작품 수집
@@ -134,8 +134,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: Gelbooru 이미지 보드 수집 플러그인 (전체 태그 메타데이터 포함)  
 **작성자**: Kabegame
 
-**경로**: `plugins/gelbooru/`  
-**문서**: [plugins/gelbooru/README.ko.md](plugins/gelbooru/README.ko.md)
+**경로**: `plugins/kabegame-plugin-gelbooru/`  
+**문서**: [plugins/kabegame-plugin-gelbooru/README.ko.md](plugins/kabegame-plugin-gelbooru/README.ko.md)
 
 **기능**:
 - gelbooru.com에서 작품 수집
@@ -164,8 +164,8 @@ Kabegame 이미지 수집 시스템용 크롤러 플러그인 저장소입니다
 **설명**: Zerochan 이미지 보드 수집 플러그인. 전체·태그·임의 검색어를 지원하며 최신/인기 정렬이 가능합니다  
 **작성자**: Kabegame
 
-**경로**: `plugins/zerochan/`  
-**문서**: [plugins/zerochan/README.ko.md](plugins/zerochan/README.ko.md)
+**경로**: `plugins/kabegame-plugin-zerochan/`  
+**문서**: [plugins/kabegame-plugin-zerochan/README.ko.md](plugins/kabegame-plugin-zerochan/README.ko.md)
 
 **기능**:
 - zerochan.net에서 이미지 수집. 사이트가 완전한 SSR이라 `fetch` + DOM 파싱만으로 동작(WebView 불필요)
@@ -282,7 +282,7 @@ pnpm prepare
 메인 프로젝트 루트에서:
 
 ```bash
-pnpm run package-plugin crawler-plugins/plugins/<플러그인명>
+pnpm run package-plugin crawler-plugins/plugins/kabegame-plugin-<플러그인명>
 ```
 
 출력: `crawler-plugins/packed/<플러그인명>.kgpg`

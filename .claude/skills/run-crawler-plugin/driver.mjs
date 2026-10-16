@@ -42,6 +42,20 @@ const EXE = process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli";
 const CLI_RELEASE = path.join(WORKSPACE, "target/release", EXE);
 const CLI_DEBUG = path.join(WORKSPACE, "target/debug", EXE);
 
+// 插件目录 = package.json 的 name = `kabegame-plugin-<id>`；命令行与 .kgpg 文件名都用剥离后的 id
+// （与 package-plugin.ts / kabegame-core `plugin_id_from_package_name` 同构）。
+const PLUGIN_PACKAGE_PREFIX = "kabegame-plugin-";
+function pluginIdFromPackageName(name) {
+  return name.startsWith(PLUGIN_PACKAGE_PREFIX) &&
+      name.length > PLUGIN_PACKAGE_PREFIX.length
+    ? name.slice(PLUGIN_PACKAGE_PREFIX.length)
+    : name;
+}
+function pluginDirOf(id) {
+  const prefixed = path.join(PLUGIN_DIR, PLUGIN_PACKAGE_PREFIX + id);
+  return fs.existsSync(prefixed) ? prefixed : path.join(PLUGIN_DIR, id);
+}
+
 function die(msg) {
   console.error(`✗ ${msg}`);
   process.exit(1);
@@ -50,7 +64,8 @@ function die(msg) {
 function usage() {
   const names = fs.existsSync(PLUGIN_DIR)
     ? fs.readdirSync(PLUGIN_DIR, { withFileTypes: true })
-      .filter((d) => d.isDirectory()).map((d) => d.name).sort()
+      .filter((d) => d.isDirectory() && d.name !== "node_modules")
+      .map((d) => pluginIdFromPackageName(d.name)).sort()
     : [];
   console.log(`用法: driver.mjs <plugin> [--var k=v]... [选项]
 
@@ -96,14 +111,14 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === "--timeout") timeoutSec = Number(argv[++i]);
   else if (a.startsWith("-")) die(`未知选项：${a}`);
   else if (plugin) die(`只能指定一个插件，已有 ${plugin}，又收到 ${a}`);
-  else plugin = a;
+  else plugin = pluginIdFromPackageName(a);
 }
 
 if (!plugin) die("必须指定插件名。加 --help 看可用列表。");
 if (!["dev", "prod"].includes(dataMode)) die(`--data 只能是 dev / prod`);
 if (!Number.isFinite(timeoutSec) || timeoutSec <= 0) die("--timeout 需要正数");
-if (!fs.existsSync(path.join(PLUGIN_DIR, plugin))) {
-  die(`插件目录不存在：plugins/${plugin}（加 --help 看可用列表）`);
+if (!fs.existsSync(pluginDirOf(plugin))) {
+  die(`插件目录不存在：plugins/${PLUGIN_PACKAGE_PREFIX}${plugin}（加 --help 看可用列表）`);
 }
 
 // ── 定位 CLI，并确认它带 plugin run ───────────────────────────────────

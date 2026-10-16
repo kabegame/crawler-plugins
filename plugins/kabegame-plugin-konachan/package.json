@@ -1,0 +1,500 @@
+{
+  "name": "kabegame-plugin-konachan",
+  "version": "1.7.3",
+  "private": true,
+  "name.zh": "konachan动漫壁纸",
+  "name.en": "Konachan anime wallpapers",
+  "name.ja": "konachanアニメ壁紙",
+  "name.ko": "konachan 애니메이션 벽지",
+  "description": "konachan动漫壁纸收集源插件",
+  "description.zh": "konachan动漫壁纸收集源插件",
+  "description.en": "Konachan anime wallpaper crawler plugin",
+  "description.ja": "konachanアニメ壁紙収集プラグイン",
+  "description.ko": "konachan 애니메이션 벽지 수집 플러그인",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://konachan.net",
+  "kbLabels": [
+    { "id": "auth.needProxy" },
+    { "id": "auth.needCookie" },
+    { "id": "content.res.desktop" },
+    { "id": "content.nsfw" }
+  ],
+  "kbConfig": [
+    {
+      "key": "source_site",
+      "type": "options",
+      "required": true,
+      "name": "源站",
+      "name.en": "Source site",
+      "name.ja": "ソースサイト",
+      "name.ko": "소스 사이트",
+      "name.zhtw": "來源站",
+      "descripts": "选择爬取来源站点。konachan.net 只收录全年龄内容；konachan.com 是完整站（含 R18），有 Cloudflare 验证，需要先在畅游中打开 konachan.com 通过验证",
+      "descripts.en": "Source site. konachan.net hosts all-ages content only; konachan.com is the full site (incl. R18) behind Cloudflare — open konachan.com in Surf and pass the check first",
+      "descripts.ja": "クロール元のサイト。konachan.net は全年齢のみ、konachan.com は R18 を含む完全版で Cloudflare 認証があるため、先にサーフで konachan.com を開いて認証を通してください",
+      "descripts.ko": "소스 사이트. konachan.net은 전체 이용가만, konachan.com은 R18을 포함한 전체 사이트이며 Cloudflare 인증이 있으므로 먼저 서핑에서 konachan.com을 열어 인증을 통과하세요",
+      "descripts.zhtw": "選擇爬取來源站點。konachan.net 只收錄全年齡內容；konachan.com 是完整站（含 R18），有 Cloudflare 驗證，需要先在暢遊中打開 konachan.com 通過驗證",
+      "default": "net",
+      "options": [
+        {
+          "name": "大众站(konachan.net)",
+          "name.en": "Safe (konachan.net)",
+          "name.ja": "全年齢 (konachan.net)",
+          "name.ko": "전체 이용가 (konachan.net)",
+          "name.zhtw": "大眾站(konachan.net)",
+          "variable": "net"
+        },
+        {
+          "name": "R18站(konachan.com)",
+          "name.en": "R18 (konachan.com)",
+          "name.ja": "R18 (konachan.com)",
+          "name.ko": "R18 (konachan.com)",
+          "name.zhtw": "R18站(konachan.com)",
+          "variable": "com"
+        }
+      ]
+    },
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "required": true,
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "爬取模式，分为全部、标签、排行榜和 id 范围",
+      "descripts.en": "Crawl mode: all, tags, ranking or ID range",
+      "descripts.ja": "クロールモード、全部・タグ・ランキング・ID 範囲に分かれています",
+      "descripts.ko": "크롤 모드, 전체·태그·랭킹·ID 범위로 나뉩니다",
+      "descripts.zhtw": "爬取模式，分為全部、標籤、排行榜和 id 範圍",
+      "default": "all",
+      "options": [
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "全部",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "标签",
+          "name.en": "Tags",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tags"
+        },
+        {
+          "name": "排行榜",
+          "name.en": "Ranking",
+          "name.ja": "ランキング",
+          "name.ko": "랭킹",
+          "name.zhtw": "排行榜",
+          "variable": "popular"
+        },
+        {
+          "name": "id 范围",
+          "name.en": "ID range",
+          "name.ja": "ID 範囲",
+          "name.ko": "ID 범위",
+          "name.zhtw": "id 範圍",
+          "variable": "id_range"
+        }
+      ]
+    },
+    {
+      "key": "rating",
+      "type": "options",
+      "name": "分级过滤",
+      "name.en": "Rating filter",
+      "name.ja": "レーティング絞り込み",
+      "name.ko": "등급 필터",
+      "name.zhtw": "分級過濾",
+      "descripts": "按站点分级过滤。全部、标签和 id 范围模式把 rating: 元标签拼进搜索串，排行榜模式在插件里按每张图的分级筛选。只有 R18 站（konachan.com）有存疑与限制级内容",
+      "descripts.en": "Filter by site rating. All, tags and ID range modes add the rating: metatag to the search string; ranking mode filters each post by its rating inside the plugin. Only the R18 site (konachan.com) has Questionable and Explicit content",
+      "descripts.ja": "サイトのレーティングで絞り込みます。全部・タグ・ID 範囲モードは rating: メタタグを検索文字列に付加し、ランキングモードはプラグイン内で各作品のレーティングを見て絞り込みます。際どい・露骨なコンテンツは R18 サイト（konachan.com）にのみあります",
+      "descripts.ko": "사이트 등급으로 필터링합니다. 전체·태그·ID 범위 모드는 rating: 메타태그를 검색 문자열에 추가하고, 랭킹 모드는 플러그인 안에서 작품별 등급으로 거릅니다. 애매함·노골적 콘텐츠는 R18 사이트(konachan.com)에만 있습니다",
+      "descripts.zhtw": "依站台分級過濾。全部、標籤和 id 範圍模式把 rating: 元標籤拼進搜尋串，排行榜模式在插件裡依每張圖的分級篩選。只有 R18 站（konachan.com）有存疑與限制級內容",
+      "default": "",
+      "options": [
+        {
+          "name": "不限",
+          "name.en": "Any",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "不限",
+          "variable": ""
+        },
+        {
+          "name": "全年龄(Safe)",
+          "name.en": "Safe",
+          "name.ja": "全年齢 (Safe)",
+          "name.ko": "전체 이용가 (Safe)",
+          "name.zhtw": "全年齡(Safe)",
+          "variable": "safe"
+        },
+        {
+          "name": "存疑(Questionable)",
+          "name.en": "Questionable",
+          "name.ja": "際どい (Questionable)",
+          "name.ko": "애매함 (Questionable)",
+          "name.zhtw": "存疑(Questionable)",
+          "variable": "questionable"
+        },
+        {
+          "name": "限制级(Explicit)",
+          "name.en": "Explicit",
+          "name.ja": "露骨 (Explicit)",
+          "name.ko": "노골적 (Explicit)",
+          "name.zhtw": "限制級(Explicit)",
+          "variable": "explicit"
+        }
+      ],
+      "when": {
+        "source_site": [
+          "com"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "descripts.en": "End page. Keep at most 100 pages per run.",
+      "descripts.ja": "終了ページ。1回あたり100ページ以内にしてください。",
+      "descripts.ko": "끝 페이지. 실행당 최대 100페이지로 제한됩니다.",
+      "descripts.zhtw": "要拉取的結束頁面。請保持最多爬取100頁，降低並發量文明爬取。否則拒絕爬取",
+      "default": 5,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "mode_tag_value",
+      "type": "list",
+      "required": true,
+      "name": "标签组合",
+      "name.en": "Tag combination",
+      "name.ja": "タグ組み合わせ",
+      "name.ko": "태그 조합",
+      "name.zhtw": "標籤組合",
+      "descripts": "输入多个标签（列表），运行时会用+连接；标签中的空格会自动转为下划线_",
+      "descripts.en": "Input multiple tags as a list; runtime joins them with + and converts spaces to _",
+      "descripts.ja": "複数タグをリストで入力。実行時に + で連結し、空白は _ に変換します",
+      "descripts.ko": "여러 태그를 목록으로 입력합니다. 실행 시 + 로 결합하며 공백은 _ 로 변환됩니다",
+      "descripts.zhtw": "輸入多個標籤（列表），執行時會用 + 連接，標籤中的空格會自動轉為下劃線_",
+      "default": [
+        "pink_hair",
+        "bikini"
+      ],
+      "options": null,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "id_start",
+      "type": "int",
+      "required": true,
+      "name": "起始 id",
+      "name.en": "Start ID",
+      "name.ja": "開始 ID",
+      "name.ko": "시작 ID",
+      "name.zhtw": "起始 id",
+      "descripts": "作品 id 下限（含），即作品页地址 /post/show/<id> 里的数字",
+      "descripts.en": "Lowest post ID (inclusive) — the number in the post URL /post/show/<id>",
+      "descripts.ja": "作品 ID の下限（含む）。作品ページ URL /post/show/<id> の数字です",
+      "descripts.ko": "작품 ID 하한(포함). 작품 페이지 주소 /post/show/<id> 의 숫자입니다",
+      "descripts.zhtw": "作品 id 下限（含），即作品頁網址 /post/show/<id> 裡的數字",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "id_end",
+      "type": "int",
+      "required": true,
+      "name": "结束 id",
+      "name.en": "End ID",
+      "name.ja": "終了 ID",
+      "name.ko": "끝 ID",
+      "name.zhtw": "結束 id",
+      "descripts": "作品 id 上限（含），与起始 id 最多相差 5000，否则拒绝爬取。按 id 从小到大抓取，区间里已删除的作品会跳过",
+      "descripts.en": "Highest post ID (inclusive); at most 5000 above the start ID, otherwise the run is refused. Posts are crawled in ascending ID order; deleted posts in the range are skipped",
+      "descripts.ja": "作品 ID の上限（含む）。開始 ID との差は最大 5000 で、超えると実行を拒否します。ID の昇順で取得し、範囲内の削除済み作品は飛ばします",
+      "descripts.ko": "작품 ID 상한(포함). 시작 ID와의 차이는 최대 5000이며 초과하면 실행을 거부합니다. ID 오름차순으로 수집하고 범위 안의 삭제된 작품은 건너뜁니다",
+      "descripts.zhtw": "作品 id 上限（含），與起始 id 最多相差 5000，否則拒絕爬取。依 id 由小到大抓取，區間裡已刪除的作品會跳過",
+      "default": 1000,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "popular_scale",
+      "type": "options",
+      "required": true,
+      "name": "排行榜类型",
+      "name.en": "Ranking type",
+      "name.ja": "ランキングの種類",
+      "name.ko": "랭킹 종류",
+      "name.zhtw": "排行榜類型",
+      "descripts": "日榜、周榜、月榜按自然日、周、月统计，可以指定日期看往期；「最近」系列是截至现在的滚动窗口，只有当期。konachan 每期只有一页，最多 40 张",
+      "descripts.en": "Daily / weekly / monthly rankings follow calendar periods and can look back by date; the \"Last …\" rankings are rolling windows up to now and only have the current period. Each period on konachan is a single page of at most 40 posts",
+      "descripts.ja": "日間・週間・月間は暦の区切りで集計され、日付を指定して過去分も見られます。「直近」系は現在までのローリング期間で、当期のみです。konachan は1期1ページ、最大40枚です",
+      "descripts.ko": "일간·주간·월간은 달력 기준으로 집계되며 날짜를 지정해 지난 기간도 볼 수 있습니다. 「최근」 계열은 지금까지의 롤링 기간이라 현재 기간만 있습니다. konachan는 기간마다 한 페이지, 최대 40장입니다",
+      "descripts.zhtw": "日榜、週榜、月榜依自然日、週、月統計，可以指定日期看往期；「最近」系列是截至現在的滾動區間，只有當期。konachan 每期只有一頁，最多 40 張",
+      "default": "day",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Daily",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "day"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Weekly",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "week"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Monthly",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "month"
+        },
+        {
+          "name": "最近 24 小时",
+          "name.en": "Last 24 hours",
+          "name.ja": "直近24時間",
+          "name.ko": "최근 24시간",
+          "name.zhtw": "最近 24 小時",
+          "variable": "1d"
+        },
+        {
+          "name": "最近一周",
+          "name.en": "Last week",
+          "name.ja": "直近1週間",
+          "name.ko": "최근 1주",
+          "name.zhtw": "最近一週",
+          "variable": "1w"
+        },
+        {
+          "name": "最近一个月",
+          "name.en": "Last month",
+          "name.ja": "直近1か月",
+          "name.ko": "최근 1개월",
+          "name.zhtw": "最近一個月",
+          "variable": "1m"
+        },
+        {
+          "name": "最近一年",
+          "name.en": "Last year",
+          "name.ja": "直近1年",
+          "name.ko": "최근 1년",
+          "name.zhtw": "最近一年",
+          "variable": "1y"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "popular_date",
+      "type": "date",
+      "format": "YYYY-MM-DD",
+      "dateMin": "2008-01-01",
+      "dateMax": "today",
+      "name": "排行榜日期",
+      "name.en": "Ranking date",
+      "name.ja": "ランキング日付",
+      "name.ko": "랭킹 날짜",
+      "name.zhtw": "排行榜日期",
+      "descripts": "留空为当期。日榜取这一天，周榜取这一天所在的那一周，月榜取这一天所在的月份",
+      "descripts.en": "Empty = current period. Daily uses this day, weekly the week containing it, monthly the month containing it",
+      "descripts.ja": "空欄は当期。日間はその日、週間はその日を含む週、月間はその日を含む月です",
+      "descripts.ko": "비우면 현재 기간. 일간은 해당일, 주간은 해당일이 속한 주, 월간은 해당일이 속한 달입니다",
+      "descripts.zhtw": "留空為當期。日榜取這一天，週榜取這一天所在的那一週，月榜取這一天所在的月份",
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
+        ]
+      }
+    },
+    {
+      "key": "popular_periods",
+      "type": "int",
+      "name": "回溯期数",
+      "name.en": "Periods",
+      "name.ja": "遡る期数",
+      "name.ko": "거슬러 올라갈 기간 수",
+      "name.zhtw": "回溯期數",
+      "descripts": "从上面的日期起往前连抓多少期，每期最多 40 张，一次最多 100 期",
+      "descripts.en": "How many consecutive periods to crawl going back from the date above; up to 40 posts each, at most 100 periods per run",
+      "descripts.ja": "上の日付から遡って連続で何期分取得するか。1期最大40枚、1回最大100期",
+      "descripts.ko": "위 날짜부터 거슬러 올라가며 연속으로 몇 기간을 수집할지. 기간당 최대 40장, 실행당 최대 100기간",
+      "descripts.zhtw": "從上面的日期起往前連抓多少期，每期最多 40 張，一次最多 100 期",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "max": 100,
+      "width": 1,
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ],
+        "popular_scale": [
+          "day",
+          "week",
+          "month"
+        ]
+      }
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "required": true,
+      "name": "质量",
+      "name.en": "Quality",
+      "name.ja": "画質",
+      "name.ko": "화질",
+      "name.zhtw": "畫質",
+      "descripts": "图片质量，这个网站质量都挺高的",
+      "descripts.en": "Image quality",
+      "descripts.ja": "画像の画質",
+      "descripts.ko": "이미지 화질",
+      "descripts.zhtw": "圖片畫質，此站畫質都挺高",
+      "default": "high",
+      "options": [
+        {
+          "name": "高",
+          "name.en": "High",
+          "name.ja": "高",
+          "name.ko": "고화질",
+          "name.zhtw": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "name.en": "Medium",
+          "name.ja": "中",
+          "name.ko": "중간",
+          "name.zhtw": "中",
+          "variable": "medium"
+        }
+      ],
+      "width": 1
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbAssets": [
+    "banners/homepage.jpg",
+    "banners/post.jpg",
+    "banners/image.jpg"
+  ],
+  "kbRecommendedConfigs": [
+    "configs/bikini.json",
+    "configs/every-day-5page.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/number_range_provider.json5",
+    "providers/number_range_router.json5",
+    "providers/rating_provider.json5",
+    "providers/rating_router.json5"
+  ],
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

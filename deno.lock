@@ -1904,7 +1904,7 @@
       ]
     },
     "members": {
-      "plugins/aibooru": {
+      "plugins/kabegame-plugin-aibooru": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1913,7 +1913,7 @@
           ]
         }
       },
-      "plugins/anihonet-wallpaper": {
+      "plugins/kabegame-plugin-anihonet-wallpaper": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1922,7 +1922,7 @@
           ]
         }
       },
-      "plugins/anime-pictures": {
+      "plugins/kabegame-plugin-anime-pictures": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1931,26 +1931,7 @@
           ]
         }
       },
-      "plugins/bilibili": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:tiny-pinyin@^1.3.2",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/bilibili-video": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/bluedafeiyu": {
+      "plugins/kabegame-plugin-bilibili": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1960,7 +1941,7 @@
           ]
         }
       },
-      "plugins/danbooru": {
+      "plugins/kabegame-plugin-bilibili-video": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1969,25 +1950,7 @@
           ]
         }
       },
-      "plugins/e-shuushuu": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/gelbooru": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/haowallpaper": {
+      "plugins/kabegame-plugin-bluedafeiyu": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -1997,7 +1960,7 @@
           ]
         }
       },
-      "plugins/heybox": {
+      "plugins/kabegame-plugin-danbooru": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2006,7 +1969,7 @@
           ]
         }
       },
-      "plugins/kabegame-server": {
+      "plugins/kabegame-plugin-e-shuushuu": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2015,7 +1978,7 @@
           ]
         }
       },
-      "plugins/kemono": {
+      "plugins/kabegame-plugin-gelbooru": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2024,16 +1987,7 @@
           ]
         }
       },
-      "plugins/konachan": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/manyacg": {
+      "plugins/kabegame-plugin-haowallpaper": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2043,7 +1997,7 @@
           ]
         }
       },
-      "plugins/miyoushe": {
+      "plugins/kabegame-plugin-heybox": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2052,7 +2006,7 @@
           ]
         }
       },
-      "plugins/nekos-moe": {
+      "plugins/kabegame-plugin-kabegame-server": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2061,7 +2015,7 @@
           ]
         }
       },
-      "plugins/pixai": {
+      "plugins/kabegame-plugin-kemono": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2070,7 +2024,7 @@
           ]
         }
       },
-      "plugins/pixiv": {
+      "plugins/kabegame-plugin-konachan": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2079,52 +2033,7 @@
           ]
         }
       },
-      "plugins/safebooru": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/twodwallpapers": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/wallhaven": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/wallpapers-craft": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/wallspic": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@rspack/cli@1",
-            "npm:@rspack/core@1",
-            "npm:typescript@^5.5.0"
-          ]
-        }
-      },
-      "plugins/weibo": {
+      "plugins/kabegame-plugin-manyacg": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2134,7 +2043,7 @@
           ]
         }
       },
-      "plugins/xhs": {
+      "plugins/kabegame-plugin-miyoushe": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2143,7 +2052,7 @@
           ]
         }
       },
-      "plugins/yandere": {
+      "plugins/kabegame-plugin-nekos-moe": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2152,7 +2061,7 @@
           ]
         }
       },
-      "plugins/zerochan": {
+      "plugins/kabegame-plugin-pixai": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",
@@ -2161,7 +2070,98 @@
           ]
         }
       },
-      "plugins/ziworld": {
+      "plugins/kabegame-plugin-pixiv": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-safebooru": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-twodwallpapers": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-wallhaven": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-wallpapers-craft": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-wallspic": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-weibo": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:tiny-pinyin@^1.3.2",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-xhs": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-yandere": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-zerochan": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@rspack/cli@1",
+            "npm:@rspack/core@1",
+            "npm:typescript@^5.5.0"
+          ]
+        }
+      },
+      "plugins/kabegame-plugin-ziworld": {
         "packageJson": {
           "dependencies": [
             "npm:@rspack/cli@1",

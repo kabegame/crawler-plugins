@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run -A
 /**
- * repack driver —— 把 src-crawler-plugins/plugins/<name>/ 打包成 .kgpg 并投放到
+ * repack driver —— 把 src-crawler-plugins/plugins/kabegame-plugin-<id>/ 打包成 .kgpg 并投放到
  * dev 数据目录 .kabegame/debug/data/plugins-directory（不碰 packed/）。
  *
  * 改完哪个插件就显式传哪个插件名。不做 git 检测：改动来自本轮编辑，自己知道改了谁，
@@ -39,6 +39,20 @@ const CLI = path.join(
   process.platform === "win32" ? "kabegame-cli.exe" : "kabegame-cli",
 );
 
+// 插件目录 = package.json 的 name = `kabegame-plugin-<id>`；命令行与 .kgpg 文件名都用剥离后的 id
+// （与 package-plugin.ts / kabegame-core `plugin_id_from_package_name` 同构）。
+const PLUGIN_PACKAGE_PREFIX = "kabegame-plugin-";
+function pluginIdFromPackageName(name) {
+  return name.startsWith(PLUGIN_PACKAGE_PREFIX) &&
+      name.length > PLUGIN_PACKAGE_PREFIX.length
+    ? name.slice(PLUGIN_PACKAGE_PREFIX.length)
+    : name;
+}
+function pluginDirOf(id) {
+  const prefixed = path.join(PLUGIN_DIR, PLUGIN_PACKAGE_PREFIX + id);
+  return fs.existsSync(prefixed) ? prefixed : path.join(PLUGIN_DIR, id);
+}
+
 function die(msg) {
   console.error(`✗ ${msg}`);
   process.exit(1);
@@ -48,7 +62,7 @@ function allPlugins() {
   return fs
     .readdirSync(PLUGIN_DIR, { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== "node_modules")
-    .map((e) => e.name)
+    .map((e) => pluginIdFromPackageName(e.name))
     .sort();
 }
 
@@ -63,7 +77,7 @@ for (let i = 0; i < argv.length; i++) {
   if (a === "--out-dir") outDir = path.resolve(process.cwd(), argv[++i]);
   else if (a === "--all") all = true;
   else if (a.startsWith("-")) die(`未知参数: ${a}`);
-  else names.push(a);
+  else names.push(pluginIdFromPackageName(a));
 }
 
 const targets = all ? allPlugins() : names;
@@ -118,7 +132,7 @@ function verify(file) {
 }
 
 function pack(name) {
-  const dir = path.join(PLUGIN_DIR, name);
+  const dir = pluginDirOf(name);
   if (!fs.existsSync(dir)) return { name, ok: false, err: "插件目录不存在" };
   // 单插件位置参数模式 —— 唯一不清理输出目录的模式
   const r = spawnSync(

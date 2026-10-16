@@ -1,0 +1,179 @@
+{
+  "name": "kabegame-plugin-patreon-webview",
+  "version": "0.1.1",
+  "private": true,
+  "name.zh": "Patreon创作者内容（WebView）",
+  "name.en": "Patreon creator content (WebView)",
+  "name.ja": "Patreonクリエイターコンテンツ（WebView）",
+  "name.ko": "Patreon크리에이터 콘텐츠 (WebView)",
+  "name.zhtw": "Patreon創作者內容（WebView）",
+  "description": "从 patreon.com 抓取创作者帖子的图片与压缩包附件，压缩包由宿主解压后逐图入库",
+  "description.zh": "从 patreon.com 抓取创作者帖子的图片与压缩包附件，压缩包由宿主解压后逐图入库",
+  "description.en": "Crawl images and archive attachments from patreon.com creator posts; archives are extracted host-side and imported per file",
+  "description.ja": "patreon.com のクリエイター投稿から画像と圧縮ファイルを取得し、圧縮ファイルはホスト側で展開して 1 枚ずつ取り込みます",
+  "description.ko": "patreon.com 크리에이터 게시물의 이미지와 압축 첨부를 수집하며, 압축 파일은 호스트에서 풀어 한 장씩 가져옵니다",
+  "description.zhtw": "從 patreon.com 抓取創作者貼文的圖片與壓縮檔附件，壓縮檔由宿主解壓後逐圖入庫",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "crawl.js",
+  "kbBackend": "webview",
+  "kbBaseUrl": "https://www.patreon.com",
+  "kbLabels": [
+    {
+      "id": "content.nsfw"
+    },
+    {
+      "id": "auth.needCookie"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "creator",
+      "type": "string",
+      "required": true,
+      "name": "创作者或合集",
+      "name.en": "Creator or collection",
+      "name.ja": "クリエイターまたはコレクション",
+      "name.ko": "크리에이터 또는 컬렉션",
+      "name.zhtw": "創作者或合集",
+      "descripts": "直接粘贴创作者主页或合集的链接即可，插件会自动识别类型。也可以只填创作者名（如 prprbecause31）、只填合集数字 id（如 1936000），或用 id:<campaign_id> 跳过一切解析。",
+      "descripts.en": "Just paste a creator or collection URL — the type is detected automatically. You can also enter only the creator name (e.g. prprbecause31), only the numeric collection id (e.g. 1936000), or id:<campaign_id> to skip all parsing.",
+      "descripts.ja": "クリエイターまたはコレクションの URL をそのまま貼り付ければ、種類は自動判別されます。クリエイター名のみ（例：prprbecause31）、コレクションの数値 id のみ（例：1936000）、または id:<campaign_id> も指定できます。",
+      "descripts.ko": "크리에이터 또는 컬렉션 URL을 붙여넣으면 종류를 자동으로 판별합니다. 크리에이터 이름만(예: prprbecause31), 컬렉션 숫자 id만(예: 1936000), 또는 id:<campaign_id>도 됩니다.",
+      "descripts.zhtw": "直接貼上創作者主頁或合集的連結即可，外掛會自動辨識類型。也可以只填創作者名（如 prprbecause31）、只填合集數字 id（如 1936000），或用 id:<campaign_id> 跳過一切解析。",
+      "default": "prprbecause31"
+    },
+    {
+      "key": "direction",
+      "type": "options",
+      "required": true,
+      "name": "爬取顺序",
+      "name.en": "Crawl order",
+      "name.ja": "取得順序",
+      "name.ko": "수집 순서",
+      "name.zhtw": "爬取順序",
+      "descripts": "从新到旧：先拿最新的，适合日常补新。从旧到新：从最早的开始补，适合回溯补全历史——中途停下也能安全续爬。合集不受此项影响。",
+      "descripts.en": "Newest first suits routine top-ups. Oldest first suits backfilling history — it can be safely resumed even if interrupted. Collections are unaffected.",
+      "descripts.ja": "新しい順は日常の追加取得向け。古い順は過去の取りこぼしを埋めるのに向き、途中で止めても安全に再開できます。コレクションには影響しません。",
+      "descripts.ko": "최신순은 일상적인 추가 수집에, 오래된순은 과거를 채우는 데 적합하며 중단해도 안전하게 이어서 수집할 수 있습니다. 컬렉션에는 적용되지 않습니다.",
+      "descripts.zhtw": "從新到舊：先拿最新的，適合日常補新。從舊到新：從最早的開始補，適合回溯補全歷史——中途停下也能安全續爬。合集不受此項影響。",
+      "default": "desc",
+      "options": [
+        {
+          "name": "从新到旧",
+          "name.en": "Newest first",
+          "name.ja": "新しい順",
+          "name.ko": "최신순",
+          "name.zhtw": "從新到舊",
+          "variable": "desc"
+        },
+        {
+          "name": "从旧到新",
+          "name.en": "Oldest first",
+          "name.ja": "古い順",
+          "name.ko": "오래된순",
+          "name.zhtw": "從舊到新",
+          "variable": "asc"
+        }
+      ]
+    },
+    {
+      "key": "time_min",
+      "type": "date",
+      "name": "最旧时间",
+      "name.en": "Oldest time",
+      "name.ja": "最も古い日時",
+      "name.ko": "가장 오래된 시각",
+      "name.zhtw": "最舊時間",
+      "descripts": "时间窗下界（含当天）。留空时：有上次爬取记录就用它（即只补新增），没有就一直翻到能扒到的最旧帖子。",
+      "descripts.en": "Lower bound of the time window, inclusive of that day. When empty: falls back to the last-run record if there is one (i.e. only new items), otherwise goes back to the oldest post available.",
+      "descripts.ja": "時間範囲の下限（その日を含む）。空の場合は前回の記録があればそれを使い（=新着のみ）、無ければ取得できる最古の投稿まで遡ります。",
+      "descripts.ko": "시간 범위의 하한(해당일 포함). 비우면 지난 실행 기록이 있으면 그것을 사용하고(=신규만), 없으면 가장 오래된 게시물까지 거슬러 올라갑니다.",
+      "descripts.zhtw": "時間範圍下界（含當天）。留空時：有上次爬取記錄就用它（即只補新增），沒有就一直翻到能扒到的最舊貼文。",
+      "format": "YYYY-MM-DD",
+      "dateMax": "today"
+    },
+    {
+      "key": "time_max",
+      "type": "date",
+      "name": "最新时间",
+      "name.en": "Newest time",
+      "name.ja": "最も新しい日時",
+      "name.ko": "가장 새로운 시각",
+      "name.zhtw": "最新時間",
+      "descripts": "时间窗上界（含当天，算到当天 23:59:59）。留空表示一直到能爬取的最新帖子。",
+      "descripts.en": "Upper bound of the time window, inclusive of that whole day (through 23:59:59). Empty means up to the newest post available.",
+      "descripts.ja": "時間範囲の上限（その日の 23:59:59 まで含む）。空なら取得できる最新の投稿まで。",
+      "descripts.ko": "시간 범위의 상한(해당일 23:59:59까지 포함). 비우면 가장 새로운 게시물까지.",
+      "descripts.zhtw": "時間範圍上界（含當天，算到當天 23:59:59）。留空表示一直到能爬取的最新貼文。",
+      "format": "YYYY-MM-DD",
+      "dateMax": "today"
+    },
+    {
+      "key": "incremental",
+      "type": "boolean",
+      "name": "只补充上次之后的新内容",
+      "name.en": "Only new since last run",
+      "name.ja": "前回以降の新着のみ",
+      "name.ko": "지난 실행 이후 새 항목만",
+      "name.zhtw": "只補充上次之後的新內容",
+      "descripts": "记住上次抓到的最新帖子时间，下次运行时遇到更早的帖子就停止翻页，只补新增部分。首次运行没有记录，按全量抓取。合集不支持（它按合集内顺序排列，不是时间序）；因页数上限提前停止时不会更新记录，以免漏掉未抓的帖子。",
+      "descripts.en": "Remembers the newest post seen last run and stops paging once it reaches older posts, fetching only what is new. The first run has no record and fetches normally. Not supported for collections (they are ordered by collection position, not time). The record is not updated when the run stops early due to the page limit, so nothing gets skipped.",
+      "descripts.ja": "前回取得した最新投稿の日時を記憶し、次回はそれより古い投稿に達した時点でページ送りを停止して新着のみを取得します。初回は記録がないため通常取得します。コレクションは非対応（時系列ではなくコレクション内の並び順のため）。ページ上限で途中終了した場合は記録を更新しません。",
+      "descripts.ko": "지난 실행에서 본 최신 게시물 시각을 기억하고, 다음 실행에서 그보다 오래된 게시물에 도달하면 페이지 넘김을 멈춰 새 항목만 가져옵니다. 첫 실행은 기록이 없어 전체를 가져옵니다. 컬렉션은 지원하지 않습니다(시간순이 아닌 컬렉션 내 순서). 페이지 상한으로 조기 종료하면 기록을 갱신하지 않습니다.",
+      "descripts.zhtw": "記住上次抓到的最新貼文時間，下次執行遇到更早的貼文就停止翻頁，只補新增部分。首次執行沒有記錄，按全量抓取。合集不支援（依合集內順序排列，非時間序）；因頁數上限提前停止時不會更新記錄。",
+      "default": true
+    },
+    {
+      "key": "archive_include",
+      "type": "string",
+      "name": "压缩包内提取规则",
+      "name.en": "Archive include pattern",
+      "name.ja": "圧縮ファイル内の抽出パターン",
+      "name.ko": "압축 파일 내 추출 패턴",
+      "name.zhtw": "壓縮檔內提取規則",
+      "descripts": "glob 模式，决定压缩包里哪些文件被提取入库。留空表示全部提取（不推荐：Patreon 的包里常混着 PSD、字体、说明文本，这些进不了图库还会刷失败计数）。",
+      "descripts.en": "Glob pattern deciding which files inside an archive get imported. Empty means extract everything (not recommended: Patreon archives often bundle PSD, fonts and readme files that cannot be imported).",
+      "descripts.ja": "圧縮ファイル内のどのファイルを取り込むかを決める glob パターン。空にすると全件展開します（非推奨：PSD やフォント、説明書きが混在しがちです）。",
+      "descripts.ko": "압축 파일 안에서 어떤 파일을 가져올지 정하는 glob 패턴입니다. 비우면 전부 추출합니다(권장하지 않음: PSD·폰트·설명 파일이 섞여 있는 경우가 많습니다).",
+      "descripts.zhtw": "glob 模式，決定壓縮檔裡哪些檔案被提取入庫。留空表示全部提取（不推薦：包裡常混著 PSD、字型、說明文字）。",
+      "default": "**/*.{png,jpg,jpeg,webp,gif,avif,bmp}"
+    },
+    {
+      "key": "archive_password",
+      "type": "string",
+      "name": "压缩包密码",
+      "name.en": "Archive password",
+      "name.ja": "圧縮ファイルのパスワード",
+      "name.ko": "압축 파일 비밀번호",
+      "name.zhtw": "壓縮檔密碼",
+      "descripts": "部分创作者会给附件加密并把密码写在帖子正文里。留空表示不加密。",
+      "descripts.en": "Some creators encrypt attachments and put the password in the post body. Leave empty for unencrypted archives.",
+      "descripts.ja": "添付ファイルを暗号化し、本文にパスワードを書くクリエイターがいます。暗号化されていない場合は空のままに。",
+      "descripts.ko": "일부 크리에이터는 첨부를 암호화하고 본문에 비밀번호를 적습니다. 암호화되지 않았다면 비워 두세요.",
+      "descripts.zhtw": "部分創作者會為附件加密並把密碼寫在貼文內文裡。留空表示不加密。"
+    },
+    {
+      "key": "include_post_images",
+      "type": "boolean",
+      "name": "同时下载帖子正文图片",
+      "name.en": "Also download post images",
+      "name.ja": "投稿本文の画像も取得",
+      "name.ko": "게시물 본문 이미지도 다운로드",
+      "name.zhtw": "同時下載貼文內文圖片",
+      "descripts": "关闭则只处理压缩包附件，帖子自带的图片会被跳过。",
+      "descripts.en": "When off, only archive attachments are processed and the post's own images are skipped.",
+      "descripts.ja": "オフにすると圧縮ファイルの添付のみを処理し、投稿自体の画像は取得しません。",
+      "descripts.ko": "끄면 압축 첨부만 처리하고 게시물 자체 이미지는 건너뜁니다.",
+      "descripts.zhtw": "關閉則只處理壓縮檔附件，貼文自帶的圖片會被跳過。",
+      "default": true
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  }
+}

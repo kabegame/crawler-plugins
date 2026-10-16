@@ -1,0 +1,410 @@
+{
+  "name": "kabegame-plugin-aibooru",
+  "version": "1.0.1",
+  "private": true,
+  "name.zh": "AIBooru AI 图库",
+  "name.en": "AIBooru",
+  "name.ja": "AIBooru AI 画像掲示板",
+  "name.ko": "AIBooru AI 이미지 보드",
+  "name.zhtw": "AIBooru AI 圖庫",
+  "description": "AIBooru（Danbooru 分支的 AI 生成图图库）收集源插件，带全量标签与 AI 生成参数（prompt / 负面词 / 采样器 / 种子 / 模型）元数据",
+  "description.zh": "AIBooru（Danbooru 分支的 AI 生成图图库）收集源插件，带全量标签与 AI 生成参数（prompt / 负面词 / 采样器 / 种子 / 模型）元数据",
+  "description.en": "AIBooru (a Danbooru fork for AI-generated art) crawler with full tags and AI generation parameters (prompt, negative prompt, sampler, seed, model)",
+  "description.ja": "AIBooru（AI 生成画像向けの Danbooru フォーク）の収集プラグイン。全タグと AI 生成パラメータ（プロンプト／ネガティブ／サンプラー／シード／モデル）のメタデータ付き",
+  "description.ko": "AIBooru(AI 생성 이미지용 Danbooru 포크) 수집 플러그인. 전체 태그와 AI 생성 파라미터(프롬프트·네거티브·샘플러·시드·모델) 메타데이터 포함",
+  "description.zhtw": "AIBooru（Danbooru 分支的 AI 生成圖圖庫）收集源插件，帶全量標籤與 AI 生成參數（prompt / 負面詞 / 採樣器 / 種子 / 模型）元數據",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://aibooru.online",
+  "kbLabels": [
+    {
+      "id": "content.res.mobile"
+    },
+    {
+      "id": "content.nsfw"
+    },
+    {
+      "id": "content.type.video"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "crawl_mode",
+      "type": "options",
+      "required": true,
+      "name": "爬取模式",
+      "name.en": "Crawl mode",
+      "name.ja": "クロールモード",
+      "name.ko": "크롤 모드",
+      "name.zhtw": "爬取模式",
+      "descripts": "爬取模式，分为全部、标签、人气榜和 id 范围",
+      "descripts.en": "Crawl mode: all, tags, popular or ID range",
+      "descripts.ja": "クロールモード：全部・タグ・人気ランキング・ID 範囲",
+      "descripts.ko": "크롤 모드: 전체·태그·인기 순위·ID 범위",
+      "descripts.zhtw": "爬取模式，分為全部、標籤、人氣榜和 id 範圍",
+      "default": "tags",
+      "options": [
+        {
+          "name": "全部",
+          "name.en": "All",
+          "name.ja": "全部",
+          "name.ko": "전체",
+          "name.zhtw": "全部",
+          "variable": "all"
+        },
+        {
+          "name": "标签",
+          "name.en": "Tags",
+          "name.ja": "タグ",
+          "name.ko": "태그",
+          "name.zhtw": "標籤",
+          "variable": "tags"
+        },
+        {
+          "name": "人气榜",
+          "name.en": "Popular",
+          "name.ja": "人気ランキング",
+          "name.ko": "인기 순위",
+          "name.zhtw": "人氣榜",
+          "variable": "popular"
+        },
+        {
+          "name": "id 范围",
+          "name.en": "ID range",
+          "name.ja": "ID 範囲",
+          "name.ko": "ID 범위",
+          "name.zhtw": "id 範圍",
+          "variable": "id_range"
+        }
+      ]
+    },
+    {
+      "key": "mode_tag_value",
+      "type": "list",
+      "required": true,
+      "name": "标签组合",
+      "name.en": "Tag combination",
+      "name.ja": "タグ組み合わせ",
+      "name.ko": "태그 조합",
+      "name.zhtw": "標籤組合",
+      "descripts": "输入标签（列表），运行时按站点搜索语法用空格连接；标签中的空格会自动转为下划线_。站点限制每次最多 4 个标签（order: 也算一个），超出会拒绝爬取",
+      "descripts.en": "Tags as a list; joined with spaces at runtime and spaces inside a tag become _. The site allows at most 4 tags per search (order: counts as one); more is refused",
+      "descripts.ja": "タグをリストで入力。実行時に空白で連結し、タグ内の空白は _ に変換します。サイトの制限で1回の検索はタグ4個まで（order: も1個に数えます）。超えると実行を拒否します",
+      "descripts.ko": "태그를 목록으로 입력합니다. 실행 시 공백으로 결합하며 태그 내 공백은 _ 로 변환됩니다. 사이트 제한으로 검색당 태그 4개까지(order:도 1개로 셈)이며 초과하면 실행을 거부합니다",
+      "descripts.zhtw": "輸入標籤（列表），執行時以空格連接，標籤中的空格會自動轉為下劃線_。站點限制每次最多 4 個標籤（order: 也算一個），超出會拒絕爬取",
+      "default": [
+        "1girl",
+        "scenery"
+      ],
+      "options": null,
+      "when": {
+        "crawl_mode": [
+          "tags"
+        ]
+      }
+    },
+    {
+      "key": "id_start",
+      "type": "int",
+      "required": true,
+      "name": "起始 id",
+      "name.en": "Start ID",
+      "name.ja": "開始 ID",
+      "name.ko": "시작 ID",
+      "name.zhtw": "起始 id",
+      "descripts": "作品 id 下限（含），即作品页地址里的数字",
+      "descripts.en": "Lowest post ID (inclusive) — the number in the post URL",
+      "descripts.ja": "作品 ID の下限（含む）。作品ページ URL の数字です",
+      "descripts.ko": "작품 ID 하한(포함). 작품 페이지 주소의 숫자입니다",
+      "descripts.zhtw": "作品 id 下限（含），即作品頁網址裡的數字",
+      "default": 1,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "id_end",
+      "type": "int",
+      "required": true,
+      "name": "结束 id",
+      "name.en": "End ID",
+      "name.ja": "終了 ID",
+      "name.ko": "끝 ID",
+      "name.zhtw": "結束 id",
+      "descripts": "作品 id 上限（含），与起始 id 最多相差 5000，否则拒绝爬取。按 id 从小到大抓取，区间里已删除的作品会跳过",
+      "descripts.en": "Highest post ID (inclusive); at most 5000 above the start ID, otherwise the run is refused. Posts are crawled in ascending ID order; deleted posts in the range are skipped",
+      "descripts.ja": "作品 ID の上限（含む）。開始 ID との差は最大 5000 で、超えると実行を拒否します。ID の昇順で取得し、範囲内の削除済み作品は飛ばします",
+      "descripts.ko": "작품 ID 상한(포함). 시작 ID와의 차이는 최대 5000이며 초과하면 실행을 거부합니다. ID 오름차순으로 수집하고 범위 안의 삭제된 작품은 건너뜁니다",
+      "descripts.zhtw": "作品 id 上限（含），與起始 id 最多相差 5000，否則拒絕爬取。依 id 由小到大抓取，區間裡已刪除的作品會跳過",
+      "default": 1000,
+      "options": null,
+      "min": 1,
+      "width": 2,
+      "when": {
+        "crawl_mode": [
+          "id_range"
+        ]
+      }
+    },
+    {
+      "key": "popular_scale",
+      "type": "options",
+      "required": true,
+      "name": "人气榜周期",
+      "name.en": "Popular scale",
+      "name.ja": "人気ランキング期間",
+      "name.ko": "인기 순위 기간",
+      "name.zhtw": "人氣榜週期",
+      "descripts": "人气榜的统计周期。站点按美东时间计日，刚过零点时当天日榜为空，此时自动改抓前一天",
+      "descripts.en": "Time scale of the popular ranking. The site counts days in US Eastern time; right after midnight today's daily ranking is empty, so the previous day is used instead",
+      "descripts.ja": "人気ランキングの集計期間。サイトは米国東部時間で日付を数えるため、深夜0時直後は当日の日間ランキングが空になり、その場合は前日分を取得します",
+      "descripts.ko": "인기 순위 집계 기간. 사이트는 미국 동부 시간 기준으로 날짜를 세므로 자정 직후에는 당일 일간 순위가 비어 있으며, 이때는 전날 순위를 수집합니다",
+      "descripts.zhtw": "人氣榜的統計週期。站點以美東時間計日，剛過零點時當天日榜為空，此時自動改抓前一天",
+      "default": "week",
+      "options": [
+        {
+          "name": "日榜",
+          "name.en": "Day",
+          "name.ja": "日間",
+          "name.ko": "일간",
+          "name.zhtw": "日榜",
+          "variable": "day"
+        },
+        {
+          "name": "周榜",
+          "name.en": "Week",
+          "name.ja": "週間",
+          "name.ko": "주간",
+          "name.zhtw": "週榜",
+          "variable": "week"
+        },
+        {
+          "name": "月榜",
+          "name.en": "Month",
+          "name.ja": "月間",
+          "name.ko": "월간",
+          "name.zhtw": "月榜",
+          "variable": "month"
+        }
+      ],
+      "when": {
+        "crawl_mode": [
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "rating",
+      "type": "options",
+      "name": "分级过滤",
+      "name.en": "Rating filter",
+      "name.ja": "レーティング絞り込み",
+      "name.ko": "등급 필터",
+      "name.zhtw": "分級過濾",
+      "descripts": "按站点分级过滤，默认只抓全年龄。站点 R-18 内容占比很高（人气榜里通常过半），选「不限」前请留意。全部、标签和 id 范围模式把 rating: 拼进搜索串（不占标签名额）；人气榜模式在插件里按每张图的分级筛选，所以一页里符合的可能很少",
+      "descripts.en": "Filter by site rating; General only by default. A large share of the site is R-18 (often over half of the popular ranking), so be careful with Any. All, tags and ID range modes add rating: to the search (it does not count toward the tag limit); popular mode filters each post inside the plugin, so a page may yield only a few matches",
+      "descripts.ja": "サイトのレーティングで絞り込みます。既定は全年齢のみ。サイトは R-18 の割合が高く（人気ランキングでは半数を超えることが多い）、「指定なし」には注意してください。全部・タグ・ID 範囲モードは rating: を検索に付加し（タグ数の制限には数えません）、人気ランキングモードはプラグイン内で作品ごとに絞り込むため、1ページで該当が少ないことがあります",
+      "descripts.ko": "사이트 등급으로 필터링하며 기본값은 전체 이용가만입니다. 사이트의 R-18 비율이 높으므로(인기 순위에서는 절반을 넘는 경우가 많음) 「제한 없음」은 주의하세요. 전체·태그·ID 범위 모드는 검색에 rating:을 추가하며(태그 수 제한에 포함되지 않음), 인기 순위 모드는 플러그인 안에서 작품별로 거르므로 한 페이지에서 해당 작품이 적을 수 있습니다",
+      "descripts.zhtw": "依站台分級過濾，預設只抓全年齡。站台 R-18 內容佔比很高（人氣榜裡通常過半），選「不限」前請留意。全部、標籤和 id 範圍模式把 rating: 拼進搜尋串（不佔標籤名額）；人氣榜模式在插件裡依每張圖的分級篩選，所以一頁裡符合的可能很少",
+      "default": "g",
+      "options": [
+        {
+          "name": "全年龄(General)",
+          "name.en": "General",
+          "name.ja": "全年齢 (General)",
+          "name.ko": "전체 이용가 (General)",
+          "name.zhtw": "全年齡(General)",
+          "variable": "g"
+        },
+        {
+          "name": "敏感(Sensitive)",
+          "name.en": "Sensitive",
+          "name.ja": "センシティブ (Sensitive)",
+          "name.ko": "민감 (Sensitive)",
+          "name.zhtw": "敏感(Sensitive)",
+          "variable": "s"
+        },
+        {
+          "name": "存疑(Questionable)",
+          "name.en": "Questionable",
+          "name.ja": "際どい (Questionable)",
+          "name.ko": "애매함 (Questionable)",
+          "name.zhtw": "存疑(Questionable)",
+          "variable": "q"
+        },
+        {
+          "name": "限制级(Explicit)",
+          "name.en": "Explicit",
+          "name.ja": "露骨 (Explicit)",
+          "name.ko": "노골적 (Explicit)",
+          "name.zhtw": "限制級(Explicit)",
+          "variable": "e"
+        },
+        {
+          "name": "不限",
+          "name.en": "Any",
+          "name.ja": "指定なし",
+          "name.ko": "제한 없음",
+          "name.zhtw": "不限",
+          "variable": ""
+        }
+      ]
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "起始页面",
+      "name.en": "Start page",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁面",
+      "descripts": "要拉取的起始页面",
+      "descripts.en": "Start page to crawl from",
+      "descripts.ja": "取得開始ページ",
+      "descripts.ko": "가져올 시작 페이지",
+      "descripts.zhtw": "要拉取的起始頁面",
+      "default": 1,
+      "min": 1,
+      "max": null,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags",
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "结束页数",
+      "name.en": "End page",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "要拉取的结束页面。请保持最多爬取100页，降低并发量文明爬取。否则拒绝爬取",
+      "descripts.en": "End page. Keep at most 100 pages per run.",
+      "descripts.ja": "終了ページ。1回あたり100ページ以内にしてください。",
+      "descripts.ko": "끝 페이지. 실행당 최대 100페이지로 제한됩니다.",
+      "descripts.zhtw": "要拉取的結束頁面。請保持最多爬取100頁，降低並發量文明爬取。否則拒絕爬取",
+      "default": 1,
+      "min": 1,
+      "max": null,
+      "when": {
+        "crawl_mode": [
+          "all",
+          "tags",
+          "popular"
+        ]
+      }
+    },
+    {
+      "key": "per_page",
+      "type": "options",
+      "required": true,
+      "name": "每页条数",
+      "name.en": "Posts per page",
+      "name.ja": "1ページあたりの件数",
+      "name.ko": "페이지당 개수",
+      "name.zhtw": "每頁條數",
+      "descripts": "每页的作品数量，站点网页默认 100 条",
+      "descripts.en": "Posts per page; the site's own default is 100",
+      "descripts.ja": "1ページあたりの作品数。サイトの既定は100件です",
+      "descripts.ko": "페이지당 작품 수. 사이트 기본값은 100개입니다",
+      "descripts.zhtw": "每頁的作品數量，站點網頁預設 100 條",
+      "default": "100",
+      "options": [
+        {
+          "name": "20",
+          "variable": "20"
+        },
+        {
+          "name": "50",
+          "variable": "50"
+        },
+        {
+          "name": "100",
+          "variable": "100"
+        },
+        {
+          "name": "200",
+          "variable": "200"
+        }
+      ]
+    },
+    {
+      "key": "quality",
+      "type": "options",
+      "required": true,
+      "name": "质量",
+      "name.en": "Quality",
+      "name.ja": "画質",
+      "name.ko": "화질",
+      "name.zhtw": "畫質",
+      "descripts": "高=原图（PNG 原图常带完整生成参数），中=站点缩放后的 sample（JPEG/WebP，体积小）",
+      "descripts.en": "High = original file (original PNGs often keep the full generation parameters), Medium = the site's resized sample (smaller JPEG/WebP)",
+      "descripts.ja": "高＝オリジナル（PNG の原本には生成パラメータが残っていることが多い）、中＝サイトのリサイズ版 sample（小さい JPEG/WebP）",
+      "descripts.ko": "고화질 = 원본 파일(PNG 원본에는 생성 파라미터가 남아 있는 경우가 많음), 중간 = 사이트가 축소한 sample(작은 JPEG/WebP)",
+      "descripts.zhtw": "高＝原圖（PNG 原圖常帶完整生成參數），中＝站點縮放後的 sample（JPEG/WebP，體積小）",
+      "default": "high",
+      "options": [
+        {
+          "name": "高",
+          "name.en": "High",
+          "name.ja": "高",
+          "name.ko": "고화질",
+          "name.zhtw": "高",
+          "variable": "high"
+        },
+        {
+          "name": "中",
+          "name.en": "Medium",
+          "name.ja": "中",
+          "name.ko": "중간",
+          "name.zhtw": "中",
+          "variable": "medium"
+        }
+      ]
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md",
+    "en": "README.en.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbRecommendedConfigs": [
+    "configs/popular-week.json",
+    "configs/scenery.json"
+  ],
+  "kbPathQLProviders": [
+    "providers/entry_provider.json5",
+    "providers/number_range_provider.json5",
+    "providers/number_range_router.json5",
+    "providers/rating_provider.json5",
+    "providers/rating_router.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

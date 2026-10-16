@@ -42,6 +42,17 @@ interface PluginPackageJson {
   [key: string]: unknown;
 }
 
+/** 插件包名（= 目录名）的可选前缀；插件 id 是剥离后的值。 */
+const PLUGIN_PACKAGE_PREFIX = "kabegame-plugin-";
+
+/** 与 package-plugin.ts / kabegame-core `plugin::plugin_id_from_package_name` 同构。 */
+function pluginIdFromPackageName(name: string): string {
+  return name.startsWith(PLUGIN_PACKAGE_PREFIX) &&
+      name.length > PLUGIN_PACKAGE_PREFIX.length
+    ? name.slice(PLUGIN_PACKAGE_PREFIX.length)
+    : name;
+}
+
 /** 从 manifest 中复制 name / name.zh / description / description.zh 等扁平键到目标对象（供 index.json 写入，由后端解析生成 i18n 对象） */
 function copyFlatI18nKeys(
   manifest: Record<string, unknown>,
@@ -202,8 +213,10 @@ function generateIndex(options: GenerateIndexOptions): string {
 
   const plugins: PluginInfo[] = [];
 
-  for (const pluginName of pluginDirs) {
-    const pluginDir = path.join(PLUGIN_DIR, pluginName);
+  for (const dirName of pluginDirs) {
+    const pluginDir = path.join(PLUGIN_DIR, dirName);
+    // 目录名 = package.json 的 name（可带 kabegame-plugin- 前缀）；索引 id 与 kgpg 文件名用剥离后的插件 id
+    const pluginName = pluginIdFromPackageName(dirName);
     const packageJsonPath = path.join(pluginDir, "package.json");
     const manifestPath = path.join(pluginDir, "manifest.json");
     const kgpgFile = path.join(OUTPUT_DIR, `${pluginName}.kgpg`);
@@ -281,6 +294,10 @@ function generateIndex(options: GenerateIndexOptions): string {
         pluginInfo.minAppVersion = minAppVersion;
       }
       copyFlatI18nKeys(manifestRaw, pluginInfo, "name");
+      // 无语言后缀的 name 是包名，作显示名回退时应为插件 id（与应用加载 kgpg 时一致）
+      if (typeof pluginInfo.name === "string") {
+        pluginInfo.name = pluginIdFromPackageName(pluginInfo.name);
+      }
       copyFlatI18nKeys(manifestRaw, pluginInfo, "description");
       if (Array.isArray(manifestRaw.kbLabels)) {
         pluginInfo.kbLabels = manifestRaw.kbLabels;
@@ -288,8 +305,8 @@ function generateIndex(options: GenerateIndexOptions): string {
 
       plugins.push(pluginInfo);
       const displayName =
-        (manifest.name as string) ||
         (manifest["name.zh"] as string) ||
+        (pluginInfo.name as string) ||
         pluginName;
       console.log(
         chalk.green(

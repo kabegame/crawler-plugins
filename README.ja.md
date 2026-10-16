@@ -13,8 +13,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: anihonetアニメ壁紙収集プラグイン  
 **作者**: Kabegame
 
-**パス**: `plugins/anihonet-wallpaper/`  
-**ドキュメント**: [plugins/anihonet-wallpaper/README.md](plugins/anihonet-wallpaper/README.md)
+**パス**: `plugins/kabegame-plugin-anihonet-wallpaper/`  
+**ドキュメント**: [plugins/kabegame-plugin-anihonet-wallpaper/README.md](plugins/kabegame-plugin-anihonet-wallpaper/README.md)
 
 **機能**:
 - anihonetwallpaper.com からアニメ壁紙を取得
@@ -36,8 +36,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: anime-picturesアニメ図庫収集プラグイン（タグ検索可）  
 **作者**: Kabegame
 
-**パス**: `plugins/anime-pictures/`  
-**ユーザー向けドキュメント**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
+**パス**: `plugins/kabegame-plugin-anime-pictures/`  
+**ユーザー向けドキュメント**: [plugins/kabegame-plugin-anime-pictures/README.md](plugins/kabegame-plugin-anime-pictures/README.md)
 
 **機能**:
 - [anime-pictures.net](https://anime-pictures.net) からタグ・ページ範囲で壁紙を一括取得
@@ -59,7 +59,7 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: konachanアニメ壁紙収集プラグイン  
 **作者**: Kabegame
 
-**パス**: `plugins/konachan/`
+**パス**: `plugins/kabegame-plugin-konachan/`
 
 **機能**:
 - konachan.net からアニメ壁紙を取得
@@ -82,8 +82,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: ziworld高品質壁紙収集プラグイン  
 **作者**: Kabegame
 
-**パス**: `plugins/ziworld/`  
-**ユーザー向けドキュメント**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
+**パス**: `plugins/kabegame-plugin-ziworld/`  
+**ユーザー向けドキュメント**: [plugins/kabegame-plugin-ziworld/README.md](plugins/kabegame-plugin-ziworld/README.md)
 
 **機能**:
 - [ziworld](https://t.ziworld.top/date.json) から壁紙を取得
@@ -103,8 +103,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: Danbooru 画像掲示板の収集プラグイン（全タグのメタデータ付き）  
 **作者**: Kabegame
 
-**パス**: `plugins/danbooru/`  
-**ドキュメント**: [plugins/danbooru/README.ja.md](plugins/danbooru/README.ja.md)
+**パス**: `plugins/kabegame-plugin-danbooru/`  
+**ドキュメント**: [plugins/kabegame-plugin-danbooru/README.ja.md](plugins/kabegame-plugin-danbooru/README.ja.md)
 
 **機能**:
 - danbooru.donmai.us（または全年齢のみの safebooru.donmai.us）から作品を取得
@@ -134,8 +134,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: Gelbooru 画像掲示板の収集プラグイン（全タグのメタデータ付き）  
 **作者**: Kabegame
 
-**パス**: `plugins/gelbooru/`  
-**ドキュメント**: [plugins/gelbooru/README.ja.md](plugins/gelbooru/README.ja.md)
+**パス**: `plugins/kabegame-plugin-gelbooru/`  
+**ドキュメント**: [plugins/kabegame-plugin-gelbooru/README.ja.md](plugins/kabegame-plugin-gelbooru/README.ja.md)
 
 **機能**:
 - gelbooru.com から作品を取得
@@ -164,8 +164,8 @@ Kabegame 画像収集システム向けのクローラープラグインをま�
 **説明**: Zerochan 画像掲示板の収集プラグイン。全体・タグ・任意のキーワード検索に対応し、新着／人気で並べ替えできます  
 **作者**: Kabegame
 
-**パス**: `plugins/zerochan/`  
-**ドキュメント**: [plugins/zerochan/README.ja.md](plugins/zerochan/README.ja.md)
+**パス**: `plugins/kabegame-plugin-zerochan/`  
+**ドキュメント**: [plugins/kabegame-plugin-zerochan/README.ja.md](plugins/kabegame-plugin-zerochan/README.ja.md)
 
 **機能**:
 - zerochan.net から画像を取得。サイトは完全な SSR なので `fetch` + DOM 解析のみで動作（WebView 不要）
@@ -282,7 +282,7 @@ pnpm prepare
 メインプロジェクトのルートで：
 
 ```bash
-pnpm run package-plugin crawler-plugins/plugins/<プラグイン名>
+pnpm run package-plugin crawler-plugins/plugins/kabegame-plugin-<プラグイン名>
 ```
 
 出力: `crawler-plugins/packed/<プラグイン名>.kgpg`

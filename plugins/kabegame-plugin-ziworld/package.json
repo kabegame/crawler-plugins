@@ -1,0 +1,112 @@
+{
+  "name": "kabegame-plugin-ziworld",
+  "version": "0.5.2",
+  "private": true,
+  "name.zh": "ziworld高质量壁纸",
+  "name.en": "ziworld high-quality wallpapers",
+  "name.ja": "ziworld高品質壁紙",
+  "name.ko": "ziworld 고품질 벽지",
+  "description": "ziworld高质量壁纸收集源插件",
+  "description.zh": "ziworld高质量壁纸收集源插件",
+  "description.en": "ziworld high-quality wallpaper crawler plugin",
+  "description.ja": "ziworld高品質壁紙収集プラグイン",
+  "description.ko": "ziworld 고품질 벽지 수집 플러그인",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://t.ziworld.top",
+  "kbLabels": [
+    { "id": "content.type.video" },
+    { "id": "content.res.mobile" },
+    { "id": "content.res.desktop" }
+  ],
+  "kbAssets": [
+    "banners/homepage.jpg"
+  ],  
+  "kbConfig": [
+    {
+      "key": "category",
+      "type": "checkbox",
+      "required": true,
+      "name": "目录",
+      "name.en": "Category",
+      "name.ja": "カテゴリ",
+      "name.ko": "카테고리",
+      "name.zhtw": "目錄",
+      "descripts": "勾选要拉取的目录（可多选）",
+      "descripts.en": "Select categories to crawl (multiple)",
+      "descripts.ja": "取得するカテゴリを選択（複数可）",
+      "descripts.ko": "수집할 카테고리 선택 (복수 선택 가능)",
+      "descripts.zhtw": "勾選要拉取的目錄（可多選）",
+      "default": [
+        "PC",
+        "背景",
+        "二次元",
+        "移动端",
+        "手机壁纸",
+        "横版壁纸",
+        "头像",
+        "萌图MP",
+        "萌图PC",
+        "原神",
+        "崩坏",
+        "鸣潮",
+        "鬼刀",
+        "初音未来",
+        "video",
+        "七濑胡桃",
+        "未归类"
+      ],
+      "options": [
+        "PC",
+        "背景",
+        "二次元",
+        "移动端",
+        "手机壁纸",
+        "横版壁纸",
+        "头像",
+        "萌图MP",
+        "萌图PC",
+        "原神",
+        "崩坏",
+        "鸣潮",
+        "鬼刀",
+        "初音未来",
+        "video",
+        "七濑胡桃",
+        "未归类"
+      ]
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "en": "README.en.md",
+    "ja": "README.ja.md",
+    "ko": "README.ko.md",
+    "default": "README.md",
+    "zhtw": "README.zhtw.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbPathQLProviders": [
+    "providers/directory_provider.json5",
+    "providers/entry_provider.json5"
+  ],
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

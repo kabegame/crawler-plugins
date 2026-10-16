@@ -42,7 +42,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 
 它会下载作品原图，多页插画和漫画也能逐页保存；排行榜还覆盖原创、AI、新人、男性向与女性向等维度。部分模式可匿名使用，个人收藏和 R18 内容需要登录，通常也需要可访问 Pixiv 的网络环境。
 
-[查看插件目录](plugins/pixiv/) · [使用说明](plugins/pixiv/README.md)
+[查看插件目录](plugins/kabegame-plugin-pixiv/) · [使用说明](plugins/kabegame-plugin-pixiv/README.md)
 
 #### PixAI
 
@@ -50,7 +50,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 
 除了全站趋势和作品榜，它还能浏览热门生成模型、按标签或作者收集，并支持动图内容。它的优势不是“再来一个图片站”，而是能沿着生成生态持续发现风格相近的作品；通常需要代理网络。
 
-[查看插件目录](plugins/pixai/)
+[查看插件目录](plugins/kabegame-plugin-pixai/)
 
 #### anime-pictures
 
@@ -58,7 +58,7 @@ Kabegame应用插件仓库，[Kabegame](https://github.com/kabegame/kabegame) �
 
 anime-pictures 的标签体系很细，特别适合批量收某个角色、IP 或题材的高清动漫图。给它一个站内标签和页码范围，它就会进入详情页取大图；通常需要代理网络。
 
-[查看插件目录](plugins/anime-pictures/) · [使用说明](plugins/anime-pictures/README.md)
+[查看插件目录](plugins/kabegame-plugin-anime-pictures/) · [使用说明](plugins/kabegame-plugin-anime-pictures/README.md)
 
 #### Konachan
 
@@ -66,7 +66,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 既可以直接抓全站最新图片，也可以组合标签缩小范围，或者按日 / 周 / 月榜抓人气作品并回溯往期；下载时侧栏标签会按类型写入应用的标签分区；同时提供大众站与 R18 站入口，并可选择图片质量。站内可能出现成人内容，通常需要代理网络，请按自身需求和所在地规则使用。
 
-[查看插件目录](plugins/konachan/) · [使用说明](plugins/konachan/README.md)
+[查看插件目录](plugins/kabegame-plugin-konachan/) · [使用说明](plugins/kabegame-plugin-konachan/README.md)
 
 #### Danbooru
 
@@ -74,7 +74,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 它把详情页的全量标签写进每张图的元数据：按 作家 / 版权 / 角色 / 通用 / 元信息 分好类，并写入应用的标签分区；画廊里还能按分数、收藏数和分级筛选已下载的图。抓取上支持标签组合、日/周/月人气榜和全站最新三种模式，可切全站或全年龄镜像，全站可按分级（General / Sensitive / Questionable / Explicit）过滤，质量可选原图直链或站点 sample。注意站点对未登录/普通账号限制每次检索最多 2 个标签；站内有成人内容，通常需要代理网络。
 
-[查看插件目录](plugins/danbooru/) · [使用说明](plugins/danbooru/README.md)
+[查看插件目录](plugins/kabegame-plugin-danbooru/) · [使用说明](plugins/kabegame-plugin-danbooru/README.md)
 
 #### Gelbooru
 
@@ -82,7 +82,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 它同样把详情页的全量标签写进每张图的元数据（作家 / 角色 / 版权 / 元信息 / 通用），图片详情侧栏按站点原样的配色渲染，可一键复制成 prompt；这些标签也会进入应用级标签画册，供浏览和筛选。抓取支持标签组合、全站最新和「先浏览标签表再逐个标签抓」三种模式，排序可选最新 / 高分 / 最近更新 / 随机，质量可选原图直链或站点 sample，视频帖直接取原 mp4。注意站点每页固定 42 张（未登录时无法调整）；站内有成人内容，通常需要代理网络。
 
-[查看插件目录](plugins/gelbooru/) · [使用说明](plugins/gelbooru/README.md)
+[查看插件目录](plugins/kabegame-plugin-gelbooru/) · [使用说明](plugins/kabegame-plugin-gelbooru/README.md)
 
 #### Safebooru
 
@@ -90,7 +90,7 @@ anime-pictures 的标签体系很细，特别适合批量收某个角色、IP �
 
 Safebooru 是 Gelbooru 的全年龄站，插件走站点匿名可用的官方 API：一页一次请求就拿到帖子和带分类的全量标签，比逐个打开详情页快得多，页码也和网页列表一一对应。抓取支持标签组合、全站最新和「先浏览标签表再逐个标签抓」三种模式，排序可选最新 / 高分 / 最近更新 / 随机；标签组合里可以直接写 `width:>=1920`、`score:>=100` 这类元标签，按分辨率挑壁纸很方便。元数据含全量标签、发布时间、上传者、来源、评分，有评论的帖子还会附带评论区；图片详情侧栏按站点详情页的样子渲染，标签按分类写入应用的标签分区。直连很慢，通常需要代理网络。
 
-[查看插件目录](plugins/safebooru/) · [使用说明](plugins/safebooru/README.md)
+[查看插件目录](plugins/kabegame-plugin-safebooru/) · [使用说明](plugins/kabegame-plugin-safebooru/README.md)
 
 #### AIBooru
 
@@ -98,7 +98,7 @@ Safebooru 是 Gelbooru 的全年龄站，插件走站点匿名可用的官方 AP
 
 AIBooru 是基于 Danbooru 的 AI 生成图图库，插件走站点公开的 JSON 接口，一页一次请求就拿到帖子、上传者、作者评论、评论区和 **AI 生成参数**（prompt、负面词、采样器、种子、步数、CFG、模型）。标签按 作家 / 模型 / 版权 / 角色 / 通用 / 元信息 分类写入应用的标签分区，其中「模型」一类能直接按生成模型浏览；prompt 和模型名也能被元数据搜索搜到。抓取支持标签组合、日/周/月人气榜、全站最新和 id 范围四种模式，质量可选原图（PNG 原图常带完整生成参数）或站点 sample。站内 R-18 内容占比很高，分级过滤默认只抓全年龄；匿名每次检索最多 4 个标签。
 
-[查看插件目录](plugins/aibooru/) · [使用说明](plugins/aibooru/README.md)
+[查看插件目录](plugins/kabegame-plugin-aibooru/) · [使用说明](plugins/kabegame-plugin-aibooru/README.md)
 
 #### yande.re
 
@@ -106,7 +106,7 @@ AIBooru 是基于 Danbooru 的 AI 生成图图库，插件走站点公开的 JSO
 
 站点和 Konachan 是同一套程序（Moebooru），标签检索的手感一致，但收录偏向高分辨率扫图。抓取支持全站最新、标签组合和排行榜三种模式，排行榜可按日 / 周 / 月回溯往期，可按分级（全年龄 / 存疑 / 限制级）过滤，排序可选最新 / 高分 / 分辨率 / 随机，质量可选原文件直链或站点 sample。元数据除了侧栏标签、统计信息和相关作品，**还会还原详情页下方的评论区**（作者、头像、时间、正文），在图片详情侧栏一并渲染；侧栏标签会按类型写入应用的标签分区，画廊里还可按分数和分级筛选。站内成人内容与全年龄内容混排，通常需要代理网络。
 
-[查看插件目录](plugins/yandere/) · [使用说明](plugins/yandere/README.md)
+[查看插件目录](plugins/kabegame-plugin-yandere/) · [使用说明](plugins/kabegame-plugin-yandere/README.md)
 
 #### Zerochan
 
@@ -114,7 +114,7 @@ AIBooru 是基于 Danbooru 的 AI 生成图图库，插件走站点公开的 JSO
 
 Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作品 / 角色 / 主题 / 来源）并记着是谁加的；每张图还带一条原作发布页 URL（Pixiv、Twitter、DeviantArt……）。插件把这些连同分享文本和收藏统计一起写进元数据，图片详情侧栏按站点原样的配色和图标还原出右侧栏，区块文案跟随应用语言。抓取支持浏览全站、单个站内标签和任意关键词搜索三种模式，都可按最新或人气排序，质量可选原图直链或站点 1024px 预览。站点有一道 bot 校验，插件会自动通过；未登录时每页看不全，通常需要代理网络。
 
-[查看插件目录](plugins/zerochan/) · [使用说明](plugins/zerochan/README.md)
+[查看插件目录](plugins/kabegame-plugin-zerochan/) · [使用说明](plugins/kabegame-plugin-zerochan/README.md)
 
 #### anihonet-wallpaper
 
@@ -122,7 +122,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 可以追日榜、周榜、月榜和年榜，也能从庞大的作品列表中直达某部动画或游戏，或按关键词搜索并控制新旧、随机排序。手机与桌面壁纸都有，特别适合定期补充轮播图库。
 
-[查看插件目录](plugins/anihonet-wallpaper/) · [使用说明](plugins/anihonet-wallpaper/README.md)
+[查看插件目录](plugins/kabegame-plugin-anihonet-wallpaper/) · [使用说明](plugins/kabegame-plugin-anihonet-wallpaper/README.md)
 
 #### 2dwallpapers
 
@@ -132,7 +132,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 输入部分作品名即可匹配站内游戏/动漫分类，例如 Genshin 或 Honkai；也能浏览未分类作品。比全站漫游更聚焦，很适合给某个主题单独建相册。
 
-[查看插件目录](plugins/twodwallpapers/) · [使用说明](plugins/twodwallpapers/README.md)
+[查看插件目录](plugins/kabegame-plugin-twodwallpapers/) · [使用说明](plugins/kabegame-plugin-twodwallpapers/README.md)
 
 ### 社区、帖子与创作者
 
@@ -142,7 +142,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 支持关键词搜索、单帖链接和作者主页三种入口，正文图片会完整收集，还能选择把评论区配图一起带走。相比通用插画站，它更接近玩家社区里正在流行的内容。
 
-[查看插件目录](plugins/miyoushe/) · [使用说明](plugins/miyoushe/README.md)
+[查看插件目录](plugins/kabegame-plugin-miyoushe/) · [使用说明](plugins/kabegame-plugin-miyoushe/README.md)
 
 #### bilibili 专栏
 
@@ -150,7 +150,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 可以按关键词批量搜索专栏，也可以只处理一个 `cv` 专栏或 Opus 链接，并保留标题等来源信息。关键词搜索和传统专栏依赖 B 站登录态，Opus 单帖通常更轻量。
 
-[查看插件目录](plugins/bilibili/) · [使用说明](plugins/bilibili/README.md)
+[查看插件目录](plugins/kabegame-plugin-bilibili/) · [使用说明](plugins/kabegame-plugin-bilibili/README.md)
 
 #### 小黑盒
 
@@ -158,7 +158,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 既能按关键词找帖，也能精准处理一条分享链接；正文和评论区图片都可以收。单帖链接更准、也更不容易触发风控；批量搜索时使用登录态通常更稳定。
 
-[查看插件目录](plugins/heybox/) · [使用说明](plugins/heybox/README.md)
+[查看插件目录](plugins/kabegame-plugin-heybox/) · [使用说明](plugins/kabegame-plugin-heybox/README.md)
 
 #### 小红书：怎么选
 
@@ -175,7 +175,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 支持小红书详情链接和短链；登录后推荐流会更贴近你的兴趣，未登录也能使用通用推荐。它不会绕过站点签名或访问控制，因此能力边界清晰、运行也更轻。
 
-[查看插件目录](plugins/xhs/) · [使用说明](plugins/xhs/README.md)
+[查看插件目录](plugins/kabegame-plugin-xhs/) · [使用说明](plugins/kabegame-plugin-xhs/README.md)
 
 ##### 小红书（WebView）
 
@@ -183,7 +183,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 它在真实网页中滚动加载并逐条进入详情，能沿用畅游里的登录状态；遇到登录或验证码时也可以直接在窗口内完成。收藏和点赞等私人列表需要对应账号本来就有访问权限。
 
-[查看插件目录](plugins/xhs-webview/) · [使用说明](plugins/xhs-webview/README.md)
+[查看插件目录](plugins/kabegame-plugin-xhs-webview/) · [使用说明](plugins/kabegame-plugin-xhs-webview/README.md)
 
 #### Kemono
 
@@ -191,7 +191,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 支持 Patreon、Fanbox、Fantia、Afdian 等多种来源，也能处理单帖链接。默认使用较稳定的 800px 缩略图；原图节点在许多网络环境中不可达。站内可能包含成人内容，收藏模式需要先登录。
 
-[查看插件目录](plugins/kemono/) · [使用说明](plugins/kemono/README.md)
+[查看插件目录](plugins/kabegame-plugin-kemono/) · [使用说明](plugins/kabegame-plugin-kemono/README.md)
 
 #### Patreon（WebView）
 
@@ -199,7 +199,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 真实浏览器后端可以通过 Patreon 的正常登录与 Cloudflare 检查，并把 ZIP、7z、tar 等压缩包中的图片逐张入库。它不会绕订阅墙或 DRM，也不处理 Patreon 视频；只能下载当前账号本来就能访问的内容。
 
-[查看插件目录](plugins/patreon-webview/) · [使用说明](plugins/patreon-webview/README.md)
+[查看插件目录](plugins/kabegame-plugin-patreon-webview/) · [使用说明](plugins/kabegame-plugin-patreon-webview/README.md)
 
 #### X（Twitter）媒体（WebView）
 
@@ -207,7 +207,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 五种模式：画师主页的「媒体」、搜索结果（支持 `#话题 min_faves:1000`、`from:画师 since:… until:…` 等高级语法）、单条推文链接，以及自己的书签和点赞。在真实网页里打开页面并自动滚动，截获页面自己加载的数据：图片取原图，视频取码率最高的 MP4，推文正文、发布时间、互动数和评论区回复一起保存（评论区图片可选下载），话题标签和画师挂成标签画册。开启「只补充上次之后的新推文」后，适合配成定时任务。需要先在畅游里登录 x.com，中国大陆需要代理。
 
-[查看插件目录](plugins/x-webview/) · [使用说明](plugins/x-webview/README.md)
+[查看插件目录](plugins/kabegame-plugin-x-webview/) · [使用说明](plugins/kabegame-plugin-x-webview/README.md)
 
 ### 视频
 
@@ -217,7 +217,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 支持 BV/av 号或链接、UP 主投稿、合集/系列、收藏夹以及关键词搜索；分离的音视频流会自动合流。登录后画质更稳定，大会员可获取账号有权播放的 4K/HDR；合流依赖 FFmpeg，目前不支持 Android，也不支持番剧、课程和直播。
 
-[查看插件目录](plugins/bilibili-video/) · [使用说明](plugins/bilibili-video/README.md)
+[查看插件目录](plugins/kabegame-plugin-bilibili-video/) · [使用说明](plugins/kabegame-plugin-bilibili-video/README.md)
 
 ### 综合壁纸站
 
@@ -227,7 +227,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 可按图片/视频、设备类型和标签缩小范围，详情元数据里还会保留作者、色系、分辨率等信息。相关标签会以拼音 key、作者会以站内用户 ID 自动写入应用标签；插件扩展可按目录、下载量、收藏量和色彩浏览。插件获取的是站点可直接访问的预览资源，而不是需要登录的原图端点。
 
-[查看插件目录](plugins/haowallpaper/) · [使用说明](plugins/haowallpaper/README.md)
+[查看插件目录](plugins/kabegame-plugin-haowallpaper/) · [使用说明](plugins/kabegame-plugin-haowallpaper/README.md)
 
 #### ziworld
 
@@ -235,7 +235,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 目录覆盖 PC、手机、横屏、头像、二次元、原神、崩坏、鸣潮和视频壁纸等，一次可选多个主题。站点更新不算频繁，但内容精致，很适合快速搭一套基础图库。
 
-[查看插件目录](plugins/ziworld/) · [使用说明](plugins/ziworld/README.md)
+[查看插件目录](plugins/kabegame-plugin-ziworld/) · [使用说明](plugins/kabegame-plugin-ziworld/README.md)
 
 #### WallpapersCraft
 
@@ -243,7 +243,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 动漫、自然、城市、汽车、极简、科技等目录一应俱全，也能按标签、热度、日期和具体分辨率筛选。尤其适合明确知道屏幕尺寸，希望下载后无需再裁切的人。
 
-[查看插件目录](plugins/wallpapers-craft/) · [使用说明](plugins/wallpapers-craft/README.md)
+[查看插件目录](plugins/kabegame-plugin-wallpapers-craft/) · [使用说明](plugins/kabegame-plugin-wallpapers-craft/README.md)
 
 #### Wallspic
 
@@ -251,7 +251,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 它和 WallpapersCraft 都适合通用壁纸，但 Wallspic 更强调专辑、热门排序和设备预设；iPhone、Android、宽屏与 Ultra HD 都有现成入口。
 
-[查看插件目录](plugins/wallspic/) · [使用说明](plugins/wallspic/README.md)
+[查看插件目录](plugins/kabegame-plugin-wallspic/) · [使用说明](plugins/kabegame-plugin-wallspic/README.md)
 
 #### wallhaven
 
@@ -259,7 +259,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 可在插件表单中配置关键词、分类、分级、排序、最低分辨率与比例，也可直接粘贴站点搜索页 URL；URL 中的分页参数会被忽略，实际页码由插件的起止页控制。每张图都会保存原图、标签、上传者、配色和来源等元数据，标签也会写进应用的标签画册。站点 API 每分钟最多 45 次请求，每页大约要 40 秒；中国大陆访问通常需要代理。
 
-[查看插件目录](plugins/wallhaven/) · [使用说明](plugins/wallhaven/README.md)
+[查看插件目录](plugins/kabegame-plugin-wallhaven/) · [使用说明](plugins/kabegame-plugin-wallhaven/README.md)
 
 找不到想要的插件？请提一个issue吧，或者等待将来陆续推出！
 
@@ -273,7 +273,7 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 
 ## 仓库开发
 
-每个插件都位于 `plugins/<插件名>/`，入口与元数据以插件自己的 `package.json` 为准，用户文档位于 `README.md`。
+每个插件都位于 `plugins/kabegame-plugin-<插件 id>/`，目录名与 `package.json` 的 `name` 一致；应用加载时剥离 `kabegame-plugin-` 前缀作为插件 id，打包产物仍是 `<插件 id>.kgpg`。入口与元数据以插件自己的 `package.json` 为准，用户文档位于 `README.md`。
 
 首次安装依赖：
 

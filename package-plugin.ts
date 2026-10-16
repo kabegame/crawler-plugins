@@ -130,6 +130,27 @@ function validatePluginId(pluginId: string): void {
   }
 }
 
+/** 插件包名（= 目录名）的可选前缀；插件 id 是剥离后的值。 */
+const PLUGIN_PACKAGE_PREFIX = "kabegame-plugin-";
+
+/**
+ * package.json 的 name / 目录名 → 插件 id：剥离可选的 `kabegame-plugin-` 前缀，剥完为空则原样。
+ * 与 kabegame-core `plugin::plugin_id_from_package_name` 同构。
+ */
+function pluginIdFromPackageName(name: string): string {
+  return name.startsWith(PLUGIN_PACKAGE_PREFIX) &&
+      name.length > PLUGIN_PACKAGE_PREFIX.length
+    ? name.slice(PLUGIN_PACKAGE_PREFIX.length)
+    : name;
+}
+
+/** 命令行给的插件 id（或完整目录名）→ plugins/ 下的目录名。 */
+function resolvePluginDirName(arg: string): string {
+  const prefixed = PLUGIN_PACKAGE_PREFIX + pluginIdFromPackageName(arg);
+  if (fs.existsSync(path.join(PLUGIN_DIR, prefixed))) return prefixed;
+  return arg;
+}
+
 function ensureCli(): void {
   if (!fs.existsSync(CLI_EXE)) {
     throw new Error(`找不到 cli ${CLI_EXE} 请在kabegame父仓库构建cli工具！`);
@@ -472,13 +493,22 @@ async function packagePlugin(
   return new Promise(async (resolve, reject) => {
     try {
       const pkg = readPluginPackageJson(pluginDir);
-      const pluginId = path.basename(pluginDir);
-      validatePluginId(pluginId);
-      if (typeof pkg?.name === "string") {
-        validatePluginId(pkg.name);
+      // 目录名 = package.json 的 name（可带 kabegame-plugin- 前缀），输出 stem = 剥离后的插件 id
+      const dirName = path.basename(pluginDir);
+      if (typeof pkg?.name === "string" && pkg.name !== dirName) {
+        throw new Error(
+          `package.json name "${pkg.name}" 必须等于目录名 "${dirName}"`,
+        );
       }
+      const pluginId = pluginIdFromPackageName(dirName);
+      validatePluginId(pluginId);
       if (pkg) validateVarDefs(pkg);
-      validatePluginId(path.basename(outputFile, ".kgpg"));
+      const outputStem = path.basename(outputFile, ".kgpg");
+      if (outputStem !== pluginId) {
+        throw new Error(
+          `输出文件名 "${outputStem}.kgpg" 必须是插件 ID "${pluginId}.kgpg"`,
+        );
+      }
       if (isV3PluginPackage(pkg)) {
         const main = pkg?.main;
         if (!main || typeof main !== "string") {
@@ -557,8 +587,9 @@ async function packageAllPlugins(outputDir: string): Promise<void> {
   console.log(chalk.cyan(`找到 ${pluginDirs.length} 个插件目录:\n`));
 
   // 打包每个插件
-  const promises = pluginDirs.map(async (pluginName) => {
-    const pluginDir = path.join(PLUGIN_DIR, pluginName);
+  const promises = pluginDirs.map(async (dirName) => {
+    const pluginDir = path.join(PLUGIN_DIR, dirName);
+    const pluginName = pluginIdFromPackageName(dirName);
     const outputFile = path.join(outputDir, `${pluginName}.kgpg`);
 
     try {
@@ -599,7 +630,9 @@ async function packageSinglePlugin(
 ): Promise<void> {
   console.log(chalk.blue(`📦 开始打包插件: ${pluginName}\n`));
 
-  const pluginDir = path.join(PLUGIN_DIR, pluginName);
+  // 参数可以是插件 id（wallhaven）或完整目录名（kabegame-plugin-wallhaven）
+  const pluginDir = path.join(PLUGIN_DIR, resolvePluginDirName(pluginName));
+  pluginName = pluginIdFromPackageName(path.basename(pluginDir));
 
   // 检查插件目录是否存在
   if (!fs.existsSync(pluginDir)) {
@@ -627,6 +660,8 @@ async function packageOnlyPlugins(
   pluginNames: string[],
   outputDir: string,
 ): Promise<void> {
+  // 参数可以是插件 id 或完整目录名，统一成 id（输出文件名 / 保留列表都按 id）
+  pluginNames = pluginNames.map(pluginIdFromPackageName);
   console.log(
     chalk.blue(
       `📦 开始打包指定插件 (${pluginNames.length} 个): ${pluginNames.join(
@@ -647,7 +682,7 @@ async function packageOnlyPlugins(
 
   const results: PluginResult[] = [];
   for (const pluginName of pluginNames) {
-    const pluginDir = path.join(PLUGIN_DIR, pluginName);
+    const pluginDir = path.join(PLUGIN_DIR, resolvePluginDirName(pluginName));
     if (!fs.existsSync(pluginDir)) {
       console.error(chalk.red(`❌ 插件目录不存在: ${pluginDir}`));
       results.push({
@@ -695,10 +730,10 @@ program
   .option("--outputDir <dir>", "输出目录（别名）")
   .option(
     "--only <plugins...>",
-    "只打包指定插件（会清理 packed 下的其它 .kgpg）",
+    "只打包指定插件 id（会清理 packed 下的其它 .kgpg）",
   )
   .option("--plugins <plugins...>", "只打包指定插件（--only 的别名）")
-  .argument("[pluginName]", "插件名称（如果提供，则只打包该插件）")
+  .argument("[pluginName]", "插件 id 或目录名（如 wallhaven / kabegame-plugin-wallhaven；提供则只打包该插件）")
   .action(async (pluginName, options) => {
     // 处理输出目录：统一从 --out-dir 及其别名中获取
     // commander 会将 --out-dir 和 --outDir 都映射到 options.outDir

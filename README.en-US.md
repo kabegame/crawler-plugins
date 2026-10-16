@@ -13,8 +13,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: anihonet anime wallpaper crawler plugin  
 **Author**: Kabegame
 
-**Path**: `plugins/anihonet-wallpaper/`  
-**Documentation**: [plugins/anihonet-wallpaper/README.md](plugins/anihonet-wallpaper/README.md)
+**Path**: `plugins/kabegame-plugin-anihonet-wallpaper/`  
+**Documentation**: [plugins/kabegame-plugin-anihonet-wallpaper/README.md](plugins/kabegame-plugin-anihonet-wallpaper/README.md)
 
 **Features**:
 - Crawl anime wallpapers from anihonetwallpaper.com
@@ -36,8 +36,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: anime-pictures anime gallery crawler (tag search)  
 **Author**: Kabegame
 
-**Path**: `plugins/anime-pictures/`  
-**User doc**: [plugins/anime-pictures/README.md](plugins/anime-pictures/README.md)
+**Path**: `plugins/kabegame-plugin-anime-pictures/`  
+**User doc**: [plugins/kabegame-plugin-anime-pictures/README.md](plugins/kabegame-plugin-anime-pictures/README.md)
 
 **Features**:
 - Batch download wallpapers from [anime-pictures.net](https://anime-pictures.net) by tag and page range
@@ -59,7 +59,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: Konachan anime wallpaper crawler plugin  
 **Author**: Kabegame
 
-**Path**: `plugins/konachan/`
+**Path**: `plugins/kabegame-plugin-konachan/`
 
 **Features**:
 - Crawl anime wallpapers from konachan.net
@@ -82,8 +82,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: ziworld high-quality wallpaper crawler plugin  
 **Author**: Kabegame
 
-**Path**: `plugins/ziworld/`  
-**User doc**: [plugins/ziworld/README.md](plugins/ziworld/README.md)
+**Path**: `plugins/kabegame-plugin-ziworld/`  
+**User doc**: [plugins/kabegame-plugin-ziworld/README.md](plugins/kabegame-plugin-ziworld/README.md)
 
 **Features**:
 - Fetch wallpapers from [ziworld](https://t.ziworld.top/date.json)
@@ -103,8 +103,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **描述**: Pixiv 插画爬虫：排行榜、收藏、画师、关键词  
 **作者**: Kabegame
 
-**路径**: `plugins/pixiv/`  
-**用户文档**: [plugins/pixiv/README.md](plugins/pixiv/README.md)
+**路径**: `plugins/kabegame-plugin-pixiv/`  
+**用户文档**: [plugins/kabegame-plugin-pixiv/README.md](plugins/kabegame-plugin-pixiv/README.md)
 
 **功能**:
 - 从 [pixiv.net](https://www.pixiv.net) 爬取插画，支持四种模式：排行榜、个人收藏、画师作品、关键词搜索
@@ -120,7 +120,7 @@ This repository contains crawler plugins for the Kabegame image collection syste
 - Pixiv 排行榜：`start_date` / `end_date`（均为 `date` + `format: YYYYMMDD`），闭区间逐日抓取
 - `artist_id`：画师 UID（画师作品模式）
 - `keyword` / `search_mode` / `keyword_order`：关键词、搜索模式（安全/R18/全部）、排序方式
-- `num_artworks`：最大作品数（1～1000），流式下载说明见插件用户文档 `plugins/pixiv/`
+- `num_artworks`：最大作品数（1～1000），流式下载说明见插件用户文档 `plugins/kabegame-plugin-pixiv/`
 
 ![image](./images/pixiv.png)
 ---
@@ -134,8 +134,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **描述**: 2dwallpapers 壁纸网站爬虫  
 **作者**: Kabegame
 
-**路径**: `plugins/twodwallpapers/`  
-**用户文档**: [plugins/twodwallpapers/README.md](plugins/twodwallpapers/README.md)
+**路径**: `plugins/kabegame-plugin-twodwallpapers/`  
+**用户文档**: [plugins/kabegame-plugin-twodwallpapers/README.md](plugins/kabegame-plugin-twodwallpapers/README.md)
 
 **功能**:
 - 从 [2dwallpapers.com](https://2dwallpapers.com) 爬取动漫、游戏等二次元壁纸
@@ -158,8 +158,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: Danbooru image board crawler plugin with full tag metadata  
 **Author**: Kabegame
 
-**Path**: `plugins/danbooru/`  
-**Documentation**: [plugins/danbooru/README.en.md](plugins/danbooru/README.en.md)
+**Path**: `plugins/kabegame-plugin-danbooru/`  
+**Documentation**: [plugins/kabegame-plugin-danbooru/README.en.md](plugins/kabegame-plugin-danbooru/README.en.md)
 
 **Features**:
 - Crawl posts from danbooru.donmai.us (or the general-rating-only safebooru.donmai.us)
@@ -189,8 +189,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: Gelbooru image board crawler plugin with full tag metadata  
 **Author**: Kabegame
 
-**Path**: `plugins/gelbooru/`  
-**Documentation**: [plugins/gelbooru/README.en.md](plugins/gelbooru/README.en.md)
+**Path**: `plugins/kabegame-plugin-gelbooru/`  
+**Documentation**: [plugins/kabegame-plugin-gelbooru/README.en.md](plugins/kabegame-plugin-gelbooru/README.en.md)
 
 **Features**:
 - Crawl posts from gelbooru.com
@@ -219,8 +219,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: Zerochan image board crawler: browse everything, one tag, or any search query, sorted by recent or popular  
 **Author**: Kabegame
 
-**Path**: `plugins/zerochan/`  
-**Documentation**: [plugins/zerochan/README.en.md](plugins/zerochan/README.en.md)
+**Path**: `plugins/kabegame-plugin-zerochan/`  
+**Documentation**: [plugins/kabegame-plugin-zerochan/README.en.md](plugins/kabegame-plugin-zerochan/README.en.md)
 
 **Features**:
 - Crawl images from zerochan.net — the site is pure SSR, so it runs on `fetch` + DOM parsing with no WebView
@@ -252,8 +252,8 @@ This repository contains crawler plugins for the Kabegame image collection syste
 **Description**: Safebooru (Gelbooru's all-ages board) crawler using the official API, with categorized tags and comments  
 **Author**: Kabegame
 
-**Path**: `plugins/safebooru/`  
-**Documentation**: [plugins/safebooru/README.en.md](plugins/safebooru/README.en.md)
+**Path**: `plugins/kabegame-plugin-safebooru/`  
+**Documentation**: [plugins/kabegame-plugin-safebooru/README.en.md](plugins/kabegame-plugin-safebooru/README.en.md)
 
 **Features**:
 - Crawl posts from safebooru.org through its anonymous official API (`dapi`). One request per page returns the posts together with every tag and its category, and page numbers match the site's listing.
@@ -367,7 +367,7 @@ pnpm prepare
 From the main project root:
 
 ```bash
-pnpm run package-plugin crawler-plugins/plugins/<plugin-name>
+pnpm run package-plugin crawler-plugins/plugins/kabegame-plugin-<plugin-name>
 ```
 
 Output: `crawler-plugins/packed/<plugin-name>.kgpg`

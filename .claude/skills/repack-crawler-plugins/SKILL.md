@@ -1,11 +1,11 @@
 ---
 name: repack-crawler-plugins
-description: 改完 src-crawler-plugins/plugins/<name>/ 下的插件源码后，立刻用本 skill 把该插件重打成 .kgpg 并投放到 dev 数据目录 .kabegame/debug/data/plugins-directory，让正在跑的 dev 应用能加载到改动。用于 repack / rebuild / 重新打包爬虫插件、把插件装进开发环境、pack plugin to dev data、更新 kgpg。
+description: 改完 src-crawler-plugins/plugins/kabegame-plugin-<id>/ 下的插件源码后，立刻用本 skill 把该插件重打成 .kgpg 并投放到 dev 数据目录 .kabegame/debug/data/plugins-directory，让正在跑的 dev 应用能加载到改动。用于 repack / rebuild / 重新打包爬虫插件、把插件装进开发环境、pack plugin to dev data、更新 kgpg。
 ---
 
 # 重打爬虫插件到 dev 数据目录
 
-**改完 `plugins/<name>/` 下任何源码，就用 driver 重打这个插件。** 产物投到
+**改完 `plugins/kabegame-plugin-<id>/` 下任何源码，就用 driver 重打这个插件。** 产物投到
 **dev 数据目录** `.kabegame/debug/data/plugins-directory/`（`deno task dev -c kabegame`
 默认读这里），**不写 `packed/`**——`packed/` 是发布产物，只在 release 时全量生成。
 

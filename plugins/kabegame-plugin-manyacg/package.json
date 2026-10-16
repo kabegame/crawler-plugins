@@ -1,0 +1,295 @@
+{
+  "name": "kabegame-plugin-manyacg",
+  "version": "0.1.2",
+  "private": true,
+  "name.zh": "ManyACG 二次元图库",
+  "name.en": "ManyACG anime gallery",
+  "name.ja": "ManyACG アニメギャラリー",
+  "name.ko": "ManyACG 애니메이션 갤러리",
+  "name.zhtw": "ManyACG 二次元圖庫",
+  "description": "ManyACG 二次元图库爬虫：支持筛选、语义搜索、相似作品与随机，附完整元数据与标签画册",
+  "description.zh": "ManyACG 二次元图库爬虫：支持筛选、语义搜索、相似作品与随机，附完整元数据与标签画册",
+  "description.en": "Crawler for the ManyACG anime gallery: filter, semantic search, similar artworks and random, with full metadata and label albums",
+  "description.ja": "ManyACG アニメギャラリーのクローラー：絞り込み・セマンティック検索・類似作品・ランダムに対応し、完全なメタデータとラベルアルバム付き",
+  "description.ko": "ManyACG 애니메이션 갤러리 크롤러: 필터, 의미 검색, 유사 작품, 무작위를 지원하며 전체 메타데이터와 라벨 앨범을 제공합니다",
+  "description.zhtw": "ManyACG 二次元圖庫爬蟲：支援篩選、語意搜尋、相似作品與隨機，附完整中繼資料與標籤相簿",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.5.2"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "https://manyacg.top",
+  "kbLabels": [
+    {
+      "id": "content.nsfw"
+    }
+  ],
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "required": true,
+      "name": "Mode",
+      "name.zh": "模式",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "Pick one crawl mode. Filter lists newest first and can combine tag, artist and keyword; Semantic, Similar and Random are exclusive and ignore those filters.",
+      "descripts.zh": "选择一种抓取方式。「筛选」按时间从新到旧，可同时叠加标签、作者、关键词；「语义搜索」「相似作品」「随机」互斥，并忽略这些筛选条件。",
+      "descripts.ja": "取得方法を1つ選びます。「絞り込み」は新しい順で、タグ・作者・キーワードを同時に指定できます。「セマンティック検索」「類似作品」「ランダム」は排他的で、これらの条件は無視されます。",
+      "descripts.ko": "수집 방식을 하나 고르세요. '필터'는 최신순이며 태그·작가·키워드를 함께 쓸 수 있고, '의미 검색'·'유사 작품'·'무작위'는 서로 배타적이며 이 조건들을 무시합니다.",
+      "descripts.zhtw": "選擇一種抓取方式。「篩選」依時間由新到舊，可同時疊加標籤、作者、關鍵字；「語意搜尋」「相似作品」「隨機」互斥，並忽略這些篩選條件。",
+      "default": "filter",
+      "options": [
+        {
+          "name": "Filter (newest first)",
+          "name.zh": "筛选（最新）",
+          "name.ja": "絞り込み（新着）",
+          "name.ko": "필터(최신순)",
+          "name.zhtw": "篩選（最新）",
+          "variable": "filter"
+        },
+        {
+          "name": "Semantic search",
+          "name.zh": "语义搜索",
+          "name.ja": "セマンティック検索",
+          "name.ko": "의미 검색",
+          "name.zhtw": "語意搜尋",
+          "variable": "semantic"
+        },
+        {
+          "name": "Similar artworks",
+          "name.zh": "相似作品",
+          "name.ja": "類似作品",
+          "name.ko": "유사 작품",
+          "name.zhtw": "相似作品",
+          "variable": "similar"
+        },
+        {
+          "name": "Random",
+          "name.zh": "随机",
+          "name.ja": "ランダム",
+          "name.ko": "무작위",
+          "name.zhtw": "隨機",
+          "variable": "random"
+        }
+      ]
+    },
+    {
+      "key": "r18",
+      "required": true,
+      "type": "options",
+      "name": "Content rating",
+      "name.zh": "内容分级",
+      "name.ja": "コンテンツレーティング",
+      "name.ko": "콘텐츠 등급",
+      "name.zhtw": "內容分級",
+      "descripts": "Applies to every mode. R-18 content is NSFW.",
+      "descripts.zh": "对所有模式生效。R-18 内容为 NSFW。",
+      "descripts.ja": "すべてのモードに適用されます。R-18 は NSFW です。",
+      "descripts.ko": "모든 모드에 적용됩니다. R-18 콘텐츠는 NSFW입니다.",
+      "descripts.zhtw": "對所有模式生效。R-18 內容為 NSFW。",
+      "default": "0",
+      "options": [
+        {
+          "name": "All ages only",
+          "name.zh": "仅全年龄",
+          "name.ja": "全年齢のみ",
+          "name.ko": "전체 이용가만",
+          "name.zhtw": "僅全年齡",
+          "variable": "0"
+        },
+        {
+          "name": "R-18 only",
+          "name.zh": "仅 R-18",
+          "name.ja": "R-18 のみ",
+          "name.ko": "R-18만",
+          "name.zhtw": "僅 R-18",
+          "variable": "1"
+        },
+        {
+          "name": "Mixed",
+          "name.zh": "混合",
+          "name.ja": "混在",
+          "name.ko": "혼합",
+          "name.zhtw": "混合",
+          "variable": "2"
+        }
+      ]
+    },
+    {
+      "key": "tag",
+      "type": "string",
+      "name": "Tag",
+      "name.zh": "标签",
+      "name.ja": "タグ",
+      "name.ko": "태그",
+      "name.zhtw": "標籤",
+      "descripts": "Exact tag name, one tag only (e.g. 原神 or genshin_impact). Combining several tags returns nothing. Leave empty for no tag filter.",
+      "descripts.zh": "完整的标签名，只能填一个（如 原神、genshin_impact）。填多个标签会搜不到结果。留空表示不按标签过滤。",
+      "descripts.ja": "タグ名を完全一致で1つだけ指定します（例：原神、genshin_impact）。複数指定すると結果が出ません。空欄ならタグで絞り込みません。",
+      "descripts.ko": "태그 이름을 정확히 하나만 입력하세요(예: 原神, genshin_impact). 여러 개를 쓰면 결과가 없습니다. 비워 두면 태그로 거르지 않습니다.",
+      "descripts.zhtw": "完整的標籤名，只能填一個（如 原神、genshin_impact）。填多個標籤會搜不到結果。留空表示不依標籤篩選。",
+      "when": {
+        "mode": [
+          "filter"
+        ]
+      }
+    },
+    {
+      "key": "artist",
+      "type": "string",
+      "name": "Artist",
+      "name.zh": "作者",
+      "name.ja": "作者",
+      "name.ko": "작가",
+      "name.zhtw": "作者",
+      "descripts": "Paste an artist page link (manyacg.top/artist/…) or the 24-character artist ID. Pixiv / Twitter user IDs do not work. Leave empty for no artist filter.",
+      "descripts.zh": "粘贴作者页链接（manyacg.top/artist/…）或 24 位作者 ID。Pixiv / Twitter 的用户 ID 不能用。留空表示不按作者过滤。",
+      "descripts.ja": "作者ページのリンク（manyacg.top/artist/…）または24文字の作者IDを貼り付けます。Pixiv / Twitter のユーザーIDは使えません。空欄なら作者で絞り込みません。",
+      "descripts.ko": "작가 페이지 링크(manyacg.top/artist/…) 또는 24자리 작가 ID를 붙여 넣으세요. Pixiv / Twitter 사용자 ID는 사용할 수 없습니다. 비워 두면 작가로 거르지 않습니다.",
+      "descripts.zhtw": "貼上作者頁連結（manyacg.top/artist/…）或 24 位作者 ID。Pixiv / Twitter 的使用者 ID 不能用。留空表示不依作者篩選。",
+      "when": {
+        "mode": [
+          "filter"
+        ]
+      }
+    },
+    {
+      "key": "keyword",
+      "type": "string",
+      "name": "Keyword",
+      "name.zh": "关键词",
+      "name.ja": "キーワード",
+      "name.ko": "키워드",
+      "name.zhtw": "關鍵字",
+      "descripts": "In Filter mode it matches title, description and tags and can be left empty; in Semantic mode it is required.",
+      "descripts.zh": "筛选模式下匹配标题、简介和标签，可留空；语义搜索模式下必填。",
+      "descripts.ja": "絞り込みではタイトル・説明・タグに一致し、空欄でも構いません。セマンティック検索では必須です。",
+      "descripts.ko": "필터 모드에서는 제목·설명·태그와 일치하며 비워 둘 수 있고, 의미 검색 모드에서는 필수입니다.",
+      "descripts.zhtw": "篩選模式下比對標題、簡介和標籤，可留空；語意搜尋模式下必填。",
+      "when": {
+        "mode": [
+          "filter",
+          "semantic"
+        ]
+      }
+    },
+    {
+      "key": "artwork",
+      "type": "string",
+      "name": "Reference artwork",
+      "name.zh": "参考作品",
+      "name.ja": "基準作品",
+      "name.ko": "기준 작품",
+      "name.zhtw": "參考作品",
+      "descripts": "Paste an artwork page link (manyacg.top/artwork/…) or the 24-character artwork ID to find similar artworks. Required.",
+      "descripts.zh": "粘贴作品页链接（manyacg.top/artwork/…）或 24 位作品 ID，查找与它相似的作品。必填。",
+      "descripts.ja": "作品ページのリンク（manyacg.top/artwork/…）または24文字の作品IDを貼り付け、類似作品を探します。必須です。",
+      "descripts.ko": "작품 페이지 링크(manyacg.top/artwork/…) 또는 24자리 작품 ID를 붙여 넣어 비슷한 작품을 찾습니다. 필수입니다.",
+      "descripts.zhtw": "貼上作品頁連結（manyacg.top/artwork/…）或 24 位作品 ID，尋找與它相似的作品。必填。",
+      "required": true,
+      "when": {
+        "mode": [
+          "similar"
+        ]
+      }
+    },
+    {
+      "key": "start_page",
+      "type": "int",
+      "name": "Start page",
+      "name.zh": "起始页数",
+      "name.ja": "開始ページ",
+      "name.ko": "시작 페이지",
+      "name.zhtw": "起始頁數",
+      "descripts": "50 artworks per page. Semantic search returns at most 1000 results (20 pages); Similar has no natural end, so keep the page range small.",
+      "descripts.zh": "每页 50 个作品。语义搜索最多返回 1000 条（20 页）；相似作品没有天然终点，页数范围请取小一些。",
+      "descripts.ja": "1ページ50作品です。セマンティック検索は最大1000件（20ページ）まで。類似作品には自然な終端がないので、ページ範囲は小さめにしてください。",
+      "descripts.ko": "페이지당 50개 작품입니다. 의미 검색은 최대 1000건(20페이지)까지이고, 유사 작품은 자연스러운 끝이 없으니 페이지 범위를 작게 잡으세요.",
+      "descripts.zhtw": "每頁 50 個作品。語意搜尋最多回傳 1000 筆（20 頁）；相似作品沒有天然終點，頁數範圍請取小一些。",
+      "default": 1,
+      "min": 1,
+      "max": 1000,
+      "width": 2,
+      "when": {
+        "mode": [
+          "filter",
+          "semantic",
+          "similar"
+        ]
+      }
+    },
+    {
+      "key": "end_page",
+      "type": "int",
+      "name": "End page",
+      "name.zh": "结束页数",
+      "name.ja": "終了ページ",
+      "name.ko": "끝 페이지",
+      "name.zhtw": "結束頁數",
+      "descripts": "Stops early when the site has no more results.",
+      "descripts.zh": "站点没有更多结果时会提前结束。",
+      "descripts.ja": "サイトにこれ以上結果がなければ途中で終了します。",
+      "descripts.ko": "사이트에 더 이상 결과가 없으면 일찍 끝납니다.",
+      "descripts.zhtw": "網站沒有更多結果時會提前結束。",
+      "default": 1,
+      "min": 1,
+      "max": 1000,
+      "width": 2,
+      "when": {
+        "mode": [
+          "filter",
+          "semantic",
+          "similar"
+        ]
+      }
+    },
+    {
+      "key": "count",
+      "type": "int",
+      "name": "Count",
+      "name.zh": "数量",
+      "name.ja": "件数",
+      "name.ko": "개수",
+      "name.zhtw": "數量",
+      "descripts": "How many random artworks to fetch (1–200). Duplicates of images you already have are skipped.",
+      "descripts.zh": "随机抓取的作品数量（1–200）。已有的图片会被去重跳过。",
+      "descripts.ja": "ランダムに取得する作品数（1〜200）。既にある画像は重複としてスキップされます。",
+      "descripts.ko": "무작위로 가져올 작품 수(1–200). 이미 있는 이미지는 중복으로 건너뜁니다.",
+      "descripts.zhtw": "隨機抓取的作品數量（1–200）。已有的圖片會被去重略過。",
+      "default": 30,
+      "min": 1,
+      "max": 200,
+      "when": {
+        "mode": [
+          "random"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "kbChangelog": {
+    "default": "CHANGELOG.md"
+  },
+  "kbDescriptionTemplate": "templates/description.ejs",
+  "kbMetadataMigration": "metadata_migrations/migrate.js",
+  "dependencies": {
+    "tiny-pinyin": "^1.3.2"
+  },
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

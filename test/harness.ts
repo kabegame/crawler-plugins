@@ -5,7 +5,7 @@
 //   import { defineCases, expectFiles } from "../../../test/harness.ts";
 //   await defineCases("bilibili", [ { name, vars, expect: expectFiles({...}) }, ... ]);
 //
-// 运行：deno run -A plugins/<name>/test/e2e.ts [用例名…]   （不带参数跑全部非 optional 用例）
+// 运行：deno run -A plugins/kabegame-plugin-<id>/test/e2e.ts [用例名…]   （不带参数跑全部非 optional 用例）
 //
 // 去重感知：dev 库里已入库过的 URL/hash 会被下载器去重（产物 0 个文件但任务成功）。
 // harness 从任务日志统计 dedup 次数，断言按「新落盘文件 + 去重命中」计总量，
