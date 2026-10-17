@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, currentHtml, downloadImage, requireCookie, setHeader, to, warn } = Kabegame;
 
@@ -30,17 +31,17 @@ function prepareSite(baseUrl) {
   const ua = Kabegame.cefUserAgent?.() || "";
   if (ua) setHeader("User-Agent", ua);
   if (requireCookie(host)) {
-    console.log(`[konachan] 已注入畅游中 ${host} 的 Cookie${ua ? " 与 CEF UA" : ""}`);
+    console.log(t(ua ? "cookieInjectedWithUa" : "cookieInjected", { host }));
   } else {
-    warn(`[konachan] 未从畅游取到 ${host} 的 Cookie；若请求被 403 拦截，请先在畅游中打开 ${baseUrl} 通过验证`);
+    warn(t("cookieMissing", { host, baseUrl }));
   }
 }
 
 function siteBlockedError(reason) {
   const hint = site.browserIdentity
-    ? `请先在畅游中打开 ${site.baseUrl} 通过验证，再重新运行任务`
-    : "请检查代理网络或稍后重试";
-  return new Error(`[konachan] ${site.host} ${reason}，被 Cloudflare 拦截：${hint}`);
+    ? t("surfChallengeHint", { baseUrl: site.baseUrl })
+    : t("networkRetryHint");
+  return new Error(t("cloudflareBlocked", { host: site.host, reason, hint }));
 }
 
 function isChallengePage(document) {
@@ -69,12 +70,14 @@ async function openDocument(url) {
     finalUrl = await to(url);
   } catch (error) {
     // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
-    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError("返回 403");
+    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) {
+      throw siteBlockedError(t("returned403"));
+    }
     throw error;
   }
   const html = await currentHtml();
   const document = parseHtml(html);
-  if (isChallengePage(document)) throw siteBlockedError("返回了验证页");
+  if (isChallengePage(document)) throw siteBlockedError(t("returnedChallengePage"));
   return { finalUrl, document, html };
 }
 
@@ -316,9 +319,9 @@ function collectPostHrefs(document, pageUrl) {
 
 function validatePageRange(startPage, endPage) {
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
 async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
@@ -326,7 +329,7 @@ async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = buildPostListUrl(baseUrl, tokens, page);
-    console.log(`[konachan][all] 打开页面 ${page}/${endPage}: ${pageUrl}`);
+    console.log(t("openPage", { mode: "all", page, total: endPage, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     for (const href of hrefs) {
@@ -338,7 +341,7 @@ async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
 
 async function crawlByTags(baseUrl, quality, vars) {
   const tags = tagListOf(vars.mode_tag_value);
-  if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+  if (tags.length === 0) throw new Error(t("tagsRequired"));
   const tokens = tags.concat(metaTokensOf(vars));
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
@@ -346,7 +349,7 @@ async function crawlByTags(baseUrl, quality, vars) {
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = buildPostListUrl(baseUrl, tokens, page);
-    console.log(`[konachan][tags] 打开页面 ${page}/${endPage}: ${pageUrl}`);
+    console.log(t("openPage", { mode: "tags", page, total: endPage, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     for (const href of hrefs) {
@@ -363,18 +366,22 @@ const MAX_ID_SPAN = 5000;
 
 function parsePostId(value, label) {
   const text = trimText(value);
-  if (!/^\d+$/.test(text)) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!/^\d+$/.test(text)) throw new Error(t("positiveIntegerRequired", { label, value: text }));
   const id = Number(text);
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    throw new Error(t("positiveIntegerRequired", { label, value: text }));
+  }
   return id;
 }
 
 function parseIdRange(vars) {
-  const startId = parsePostId(vars.id_start, "起始 id");
-  const endId = parsePostId(vars.id_end, "结束 id");
-  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  const startId = parsePostId(vars.id_start, t("startIdLabel"));
+  const endId = parsePostId(vars.id_end, t("endIdLabel"));
+  if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
   if (endId - startId > MAX_ID_SPAN) {
-    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+    throw new Error(
+      t("idRangeTooLarge", { max: MAX_ID_SPAN, startId, endId, span: endId - startId }),
+    );
   }
   return { startId, endId };
 }
@@ -396,7 +403,7 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   const { startId, endId } = parseIdRange(vars);
   const tokens = [`id:${startId}..${endId}`, "order:id"].concat(metaTokensOf(vars));
   const total = await countPosts(baseUrl, tokens);
-  console.log(`[konachan][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
   if (total === 0) return;
   // 总数未知时按区间宽度估页数，进度可能提前到顶，不影响抓取
   const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / 40));
@@ -407,7 +414,9 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   let seen = 0;
   for (let page = 1; page <= maxPages; page += 1) {
     const pageUrl = buildPostListUrl(baseUrl, tokens, page);
-    console.log(`[konachan][id] 打开页面 ${page}/${total == null ? "?" : estimatedPages}: ${pageUrl}`);
+    console.log(
+      t("openPage", { mode: "id", page, total: total == null ? "?" : estimatedPages, url: pageUrl }),
+    );
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     if (hrefs.length === 0 || hrefs[0] === previousFirst) break;
@@ -481,7 +490,9 @@ function postIdOfHref(href) {
 async function crawlPopular(baseUrl, quality, vars) {
   const scale = coerceStr(vars.popular_scale || "day");
   const recent = POPULAR_RECENT_PERIODS.has(scale);
-  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) throw new Error(`未知的排行榜类型: ${scale}`);
+  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) {
+    throw new Error(t("unknownRanking", { scale }));
+  }
   // 滚动窗口只有当期，回溯期数对它没有意义
   const periods = recent
     ? 1
@@ -492,13 +503,13 @@ async function crawlPopular(baseUrl, quality, vars) {
   const periodProgress = 90.0 / periods;
   for (let k = 0; k < periods; k += 1) {
     const pageUrl = buildPopularUrl(baseUrl, scale, shiftPopularDate(startDate, scale, k));
-    console.log(`[konachan][popular] 打开排行榜 ${k + 1}/${periods}: ${pageUrl}`);
+    console.log(t("openPopular", { period: k + 1, total: periods, url: pageUrl }));
     const { document, finalUrl, html } = await openDocument(pageUrl);
     let hrefs = collectPostHrefs(document, finalUrl);
     if (ratingLetter && hrefs.length > 0) {
       const ratings = postRatingsOf(html);
       if (ratings.size === 0) {
-        warn(`[konachan][popular] 页面里没找到作品分级信息，本期不做分级过滤：${finalUrl}`);
+        warn(t("ratingInfoMissing", { url: finalUrl }));
       } else {
         const before = hrefs.length;
         // 取不到分级的作品保留，宁可多下也不静默漏掉
@@ -506,11 +517,11 @@ async function crawlPopular(baseUrl, quality, vars) {
           const rating = ratings.get(postIdOfHref(href));
           return !rating || rating === ratingLetter;
         });
-        console.log(`[konachan][popular] 分级过滤 ${ratingName}：${before} → ${hrefs.length}`);
+        console.log(t("ratingFiltered", { rating: ratingName, before, after: hrefs.length }));
       }
     }
     if (hrefs.length === 0) {
-      console.log(`[konachan][popular] 本期没有符合条件的作品：${finalUrl}`);
+      console.log(t("popularEmpty", { url: finalUrl }));
       addProgress(periodProgress);
       continue;
     }
@@ -543,6 +554,6 @@ export async function crawl(common, custom) {
   } else if (vars.crawl_mode === "id_range") {
     await crawlByIdRange(baseUrl, quality, vars);
   } else {
-    throw new Error(`未知的爬取模式: ${vars.crawl_mode}`);
+    throw new Error(t("unknownMode", { mode: vars.crawl_mode }));
   }
 }
