@@ -8,6 +8,7 @@ import { ARTWORKS_QUERY, OPERATION_ARTWORKS } from "./consts";
 import { fetchGraphql } from "./api";
 import { processArtworksEdgesForDownload } from "./download";
 import { arrayValue, coerceStr, log } from "./util";
+import { t } from "./i18n";
 
 /** 把排序选项翻成 listArtworks 的 feed / orderBy / first / last。 */
 export function applyArtworkSortVariables(variables, artworkSort) {
@@ -63,13 +64,20 @@ async function crawlArtworkPages({
   const effectivePages = maxPages - skipPages;
   const perPageProgress = effectivePages > 0 ? perItemProgress / effectivePages : 0.0;
 
-  log(`[PixAI] 处理${label}：${scopeDesc}，排序=${artworkSort}，起始页=${skipPages + 1}`);
+  log(t("artworkFlowStart", { label, scope: scopeDesc, sort: artworkSort, startPage: skipPages + 1 }));
 
   while (artworkPage < maxPages) {
     if (artworkPage < skipPages) {
-      log(`[PixAI] ${label} ${scopeDesc} 第 ${artworkPage + 1}/${maxPages} 页（未到起始页，仅获取游标）`);
+      log(t("artworkPageCursorOnly", { label, scope: scopeDesc, page: artworkPage + 1, maxPages }));
     } else {
-      log(`[PixAI] ${label} ${scopeDesc} 第 ${artworkPage + 1}/${maxPages} 页（有效第 ${artworkPage - skipPages + 1}/${effectivePages} 页）`);
+      log(t("artworkPageProgress", {
+        label,
+        scope: scopeDesc,
+        page: artworkPage + 1,
+        maxPages,
+        effectivePage: artworkPage - skipPages + 1,
+        effectivePages,
+      }));
     }
 
     const variables = { ...baseVariables };
@@ -79,18 +87,18 @@ async function crawlArtworkPages({
     const res = await fetchGraphql(OPERATION_ARTWORKS, variables, ARTWORKS_QUERY);
     const artworks = res?.data?.artworks;
     if (!artworks) {
-      log(`[PixAI] ${label} ${scopeDesc} 响应缺少 artworks，停止`);
+      log(t("artworksMissing", { label, scope: scopeDesc }));
       break;
     }
 
     const edges = arrayValue(artworks.edges);
     if (edges.length === 0) {
       log(artworkPage === 0
-        ? `[PixAI] 警告：${label} ${scopeDesc} 无任何作品数据，跳过`
-        : `[PixAI] ${label} ${scopeDesc} 当前页无数据，停止`);
+        ? t("noArtworkData", { label, scope: scopeDesc })
+        : t("artworkPageEmpty", { label, scope: scopeDesc }));
       break;
     }
-    log(`[PixAI] ${label}作品页返回 ${edges.length} 条`);
+    log(t("artworkPageReturned", { label, count: edges.length }));
 
     if (artworkPage >= skipPages) {
       downloaded += await processArtworksEdgesForDownload(
@@ -107,13 +115,13 @@ async function crawlArtworkPages({
     if (!pageInfo) break;
     if (useBeforePagination) {
       if (pageInfo.hasPreviousPage !== true) {
-        log(`[PixAI] ${label} ${scopeDesc} 无上一作品页`);
+        log(t("noPreviousArtworkPage", { label, scope: scopeDesc }));
         break;
       }
       cursor = coerceStr(pageInfo.startCursor);
     } else {
       if (pageInfo.hasNextPage !== true) {
-        log(`[PixAI] ${label} ${scopeDesc} 无下一作品页`);
+        log(t("noNextArtworkPage", { label, scope: scopeDesc }));
         break;
       }
       cursor = coerceStr(pageInfo.endCursor);
@@ -122,7 +130,7 @@ async function crawlArtworkPages({
     artworkPage += 1;
   }
 
-  log(`[PixAI] ${label}处理完成：${scopeDesc}，排序=${artworkSort}，共下载 ${downloaded} 张`);
+  log(t("artworkFlowDone", { label, scope: scopeDesc, sort: artworkSort, count: downloaded }));
   return downloaded;
 }
 
@@ -144,7 +152,7 @@ export async function processArtworks(
     baseVariables,
     label,
     downloadLabel: label,
-    scopeDesc: queryKey && id ? `${queryKey}=${id}` : "全站",
+    scopeDesc: queryKey && id ? `${queryKey}=${id}` : t("labelGlobal"),
     contextId: id,
     maxPages,
     perItemProgress,
@@ -168,8 +176,8 @@ export async function processAuthorArtworks(
 ) {
   return crawlArtworkPages({
     baseVariables: { authorId, types },
-    label: "作者流",
-    downloadLabel: "作者",
+    label: t("labelAuthorFlow"),
+    downloadLabel: t("labelAuthor"),
     scopeDesc: `authorId=${authorId}, types=${artworkTypeLabel}`,
     contextId: authorId,
     maxPages,

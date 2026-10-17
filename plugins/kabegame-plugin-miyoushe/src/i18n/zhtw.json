@@ -1,0 +1,20 @@
+{
+  "emoticonSetFailed": "[米游社] emoticon_set 請求失敗 retcode={retcode}",
+  "emoticonSetNetworkError": "[米游社] emoticon_set 網路錯誤，表情將降級為文字",
+  "repliesNetworkError": "[米游社] getPostReplies 網路錯誤，post_id={postId}",
+  "repliesFailed": "[米游社] getPostReplies 失敗：post_id={postId} retcode={retcode}",
+  "singlePostUrlRequired": "[米游社] 單篇貼文模式：請填寫貼文 URL",
+  "postIdExtractFailed": "[米游社] 無法從連結中擷取貼文 ID，請確認網址形如 https://www.miyoushe.com/遊戲/article/貼文id",
+  "postFullFailed": "[米游社] getPostFull 失敗：post_id={postId} retcode={retcode} {message}",
+  "postFullNoPost": "[米游社] getPostFull 回應裡沒有 data.post.post：post_id={postId}",
+  "postNoImages": "[米游社] 貼文沒有圖片：post_id={postId}",
+  "userUidRequired": "[米游社] 作者貼文模式：請填寫作者 UID",
+  "endPageBeforeStart": "[米游社] 結束頁需要大於或等於起始頁",
+  "userPostsFailed": "[米游社] userPostList 失敗：uid={uid} retcode={retcode} {message}",
+  "pageNoResults": "[米游社] 第 {page} 頁沒有結果，停止",
+  "userPostsDone": "[米游社] 作者貼文列表任務結束，共處理 {count} 篇貼文",
+  "searchFailed": "[米游社] 搜尋失敗：page={page} retcode={retcode} {message}",
+  "emoticonLoading": "[米游社] 拉取表情集合...",
+  "emoticonLoaded": "[米游社] 表情集合載入完成",
+  "taskFinished": "[米游社] 任務結束"
+}

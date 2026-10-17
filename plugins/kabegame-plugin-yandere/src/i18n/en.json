@@ -1,0 +1,21 @@
+{
+  "pageRangeTooLarge": "A single run cannot crawl more than 100 pages. Please crawl responsibly",
+  "endPageBeforeStart": "The end page must not be before the start page",
+  "openPage": "[yandere][{label}] Opening page {page}/{total}: {url}",
+  "emptyPageStop": "[yandere][{label}] No posts on page {page}; stopping",
+  "imageMissing": "[yandere] No image URL was found on the post page; skipping: {url}",
+  "tagsRequired": "Tag mode requires at least one tag",
+  "startIdLabel": "Start ID",
+  "endIdLabel": "End ID",
+  "positiveIntegerRequired": "{label} must be a positive integer; current value: “{value}”",
+  "endIdBeforeStart": "End ID ({endId}) must be at least the start ID ({startId})",
+  "idRangeTooLarge": "The ID range may span at most {max}; {startId}..{endId} spans {span}",
+  "unknownCount": "unknown",
+  "idRangeSummary": "[yandere][id] IDs {startId}..{endId}, {total} post(s)",
+  "unknownRanking": "Unknown ranking type: {scale}",
+  "openPopular": "[yandere][popular] Opening ranking {period}/{total}: {url}",
+  "ratingInfoMissing": "[yandere][popular] No post rating data was found on the page; skipping rating filtering for this period: {url}",
+  "ratingFiltered": "[yandere][popular] Rating filter {rating}: {before} → {after}",
+  "popularEmpty": "[yandere][popular] No matching posts in this period: {url}",
+  "unknownMode": "Unknown crawl mode: {mode}"
+}

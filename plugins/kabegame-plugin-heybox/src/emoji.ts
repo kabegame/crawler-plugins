@@ -3,6 +3,7 @@
 // 这里把官方表情列表存进 plugin_data，按需更新：帖子里出现 plugin_data 表中没有的表情时，
 // 本次任务拉一次官方列表并合并写回。详情模板在 iframe 里经 __bridge.getPluginData() 读取补全。
 import { API_HOST, PATH_EMOJI_LIST } from "./consts";
+import { t } from "./i18n";
 import { signedUrl } from "./sign";
 import { coerceStr, fetchJson, isChallenge, log } from "./util";
 
@@ -77,7 +78,7 @@ export async function ensureEmojis(keys, commonParams) {
   try {
     const response = await fetchJson(signedUrl(API_HOST, PATH_EMOJI_LIST, commonParams));
     if (isChallenge(response?.status) || response?.status !== "ok") {
-      log(`表情列表请求失败 status=${coerceStr(response?.status)}，新表情将显示为文本`, "warn");
+      log(t("emojiListFailed", { status: coerceStr(response?.status) }), "warn");
       return;
     }
     const fetched = flattenEmojiGroups(response.result);
@@ -91,11 +92,17 @@ export async function ensureEmojis(keys, commonParams) {
     setPluginData(data);
 
     const stillMissing = missing.filter((key) => !emojiMap[key]);
+    const emojiCount = Object.keys(emojiMap).length;
     log(
-      `[小黑盒] 表情表已更新 version=${data[EMOJI_VERSION_KEY]} 共 ${Object.keys(emojiMap).length} 个` +
-        (stillMissing.length ? `；官方列表仍无：${stillMissing.join("、")}` : ""),
+      stillMissing.length
+        ? t("emojiUpdatedWithMissing", {
+            version: data[EMOJI_VERSION_KEY],
+            count: emojiCount,
+            missing: stillMissing.join(", "),
+          })
+        : t("emojiUpdated", { version: data[EMOJI_VERSION_KEY], count: emojiCount }),
     );
   } catch (error) {
-    log(`表情列表更新失败：${error?.message ?? error}，新表情将显示为文本`, "warn");
+    log(t("emojiUpdateFailed", { error: error?.message ?? error }), "warn");
   }
 }

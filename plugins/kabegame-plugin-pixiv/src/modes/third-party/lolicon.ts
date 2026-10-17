@@ -4,6 +4,7 @@
 // 实测结论（请求头 403、限流形态、r18 分类偏差、图库范围）见 docs/lolicon-api.md。
 import { sleep } from "@kabegame/plugin-sdk";
 import { coerceStr, ensurePixivCookie } from "../../common";
+import { t } from "../../i18n";
 
 const { warn } = Kabegame;
 
@@ -32,7 +33,7 @@ function jstDayStart(value, label) {
   const text = coerceStr(value).trim();
   if (!text) return null;
   const m = text.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
-  if (!m) throw new Error(`${label}格式应为 YYYY-MM-DD：${text}`);
+  if (!m) throw new Error(t("dateFormat", { label, value: text }));
   return Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])) -
     JST_OFFSET_MS;
 }
@@ -48,22 +49,22 @@ function buildQuery(vars) {
 
   const tags = listOf(vars.lolicon_tags);
   if (tags.length > MAX_TAG_GROUPS) {
-    throw new Error(`标签最多 ${MAX_TAG_GROUPS} 组（组间为「且」），当前 ${tags.length} 组`);
+    throw new Error(t("tagGroupsTooMany", { max: MAX_TAG_GROUPS, count: tags.length }));
   }
   for (const group of tags) {
     const ors = group.split("|").map((t) => t.trim()).filter(Boolean);
     if (ors.length > MAX_TAG_OR) {
-      throw new Error(`单组标签最多 ${MAX_TAG_OR} 个「|」备选：${group}`);
+      throw new Error(t("tagOrTooMany", { max: MAX_TAG_OR, group }));
     }
     if (ors.length > 0) add("tag", ors.join("|"));
   }
 
   const uids = listOf(vars.lolicon_uids);
   if (uids.length > MAX_UIDS) {
-    throw new Error(`画师 UID 最多 ${MAX_UIDS} 个，当前 ${uids.length} 个`);
+    throw new Error(t("uidsTooMany", { max: MAX_UIDS, count: uids.length }));
   }
   for (const uid of uids) {
-    if (!/^\d+$/.test(uid)) throw new Error(`画师 UID 必须是数字：${uid}`);
+    if (!/^\d+$/.test(uid)) throw new Error(t("uidNotNumber", { uid }));
     add("uid", uid);
   }
 
@@ -71,12 +72,12 @@ function buildQuery(vars) {
   if (aspect) add("aspectRatio", aspect);
   if (vars.lolicon_exclude_ai) add("excludeAI", "true");
 
-  const after = jstDayStart(vars.lolicon_date_after, "起始日期");
-  const beforeDay = jstDayStart(vars.lolicon_date_before, "结束日期");
+  const after = jstDayStart(vars.lolicon_date_after, t("labelDateAfter"));
+  const beforeDay = jstDayStart(vars.lolicon_date_before, t("labelDateBefore"));
   // 结束日期含当天：取次日 JST 0 点前 1 毫秒。
   const before = beforeDay == null ? null : beforeDay + DAY_MS - 1;
   if (after != null && before != null && after > before) {
-    throw new Error("起始日期不能晚于结束日期");
+    throw new Error(t("dateRangeInvalid"));
   }
   if (after != null) add("dateAfter", after);
   if (before != null) add("dateBefore", before);
@@ -93,12 +94,12 @@ async function requestSetu(url) {
     const limited = response.status === 429 ||
       (json && coerceStr(json.error).includes("太快"));
     if (limited && attempt < RETRY_LIMIT) {
-      warn(`[Pixiv/lolicon] 请求被限流，${RETRY_DELAY_MS / 1000} 秒后重试`);
+      warn(t("loliconRateLimited", { seconds: RETRY_DELAY_MS / 1000 }));
       await sleep(RETRY_DELAY_MS);
       continue;
     }
-    if (!response.ok) throw new Error(`lolicon 请求失败：HTTP ${response.status}`);
-    if (json?.error) throw new Error(`lolicon 返回错误：${json.error}`);
+    if (!response.ok) throw new Error(t("loliconRequestFailed", { status: response.status }));
+    if (json?.error) throw new Error(t("loliconReturnedError", { error: json.error }));
     return Array.isArray(json?.data) ? json.data : [];
   }
 }
@@ -109,13 +110,13 @@ export const lolicon = {
   prepare(vars) {
     // R18 作品的 pixiv 详情与分页接口需要登录态。
     if ((vars.lolicon_r18 ?? "safe") !== "safe") {
-      ensurePixivCookie("lolicon R18 / 混合");
+      ensurePixivCookie(t("labelLoliconR18"));
     }
   },
 
   async fetchPage(vars) {
     const { url, num } = buildQuery(vars);
-    console.log(`[Pixiv/lolicon] 请求 ${url}`);
+    console.log(t("loliconRequest", { url }));
     const data = await requestSetu(url);
 
     const safeOnly = (vars.lolicon_r18 ?? "safe") === "safe";
@@ -135,10 +136,10 @@ export const lolicon = {
       if (!ids.includes(pid)) ids.push(pid);
     }
     if (r18Skipped > 0) {
-      console.log(`[Pixiv/lolicon] 全年龄模式跳过 ${r18Skipped} 个带 R-18 标签的作品`);
+      console.log(t("loliconR18Skipped", { count: r18Skipped }));
     }
     if (data.length < num) {
-      warn(`[Pixiv/lolicon] 符合条件的作品只有 ${data.length} 个，少于请求的 ${num} 个`);
+      warn(t("loliconFewResults", { count: data.length, num }));
     }
     return { ids, next: null };
   },

@@ -13,6 +13,7 @@ import { sleep } from "@kabegame/plugin-sdk";
 import {
   BANGUMI_MEDIA_API, BANGUMI_PLAYURL_API, BANGUMI_SEASON_API, FNVAL_BANGUMI, WEB_BASE,
 } from "./consts";
+import { t } from "./i18n";
 import { ingestDash } from "./ingest";
 import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
 
@@ -35,7 +36,7 @@ async function fetchSeason(query, referer) {
   const json = await fetchJson(`${BANGUMI_SEASON_API}?${query}`, { Referer: referer });
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
-    throw new Error(`番剧 season 接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    throw new Error(t("seasonFailed", { code: json?.code, message: coerceStr(json?.message) }));
   }
   return json.result;
 }
@@ -48,10 +49,10 @@ async function mediaToSeasonId(mdId) {
   );
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
-    throw new Error(`番剧 media 接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    throw new Error(t("mediaFailed", { code: json?.code, message: coerceStr(json?.message) }));
   }
   const ssId = json?.result?.media?.season_id;
-  if (!ssId) throw new Error(`md${mdId} 未关联任何季（season_id 缺失）`);
+  if (!ssId) throw new Error(t("mdNoSeason", { md: mdId }));
   return String(ssId);
 }
 
@@ -123,7 +124,7 @@ async function processEpisode(season, ep, vars, budget) {
     (p) => p?.name === "AreaLimitPanel" && p?.config?.is_block,
   );
   if (geoBlocked) {
-    const error = new Error(`${displayName} 有地区限制，当前网络所在地区不可观看`);
+    const error = new Error(t("geoBlocked", { name: displayName }));
     error.noRetry = true;
     throw error;
   }
@@ -134,10 +135,7 @@ async function processEpisode(season, ep, vars, budget) {
     || info?.play_video_type === "preview"
     || Number(videoInfo?.is_preview ?? 0) === 1;
   if (code === -10403 || preview) {
-    const error = new Error(
-      `${displayName} 为大会员专享，当前登录态无权观看完整版（试看片段不入库），跳过。`
-      + `如已开通大会员请先在畅游登录 bilibili。`,
-    );
+    const error = new Error(t("vipOnly", { name: displayName }));
     error.noRetry = true;
     error.skipEpisode = true;
     throw error;
@@ -145,12 +143,12 @@ async function processEpisode(season, ep, vars, budget) {
 
   if (code !== 0) {
     checkBilibiliRisk(code);
-    throw new Error(`番剧 playurl 失败（${code}）: ${coerceStr(info?.message)}`);
+    throw new Error(t("bangumiPlayurlFailed", { code, message: coerceStr(info?.message) }));
   }
 
   const dash = videoInfo?.dash;
   if (!dash || !(dash.video || []).length) {
-    throw new Error("番剧 playurl 未返回 DASH 流");
+    throw new Error(t("bangumiNoDash"));
   }
 
   await ingestDash({
@@ -172,10 +170,13 @@ async function processEpisodeWithRetry(season, ep, vars, budget, intervalMs, ret
       return;
     } catch (error) {
       if (attempt >= retries || error?.noRetry) throw error;
-      warn(
-        `ep${ep?.id} 下载失败（${coerceStr(error?.message ?? error)}），`
-        + `${Math.round(intervalMs / 1000)}s 后重试（第 ${attempt + 1}/${retries} 次）`,
-      );
+      warn(t("retryLater", {
+        label: `ep${coerceStr(ep?.id)}`,
+        error: coerceStr(error?.message ?? error),
+        seconds: Math.round(intervalMs / 1000),
+        attempt: attempt + 1,
+        total: retries,
+      }));
       await sleep(intervalMs);
     }
   }
@@ -185,10 +186,7 @@ async function processEpisodeWithRetry(season, ep, vars, budget, intervalMs, ret
 export async function crawlBangumi(vars, intervalMs, retries) {
   const target = parseBangumiId(vars.bangumi_url);
   if (!target.kind) {
-    throw new Error(
-      "无法识别番剧链接。支持单集（/bangumi/play/ep21495）、整季（/bangumi/play/ss26801）、"
-      + "剧集页（/bangumi/media/md24097891），或直接填 ep/ss/md 编号",
-    );
+    throw new Error(t("bangumiUrlUnrecognized"));
   }
 
   let seasonQuery;
@@ -219,18 +217,25 @@ export async function crawlBangumi(vars, intervalMs, retries) {
   }
 
   // 整季批量：ep_start 是正片列表的 1 起序号，max_videos 截断。
-  if (mainEpisodes.length === 0) throw new Error(`「${coerceStr(season?.title)}」没有正片剧集`);
+  if (mainEpisodes.length === 0) throw new Error(t("noEpisodes", { title: coerceStr(season?.title) }));
   const epStart = Math.max(1, Number(vars.ep_start ?? 1));
   const maxVideos = Math.max(1, Number(vars.max_videos ?? 5));
   const episodes = mainEpisodes.slice(epStart - 1, epStart - 1 + maxVideos);
   if (episodes.length === 0) {
-    throw new Error(`「${coerceStr(season?.title)}」正片共 ${mainEpisodes.length} 集，起始集数 ${epStart} 超出范围`);
+    throw new Error(t("epStartOutOfRange", {
+      title: coerceStr(season?.title),
+      total: mainEpisodes.length,
+      start: epStart,
+    }));
   }
 
-  console.log(
-    `[bilibili-video] 番剧「${coerceStr(season?.title)}」正片共 ${mainEpisodes.length} 集，`
-    + `本次从第 ${epStart} 集起下载 ${episodes.length} 集（上限 ${maxVideos}）`,
-  );
+  console.log(t("bangumiSummary", {
+    title: coerceStr(season?.title),
+    total: mainEpisodes.length,
+    start: epStart,
+    count: episodes.length,
+    max: maxVideos,
+  }));
 
   const budget = 100.0 / episodes.length;
   let failed = 0;
@@ -238,13 +243,18 @@ export async function crawlBangumi(vars, intervalMs, retries) {
   for (let index = 0; index < episodes.length; index += 1) {
     const ep = episodes[index];
     if (index > 0) await sleep(intervalMs);
-    console.log(`[bilibili-video] (${index + 1}/${episodes.length}) ep${ep?.id} ${episodeDisplayName(season, ep)}`);
+    console.log(t("bangumiEpisodeItem", {
+      index: index + 1,
+      total: episodes.length,
+      ep: coerceStr(ep?.id),
+      name: episodeDisplayName(season, ep),
+    }));
     try {
       await processEpisodeWithRetry(season, ep, vars, budget, intervalMs, retries);
     } catch (error) {
       if (error?.skipEpisode) skipped += 1;
       else failed += 1;
-      warn(`ep${ep?.id} ${coerceStr(error?.message ?? error)}`);
+      warn(t("epError", { ep: coerceStr(ep?.id), error: coerceStr(error?.message ?? error) }));
       addProgress(budget);
     }
   }
@@ -253,10 +263,10 @@ export async function crawlBangumi(vars, intervalMs, retries) {
   if (succeeded === 0) {
     throw new Error(
       skipped > 0 && failed === 0
-        ? `全部 ${skipped} 集都是大会员专享且当前无权观看，未下载任何内容`
-        : "所有剧集均下载失败",
+        ? t("allVipSkipped", { count: skipped })
+        : t("allEpisodesFailed"),
     );
   }
-  if (skipped > 0) warn(`共 ${episodes.length} 集，其中 ${skipped} 集为大会员专享已跳过。`);
-  if (failed > 0) warn(`共 ${episodes.length} 集，其中 ${failed} 集失败。`);
+  if (skipped > 0) warn(t("vipSkipped", { total: episodes.length, count: skipped }));
+  if (failed > 0) warn(t("episodesFailed", { total: episodes.length, count: failed }));
 }

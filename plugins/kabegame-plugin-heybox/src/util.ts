@@ -1,6 +1,7 @@
 // @ts-nocheck
 // 通用小工具：宿主桥接（日志 / 请求头 / 登录提示）、取值归一、文本清洗、风控判定、HTTP JSON。
 import { REQUEST_HEADERS } from "./consts";
+import { t } from "./i18n";
 
 const { createImageMetadata: createImageMetadataRow, setHeader, warn } = Kabegame;
 
@@ -13,7 +14,7 @@ export function setCookieAvailable(value) {
 
 /** 未登录时给告警补一句去畅游登录的提示；已登录返回空串。 */
 export function loginHint() {
-  return cookieAvailable ? "" : "（当前未登录，请先在畅游登录小黑盒后重试）";
+  return cookieAvailable ? "" : t("loginHint");
 }
 
 export function setRequestHeaders() {
@@ -68,9 +69,7 @@ export function isChallenge(status) {
 }
 
 export function challengeError(where, status) {
-  throw new Error(
-    `${where} status=${status ?? "nil"}。已触发小黑盒风控/验证码，请切换网络或代理 IP 后重试。`,
-  );
+  throw new Error(t("challengeError", { where, status: status ?? "nil" }));
 }
 
 export async function fetchJson(url) {

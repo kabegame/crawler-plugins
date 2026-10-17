@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, currentHtml, delHeader, downloadImage, requireCookie, setHeader, to, warn } = Kabegame;
 
@@ -75,15 +76,15 @@ function prepareSite(baseUrl) {
     browserIdentity: BROWSER_IDENTITY_HOSTS.has(host),
   };
   if (!applySiteHeaders()) {
-    warn(`[danbooru] 未从畅游取到 ${host} 的 Cookie；若请求被 403 拦截，请先在畅游中打开 ${baseUrl} 通过验证`);
+    warn(t("cookieMissing", { host, baseUrl }));
   }
 }
 
 function siteBlockedError(reason) {
   const hint = site.browserIdentity
-    ? `请先在畅游中打开 ${site.baseUrl} 通过验证，再重新运行任务`
-    : "请检查代理网络或稍后重试";
-  return new Error(`[danbooru] ${site.host} ${reason}，被 Cloudflare 拦截：${hint}`);
+    ? t("surfChallengeHint", { baseUrl: site.baseUrl })
+    : t("networkRetryHint");
+  return new Error(t("cloudflareBlocked", { host: site.host, reason, hint }));
 }
 
 function isChallengePage(document) {
@@ -97,11 +98,11 @@ async function openDocument(url) {
     finalUrl = await to(url);
   } catch (error) {
     // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
-    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError("返回 403");
+    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError(t("returned403"));
     throw error;
   }
   const document = parseHtml(await currentHtml());
-  if (isChallengePage(document)) throw siteBlockedError("返回了验证页");
+  if (isChallengePage(document)) throw siteBlockedError(t("returnedChallengePage"));
   return { finalUrl, document };
 }
 
@@ -339,7 +340,7 @@ async function processDetailPage(href, baseUrl, quality) {
   const meta = buildDanbooruMetadata(document, finalUrl);
   const imageUrl = pickImageUrl(meta, quality);
   if (!imageUrl) {
-    console.warn(`[danbooru] 详情页没解析出图片地址，跳过：${finalUrl}`);
+    console.warn(t("imageMissing", { url: finalUrl }));
     return;
   }
   const opts = { url: finalUrl };
@@ -368,16 +369,16 @@ function collectPostHrefs(document, pageUrl, ratingLetter = "") {
   // 根本不是列表页——多半是 Cloudflare 挑战页或错误页。两者在解析上都是「0 个作品」，
   // 不区分的话风控会伪装成「这个标签没图」静默跑完。
   if (articles.length === 0 && !document.querySelector(".posts-container, #posts")) {
-    console.warn(`[danbooru] 页面里没有作品列表容器，可能被站点拦截或返回了错误页：${pageUrl}`);
+    console.warn(t("listContainerMissing", { url: pageUrl }));
   }
   return hrefs;
 }
 
 function validatePageRange(startPage, endPage) {
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
 function normalizePerPage(value) {
@@ -392,17 +393,17 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label, r
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = makePageUrl(page);
-    console.log(`[danbooru][${label}] 打开页面 ${page}/${endPage}: ${pageUrl}`);
+    console.log(t("openPage", { label, page, total: endPage, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl, ratingLetter);
     if (hrefs.length === 0 && ratingLetter && document.querySelector("article.post-preview")) {
       // 这一页有作品、只是都被分级筛掉了，后面的页仍可能有符合的
-      console.log(`[danbooru][${label}] 第 ${page} 页没有分级为 ${ratingLetter} 的作品，继续下一页`);
+      console.log(t("noRatingPostsOnPage", { label, page, rating: ratingLetter }));
       addProgress(pageProgress);
       continue;
     }
     if (hrefs.length === 0) {
-      console.log(`[danbooru][${label}] 第 ${page} 页没有作品，结束`);
+      console.log(t("emptyPageStop", { label, page }));
       addProgress(pageProgress);
       break;
     }
@@ -451,10 +452,10 @@ async function crawlAll(baseUrl, quality, vars) {
 
 async function crawlByTags(baseUrl, quality, vars) {
   const tagsValue = buildTagsValueFromList(vars.mode_tag_value);
-  if (!tagsValue) throw new Error("标签模式需要至少填写一个标签");
+  if (!tagsValue) throw new Error(t("tagsRequired"));
   // 站点对匿名/普通账号限制每次检索最多 2 个标签，超了它会直接报错页
   if (tagsValue.split(" ").length > 2) {
-    console.warn(`[danbooru][tags] 一次检索了 ${tagsValue.split(" ").length} 个标签，站点对普通账号限制 2 个，可能返回空结果`);
+    console.warn(t("tooManyTags", { count: tagsValue.split(" ").length }));
   }
   const perPage = normalizePerPage(vars.per_page);
   const startPage = Number(vars.start_page ?? 1);
@@ -478,16 +479,18 @@ const MAX_ID_SPAN = 5000;
 function parsePostId(value, label) {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    throw new Error(t("positiveIntegerRequired", { label, value: text }));
+  }
   return id;
 }
 
 function parseIdRange(vars) {
-  const startId = parsePostId(vars.id_start, "起始 id");
-  const endId = parsePostId(vars.id_end, "结束 id");
-  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  const startId = parsePostId(vars.id_start, t("startIdLabel"));
+  const endId = parsePostId(vars.id_end, t("endIdLabel"));
+  if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
   if (endId - startId > MAX_ID_SPAN) {
-    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+    throw new Error(t("idRangeTooLarge", { max: MAX_ID_SPAN, startId, endId, span: endId - startId }));
   }
   return { startId, endId };
 }
@@ -511,7 +514,7 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   const tagsValue = site.host === "donmai.moe" ? `${idTags} rating:g` : withRatingToken(idTags, vars);
   const perPage = normalizePerPage(vars.per_page);
   const total = await countPosts(baseUrl, tagsValue);
-  console.log(`[danbooru][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
   if (total === 0) return;
   // 总数未知时按区间宽度估页数，进度可能提前到顶，不影响抓取
   const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / perPage));
@@ -522,7 +525,7 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   let seen = 0;
   for (let page = 1; page <= maxPages; page += 1) {
     const pageUrl = buildPostsUrl(baseUrl, tagsValue, perPage, page);
-    console.log(`[danbooru][id] 打开页面 ${page}/${total == null ? "?" : estimatedPages}: ${pageUrl}`);
+    console.log(t("openPage", { label: "id", page, total: total == null ? "?" : estimatedPages, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     if (hrefs.length === 0 || hrefs[0] === previousFirst) break;
@@ -570,6 +573,6 @@ export async function crawl(common, custom) {
   } else if (mode === "id_range") {
     await crawlByIdRange(baseUrl, quality, vars);
   } else {
-    throw new Error(`未知的爬取模式: ${mode}`);
+    throw new Error(t("unknownMode", { mode }));
   }
 }

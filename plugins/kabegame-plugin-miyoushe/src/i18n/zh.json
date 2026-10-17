@@ -1,0 +1,20 @@
+{
+  "emoticonSetFailed": "[米游社] emoticon_set 请求失败 retcode={retcode}",
+  "emoticonSetNetworkError": "[米游社] emoticon_set 网络错误，表情将降级为文本",
+  "repliesNetworkError": "[米游社] getPostReplies 网络错误，post_id={postId}",
+  "repliesFailed": "[米游社] getPostReplies 失败：post_id={postId} retcode={retcode}",
+  "singlePostUrlRequired": "[米游社] 单帖子模式：请填写帖子 URL",
+  "postIdExtractFailed": "[米游社] 无法从链接中提取帖子 ID，请确认地址形如 https://www.miyoushe.com/游戏/article/帖子id",
+  "postFullFailed": "[米游社] getPostFull 失败：post_id={postId} retcode={retcode} {message}",
+  "postFullNoPost": "[米游社] getPostFull 响应里没有 data.post.post：post_id={postId}",
+  "postNoImages": "[米游社] 帖子没有图片：post_id={postId}",
+  "userUidRequired": "[米游社] 作者帖子模式：请填写作者 UID",
+  "endPageBeforeStart": "[米游社] 结束页需要大于或等于起始页",
+  "userPostsFailed": "[米游社] userPostList 失败：uid={uid} retcode={retcode} {message}",
+  "pageNoResults": "[米游社] 第 {page} 页没有结果，停止",
+  "userPostsDone": "[米游社] 作者帖子列表任务结束，共处理 {count} 帖",
+  "searchFailed": "[米游社] 搜索失败：page={page} retcode={retcode} {message}",
+  "emoticonLoading": "[米游社] 拉取表情集合...",
+  "emoticonLoaded": "[米游社] 表情集合加载完成",
+  "taskFinished": "[米游社] 任务结束"
+}

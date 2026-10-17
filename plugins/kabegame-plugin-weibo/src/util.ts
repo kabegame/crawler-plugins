@@ -3,6 +3,7 @@
 import { md5, sleep } from "@kabegame/plugin-sdk";
 
 import { SUPERTOPIC_PREFIX } from "./consts";
+import { t } from "./i18n";
 
 export function str(value) {
   return value == null ? "" : String(value);
@@ -20,7 +21,7 @@ export function pause(ms) {
 export class LoginError extends Error {}
 
 function loginError() {
-  return new LoginError("微博登录态无效或已过期，请先在畅游重新登录 weibo.com 后重试。");
+  return new LoginError(t("loginExpired"));
 }
 
 /**
@@ -42,7 +43,7 @@ export async function fetchJson(url, headers) {
     const msg = json?.msg || json?.message || body.slice(0, 80);
     throw new Error(`HTTP ${response.status}: ${msg}`);
   }
-  if (json == null) throw new Error(`接口返回不是 JSON：${body.slice(0, 80)}`);
+  if (json == null) throw new Error(t("notJson", { body: body.slice(0, 80) }));
   return json;
 }
 

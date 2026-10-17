@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
 const { setHeader, warn } = Kabegame;
@@ -7,10 +8,10 @@ const { setHeader, warn } = Kabegame;
 export async function runUser(vars) {
   const artistId = coerceStr(vars.artist_id);
   const userId = coerceStr(vars.user_id);
-  if (!artistId) throw new Error("画师模式请填写画师 UID");
-  if (!userId) throw new Error("画师模式请填写登录用户 UID");
+  if (!artistId) throw new Error(t("artistRequired"));
+  if (!userId) throw new Error(t("artistUserRequired"));
   setHeader("x-user-id", userId);
-  ensurePixivCookie("画师作品抓取");
+  ensurePixivCookie(t("labelArtist"));
 
   let json;
   try {
@@ -18,7 +19,7 @@ export async function runUser(vars) {
       `https://www.pixiv.net/ajax/user/${artistId}/profile/all?lang=zh`,
     );
   } catch (e) {
-    rethrowIfLoginFailed(e, "画师作品抓取", true);
+    rethrowIfLoginFailed(e, t("labelArtist"), true);
     throw e;
   }
   const illusts = json?.body?.illusts || {};
@@ -34,13 +35,11 @@ export async function runUser(vars) {
   if (lastPage <= 0 || lastPage > totalPages) lastPage = totalPages;
 
   if (ids.length === 0) {
-    warn("该画师没有可抓取的作品");
+    warn(t("artistEmpty"));
     return;
   }
   if (firstPage > totalPages || firstPage > lastPage) {
-    warn(
-      `画师作品页范围为空：起始页 ${firstPage}，结束页 ${lastPage}，总页数 ${totalPages}`,
-    );
+    warn(t("artistPageRangeEmpty", { firstPage, lastPage, totalPages }));
     return;
   }
 

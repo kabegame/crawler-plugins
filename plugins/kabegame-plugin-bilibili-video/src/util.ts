@@ -1,5 +1,6 @@
 // @ts-nocheck
 // 通用小工具：取值归一、时间、风控码判定、HTTP JSON、输入解析。
+import { t } from "./i18n";
 
 const { warn } = Kabegame;
 
@@ -14,10 +15,10 @@ export function nowSeconds() {
 /** -101 登录态缺失 → 硬失败；-352 风控 → 告警不中断。与 bilibili 专栏插件一致。 */
 export function checkBilibiliRisk(code) {
   if (code === -101) {
-    throw new Error("B 站接口返回未登录（-101）：未获取到有效登录态，请先在畅游登录 bilibili 后重试。");
+    throw new Error(t("apiNotLoggedIn"));
   }
   if (code === -352) {
-    warn("B 站接口触发风控（-352），可稍后重试或更换网络；若持续失败请在畅游重新登录 bilibili。");
+    warn(t("riskControl"));
   }
 }
 

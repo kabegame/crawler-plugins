@@ -9,6 +9,8 @@
 //   recommend —— 反复请求 /explore 抓推荐流。推荐流不能翻页，但每次刷新返回的
 //                约 25 条互不重复（实测三次刷新零重叠），所以用"刷新轮数"代替分页。
 
+import { t } from "./i18n";
+
 const {
   addProgress,
   createImageMetadata,
@@ -28,7 +30,6 @@ const NOTE_LINK_RE =
   /(?:https?:\/\/)?(?:www\.)?(?:xiaohongshu|rednote)\.com\/(?:explore|discovery\/item|user\/profile\/[A-Za-z0-9]+)\/\S+/g;
 const SHORT_LINK_RE = /(?:https?:\/\/)?xhslink\.com\/[^\s"<>\\^`{|}，。；！？、【】《》]+/g;
 
-const log = (msg: string) => console.log(`[xhs] ${msg}`);
 const str = (v: unknown) => (v == null ? "" : String(v).trim());
 
 /** 对数正态抖动，模拟人类节奏（参考 XHS-Downloader tools.py 的做法） */
@@ -61,12 +62,12 @@ async function fetchHtml(url: string, attempts = 3): Promise<string | null> {
       if (res.ok) return await res.text();
       // 4xx 里只有 429 值得重试，其余是永久失败
       if (res.status !== 429 && res.status < 500) {
-        warn(`请求 ${url} 返回 ${res.status}，跳过`);
+        warn(t("requestSkipped", { url, status: res.status }));
         return null;
       }
-      warn(`请求 ${url} 返回 ${res.status}，第 ${i + 1} 次重试`);
+      warn(t("requestRetryStatus", { url, status: res.status, attempt: i + 1 }));
     } catch (err: any) {
-      warn(`请求 ${url} 失败：${err?.message ?? err}，第 ${i + 1} 次重试`);
+      warn(t("requestRetryError", { url, error: err?.message ?? err, attempt: i + 1 }));
     }
     await sleep(1000 * Math.pow(2, i) + Math.random() * 500);
   }
@@ -86,7 +87,7 @@ function parseInitialState(html: string): any | null {
   try {
     return JSON.parse(raw);
   } catch (err: any) {
-    warn(`解析 __INITIAL_STATE__ 失败：${err?.message ?? err}`);
+    warn(t("parseStateFailed", { error: err?.message ?? err }));
     return null;
   }
 }
@@ -221,7 +222,7 @@ async function downloadNote(
   }
 
   if (units.length === 0) {
-    warn(`作品 ${noteId} 没有可下载的媒体，跳过`);
+    warn(t("noMedia", { id: noteId }));
     onUnit(0);
     return 0;
   }
@@ -244,7 +245,7 @@ async function downloadNote(
       });
       ok += 1;
     } catch (err: any) {
-      warn(`下载失败 ${unit.url}：${err?.message ?? err}`);
+      warn(t("downloadFailed", { url: unit.url, error: err?.message ?? err }));
     }
     onUnit(units.length);
   }
@@ -265,7 +266,7 @@ async function crawlNoteUrl(
   const state = parseInitialState(html);
   const note = state ? pickNoteDetail(state) : null;
   if (!note) {
-    warn(`未能从 ${url} 解析出作品数据（可能已删除、仅登录可见，或链接无效）`);
+    warn(t("noteParseFailed", { url }));
     onUnit(0);
     return 0;
   }
@@ -281,12 +282,10 @@ async function crawlByLinks(rawInput: string, vars: Vars): Promise<void> {
   ];
   const unique = [...new Set(links)];
   if (unique.length === 0) {
-    throw new Error(
-      "没有识别到有效的小红书作品链接。支持 explore / discovery/item / user/profile 作品链接与 xhslink.com 短链。",
-    );
+    throw new Error(t("noValidLinks"));
   }
 
-  log(`共 ${unique.length} 个作品链接`);
+  console.log(t("linkCount", { count: unique.length }));
   const perNote = 100 / unique.length;
   let done = 0;
 
@@ -298,21 +297,19 @@ async function crawlByLinks(rawInput: string, vars: Vars): Promise<void> {
       addProgress(unitStep);
     });
     done += ok;
-    log(`[${done}] ${link} → ${ok} 个文件`);
+    console.log(t("fileCount", { done, link, ok }));
     await sleep(jitter(vars.delayMs));
   }
-  log(`完成，共下载 ${done} 个文件`);
+  console.log(t("doneDownloads", { count: done }));
 }
 
 /** 模式二：刷推荐流 */
 async function crawlRecommend(rounds: number, maxItems: number, vars: Vars): Promise<void> {
   if (!requireCookie(HOST)) {
     // 有就更好、没有也能跑：未登录拿到的是通用推荐，登录后才是个性化推荐
-    warn(
-      "未从畅游获取到小红书 Cookie，将以未登录状态抓取通用推荐。若想抓取个性化推荐，请先在畅游中登录小红书。",
-    );
+    warn(t("cookieMissingRecommend"));
   } else {
-    log("已注入畅游 Cookie，抓取个性化推荐");
+    console.log(t("cookieInjectedRecommend"));
   }
 
   const seen = new Set<string>();
@@ -328,13 +325,13 @@ async function crawlRecommend(rounds: number, maxItems: number, vars: Vars): Pro
 
     const html = await fetchHtml(`${BASE_URL}/explore`);
     if (!html) {
-      warn(`第 ${round} 轮推荐页抓取失败，跳过`);
+      warn(t("roundFetchFailed", { round }));
       continue;
     }
     const state = parseInitialState(html);
     const feeds = unwrap(state?.feed?.feeds);
     if (!Array.isArray(feeds) || feeds.length === 0) {
-      warn(`第 ${round} 轮没有解析到推荐条目`);
+      warn(t("roundEmpty", { round }));
       continue;
     }
 
@@ -343,7 +340,7 @@ async function crawlRecommend(rounds: number, maxItems: number, vars: Vars): Pro
       const id = str(it?.id);
       return id && !seen.has(id);
     });
-    log(`第 ${round}/${rounds} 轮：${feeds.length} 条，其中 ${fresh.length} 条是新的`);
+    console.log(t("roundSummary", { round, rounds, feeds: feeds.length, fresh: fresh.length }));
 
     for (const item of fresh) {
       if (processed >= limit) break;
@@ -359,14 +356,14 @@ async function crawlRecommend(rounds: number, maxItems: number, vars: Vars): Pro
         addProgress(unitStep);
       });
       files += ok;
-      if (ok > 0) log(`[${processed}] ${id} → ${ok} 个文件`);
+      if (ok > 0) console.log(t("fileCount", { done: processed, link: id, ok }));
       await sleep(jitter(vars.delayMs));
     }
 
     if (processed < limit && round < rounds) await sleep(jitter(vars.delayMs));
   }
 
-  log(`完成，处理 ${processed} 个作品，下载 ${files} 个文件`);
+  console.log(t("doneRecommend", { processed, files }));
 }
 
 export async function crawl(_common: unknown, custom: Record<string, any>): Promise<void> {
@@ -385,15 +382,15 @@ export async function crawl(_common: unknown, custom: Record<string, any>): Prom
     const rounds = Math.max(1, Number(cfg.refresh_rounds) || 5);
     // 留空（null）按默认 100 处理；只有显式填 0 才表示不限
     const maxItems = Math.max(0, Number(cfg.max_items ?? 100) || 0);
-    log(`模式：首页推荐，刷新 ${rounds} 轮，上限 ${maxItems || "不限"} 个作品`);
+    console.log(t("modeRecommend", { rounds, max: maxItems || t("unlimited") }));
     await crawlRecommend(rounds, maxItems, vars);
     return;
   }
 
   // 单作品模式也顺带注入 Cookie：部分内容未登录看不全，取不到不影响主流程
   if (!requireCookie(HOST)) {
-    warn("未从畅游获取到小红书 Cookie，将以未登录状态抓取。部分作品可能无法访问。");
+    warn(t("cookieMissing"));
   }
-  log("模式：作品链接");
+  console.log(t("modeNote"));
   await crawlByLinks(cfg.note_urls, vars);
 }

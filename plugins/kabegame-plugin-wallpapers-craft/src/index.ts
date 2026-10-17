@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, currentHtml, downloadImage, to } = Kabegame;
 
@@ -136,22 +137,22 @@ export async function crawl(common, custom) {
   const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
-  if (endPage < startPage) throw new Error("结束页数需要大于或等于起始页数");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 
   const selectedRes = getSelectedRes(vars);
-  console.log("[wallpapers-craft] 开始爬取");
+  console.log(t("crawlStarted"));
   const startUrl = buildPageUrl(vars, baseUrl, startPage, selectedRes);
   let { document } = await openDocument(startUrl);
 
   const maxPage = getMaxPage(document);
   const actualEndPage = Math.min(endPage, maxPage);
-  if (startPage > maxPage) throw new Error(`起始页 ${startPage} 超出网站最大页 ${maxPage}`);
+  if (startPage > maxPage) throw new Error(t("startPageBeyondMax", { startPage, maxPage }));
   const totalPages = actualEndPage - startPage + 1;
 
   for (let page = startPage; page <= actualEndPage; page += 1) {
     const pageUrl = buildPageUrl(vars, baseUrl, page, selectedRes);
     if (page > startPage) {
-      console.log(`翻页: ${page}/${actualEndPage} -> ${pageUrl}`);
+      console.log(t("turningPage", { page, endPage: actualEndPage, url: pageUrl }));
       document = (await openDocument(pageUrl)).document;
     }
 
@@ -165,7 +166,7 @@ export async function crawl(common, custom) {
     const pageProgress = totalPages > 0 ? 100.0 / totalPages : 0.0;
     const perImageProgress = thumbnailSrcs.length > 0 ? pageProgress / thumbnailSrcs.length : pageProgress;
 
-    console.log(`第 ${page} 页: 缩略图 ${thumbnailSrcs.length} 张，开始处理下载`);
+    console.log(t("pageImages", { page, count: thumbnailSrcs.length }));
     for (let idx = 0; idx < thumbnailSrcs.length; idx += 1) {
       const finalRes = selectedRes || extractRes(infoTextForThumb(infoTexts, idx));
       if (finalRes) {
@@ -177,5 +178,5 @@ export async function crawl(common, custom) {
     if (thumbnailSrcs.length === 0) addProgress(pageProgress);
   }
 
-  console.log("[wallpapers-craft] 爬取结束");
+  console.log(t("crawlFinished"));
 }

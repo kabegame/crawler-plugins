@@ -1,0 +1,21 @@
+{
+  "pageRangeTooLarge": "한 번에 100페이지를 초과하여 크롤할 수 없습니다. 책임감 있게 크롤해 주세요",
+  "endPageBeforeStart": "끝 페이지는 시작 페이지보다 앞설 수 없습니다",
+  "openPage": "[yandere][{label}] 페이지 {page}/{total} 여는 중: {url}",
+  "emptyPageStop": "[yandere][{label}] {page}페이지에 게시물이 없어 종료합니다",
+  "imageMissing": "[yandere] 게시물 페이지에서 이미지 URL을 찾지 못해 건너뜁니다: {url}",
+  "tagsRequired": "태그 모드에는 태그가 하나 이상 필요합니다",
+  "startIdLabel": "시작 ID",
+  "endIdLabel": "끝 ID",
+  "positiveIntegerRequired": "{label}은(는) 양의 정수여야 합니다. 현재 값: 「{value}」",
+  "endIdBeforeStart": "끝 ID({endId})는 시작 ID({startId}) 이상이어야 합니다",
+  "idRangeTooLarge": "ID 범위는 최대 {max}까지입니다. 현재 {startId}..{endId}는 {span} 차이입니다",
+  "unknownCount": "알 수 없음",
+  "idRangeSummary": "[yandere][id] ID {startId}..{endId}, 총 {total}개",
+  "unknownRanking": "알 수 없는 랭킹 유형: {scale}",
+  "openPopular": "[yandere][popular] 랭킹 {period}/{total} 여는 중: {url}",
+  "ratingInfoMissing": "[yandere][popular] 페이지에서 게시물 등급 정보를 찾지 못해 이번 기간에는 등급 필터링을 하지 않습니다: {url}",
+  "ratingFiltered": "[yandere][popular] 등급 필터 {rating}: {before} → {after}",
+  "popularEmpty": "[yandere][popular] 이번 기간에 조건에 맞는 게시물이 없습니다: {url}",
+  "unknownMode": "알 수 없는 크롤 모드: {mode}"
+}

@@ -4,6 +4,7 @@
 import { md5 } from "@kabegame/plugin-sdk";
 
 import { MIXIN_TAB, NAV_URL } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
 
 const { delHeader, setHeader } = Kabegame;
@@ -35,10 +36,10 @@ export async function getWbiKeys() {
   delHeader("Referer");
   if (nav?.code !== 0) {
     checkBilibiliRisk(nav?.code);
-    throw new Error(`nav 接口异常: ${coerceStr(nav?.message)}`);
+    throw new Error(t("navApiError", { message: coerceStr(nav?.message) }));
   }
   const wbi = nav?.data?.wbi_img || {};
   const keys = { img: stemFromWbiUrl(wbi.img_url), sub: stemFromWbiUrl(wbi.sub_url) };
-  if (!keys.img || !keys.sub) throw new Error("无法从 nav 获取 WBI 密钥");
+  if (!keys.img || !keys.sub) throw new Error(t("wbiKeysMissing"));
   return keys;
 }

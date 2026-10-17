@@ -1,0 +1,21 @@
+{
+  "pageRangeTooLarge": "在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪",
+  "endPageBeforeStart": "结束页面需要比开始页面大",
+  "openPage": "[yandere][{label}] 打开页面 {page}/{total}: {url}",
+  "emptyPageStop": "[yandere][{label}] 第 {page} 页没有作品，结束",
+  "imageMissing": "[yandere] 详情页没解析出图片地址，跳过：{url}",
+  "tagsRequired": "标签模式需要至少填写一个标签",
+  "startIdLabel": "起始 id",
+  "endIdLabel": "结束 id",
+  "positiveIntegerRequired": "{label}需要是正整数，当前为「{value}」",
+  "endIdBeforeStart": "结束 id（{endId}）需要不小于起始 id（{startId}）",
+  "idRangeTooLarge": "id 范围最多相差 {max}，当前 {startId}..{endId} 相差 {span}",
+  "unknownCount": "未知",
+  "idRangeSummary": "[yandere][id] id {startId}..{endId}，共 {total} 张",
+  "unknownRanking": "未知的排行榜类型: {scale}",
+  "openPopular": "[yandere][popular] 打开排行榜 {period}/{total}: {url}",
+  "ratingInfoMissing": "[yandere][popular] 页面里没找到作品分级信息，本期不做分级过滤：{url}",
+  "ratingFiltered": "[yandere][popular] 分级过滤 {rating}：{before} → {after}",
+  "popularEmpty": "[yandere][popular] 本期没有符合条件的作品：{url}",
+  "unknownMode": "未知的爬取模式: {mode}"
+}

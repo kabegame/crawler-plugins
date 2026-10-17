@@ -1,0 +1,21 @@
+{
+  "pageRangeTooLarge": "1回の実行で100ページを超えてクロールすることはできません。節度あるクロールにご協力ください",
+  "endPageBeforeStart": "終了ページは開始ページ以降にしてください",
+  "openPage": "[yandere][{label}] ページ {page}/{total} を開いています：{url}",
+  "emptyPageStop": "[yandere][{label}] {page} ページ目に投稿がないため終了します",
+  "imageMissing": "[yandere] 投稿ページから画像 URL を取得できず、スキップします：{url}",
+  "tagsRequired": "タグモードでは少なくとも1つのタグが必要です",
+  "startIdLabel": "開始 ID",
+  "endIdLabel": "終了 ID",
+  "positiveIntegerRequired": "{label}は正の整数である必要があります。現在の値：「{value}」",
+  "endIdBeforeStart": "終了 ID（{endId}）は開始 ID（{startId}）以上にしてください",
+  "idRangeTooLarge": "ID の範囲は最大 {max} までです。現在 {startId}..{endId} で {span} の差があります",
+  "unknownCount": "不明",
+  "idRangeSummary": "[yandere][id] ID {startId}..{endId}、全 {total} 件",
+  "unknownRanking": "不明なランキング種別：{scale}",
+  "openPopular": "[yandere][popular] ランキング {period}/{total} を開いています：{url}",
+  "ratingInfoMissing": "[yandere][popular] ページに投稿のレーティング情報が見つからないため、今回の期間はレーティング絞り込みを行いません：{url}",
+  "ratingFiltered": "[yandere][popular] レーティング絞り込み {rating}：{before} → {after}",
+  "popularEmpty": "[yandere][popular] 今回の期間に条件を満たす投稿はありません：{url}",
+  "unknownMode": "不明なクロールモード：{mode}"
+}

@@ -1,0 +1,17 @@
+{
+  "pageParseFailed": "페이지를 해석하지 못했습니다: {url}",
+  "missingJsonLd": "[haowallpaper] 상세 페이지에 JSON-LD가 없어 건너뜁니다: {url}",
+  "missingContentUrl": "[haowallpaper] 상세 페이지에 contentUrl이 없어 건너뜁니다: {url}",
+  "endPageBeforeStart": "끝 페이지는 시작 페이지보다 뒤여야 합니다",
+  "pageRangeTooLarge": "한 번에 100페이지를 초과해 가져올 수 없습니다. 서버에 무리가 가지 않도록 이용해 주세요",
+  "formatsRequired": "선택한 형식이 없습니다",
+  "defaultWpType": "기본값",
+  "crawlStarted": "[haowallpaper] 크롤 시작: 유형={wallpaperType}, 페이지={startPage}-{endPage}, 검색=[{tags}], wpType={wpType}",
+  "startPageBeyondTotal": "[haowallpaper] 시작 페이지 {startPage}이(가) 사이트 전체 페이지 수 {totalPages}를 넘었습니다",
+  "totalPages": "[haowallpaper] 사이트 전체 페이지 수 {totalPages}, 실제로 수집할 범위 {startPage}-{endPage}",
+  "pageItems": "[haowallpaper] {page}/{endPage} 페이지: {count}개 항목",
+  "pageEmpty": "[haowallpaper] {page} 페이지에 항목이 없습니다 (a={anchors}, card={cards}, cardMobile={mobileCards})",
+  "detailFailed": "[haowallpaper] 상세 페이지 처리에 실패해 건너뜁니다: {url} ({error})",
+  "pageDone": "[haowallpaper] {page}/{endPage} 페이지 완료: {downloaded}/{total}개 다운로드",
+  "crawlFinished": "[haowallpaper] 크롤을 종료했습니다"
+}

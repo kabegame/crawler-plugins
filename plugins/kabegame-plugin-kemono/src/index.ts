@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { t } from "./i18n";
+
 const {
   addProgress,
   createImageMetadata,
@@ -49,8 +51,9 @@ function coerceStr(value) {
 
 // 走 console.log → op_kabegame_log，进任务日志。warn 留给真正的异常，
 // 正常的流程边界（进入/离开作者、页面、帖子）用 log，免得任务日志全是黄色。
+// [kemono] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
 function log(message) {
-  console.log(`[kemono] ${message}`);
+  console.log(message);
 }
 
 function setSiteHeaders() {
@@ -74,16 +77,16 @@ async function fetchJson(url) {
   return response.json();
 }
 
-function rethrowIfLoginFailed(error, reason) {
+function rethrowIfLoginFailed(error, reasonKey) {
   if (error?.status === 401 || error?.status === 403) {
-    throw new Error(`${reason}失败：${HOST} 登录态失效（${error.status}），请在畅游重新登录后重试`);
+    throw new Error(t(reasonKey, { host: HOST, status: error.status }));
   }
   throw error;
 }
 
 function ensureFavoriteCookie() {
   if (!requireCookie(HOST)) {
-    throw new Error(`收藏模式需要登录：未从畅游获取到 ${HOST} 的 Cookie，请先在畅游登录该站点后重试`);
+    throw new Error(t("favoriteCookieMissing", { host: HOST }));
   }
 }
 
@@ -97,7 +100,7 @@ async function fetchCreatorProfile(service, creatorId, loginRequired) {
     return body && typeof body === "object" ? body : null;
   } catch (error) {
     if (error?.status === 404) return null;
-    if (loginRequired) rethrowIfLoginFailed(error, "获取作者信息");
+    if (loginRequired) rethrowIfLoginFailed(error, "loginFailedCreatorProfile");
     throw error;
   }
 }
@@ -112,7 +115,7 @@ async function fetchSinglePost(service, creatorId, postId, loginRequired) {
     return body?.post && typeof body.post === "object" ? body.post : null;
   } catch (error) {
     if (error?.status === 404) return null;
-    if (loginRequired) rethrowIfLoginFailed(error, "获取帖子");
+    if (loginRequired) rethrowIfLoginFailed(error, "loginFailedPost");
     throw error;
   }
 }
@@ -127,11 +130,13 @@ async function fetchPostPage(service, creatorId, page, loginRequired) {
   const url = `${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/posts?o=${offset}`;
   try {
     const body = await fetchJson(url);
-    if (!Array.isArray(body)) throw new Error(`${service}:${creatorId} 的帖子列表格式无效`);
+    if (!Array.isArray(body)) {
+      throw new Error(t("postListInvalid", { service, creatorId }));
+    }
     return body;
   } catch (error) {
     if (error?.status === 400) return null;
-    if (loginRequired) rethrowIfLoginFailed(error, "获取帖子列表");
+    if (loginRequired) rethrowIfLoginFailed(error, "loginFailedPostList");
     throw error;
   }
 }
@@ -141,10 +146,10 @@ async function fetchFavorites(type) {
   setSiteHeaders();
   try {
     const body = await fetchJson(`${BASE_URL}/api/v1/account/favorites?type=${type}`);
-    if (!Array.isArray(body)) throw new Error(`${HOST} 收藏列表格式无效`);
+    if (!Array.isArray(body)) throw new Error(t("favoritesInvalid", { host: HOST }));
     return body;
   } catch (error) {
-    rethrowIfLoginFailed(error, "获取收藏列表");
+    rethrowIfLoginFailed(error, "loginFailedFavorites");
   }
 }
 
@@ -152,7 +157,7 @@ function decodePathComponent(value) {
   try {
     return decodeURIComponent(value);
   } catch {
-    throw new Error(`链接路径包含无效编码：${value}`);
+    throw new Error(t("invalidPathEncoding", { value }));
   }
 }
 
@@ -162,28 +167,32 @@ function parseLink(rawLink) {
   try {
     url = new URL(rawLink);
   } catch {
-    throw new Error("链接模式请填写有效的 kemono.cr URL");
+    throw new Error(t("invalidUrl", { host: HOST }));
   }
 
   const hostname = url.hostname.toLowerCase();
   const known = HOST_ALIASES.some((host) => hostname === host || hostname.endsWith(`.${host}`));
-  if (!known) throw new Error(`不支持的链接站点：${hostname}（本插件只支持 ${HOST}）`);
+  if (!known) {
+    throw new Error(t("unsupportedLinkHost", { hostname, host: HOST }));
+  }
 
   const parts = url.pathname.split("/");
   if ((parts.length !== 4 && parts.length !== 6) || parts[0] !== "" || parts[2] !== "user") {
-    throw new Error("链接路径应为 /<service>/user/<uid> 或 /<service>/user/<uid>/post/<pid>");
+    throw new Error(t("linkPathInvalid"));
   }
   if (parts.length === 6 && parts[4] !== "post") {
-    throw new Error("单帖链接路径应为 /<service>/user/<uid>/post/<pid>");
+    throw new Error(t("singlePostPathInvalid"));
   }
 
   const service = decodePathComponent(parts[1]);
   const creatorId = decodePathComponent(parts[3]);
   const postId = parts.length === 6 ? decodePathComponent(parts[5]) : "";
   if (!service || !creatorId || (parts.length === 6 && !postId)) {
-    throw new Error("链接中的 service、作者 ID 或帖子 ID 不能为空");
+    throw new Error(t("emptyLinkParts"));
   }
-  if (!SUPPORTED_SERVICES.has(service)) throw new Error(`不支持的 service：${service}`);
+  if (!SUPPORTED_SERVICES.has(service)) {
+    throw new Error(t("unsupportedService", { service }));
+  }
   return { service, creatorId, postIds: postId ? new Set([postId]) : null };
 }
 
@@ -211,7 +220,7 @@ async function resolveTargets(vars) {
   const source = coerceStr(vars.source) || "link";
   if (source === "link") {
     const link = coerceStr(vars.link);
-    if (!link) throw new Error("链接模式请填写作者或帖子链接");
+    if (!link) throw new Error(t("linkRequired"));
     addTarget(targets, targetByKey, parseLink(link));
     return { targets, loginRequired: false };
   }
@@ -219,19 +228,26 @@ async function resolveTargets(vars) {
   if (source === "creator") {
     const service = coerceStr(vars.service);
     const creatorId = coerceStr(vars.creator_id);
-    if (!SUPPORTED_SERVICES.has(service)) throw new Error(`不支持的 service：${service}`);
-    if (!creatorId) throw new Error("作者模式请填写作者 ID");
+    if (!SUPPORTED_SERVICES.has(service)) {
+      throw new Error(t("unsupportedService", { service }));
+    }
+    if (!creatorId) throw new Error(t("creatorIdRequired"));
     addTarget(targets, targetByKey, { service, creatorId, postIds: null });
     return { targets, loginRequired: false };
   }
 
   if (source !== "fav_creator" && source !== "fav_post") {
-    throw new Error(`未知的爬取模式：${source}`);
+    throw new Error(t("unknownMode", { source }));
   }
 
   ensureFavoriteCookie();
   if (source === "fav_creator") {
-    const range = pageRange(vars, "fav_creator_page_start", "fav_creator_page_end", "收藏作者页数范围");
+    const range = pageRange(
+      vars,
+      "fav_creator_page_start",
+      "fav_creator_page_end",
+      t("favCreatorPageRangeLabel"),
+    );
     const creators = slicePages(await fetchFavorites("user"), range);
     for (const creator of creators) {
       const service = coerceStr(creator?.service);
@@ -243,7 +259,7 @@ async function resolveTargets(vars) {
   } else {
     // Go 实现把收藏接口结果只作为 service/user/post id，再回作者列表按 id 过滤（main.go:140-145）。
     // 与标签模式共用同一组「页数范围」变量：两者都是在一条扁平的帖子列表上翻页。
-    const range = pageRange(vars, "list_page_start", "list_page_end", "页数范围");
+    const range = pageRange(vars, "list_page_start", "list_page_end", t("pageRangeLabel"));
     const posts = slicePages(await fetchFavorites("post"), range);
     for (const post of posts) {
       const service = coerceStr(post?.service);
@@ -265,7 +281,7 @@ async function fetchTagPage(tag, page) {
   const url = `${BASE_URL}/api/v1/posts?tag=${encodeURIComponent(tag)}&o=${offset}`;
   const body = await fetchJson(url);
   const posts = Array.isArray(body?.posts) ? body.posts : null;
-  if (!posts) throw new Error(`标签 ${tag} 的帖子列表格式无效`);
+  if (!posts) throw new Error(t("tagPostListInvalid", { tag }));
   return { posts, count: positiveInteger(body?.count, 0) };
 }
 
@@ -273,12 +289,12 @@ async function fetchTagPage(tag, page) {
 // （实测一页 50 帖只有约 10 个唯一作者，缓存命中率高）。
 async function crawlTag(vars) {
   const tag = coerceStr(vars.tag);
-  if (!tag) throw new Error("标签模式请填写标签");
-  const { start, end } = pageRange(vars, "list_page_start", "list_page_end", "页数范围");
+  if (!tag) throw new Error(t("tagRequired"));
+  const { start, end } = pageRange(vars, "list_page_start", "list_page_end", t("pageRangeLabel"));
 
   const first = await fetchTagPage(tag, start);
   if (first.posts.length === 0) {
-    warn(`标签「${tag}」在第 ${start} 页没有帖子（该标签可能不存在，或起始页超出范围）`);
+    warn(t("tagPageEmpty", { tag, page: start }));
     return;
   }
 
@@ -290,7 +306,7 @@ async function crawlTag(vars) {
     : end;
   const progress = makeProgress(1);
   progress.beginTarget(Math.max(1, lastPage - start + 1));
-  log(`▶ 标签「${tag}」开始：本次爬取第 ${start}~${lastPage} 页`);
+  log(t("tagStart", { tag, start, end: lastPage }));
 
   const profiles = new Map();
   const profileFor = async (service, creatorId) => {
@@ -309,7 +325,7 @@ async function crawlTag(vars) {
       SUPPORTED_SERVICES.has(coerceStr(post?.service)) && coerceStr(post?.user));
     const images = countImages(usable, vars);
     progress.beginBatch(images);
-    log(`  ┌ 第 ${page} 页开始：${usable.length} 个帖子，${images} 张图`);
+    log(t("pageStart", { page, posts: usable.length, images }));
 
     let pageOk = 0;
     for (const post of usable) {
@@ -320,7 +336,7 @@ async function crawlTag(vars) {
     totalPosts += usable.length;
     totalImages += images;
     totalOk += pageOk;
-    log(`  └ 第 ${page} 页结束：下载 ${pageOk}/${images} 张`);
+    log(t("pageEnd", { page, ok: pageOk, images }));
 
     if (batch.length < PAGE_SIZE) break;
     page += 1;
@@ -328,7 +344,7 @@ async function crawlTag(vars) {
     batch = (await fetchTagPage(tag, page)).posts;
     if (batch.length === 0) break;
   }
-  log(`◀ 标签「${tag}」结束：${totalPosts} 帖，下载 ${totalOk}/${totalImages} 张`);
+  log(t("tagEnd", { tag, posts: totalPosts, ok: totalOk, images: totalImages }));
 }
 
 // 收藏接口一次返回完整列表（上游 Go 也是一次性拉取，没有 ?o= 分页），
@@ -338,7 +354,7 @@ function slicePages(list, range) {
   const from = (range.start - 1) * PAGE_SIZE;
   if (from >= list.length) {
     const total = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
-    warn(`起始页 ${range.start} 超出收藏列表页数（共 ${total} 页 / ${list.length} 项）`);
+    warn(t("favStartPageOutOfRange", { start: range.start, total, count: list.length }));
     return [];
   }
   const to = range.end === Number.MAX_SAFE_INTEGER ? list.length : Math.min(list.length, range.end * PAGE_SIZE);
@@ -358,19 +374,21 @@ function pageRange(vars, startKey, endKey, label) {
   // 结束页留空（null）不等同于填 0（翻到最后一页），按只爬起始页处理
   const rawEnd = positiveInteger(vars[endKey], start);
   const end = rawEnd <= 0 ? Number.MAX_SAFE_INTEGER : rawEnd;
-  if (end < start) throw new Error(`${label}：结束页（${rawEnd}）不能小于起始页（${start}）`);
+  if (end < start) {
+    throw new Error(t("pageRangeReversed", { label, end: rawEnd, start }));
+  }
   return { start, end };
 }
 
 // 作者帖子列表的页范围。单作者、链接、收藏的作者三种模式共用这一组。
 function creatorPageRange(vars) {
-  return pageRange(vars, "creator_page_start", "creator_page_end", "作者页数范围");
+  return pageRange(vars, "creator_page_start", "creator_page_end", t("creatorPageRangeLabel"));
 }
 
 function creatorLabel(creator, target) {
   const name = coerceStr(creator?.name);
   return name
-    ? `${name}（${target.service}:${target.creatorId}）`
+    ? t("creatorLabel", { name, service: target.service, creatorId: target.creatorId })
     : `${target.service}:${target.creatorId}`;
 }
 
@@ -379,30 +397,30 @@ function creatorLabel(creator, target) {
 async function crawlTarget(target, vars, loginRequired, progress) {
   const creator = await fetchCreatorProfile(target.service, target.creatorId, loginRequired);
   if (!creator) {
-    warn(`创作者不存在，已跳过：${target.service}:${target.creatorId}（${HOST}）`);
+    warn(t("creatorMissing", { service: target.service, creatorId: target.creatorId, host: HOST }));
     return;
   }
   const who = creatorLabel(creator, target);
 
   // 显式点名的帖子（单帖链接、收藏的作品）：直接走单帖接口，作者页范围不适用。
   if (target.postIds) {
-    log(`▶ 进入作者 ${who}：指定 ${target.postIds.size} 个帖子`);
+    log(t("enterCreatorPosts", { who, count: target.postIds.size }));
     progress.beginTarget(1);
     const posts = [];
     for (const postId of target.postIds) {
       const post = await fetchSinglePost(target.service, target.creatorId, postId, loginRequired);
       if (post) posts.push(post);
-      else warn(`帖子不存在，已跳过：${target.service}:${target.creatorId}:${postId}`);
+      else warn(t("postMissing", { service: target.service, creatorId: target.creatorId, postId }));
     }
     const images = countImages(posts, vars);
     progress.beginBatch(images);
-    log(`  取到 ${posts.length} 个帖子，共 ${images} 张图`);
+    log(t("fetchedPosts", { posts: posts.length, images }));
     let done = 0;
     for (const post of posts) {
       const r = await downloadPost({ creator, post }, vars, () => progress.tick());
       done += r.ok;
     }
-    log(`◀ 作者结束 ${who}：${posts.length} 帖，下载 ${done} 张`);
+    log(t("creatorEndSingle", { who, posts: posts.length, ok: done }));
     return;
   }
 
@@ -410,13 +428,19 @@ async function crawlTarget(target, vars, loginRequired, progress) {
   const postCount = positiveInteger(creator?.post_count, 0);
   const lastPage = postCount > 0 ? Math.ceil(postCount / PAGE_SIZE) : 0;
   if (lastPage > 0 && start > lastPage) {
-    warn(`起始页 ${start} 超出该作者的页数（共 ${lastPage} 页 / ${postCount} 帖），已跳过`);
+    warn(t("creatorStartPageOutOfRange", { start, total: lastPage, posts: postCount }));
     return;
   }
   const lastWanted = end === Number.MAX_SAFE_INTEGER
     ? (lastPage > 0 ? lastPage : start)
     : (lastPage > 0 ? Math.min(end, lastPage) : end);
-  log(`▶ 进入作者 ${who}：共 ${postCount} 帖 / ${lastPage || "?"} 页，本次爬取第 ${start}~${lastWanted} 页`);
+  log(t("enterCreator", {
+    who,
+    posts: postCount,
+    pages: lastPage || "?",
+    start,
+    end: lastWanted,
+  }));
   progress.beginTarget(Math.max(1, lastWanted - start + 1));
 
   let totalPosts = 0;
@@ -428,7 +452,7 @@ async function crawlTarget(target, vars, loginRequired, progress) {
     if (posts.length === 0) break;
     const images = countImages(posts, vars);
     progress.beginBatch(images);
-    log(`  ┌ 第 ${page} 页开始：${posts.length} 个帖子，${images} 张图`);
+    log(t("pageStart", { page, posts: posts.length, images }));
     let pageOk = 0;
     for (const post of posts) {
       const r = await downloadPost({ creator, post }, vars, () => progress.tick());
@@ -437,10 +461,10 @@ async function crawlTarget(target, vars, loginRequired, progress) {
     totalPosts += posts.length;
     totalImages += images;
     totalOk += pageOk;
-    log(`  └ 第 ${page} 页结束：下载 ${pageOk}/${images} 张`);
+    log(t("pageEnd", { page, ok: pageOk, images }));
     if (posts.length < PAGE_SIZE) break;
   }
-  log(`◀ 作者结束 ${who}：${totalPosts} 帖，下载 ${totalOk}/${totalImages} 张`);
+  log(t("creatorEnd", { who, posts: totalPosts, ok: totalOk, images: totalImages }));
 }
 
 // 进度分两级：先把 99% 按「批次」（一页帖子 / 一组单帖）平分，
@@ -507,7 +531,7 @@ function useThumbnail(vars) {
 
 function attachmentUrl(file, vars) {
   const path = coerceStr(file?.path);
-  if (!path) throw new Error("附件缺少 path");
+  if (!path) throw new Error(t("attachmentPathMissing"));
   // 缩略图走 img 主机的独立路径，不带 ?f=（实测不需要），也不经 kemono.cr 302 中转。
   if (useThumbnail(vars)) return `${THUMB_BASE_URL}/thumbnail/data${path}`;
   const originalName = fileName(file);
@@ -559,7 +583,12 @@ function rawAttachmentCount(post) {
 
 function postLabel(post) {
   const title = coerceStr(post?.title) || coerceStr(post?.id);
-  return `「${title}」(${coerceStr(post?.service)}:${coerceStr(post?.user)}:${coerceStr(post?.id)})`;
+  return t("postLabel", {
+    title,
+    service: coerceStr(post?.service),
+    user: coerceStr(post?.user),
+    postId: coerceStr(post?.id),
+  });
 }
 
 // onImage 在每张图片下载结束后调用（无论成败），用于按图片推进进度条。
@@ -570,12 +599,16 @@ async function downloadPost(item, vars, onImage) {
     // 纯文字帖（公告、更新说明）本来就没有附件，属于正常情况，不值得报警。
     // 只有原本有附件、却被缩略图模式滤掉时才提示。
     if (rawAttachmentCount(post) > 0) {
-      warn(`帖子的附件都被过滤掉了：${post?.service}:${post?.user}:${post?.id}`);
+      warn(t("attachmentsFiltered", {
+        service: post?.service,
+        user: post?.user,
+        postId: post?.id,
+      }));
     }
     return { images: 0, ok: 0, failed: 0 };
   }
 
-  log(`  → 帖子开始 ${postLabel(post)}：${files.length} 张图`);
+  log(t("postStart", { post: postLabel(post), images: files.length }));
 
   // 必须在确认有附件之后再建 metadata，否则纯文字帖会留下没有图片引用的孤儿记录。
   const metadataId = Number(createImageMetadata({
@@ -608,11 +641,14 @@ async function downloadPost(item, vars, onImage) {
       ok += 1;
     } catch (error) {
       failed += 1;
-      warn(`附件下载失败：${url || coerceStr(entry.file?.path)}（${error?.message || error}）`);
+      warn(t("attachmentDownloadFailed", {
+        url: url || coerceStr(entry.file?.path),
+        error: error?.message || error,
+      }));
     }
     if (onImage) onImage();
   }
-  log(`  ← 帖子结束 ${postLabel(post)}：成功 ${ok}，失败 ${failed}`);
+  log(t("postEnd", { post: postLabel(post), ok, failed }));
   return { images: files.length, ok, failed };
 }
 
@@ -625,7 +661,7 @@ export async function crawl(_common, custom) {
   }
   const { targets, loginRequired } = await resolveTargets(vars);
   if (targets.length === 0) {
-    warn("没有找到可爬取的收藏目标");
+    warn(t("noTargets"));
     return;
   }
   const progress = makeProgress(targets.length);

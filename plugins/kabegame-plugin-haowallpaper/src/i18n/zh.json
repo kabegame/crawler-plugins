@@ -1,0 +1,17 @@
+{
+  "pageParseFailed": "页面解析失败: {url}",
+  "missingJsonLd": "[haowallpaper] 详情页缺少 JSON-LD，跳过: {url}",
+  "missingContentUrl": "[haowallpaper] 详情页无 contentUrl，跳过: {url}",
+  "endPageBeforeStart": "结束页面需要比开始页面大",
+  "pageRangeTooLarge": "在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪",
+  "formatsRequired": "没有勾选任何格式",
+  "defaultWpType": "默认",
+  "crawlStarted": "[haowallpaper] 开始爬取: 类型={wallpaperType}, 页码={startPage}-{endPage}, 搜索=[{tags}], wpType={wpType}",
+  "startPageBeyondTotal": "[haowallpaper] 起始页 {startPage} 超出站点总页数 {totalPages}",
+  "totalPages": "[haowallpaper] 站点总页数 {totalPages}，实际爬取 {startPage}-{endPage}",
+  "pageItems": "[haowallpaper] 第 {page}/{endPage} 页: {count} 个条目",
+  "pageEmpty": "[haowallpaper] 第 {page} 页无条目 (a={anchors}, card={cards}, cardMobile={mobileCards})",
+  "detailFailed": "[haowallpaper] 处理详情页失败，跳过: {url} ({error})",
+  "pageDone": "[haowallpaper] 第 {page}/{endPage} 页完成: 下载 {downloaded}/{total}",
+  "crawlFinished": "[haowallpaper] 爬取结束"
+}

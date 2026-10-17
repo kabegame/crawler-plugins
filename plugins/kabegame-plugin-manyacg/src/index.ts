@@ -12,6 +12,7 @@
 //   - r18              0 仅全年龄 / 1 仅 R-18 / 2 混合，四种模式都生效。
 
 import TinyPinyin from "tiny-pinyin";
+import { t } from "./i18n";
 
 const { addProgress, createImageMetadata, downloadImage, warn } = Kabegame;
 
@@ -25,8 +26,9 @@ const REQUEST_ATTEMPTS = 3;
 const LABEL_TAG = "manyacg/tag";
 const LABEL_ARTIST = "manyacg/artist";
 
+// [manyacg] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
 function log(message) {
-  console.log(`[manyacg] ${message}`);
+  console.log(message);
 }
 
 function str(value) {
@@ -50,7 +52,7 @@ async function apiGet(path, query) {
       } catch {
         // 非 JSON 响应交给下面的状态码处理
       }
-      if (res.status === 400) throw Object.assign(new Error(body?.message || "参数错误"), { fatal: true });
+      if (res.status === 400) throw Object.assign(new Error(body?.message || t("badRequest")), { fatal: true });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return { status: res.status, data: Array.isArray(body?.data) ? body.data : [] };
     } catch (e) {
@@ -58,7 +60,7 @@ async function apiGet(path, query) {
       lastError = e;
     }
   }
-  throw new Error(`请求失败：${lastError?.message ?? lastError}`);
+  throw new Error(t("requestFailed", { error: lastError?.message ?? lastError }));
 }
 
 // ---------------------------------------------------------- label 与 key ----
@@ -214,7 +216,7 @@ async function downloadArtwork(art, siteBase) {
     .filter((p) => p?.regular)
     .sort((a, b) => (Number(a.index) || 0) - (Number(b.index) || 0));
   if (pictures.length === 0) {
-    warn(`[manyacg] 作品 ${art?.id} 没有可下载的图片，跳过`);
+    warn(t("artworkNoImages", { id: art?.id }));
     return 0;
   }
   const pageUrl = `${siteBase}/artwork/${art.id}`;
@@ -234,7 +236,7 @@ async function downloadArtwork(art, siteBase) {
 async function processArtworks(list, seen, siteBase, pct, bump) {
   const fresh = list.filter((art) => art?.id && !seen.has(art.id));
   const skipped = list.length - fresh.length;
-  if (skipped > 0) log(`  去掉本次任务内已出现过的 ${skipped} 个作品`);
+  if (skipped > 0) log(t("duplicatesSkipped", { count: skipped }));
   if (fresh.length === 0) {
     bump(pct);
     return;
@@ -244,9 +246,16 @@ async function processArtworks(list, seen, siteBase, pct, bump) {
     seen.add(art.id);
     try {
       const count = await downloadArtwork(art, siteBase);
-      log(`  ${i + 1}/${fresh.length} ${str(art.title) || art.id}：${count} 张`);
+      log(
+        t("artworkProgress", {
+          index: i + 1,
+          total: fresh.length,
+          name: str(art.title) || art.id,
+          count,
+        }),
+      );
     } catch (e) {
-      warn(`[manyacg] 作品 ${art.id} 失败：${e?.message ?? e}`);
+      warn(t("artworkFailed", { id: art.id, error: e?.message ?? e }));
     }
     bump(each);
   }
@@ -279,12 +288,12 @@ export async function crawl(common, custom) {
 
   if (mode === "random") {
     const limit = Math.min(RANDOM_MAX, Math.max(1, Number(vars.count ?? 30) || 30));
-    log(`随机模式：${limit} 个作品（r18=${r18}）`);
+    log(t("randomMode", { limit, r18 }));
     try {
       const { data } = await apiGet("/artwork/random", { limit: String(limit), r18 });
       await processArtworks(data || [], seen, siteBase, 100, bump);
     } catch (e) {
-      warn(`[manyacg] 随机读取失败：${e?.message ?? e}`);
+      warn(t("randomFailed", { error: e?.message ?? e }));
     }
     finish();
     return;
@@ -296,70 +305,70 @@ export async function crawl(common, custom) {
   if (mode === "semantic") {
     const keyword = str(vars.keyword);
     if (!keyword) {
-      warn("[manyacg] 语义搜索必须填写关键词");
+      warn(t("semanticKeywordRequired"));
       finish();
       return;
     }
     query.keyword = keyword;
     query.hybrid = "true";
-    title = `语义搜索「${keyword}」`;
+    title = t("titleSemantic", { keyword });
   } else if (mode === "similar") {
     const id = parseObjectId(vars.artwork);
     if (!id) {
-      warn("[manyacg] 相似作品模式需要填写参考作品的链接或 24 位 ID");
+      warn(t("similarTargetRequired"));
       finish();
       return;
     }
     query.similar_target = id;
-    title = `相似作品 ${id}`;
+    title = t("titleSimilar", { id });
   } else {
     const parts = [];
     const tag = str(vars.tag);
     const keyword = str(vars.keyword);
     if (tag) {
       query.tag = tag;
-      parts.push(`标签「${tag}」`);
+      parts.push(t("filterTag", { tag }));
     }
     if (str(vars.artist)) {
       const artistId = parseObjectId(vars.artist);
       // 填了作者却解析不出 ID 时不能悄悄忽略，否则会变成抓全站。
       if (!artistId) {
-        warn("[manyacg] 作者需要填写作者页链接或 24 位作者 ID（Pixiv / Twitter 的用户 ID 不能用）");
+        warn(t("artistRequired"));
         finish();
         return;
       }
       query.artist_id = artistId;
-      parts.push(`作者 ${artistId}`);
+      parts.push(t("filterArtist", { id: artistId }));
     }
     if (keyword) {
       query.keyword = keyword;
-      parts.push(`关键词「${keyword}」`);
+      parts.push(t("filterKeyword", { keyword }));
     }
-    title = parts.length > 0 ? `筛选：${parts.join(" + ")}` : "筛选：最新";
+    title = parts.length > 0 ? t("filterTitle", { parts: parts.join(" + ") }) : t("filterLatest");
   }
 
   const startPage = Math.max(1, Number(vars.start_page ?? 1) || 1);
   const endPage = Math.max(startPage, Number(vars.end_page ?? startPage) || startPage);
   const pctPerPage = 100 / (endPage - startPage + 1);
-  log(`${title}，r18=${r18}，第 ${startPage}~${endPage} 页（每页 ${PAGE_SIZE}）`);
+  log(t("crawlSummary", { title, r18, startPage, endPage, pageSize: PAGE_SIZE }));
 
   for (let page = startPage; page <= endPage; page += 1) {
     let list;
     try {
       ({ data: list } = await apiGet("/artwork/list", { ...query, page: String(page) }));
     } catch (e) {
-      warn(`[manyacg] 第 ${page} 页读取失败：${e?.message ?? e}`);
+      warn(t("pageFailed", { page, error: e?.message ?? e }));
       bump(pctPerPage);
       continue;
     }
     // 404 或空页：没有更多结果（条件无匹配 / 越过最后一页 / 语义搜索到 1000 条上限）。
     if (!list || list.length === 0) {
-      log(`第 ${page} 页没有结果，已到末尾`);
+      log(t("pageNoResults", { page }));
       break;
     }
-    log(`┌ 第 ${page} 页：${list.length} 个作品`);
+    log(t("pageStart", { page, count: list.length }));
     await processArtworks(list, seen, siteBase, pctPerPage, bump);
-    log(`└ 第 ${page} 页完成`);
+    log(t("pageDone", { page }));
     // 不能按「不满一页」判断末页：语义搜索的中间页也可能比 page_size 少几条（实测 200 → 199），
     // 只认 404 / 空页。
   }

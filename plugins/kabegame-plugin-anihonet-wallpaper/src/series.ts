@@ -2,6 +2,7 @@
 // 作品列表分页与单作品抓取。
 import { processDetailPage } from "./detail";
 import { openDocument, resolveUrl, textOf } from "./runtime";
+import { t } from "./i18n";
 
 const { addProgress, warn } = Kabegame;
 
@@ -29,18 +30,18 @@ export async function crawlAnimeSeries(
   baseUrl,
 ) {
   const full = resolveUrl(seriesHref, baseUrl);
-  console.log(`[anihonet] 进入作品列表页 行=${rowId} 第${idxInRow}/${totalInRow} 个分类: ${full}`);
+  console.log(t("seriesListOpen", { rowId, index: idxInRow, total: totalInRow, url: full }));
   let { document, finalUrl } = await openDocument(full);
   const listTotalPages = parseListPageTotalPages(document);
   let start = Math.max(1, Number(userStart || 1));
   let end = Number(userEnd || 0);
   const rangeMode = end > 0;
   if (rangeMode && start > end) [start, end] = [end, start];
-  const requestedRange = rangeMode ? `${start}-${end}` : "全部";
+  const requestedRange = rangeMode ? `${start}-${end}` : t("allPages");
   const actualRange = `1-${listTotalPages}`;
-  console.log(`[anihonet] 作品页数范围参数=${requestedRange}，检测到的实际页数范围=${actualRange}`);
+  console.log(t("seriesRangeInfo", { requestedRange, actualRange }));
   if (rangeMode && (start > listTotalPages || end > listTotalPages)) {
-    warn(`[anihonet] 检测到的实际页数范围 ${actualRange} 未覆盖输入范围 ${requestedRange}，超出部分不会抓取`);
+    warn(t("rangeNotCovered", { actualRange, requestedRange }));
   }
   if (rangeMode && start > listTotalPages) {
     addProgress(listPctBudget);

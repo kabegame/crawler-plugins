@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { t } from "./i18n";
 const {
   addProgress,
   createImageMetadata,
@@ -124,7 +125,7 @@ async function buildEmoticonMap() {
   try {
     const resp = await fetchJson(API_EMOTICONS);
     if (resp?.retcode !== 0) {
-      warn(`emoticon_set 请求失败 retcode=${coerceStr(resp?.retcode)}`);
+      warn(t("emoticonSetFailed", { retcode: coerceStr(resp?.retcode) }));
       return map;
     }
     for (const group of Array.isArray(resp?.data?.list) ? resp.data.list : []) {
@@ -138,7 +139,7 @@ async function buildEmoticonMap() {
     }
     if (Object.keys(map).length > 0) writeCachedEmoticonMap(map);
   } catch {
-    warn("[米游社] emoticon_set 网络错误，表情将降级为文本");
+    warn(t("emoticonSetNetworkError"));
   }
   return map;
 }
@@ -194,11 +195,11 @@ async function collectRepliesUntilLimit(postId, replyLimit) {
     try {
       resp = await fetchJson(buildRepliesUrl(postId, size, lastId));
     } catch {
-      warn(`[米游社] getPostReplies 网络错误，post_id=${postId}`);
+      warn(t("repliesNetworkError", { postId }));
       break;
     }
     if (resp?.retcode !== 0) {
-      warn(`getPostReplies 失败 post_id=${postId} retcode=${coerceStr(resp?.retcode)}`);
+      warn(t("repliesFailed", { postId, retcode: coerceStr(resp?.retcode) }));
       break;
     }
     const list = Array.isArray(resp?.data?.list) ? resp.data.list : [];
@@ -317,18 +318,24 @@ async function downloadPostImages(item, post, postId, postWeight, emoticonMap, v
 
 async function crawlSinglePost(vars, emoticonMap) {
   const inputUrl = coerceStr(vars.post_url).trim();
-  if (!inputUrl) throw new Error("单帖子模式：请填写帖子 URL");
+  if (!inputUrl) throw new Error(t("singlePostUrlRequired"));
   const postId = extractPostId(inputUrl);
-  if (!postId) throw new Error("无法从 URL 中提取帖子 ID，请确认格式为 https://www.miyoushe.com/{游戏}/article/{id}");
+  if (!postId) throw new Error(t("postIdExtractFailed"));
 
   const resp = await fetchJson(`${API_POST_FULL}?post_id=${encodeURIComponent(postId)}`);
   if (resp?.retcode !== 0) {
-    throw new Error(`getPostFull 失败 post_id=${postId} retcode=${coerceStr(resp?.retcode)} ${coerceStr(resp?.message)}`);
+    throw new Error(
+      t("postFullFailed", {
+        postId,
+        retcode: coerceStr(resp?.retcode),
+        message: coerceStr(resp?.message),
+      }),
+    );
   }
   const postWrap = resp?.data?.post;
   const post = postWrap?.post;
-  if (!post) throw new Error(`getPostFull 响应无 data.post.post，post_id=${postId}`);
-  if (imageUrlsFromList(post.images).length === 0) throw new Error(`帖子无图片 post_id=${postId}`);
+  if (!post) throw new Error(t("postFullNoPost", { postId }));
+  if (imageUrlsFromList(post.images).length === 0) throw new Error(t("postNoImages", { postId }));
   await downloadPostImages(postWrap, post, postId, 100.0, emoticonMap, vars, inputUrl);
 }
 
@@ -345,11 +352,11 @@ async function fastForwardUserOffset(uid, pageSize, startPage) {
 
 async function runUserPosts(vars, emoticonMap) {
   const uid = coerceStr(vars.user_uid).trim();
-  if (!uid) throw new Error("作者帖子模式：请填写作者 UID");
+  if (!uid) throw new Error(t("userUidRequired"));
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   const pageSize = Number(vars.page_size ?? 20);
-  if (endPage < startPage) throw new Error("结束页须大于或等于起始页");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 
   let offset = await fastForwardUserOffset(uid, pageSize, startPage);
   const totalPages = endPage - startPage + 1;
@@ -359,12 +366,18 @@ async function runUserPosts(vars, emoticonMap) {
   for (let page = startPage; page <= endPage; page += 1) {
     const resp = await fetchJson(buildUserPostsUrl(uid, pageSize, offset));
     if (resp?.retcode !== 0) {
-      warn(`userPostList 失败 uid=${uid} retcode=${coerceStr(resp?.retcode)} ${coerceStr(resp?.message)}`);
+      warn(
+        t("userPostsFailed", {
+          uid,
+          retcode: coerceStr(resp?.retcode),
+          message: coerceStr(resp?.message),
+        }),
+      );
       break;
     }
     const list = Array.isArray(resp?.data?.list) ? resp.data.list : [];
     if (list.length === 0) {
-      warn(`第 ${page} 页无结果，停止`);
+      warn(t("pageNoResults", { page }));
       addProgress(pageWeight);
       break;
     }
@@ -384,7 +397,7 @@ async function runUserPosts(vars, emoticonMap) {
     if (resp?.data?.is_last === true || !newOffset || newOffset === offset) break;
     offset = newOffset;
   }
-  console.log(`[米游社] 作者帖子列表任务结束，共处理 ${totalPosts} 帖`);
+  console.log(t("userPostsDone", { count: totalPosts }));
 }
 
 async function fastForwardSearchCursor(keyword, pageSize, startPage, gids) {
@@ -404,7 +417,7 @@ async function runSearch(vars, emoticonMap) {
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   const pageSize = Number(vars.page_size ?? 20);
-  if (endPage < startPage) throw new Error("结束页须大于或等于起始页");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 
   let cursor = await fastForwardSearchCursor(keyword, pageSize, startPage, gids);
   const totalPages = endPage - startPage + 1;
@@ -412,12 +425,18 @@ async function runSearch(vars, emoticonMap) {
   for (let page = startPage; page <= endPage; page += 1) {
     const resp = await fetchJson(buildSearchUrl(keyword, pageSize, cursor, gids));
     if (resp?.retcode !== 0) {
-      warn(`搜索失败 page=${page} retcode=${coerceStr(resp?.retcode)} ${coerceStr(resp?.message)}`);
+      warn(
+        t("searchFailed", {
+          page,
+          retcode: coerceStr(resp?.retcode),
+          message: coerceStr(resp?.message),
+        }),
+      );
       break;
     }
     const list = Array.isArray(resp?.data?.list) ? resp.data.list : [];
     if (list.length === 0) {
-      warn(`第 ${page} 页无结果，停止`);
+      warn(t("pageNoResults", { page }));
       addProgress(pageWeight);
       break;
     }
@@ -441,9 +460,9 @@ async function runSearch(vars, emoticonMap) {
 export async function crawl(_common, custom) {
   const vars = custom || {};
   setRequestHeaders();
-  console.log("[米游社] 拉取表情集合...");
+  console.log(t("emoticonLoading"));
   const emoticonMap = await buildEmoticonMap();
-  console.log("[米游社] 表情集合加载完成");
+  console.log(t("emoticonLoaded"));
 
   if (vars.crawl_mode === "single_post") {
     await crawlSinglePost(vars, emoticonMap);
@@ -452,5 +471,5 @@ export async function crawl(_common, custom) {
   } else {
     await runSearch(vars, emoticonMap);
   }
-  console.log("[米游社] 任务结束");
+  console.log(t("taskFinished"));
 }

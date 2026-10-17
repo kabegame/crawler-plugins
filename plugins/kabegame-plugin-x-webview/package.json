@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-x-webview",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "name.zh": "X（Twitter）媒体（WebView）",
   "name.en": "X (Twitter) media (WebView)",

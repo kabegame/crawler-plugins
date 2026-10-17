@@ -1,6 +1,7 @@
 // @ts-nocheck
 // 评论区拉取与精简。评论只入 metadata 供详情模板展示，上限 100 条。
 import { REPLY_API } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchWith509Retry } from "./util";
 import { signUrl } from "./wbi";
 
@@ -62,11 +63,11 @@ export async function fetchArticleReplies(cvId, img, sub) {
   while (collected.length < cap && !isEnd) {
     const reply = await fetchWith509Retry(
       () => signReplyUrl(cvId, offset, img, sub),
-      `cv ${cvId} 评论接口`,
+      t("commentApiLabel", { cvId }),
     );
     if (reply?.code !== 0) {
       checkBilibiliRisk(reply?.code);
-      warn(`评论 API 拉取失败 (cv ${cvId}): ${coerceStr(reply?.message)}`);
+      warn(t("commentsFetchFailed", { cvId, message: coerceStr(reply?.message) }));
       break;
     }
     const cursor = reply?.data?.cursor;

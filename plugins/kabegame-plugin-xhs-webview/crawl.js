@@ -11,6 +11,190 @@
 const BASE_URL = "https://www.xiaohongshu.com";
 const AUTHOR_MODES = ["author_post", "author_collect", "author_like"];
 
+// 用户可见文案跟随界面语言。zh 是基准表，其余语言必须覆盖全部 key。
+// WebView 插件不经过打包，无法 import JSON，因此把五语言表内联在这里。
+const MESSAGES = {
+  zh: {
+    statePresent: "存在",
+    stateAbsent: "缺失",
+    hasValue: "有",
+    noValue: "无",
+    listStateTimeout: "[xhs] 等待 20s 仍未读到列表数据 · mode={mode} · __INITIAL_STATE__={state} · feed={feed} · user={user} · search={search}",
+    scrollLimitReached: "[xhs] 滚动结束 · 已达上限 {count}/{maxItems} 条",
+    scrollRound: "[xhs] 滚动第 {round}/{rounds} 轮 · 当前抓到 {count} 条",
+    restrictedListHint: "[xhs] 收藏或点赞列表为空，请在爬虫窗口中登录，并打开对应的收藏或点赞标签页。",
+    restrictedItemsFound: "[xhs] 检测到 {count} 条，继续抓取",
+    waitingLogin: "[xhs] 仍在等待登录/切换标签页…（{seconds}s）",
+    restrictedTimeout: "[xhs] 等待 90s 后列表仍为空，放弃该模式",
+    downloadFailed: "[xhs] 下载失败：{name}：{error}",
+    downloadNote: "[xhs] 下载作品「{title}」({noteId}) · {count} 张图{video}",
+    withVideo: " + 视频",
+    processItem: "[xhs] 处理作品 {index}/{total} · {url}",
+    noteParseFailed: "[xhs] 未解析到作品数据，跳过 · {url}",
+    detailFailed: "[xhs] 抓取详情失败，跳过 · {url} · {error}",
+    allDone: "[xhs] 全部完成 · 成功 {done}/{total}",
+    initial: "[xhs] 初始化 · 模式={mode} · 最多 {maxItems} 条 · 滚动 {rounds} 轮",
+    noNoteLinks: "[xhs] 没有识别到有效的小红书作品链接，任务结束。",
+    noteLinkMode: "[xhs] 链接模式 · 识别到 {count} 条作品链接",
+    authorRequired: "[xhs] 请填写作者主页 URL 或 userId，任务结束。",
+    boardRequired: "[xhs] 请填写专辑 URL 或 id，任务结束。",
+    keywordRequired: "[xhs] 请填写搜索关键词，任务结束。",
+    unknownMode: "[xhs] 未知爬取模式：{mode}",
+    openListPage: "[xhs] 打开列表页：{url}",
+    waitListData: "[xhs] 列表页 · 等待数据注入（mode={mode}）…",
+    emptyList: "[xhs] 当前列表没有可抓取的作品；请检查页面、登录状态或筛选条件。",
+    listReady: "[xhs] 列表加载完成，共入队 {count} 条作品",
+    pageLoaded: "[xhs] ▶ 页面加载 · 阶段={phase} · {url}",
+    stageEnded: "[xhs] 阶段={phase}，结束",
+    pluginFailed: "[xhs] 插件运行失败：{error}"
+  },
+  en: {
+    statePresent: "present",
+    stateAbsent: "missing",
+    hasValue: "yes",
+    noValue: "no",
+    listStateTimeout: "[xhs] Still no list data after 20s · mode={mode} · __INITIAL_STATE__={state} · feed={feed} · user={user} · search={search}",
+    scrollLimitReached: "[xhs] Scrolling finished · reached the limit of {count}/{maxItems} items",
+    scrollRound: "[xhs] Scroll round {round}/{rounds} · {count} items collected so far",
+    restrictedListHint: "[xhs] The favorites or likes list is empty. Sign in in the crawler window and open the matching favorites or likes tab.",
+    restrictedItemsFound: "[xhs] Found {count} items; continuing",
+    waitingLogin: "[xhs] Still waiting for sign-in or a tab switch… ({seconds}s)",
+    restrictedTimeout: "[xhs] The list is still empty after 90s; giving up on this mode",
+    downloadFailed: "[xhs] Download failed: {name}: {error}",
+    downloadNote: "[xhs] Downloading “{title}” ({noteId}) · {count} image(s){video}",
+    withVideo: " + video",
+    processItem: "[xhs] Processing post {index}/{total} · {url}",
+    noteParseFailed: "[xhs] No post data could be parsed; skipping · {url}",
+    detailFailed: "[xhs] Failed to crawl the detail page; skipping · {url} · {error}",
+    allDone: "[xhs] All done · {done}/{total} succeeded",
+    initial: "[xhs] Starting · mode={mode} · up to {maxItems} items · {rounds} scroll rounds",
+    noNoteLinks: "[xhs] No valid Xiaohongshu post links were recognized; ending the task.",
+    noteLinkMode: "[xhs] Link mode · {count} post links recognized",
+    authorRequired: "[xhs] Enter the creator profile URL or userId; ending the task.",
+    boardRequired: "[xhs] Enter the board URL or id; ending the task.",
+    keywordRequired: "[xhs] Enter a search keyword; ending the task.",
+    unknownMode: "[xhs] Unknown crawl mode: {mode}",
+    openListPage: "[xhs] Opening the list page: {url}",
+    waitListData: "[xhs] List page · waiting for data injection (mode={mode})…",
+    emptyList: "[xhs] No posts available in the current list; check the page, sign-in state, or filters.",
+    listReady: "[xhs] List loaded; {count} posts queued",
+    pageLoaded: "[xhs] ▶ Page load · phase={phase} · {url}",
+    stageEnded: "[xhs] Phase={phase}; exiting",
+    pluginFailed: "[xhs] Plugin run failed: {error}"
+  },
+  ja: {
+    statePresent: "あり",
+    stateAbsent: "なし",
+    hasValue: "あり",
+    noValue: "なし",
+    listStateTimeout: "[xhs] 20 秒待ってもリストデータを取得できません · mode={mode} · __INITIAL_STATE__={state} · feed={feed} · user={user} · search={search}",
+    scrollLimitReached: "[xhs] スクロール終了 · 上限 {count}/{maxItems} 件に到達",
+    scrollRound: "[xhs] スクロール {round}/{rounds} 回目 · 現在 {count} 件取得",
+    restrictedListHint: "[xhs] お気に入りまたはいいね一覧が空です。クローラーウィンドウでログインし、該当するお気に入り／いいねタブを開いてください。",
+    restrictedItemsFound: "[xhs] {count} 件を検出しました。取得を続けます",
+    waitingLogin: "[xhs] ログインまたはタブ切り替えを待っています…（{seconds}秒）",
+    restrictedTimeout: "[xhs] 90 秒待っても一覧が空のため、このモードを断念します",
+    downloadFailed: "[xhs] ダウンロード失敗：{name}：{error}",
+    downloadNote: "[xhs] 投稿「{title}」をダウンロード ({noteId}) · 画像 {count} 枚{video}",
+    withVideo: " + 動画",
+    processItem: "[xhs] 投稿 {index}/{total} を処理 · {url}",
+    noteParseFailed: "[xhs] 投稿データを解析できませんでした。スキップします · {url}",
+    detailFailed: "[xhs] 詳細の取得に失敗しました。スキップします · {url} · {error}",
+    allDone: "[xhs] 完了 · 成功 {done}/{total}",
+    initial: "[xhs] 初期化 · モード={mode} · 最大 {maxItems} 件 · スクロール {rounds} 回",
+    noNoteLinks: "[xhs] 有効な Xiaohongshu の投稿リンクが見つかりません。タスクを終了します。",
+    noteLinkMode: "[xhs] リンクモード · {count} 件の投稿リンクを検出",
+    authorRequired: "[xhs] 作者プロフィールの URL または userId を入力してください。タスクを終了します。",
+    boardRequired: "[xhs] アルバムの URL または id を入力してください。タスクを終了します。",
+    keywordRequired: "[xhs] 検索キーワードを入力してください。タスクを終了します。",
+    unknownMode: "[xhs] 不明なクロールモード：{mode}",
+    openListPage: "[xhs] 一覧ページを開きます：{url}",
+    waitListData: "[xhs] 一覧ページ · データの注入を待っています（mode={mode}）…",
+    emptyList: "[xhs] 現在の一覧に取得できる投稿がありません。ページ、ログイン状態、絞り込み条件を確認してください。",
+    listReady: "[xhs] 一覧の読み込みが完了しました。{count} 件をキューに追加",
+    pageLoaded: "[xhs] ▶ ページ読み込み · フェーズ={phase} · {url}",
+    stageEnded: "[xhs] フェーズ={phase} のため終了します",
+    pluginFailed: "[xhs] プラグインの実行に失敗しました：{error}"
+  },
+  ko: {
+    statePresent: "있음",
+    stateAbsent: "없음",
+    hasValue: "있음",
+    noValue: "없음",
+    listStateTimeout: "[xhs] 20초가 지나도 목록 데이터를 읽지 못했습니다 · mode={mode} · __INITIAL_STATE__={state} · feed={feed} · user={user} · search={search}",
+    scrollLimitReached: "[xhs] 스크롤 종료 · 최대 {count}/{maxItems}개 도달",
+    scrollRound: "[xhs] 스크롤 {round}/{rounds}회 · 현재 {count}개 수집",
+    restrictedListHint: "[xhs] 즐겨찾기 또는 좋아요 목록이 비어 있습니다. 크롤러 창에서 로그인하고 해당 즐겨찾기 또는 좋아요 탭을 열어 주세요.",
+    restrictedItemsFound: "[xhs] {count}개를 감지했습니다. 계속 수집합니다",
+    waitingLogin: "[xhs] 로그인 또는 탭 전환을 기다리는 중… ({seconds}초)",
+    restrictedTimeout: "[xhs] 90초가 지나도 목록이 비어 있어 이 모드를 포기합니다",
+    downloadFailed: "[xhs] 다운로드 실패: {name}: {error}",
+    downloadNote: "[xhs] 게시물 “{title}” 다운로드 ({noteId}) · 이미지 {count}장{video}",
+    withVideo: " + 동영상",
+    processItem: "[xhs] 게시물 {index}/{total} 처리 · {url}",
+    noteParseFailed: "[xhs] 게시물 데이터를 파싱하지 못했습니다. 건너뜁니다 · {url}",
+    detailFailed: "[xhs] 상세 정보 수집 실패, 건너뜀 · {url} · {error}",
+    allDone: "[xhs] 모두 완료 · 성공 {done}/{total}",
+    initial: "[xhs] 초기화 · 모드={mode} · 최대 {maxItems}개 · 스크롤 {rounds}회",
+    noNoteLinks: "[xhs] 유효한 샤오홍슈 게시물 링크를 찾지 못했습니다. 작업을 종료합니다.",
+    noteLinkMode: "[xhs] 링크 모드 · 게시물 링크 {count}개 감지",
+    authorRequired: "[xhs] 작성자 프로필 URL 또는 userId를 입력해 주세요. 작업을 종료합니다.",
+    boardRequired: "[xhs] 앨범 URL 또는 id를 입력해 주세요. 작업을 종료합니다.",
+    keywordRequired: "[xhs] 검색어를 입력해 주세요. 작업을 종료합니다.",
+    unknownMode: "[xhs] 알 수 없는 크롤 모드: {mode}",
+    openListPage: "[xhs] 목록 페이지 열기: {url}",
+    waitListData: "[xhs] 목록 페이지 · 데이터 주입 대기 중(mode={mode})…",
+    emptyList: "[xhs] 현재 목록에 수집할 게시물이 없습니다. 페이지, 로그인 상태 또는 필터를 확인해 주세요.",
+    listReady: "[xhs] 목록 로드 완료, 게시물 {count}개 대기열 추가",
+    pageLoaded: "[xhs] ▶ 페이지 로드 · 단계={phase} · {url}",
+    stageEnded: "[xhs] 단계={phase}, 종료합니다",
+    pluginFailed: "[xhs] 플러그인 실행 실패: {error}"
+  },
+  zhtw: {
+    statePresent: "存在",
+    stateAbsent: "缺失",
+    hasValue: "有",
+    noValue: "無",
+    listStateTimeout: "[xhs] 等待 20s 仍未讀到列表資料 · mode={mode} · __INITIAL_STATE__={state} · feed={feed} · user={user} · search={search}",
+    scrollLimitReached: "[xhs] 滾動結束 · 已達上限 {count}/{maxItems} 則",
+    scrollRound: "[xhs] 滾動第 {round}/{rounds} 輪 · 目前抓到 {count} 則",
+    restrictedListHint: "[xhs] 收藏或按讚列表為空，請在爬蟲視窗中登入，並開啟對應的收藏或按讚分頁。",
+    restrictedItemsFound: "[xhs] 偵測到 {count} 則，繼續抓取",
+    waitingLogin: "[xhs] 仍在等待登入／切換分頁…（{seconds}s）",
+    restrictedTimeout: "[xhs] 等待 90s 後列表仍為空，放棄此模式",
+    downloadFailed: "[xhs] 下載失敗：{name}：{error}",
+    downloadNote: "[xhs] 下載作品「{title}」({noteId}) · {count} 張圖{video}",
+    withVideo: " + 影片",
+    processItem: "[xhs] 處理作品 {index}/{total} · {url}",
+    noteParseFailed: "[xhs] 未解析到作品資料，跳過 · {url}",
+    detailFailed: "[xhs] 抓取詳情失敗，跳過 · {url} · {error}",
+    allDone: "[xhs] 全部完成 · 成功 {done}/{total}",
+    initial: "[xhs] 初始化 · 模式={mode} · 最多 {maxItems} 則 · 滾動 {rounds} 輪",
+    noNoteLinks: "[xhs] 沒有辨識到有效的小紅書作品連結，任務結束。",
+    noteLinkMode: "[xhs] 連結模式 · 辨識到 {count} 則作品連結",
+    authorRequired: "[xhs] 請填寫作者主頁 URL 或 userId，任務結束。",
+    boardRequired: "[xhs] 請填寫專輯 URL 或 id，任務結束。",
+    keywordRequired: "[xhs] 請填寫搜尋關鍵字，任務結束。",
+    unknownMode: "[xhs] 未知的爬取模式：{mode}",
+    openListPage: "[xhs] 開啟列表頁：{url}",
+    waitListData: "[xhs] 列表頁 · 等待資料注入（mode={mode}）…",
+    emptyList: "[xhs] 目前列表沒有可抓取的作品；請檢查頁面、登入狀態或篩選條件。",
+    listReady: "[xhs] 列表載入完成，共加入 {count} 則作品",
+    pageLoaded: "[xhs] ▶ 頁面載入 · 階段={phase} · {url}",
+    stageEnded: "[xhs] 階段={phase}，結束",
+    pluginFailed: "[xhs] 外掛執行失敗：{error}"
+  }
+};
+
+const LANG = Kabegame.getLang?.() ?? "zh";
+const t = (key, params = {}) => {
+  const table = MESSAGES[LANG] || MESSAGES.zh;
+  const tpl = table[key] ?? MESSAGES.zh[key] ?? key;
+  return tpl.replace(/\{(\w+)\}/g, (m, name) =>
+    params[name] != null ? String(params[name]) : m
+  );
+};
+
 function unwrap(value) {
   return value && value._rawValue !== undefined ? value._rawValue : value;
 }
@@ -19,13 +203,13 @@ function errorMessage(error) {
   return error?.message ?? String(error);
 }
 
-// 统一带 [xhs] 前缀的日志，方便在任务日志里筛选、定位卡点。
+// 统一日志出口；[xhs] 前缀放在各语言文案里，方便在任务日志里筛选、定位卡点。
 function log(message) {
-  return Kabegame.log(`[xhs] ${message}`);
+  return Kabegame.log(message);
 }
 
 function warn(message) {
-  return Kabegame.warn(`[xhs] ${message}`);
+  return Kabegame.warn(message);
 }
 
 function randomInt(min, max) {
@@ -208,11 +392,13 @@ async function waitForListState(mode, boardId) {
   // 超时诊断：区分“页面根本没注入数据”和“数据路径不对”。
   const state = initialState();
   await warn(
-    `等待 20s 仍未读到列表数据 · mode=${mode} · __INITIAL_STATE__=${
-      state ? "存在" : "缺失"
-    } · feed=${state?.feed ? "有" : "无"} · user=${
-      state?.user ? "有" : "无"
-    } · search=${state?.search ? "有" : "无"}`,
+    t("listStateTimeout", {
+      mode,
+      state: state ? t("statePresent") : t("stateAbsent"),
+      feed: state?.feed ? t("hasValue") : t("noValue"),
+      user: state?.user ? t("hasValue") : t("noValue"),
+      search: state?.search ? t("hasValue") : t("noValue"),
+    }),
   );
   return false;
 }
@@ -221,10 +407,10 @@ async function scrollList(mode, boardId, maxItems, scrollRounds) {
   for (let round = 0; round < scrollRounds; round += 1) {
     const count = listItems(mode, boardId).length;
     if (count >= maxItems) {
-      await log(`滚动结束 · 已达上限 ${count}/${maxItems} 条`);
+      await log(t("scrollLimitReached", { count, maxItems }));
       break;
     }
-    await log(`滚动第 ${round + 1}/${scrollRounds} 轮 · 当前抓到 ${count} 条`);
+    await log(t("scrollRound", { round: round + 1, rounds: scrollRounds, count }));
     window.scrollTo(0, document.body.scrollHeight);
     await Kabegame.sleep(randomInt(250, 500));
     if (Math.random() < 0.2) {
@@ -235,22 +421,20 @@ async function scrollList(mode, boardId, maxItems, scrollRounds) {
 }
 
 async function waitForRestrictedAuthorItems(mode, boardId) {
-  await warn(
-    "收藏或点赞列表为空，请在爬虫窗口中登录，并打开对应的收藏或点赞标签页。",
-  );
+  await warn(t("restrictedListHint"));
   await Kabegame.requestShowWebview();
   for (let attempt = 0; attempt < 90; attempt += 1) {
     const items = listItems(mode, boardId);
     if (items.length > 0) {
-      await log(`检测到 ${items.length} 条，继续抓取`);
+      await log(t("restrictedItemsFound", { count: items.length }));
       return items;
     }
     if (attempt > 0 && attempt % 15 === 0) {
-      await log(`仍在等待登录/切换标签页…（${attempt}s）`);
+      await log(t("waitingLogin", { seconds: attempt }));
     }
     await Kabegame.sleep(1000);
   }
-  await warn("等待 90s 后列表仍为空，放弃该模式");
+  await warn(t("restrictedTimeout"));
   return [];
 }
 
@@ -346,7 +530,7 @@ async function downloadMedia(url, options) {
   try {
     await Kabegame.downloadImage(url, options);
   } catch (error) {
-    await warn(`下载失败：${options.name}：${errorMessage(error)}`);
+    await warn(t("downloadFailed", { name: options.name, error: errorMessage(error) }));
   }
   // 每次下载之间隔 500ms，压低对 xhs CDN 的突发并发，减少瞬时拒绝（宿主侧另有重试兜底）。
   await Kabegame.sleep(3000);
@@ -394,9 +578,12 @@ async function downloadNote(note, sourceUrl, fallbackId, progressBudget = 0) {
   }
 
   await log(
-    `下载作品「${title}」(${noteId}) · ${images.length} 图${
-      hasVideo ? " + 视频" : ""
-    }`,
+    t("downloadNote", {
+      title,
+      noteId,
+      count: images.length,
+      video: hasVideo ? t("withVideo") : "",
+    }),
   );
 
   // 空作品也要把预算加满，保证总进度最终到 100%。
@@ -428,7 +615,7 @@ async function processQueue(queue) {
   for (let i = 0; i < total; i += 1) {
     const entry = queue[i];
     const source = detailUrl(entry);
-    await log(`处理作品 ${i + 1}/${total} · ${source}`);
+    await log(t("processItem", { index: i + 1, total, url: source }));
     try {
       const note = await fetchNote(entry);
       if (note) {
@@ -436,17 +623,17 @@ async function processQueue(queue) {
         await downloadNote(note, source, entry.id, perItem);
         done += 1;
       } else {
-        await warn(`未解析到作品数据，跳过 · ${source}`);
+        await warn(t("noteParseFailed", { url: source }));
         await Kabegame.addProgress(perItem);
       }
     } catch (error) {
-      await warn(`抓取详情失败，跳过 · ${source} · ${errorMessage(error)}`);
+      await warn(t("detailFailed", { url: source, error: errorMessage(error) }));
       await Kabegame.addProgress(perItem);
     }
     if (i < total - 1) await politeDelay();
   }
 
-  await log(`全部完成 · 成功 ${done}/${total}`);
+  await log(t("allDone", { done, total }));
 }
 
 // ── 阶段处理 ───────────────────────────────────────────────────────────
@@ -456,18 +643,18 @@ async function handleInitial() {
   const maxItems = clampInt(Kabegame.vars?.max_items, 50, 1, 500);
   const scrollRounds = clampInt(Kabegame.vars?.scroll_rounds, 5, 0, 100);
   await log(
-    `初始化 · 模式=${mode} · 最多 ${maxItems} 条 · 滚动 ${scrollRounds} 轮`,
+    t("initial", { mode, maxItems, rounds: scrollRounds }),
   );
 
   // 链接模式：无需列表页，直接在当前执行流里 fetch 抓取全部链接。
   if (mode === "note") {
     const queue = normalizeNoteUrls(Kabegame.vars?.note_urls);
     if (queue.length === 0) {
-      await warn("没有识别到有效的小红书作品链接，任务结束。");
+      await warn(t("noNoteLinks"));
       await Kabegame.exit();
       return;
     }
-    await log(`链接模式 · 识别到 ${queue.length} 条作品链接`);
+    await log(t("noteLinkMode", { count: queue.length }));
     await processQueue(queue);
     await Kabegame.exit();
     return;
@@ -481,7 +668,7 @@ async function handleInitial() {
   } else if (AUTHOR_MODES.includes(mode)) {
     const authorId = extractId(Kabegame.vars?.author_url, "author");
     if (!authorId) {
-      await warn("请填写作者主页 URL 或 userId，任务结束。");
+      await warn(t("authorRequired"));
       await Kabegame.exit();
       return;
     }
@@ -489,7 +676,7 @@ async function handleInitial() {
   } else if (mode === "board") {
     boardId = extractId(Kabegame.vars?.board_url, "board");
     if (!boardId) {
-      await warn("请填写专辑 URL 或 id，任务结束。");
+      await warn(t("boardRequired"));
       await Kabegame.exit();
       return;
     }
@@ -497,7 +684,7 @@ async function handleInitial() {
   } else if (mode === "search") {
     const keyword = String(Kabegame.vars?.search_keyword ?? "").trim();
     if (!keyword) {
-      await warn("请填写搜索关键词，任务结束。");
+      await warn(t("keywordRequired"));
       await Kabegame.exit();
       return;
     }
@@ -505,21 +692,21 @@ async function handleInitial() {
       encodeURIComponent(keyword)
     }`;
   } else {
-    await warn(`未知爬取模式：${mode}`);
+    await warn(t("unknownMode", { mode }));
     await Kabegame.exit();
     return;
   }
 
   // 列表页处理需要这些参数，跨这一次导航传给 list 阶段。
   await Kabegame.updateState({ mode, maxItems, scrollRounds, boardId });
-  await log(`打开列表页：${targetUrl}`);
+  await log(t("openListPage", { url: targetUrl }));
   await Kabegame.to(targetUrl, { pageLabel: "list" });
 }
 
 async function handleList() {
   const state = await Kabegame.state();
   await Kabegame.waitForDom();
-  await log(`列表页 · 等待数据注入（mode=${state.mode}）…`);
+  await log(t("waitListData", { mode: state.mode }));
   await waitForListState(state.mode, state.boardId);
   await scrollList(
     state.mode,
@@ -537,12 +724,12 @@ async function handleList() {
   queue = queue.slice(0, state.maxItems);
 
   if (queue.length === 0) {
-    await warn("当前列表没有可抓取的作品；请检查页面、登录状态或筛选条件。");
+    await warn(t("emptyList"));
     await Kabegame.exit();
     return;
   }
 
-  await log(`列表加载完成，共入队 ${queue.length} 条作品`);
+  await log(t("listReady", { count: queue.length }));
   // 关键：在列表页原地 fetch 抓取所有详情，全程不再导航，页面不再重载。
   await processQueue(queue);
   await Kabegame.exit();
@@ -552,7 +739,7 @@ async function main() {
   try {
     const pageLabel = await Kabegame.pageLabel();
     // 每次页面加载脚本都会重跑，这条锚点是排障时判断“卡在哪个阶段”的唯一线索。
-    await log(`▶ 页面加载 · 阶段=${pageLabel} · ${location.href}`);
+    await log(t("pageLoaded", { phase: pageLabel, url: location.href }));
     switch (pageLabel) {
       case "initial":
         await handleInitial();
@@ -561,12 +748,12 @@ async function main() {
         await handleList();
         return;
       default:
-        await log(`阶段=${pageLabel}，结束`);
+        await log(t("stageEnded", { phase: pageLabel }));
         await Kabegame.exit();
         return;
     }
   } catch (error) {
-    await warn(`插件运行失败：${errorMessage(error)}`);
+    await warn(t("pluginFailed", { error: errorMessage(error) }));
     await Kabegame.exit();
   }
 }

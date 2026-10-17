@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-bilibili",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "name.zh": "bilibili专栏",
   "name.en": "Bilibili Articles",

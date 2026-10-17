@@ -1,0 +1,23 @@
+{
+  "requestSkipped": "請求 {url} 回傳 {status}，跳過",
+  "requestRetryStatus": "請求 {url} 回傳 {status}，第 {attempt} 次重試",
+  "requestRetryError": "請求 {url} 失敗：{error}，第 {attempt} 次重試",
+  "parseStateFailed": "解析 __INITIAL_STATE__ 失敗：{error}",
+  "noMedia": "作品 {id} 沒有可下載的媒體，跳過",
+  "downloadFailed": "下載失敗 {url}：{error}",
+  "noteParseFailed": "未能從 {url} 解析出作品資料（可能已刪除、僅登入可見，或連結無效）",
+  "noValidLinks": "沒有辨識到有效的小紅書作品連結。支援 explore / discovery/item / user/profile 作品連結與 xhslink.com 短連結。",
+  "linkCount": "[xhs] 共 {count} 個作品連結",
+  "fileCount": "[xhs] [{done}] {link} → {ok} 個檔案",
+  "doneDownloads": "[xhs] 完成，共下載 {count} 個檔案",
+  "cookieMissingRecommend": "未從暢遊取得小紅書 Cookie，將以未登入狀態抓取一般推薦。若想抓取個人化推薦，請先在暢遊登入小紅書。",
+  "cookieInjectedRecommend": "[xhs] 已注入暢遊 Cookie，抓取個人化推薦",
+  "roundFetchFailed": "第 {round} 輪推薦頁抓取失敗，跳過",
+  "roundEmpty": "第 {round} 輪沒有解析到推薦項目",
+  "roundSummary": "[xhs] 第 {round}/{rounds} 輪：{feeds} 筆，其中 {fresh} 筆是新的",
+  "doneRecommend": "[xhs] 完成，處理 {processed} 個作品，下載 {files} 個檔案",
+  "modeRecommend": "[xhs] 模式：首頁推薦，重新整理 {rounds} 輪，上限 {max} 個作品",
+  "unlimited": "不限",
+  "modeNote": "[xhs] 模式：作品連結",
+  "cookieMissing": "未從暢遊取得小紅書 Cookie，將以未登入狀態抓取。部分作品可能無法存取。"
+}

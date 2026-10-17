@@ -1,7 +1,7 @@
 {
   "name": "kabegame-plugin-weibo",
   "name.zh": "微博",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "name.en": "Weibo",
   "name.ja": "Weibo（微博）",

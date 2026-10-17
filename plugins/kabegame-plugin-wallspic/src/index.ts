@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { t } from "./i18n";
+
 const { addProgress, currentHtml, downloadImage, to } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://wallspic.com";
@@ -103,32 +105,32 @@ export async function crawl(common, custom) {
   const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
-  if (endPage < startPage) throw new Error("结束页数需要大于或等于起始页数");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 
-  console.log("[wallspic] 开始爬取");
+  console.log(t("crawlStarted"));
   const startUrl = buildPageUrl(vars, baseUrl, startPage);
-  console.log(`打开起始页: ${startUrl}`);
+  console.log(t("openStartPage", { url: startUrl }));
   let { document } = await openDocument(startUrl);
 
   const maxPage = parseMaxPage(document);
   const actualEndPage = Math.min(endPage, maxPage);
-  if (startPage > maxPage) throw new Error(`起始页 ${startPage} 超出网站最大页 ${maxPage}`);
+  if (startPage > maxPage) throw new Error(t("startPageBeyondMax", { startPage, maxPage }));
   const totalPages = actualEndPage - startPage + 1;
-  console.log(`站点分页上限: ${maxPage}，实际结束页: ${actualEndPage}，本任务共 ${totalPages} 页`);
+  console.log(t("paginationSummary", { maxPage, endPage: actualEndPage, totalPages }));
 
   for (let page = startPage; page <= actualEndPage; page += 1) {
     const pageUrl = buildPageUrl(vars, baseUrl, page);
     if (page > startPage) {
-      console.log(`翻页: ${page}/${actualEndPage} -> ${pageUrl}`);
+      console.log(t("turningPage", { page, endPage: actualEndPage, url: pageUrl }));
       document = (await openDocument(pageUrl)).document;
     } else {
-      console.log(`处理第 ${page}/${actualEndPage} 页（已在起始页）`);
+      console.log(t("processStartPage", { page, endPage: actualEndPage }));
     }
 
     const imageUrls = collectContentUrlsFromScripts(document);
     const pageProgress = totalPages > 0 ? 100.0 / totalPages : 0.0;
     const perImageProgress = imageUrls.length > 0 ? pageProgress / imageUrls.length : pageProgress;
-    console.log(`第 ${page} 页: 解析到 ${imageUrls.length} 个图片地址，开始下载`);
+    console.log(t("pageImages", { page, count: imageUrls.length }));
 
     for (const imageUrl of imageUrls) {
       await downloadImage(imageUrl, { url: pageUrl });
@@ -137,5 +139,5 @@ export async function crawl(common, custom) {
     if (imageUrls.length === 0) addProgress(pageProgress);
   }
 
-  console.log("[wallspic] 爬取结束");
+  console.log(t("crawlFinished"));
 }

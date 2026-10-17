@@ -3,6 +3,7 @@
 // UGC（video.ts）与番剧 PGC（bangumi.ts）的 playurl 接口不同，但拿到 dash 之后
 // 的处理完全同构，所以从 processPart 抽出来共用。
 import { qualityLabels, pickAudio, pickVideo, streamUrls } from "./formats";
+import { t } from "./i18n";
 import { coerceStr } from "./util";
 import { downloadStreamToVfs, removeQuietly } from "./vfs";
 
@@ -19,13 +20,18 @@ const { addProgress, downloadImage, ffmpeg, fs, warn } = Kabegame;
 export async function ingestDash({ dash, formatSource, displayName, stem, pageUrl, buildMeta, vars, budget }) {
   const video = pickVideo(dash, Number(vars.max_quality ?? 0), vars.prefer_avc !== false);
   const audio = pickAudio(dash);
-  if (!video) throw new Error("playurl 未返回可用视频流");
-  if (!audio) throw new Error("playurl 未返回可用音频流");
+  if (!video) throw new Error(t("noVideoStream"));
+  if (!audio) throw new Error(t("noAudioStream"));
 
-  const qualityLabel = qualityLabels(formatSource)[Number(video.id ?? 0)] || `quality ${video.id}`;
-  console.log(
-    `[bilibili-video] ▶ ${displayName}：${qualityLabel} / ${video.width}x${video.height} / ${coerceStr(video.codecs)}`,
-  );
+  const qualityLabel = qualityLabels(formatSource)[Number(video.id ?? 0)]
+    || t("qualityFallback", { id: coerceStr(video.id) });
+  console.log(t("partStart", {
+    name: displayName,
+    quality: qualityLabel,
+    width: coerceStr(video.width),
+    height: coerceStr(video.height),
+    codecs: coerceStr(video.codecs),
+  }));
 
   const root = fs.getRoot();
   const videoPath = `${root}/tmp/${stem}.video.m4s`;
@@ -42,10 +48,10 @@ export async function ingestDash({ dash, formatSource, displayName, stem, pageUr
     };
 
     await downloadStreamToVfs(
-      streamUrls(video), videoPath, Number(video.size ?? 0), `${displayName} 视频流`, reportChunk(0.6),
+      streamUrls(video), videoPath, Number(video.size ?? 0), t("videoStreamLabel", { name: displayName }), reportChunk(0.6),
     );
     await downloadStreamToVfs(
-      streamUrls(audio), audioPath, Number(audio.size ?? 0), `${displayName} 音频流`, reportChunk(0.2),
+      streamUrls(audio), audioPath, Number(audio.size ?? 0), t("audioStreamLabel", { name: displayName }), reportChunk(0.2),
     );
 
     await ffmpeg.muxStreams([videoPath, audioPath], outputPath);
@@ -54,7 +60,7 @@ export async function ingestDash({ dash, formatSource, displayName, stem, pageUr
 
     const probe = await ffmpeg.probe(outputPath);
     if (probe && !probe.browserSafe) {
-      warn(`${displayName} 合流结果不是浏览器可直接播放的编码（${probe.mimeType}），画廊可能只显示缩略图。`);
+      warn(t("muxNotBrowserSafe", { name: displayName, mime: coerceStr(probe.mimeType) }));
     }
 
     await downloadImage(outputPath, {
@@ -65,7 +71,7 @@ export async function ingestDash({ dash, formatSource, displayName, stem, pageUr
 
     // 补齐本条目剩余额度（分块进度是估算，未必刚好加满）。
     addProgress(Math.max(0, budget - reported));
-    console.log(`[bilibili-video] ◀ ${displayName} 已提交下载队列`);
+    console.log(t("submitted", { name: displayName }));
   } finally {
     // 合流产物 outputPath 交给下次任务开头的 cleanupStaleTmp 清理，见 vfs.ts。
     await removeQuietly(videoPath);

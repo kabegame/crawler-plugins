@@ -10,6 +10,7 @@
 //   - 原图端点 downloadFile 需要登录（401），本插件不碰。
 
 import { labelsFromMetadata } from "./labels";
+import { t } from "./i18n";
 
 const { addProgress, currentDocument, downloadImage, to, warn } = Kabegame;
 
@@ -47,7 +48,7 @@ function contentRoot(document) {
 async function openDocument(url) {
   const finalUrl = await to(url);
   const document = await currentDocument();
-  if (!document) throw new Error(`页面解析失败: ${finalUrl}`);
+  if (!document) throw new Error(t("pageParseFailed", { url: finalUrl }));
   return { finalUrl, document, root: contentRoot(document) };
 }
 
@@ -216,7 +217,7 @@ async function processDetailPage(detailUrl, formats) {
   const { document, finalUrl, root } = await openDocument(detailUrl);
   const jsonLd = parseJsonLd(document);
   if (!jsonLd) {
-    warn(`[haowallpaper] 详情页缺少 JSON-LD，跳过: ${finalUrl}`);
+    warn(t("missingJsonLd", { url: finalUrl }));
     return false;
   }
 
@@ -227,7 +228,7 @@ async function processDetailPage(detailUrl, formats) {
 
   const downloadUrl = resolveUrl(jsonLd.contentUrl, finalUrl);
   if (!downloadUrl) {
-    warn(`[haowallpaper] 详情页无 contentUrl，跳过: ${finalUrl}`);
+    warn(t("missingContentUrl", { url: finalUrl }));
     return false;
   }
 
@@ -295,17 +296,23 @@ export async function crawl(common, custom) {
     ),
   );
 
-  if (endPageConfig < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPageConfig < startPage) throw new Error(t("endPageBeforeStart"));
   if (endPageConfig >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
   if (!wantsFormat(formats, false) && !wantsFormat(formats, true)) {
-    throw new Error("没有勾选任何格式");
+    throw new Error(t("formatsRequired"));
   }
   const kind = kindOf(formats);
 
   console.log(
-    `[haowallpaper] 开始爬取: 类型=${wallpaperType}, 页码=${startPage}-${endPageConfig}, 搜索=[${searchTags.join("、")}], wpType=${wpTypeOf(wallpaperType, kind) ?? "默认"}`,
+    t("crawlStarted", {
+      wallpaperType,
+      startPage,
+      endPage: endPageConfig,
+      tags: searchTags.join("、"),
+      wpType: wpTypeOf(wallpaperType, kind) ?? t("defaultWpType"),
+    }),
   );
 
   // 先开起始页拿总页数（搜索时为搜索结果的总页数），据此收窄结束页。
@@ -313,14 +320,14 @@ export async function crawl(common, custom) {
   const totalPages = parseTotalPages(root);
   const endPage = Math.min(endPageConfig, totalPages);
   if (startPage > totalPages) {
-    warn(`[haowallpaper] 起始页 ${startPage} 超出站点总页数 ${totalPages}`);
+    warn(t("startPageBeyondTotal", { startPage, totalPages }));
     addProgress(100.0);
     return;
   }
 
   const requestedPages = endPage - startPage + 1;
   const pctPerPage = requestedPages > 0 ? 100.0 / requestedPages : 0.0;
-  console.log(`[haowallpaper] 站点总页数 ${totalPages}，实际爬取 ${startPage}-${endPage}`);
+  console.log(t("totalPages", { totalPages, startPage, endPage }));
 
   for (let page = startPage; page <= endPage; page += 1) {
     if (page !== startPage) {
@@ -328,13 +335,16 @@ export async function crawl(common, custom) {
     }
 
     const detailLinks = parseDetailLinks(root, finalUrl);
-    console.log(`[haowallpaper] 第 ${page}/${endPage} 页: ${detailLinks.length} 个条目`);
+    console.log(t("pageItems", { page, endPage, count: detailLinks.length }));
     if (detailLinks.length === 0) {
       // 诊断：区分「查询根不对」和「页面确实没有条目」。
       warn(
-        `[haowallpaper] 第 ${page} 页无条目 (a=${root.querySelectorAll("a").length}, card=${
-          root.querySelectorAll(".card").length
-        }, cardMobile=${root.querySelectorAll("a.cardMobile").length})`,
+        t("pageEmpty", {
+          page,
+          anchors: root.querySelectorAll("a").length,
+          cards: root.querySelectorAll(".card").length,
+          mobileCards: root.querySelectorAll("a.cardMobile").length,
+        }),
       );
       addProgress(pctPerPage);
       continue;
@@ -346,12 +356,12 @@ export async function crawl(common, custom) {
       try {
         if (await processDetailPage(detailUrl, formats)) downloaded += 1;
       } catch (e) {
-        warn(`[haowallpaper] 处理详情页失败，跳过: ${detailUrl} (${e?.message ?? e})`);
+        warn(t("detailFailed", { url: detailUrl, error: e?.message ?? e }));
       }
       addProgress(pctPerItem);
     }
-    console.log(`[haowallpaper] 第 ${page}/${endPage} 页完成: 下载 ${downloaded}/${detailLinks.length}`);
+    console.log(t("pageDone", { page, endPage, downloaded, total: detailLinks.length }));
   }
 
-  console.log("[haowallpaper] 爬取结束");
+  console.log(t("crawlFinished"));
 }

@@ -1,0 +1,11 @@
+{
+  "endPageBeforeStart": "終了ページは開始ページ以降にしてください",
+  "crawlStarted": "[wallspic] クロールを開始します",
+  "openStartPage": "開始ページを開きます: {url}",
+  "startPageBeyondMax": "開始ページ {startPage} がサイトの最大ページ {maxPage} を超えています",
+  "paginationSummary": "サイトのページ上限: {maxPage}、実際の終了ページ: {endPage}、このタスクは全 {totalPages} ページです",
+  "turningPage": "ページを移動します: {page}/{endPage} -> {url}",
+  "processStartPage": "{page}/{endPage} ページを処理します（開始ページ上）",
+  "pageImages": "{page} ページ: 画像 URL を {count} 件検出しました。ダウンロードを開始します",
+  "crawlFinished": "[wallspic] クロールを終了しました"
+}

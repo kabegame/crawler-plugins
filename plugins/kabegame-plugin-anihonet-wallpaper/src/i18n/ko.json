@@ -1,0 +1,12 @@
+{
+  "invalidWallpaperType": "[anihonet] 오류: wallpaper_type은(는) all/sp/image/imgpc/pc 중 하나여야 합니다",
+  "unknownMode": "[anihonet] 오류: crawl_mode은(는) ranking, single_work, search 중 하나여야 합니다",
+  "searchQueryEmpty": "[anihonet] 검색 키워드가 비어 있어 사이트 검색을 시작하지 않았습니다",
+  "searchStart": "[anihonet] 사이트 검색 키워드={query} 방향={order} 정렬={orderBy} 지정 페이지 범위={requestedRange}, 감지된 실제 페이지 범위={actualRange}",
+  "rangeNotCovered": "[anihonet] 감지된 실제 페이지 범위 {actualRange}이(가) 입력 범위 {requestedRange}을(를) 포함하지 않아, 벗어난 부분은 크롤링하지 않습니다",
+  "searchPageOpen": "[anihonet] 검색 결과 {page}/{total} 페이지, 상세 페이지 {count}개: {url}",
+  "detailOpen": "[anihonet]   상세 페이지 {index}/{total} 열기: {url}",
+  "seriesListOpen": "[anihonet] 작품 목록 페이지 열기 행={rowId} {index}/{total}번째 분류: {url}",
+  "allPages": "전체",
+  "seriesRangeInfo": "[anihonet] 작품 페이지 범위 매개변수={requestedRange}, 감지된 실제 페이지 범위={actualRange}"
+}

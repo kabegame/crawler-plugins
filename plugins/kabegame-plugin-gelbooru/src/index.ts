@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, currentHtml, downloadImage, setHeader, to } = Kabegame;
 
@@ -311,7 +312,7 @@ async function processDetailPage(href, baseUrl, quality) {
   const meta = buildGelbooruMetadata(document, finalUrl);
   const mediaUrl = pickMediaUrl(meta, quality);
   if (!mediaUrl) {
-    console.warn(`[gelbooru] 详情页没解析出媒体地址，跳过：${finalUrl}`);
+    console.warn(t("imageMissing", { url: finalUrl }));
     return;
   }
   const opts = { url: finalUrl };
@@ -329,9 +330,9 @@ function collectPostHrefs(document, pageUrl) {
 
 function validatePageRange(startPage, endPage) {
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
 // 站点搜索串：标签之间用 +，每个 token 单独编码（sort:score:desc 里的冒号要转义）
@@ -352,11 +353,11 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = makePageUrl(page);
-    console.log(`[gelbooru][${label}] 打开页面 ${page}/${endPage}: ${pageUrl}`);
+    console.log(t("openPage", { label, page, total: endPage, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     if (hrefs.length === 0) {
-      console.log(`[gelbooru][${label}] 第 ${page} 页没有作品，结束`);
+      console.log(t("emptyPageStop", { label, page }));
       addProgress(pageProgress);
       break;
     }
@@ -388,7 +389,7 @@ async function crawlAll(baseUrl, quality, vars) {
 
 async function crawlByTags(baseUrl, quality, vars) {
   const tags = tagListOf(vars.mode_tag_value);
-  if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+  if (tags.length === 0) throw new Error(t("tagsRequired"));
   const tokens = tags.concat(sortTokenOf(vars));
   await crawlListPages(
     (page) => buildPostListUrl(baseUrl, tokens, page),
@@ -450,7 +451,12 @@ async function crawlTagPosts(baseUrl, quality, tag, maxPages, perTagProgress) {
     addProgress(perPageProgress);
   }
   console.log(
-    `[gelbooru][tag-list] 标签完成: ${tag.name}（${tag.category}），实际下载 ${downloaded} / 站内共 ${tag.count}`,
+    t("tagDone", {
+      name: tag.name,
+      category: tag.category,
+      downloaded,
+      count: tag.count,
+    }),
   );
 }
 
@@ -463,9 +469,14 @@ async function crawlByTagList(baseUrl, quality, vars) {
   const tagCount = Math.max(1, Number(vars.mode_tag_count ?? 3));
   const maxPages = Math.max(1, Number(vars.mode_tag_pages ?? 1));
 
+  const categoryLabel = category ? t("onlyCategory", { category }) : "";
   console.log(
-    `[gelbooru][tag-list] 开始标签列表模式：匹配 ${pattern}${category ? `（仅 ${category}）` : ""}，` +
-      `跳过 ${skipCount} 个，取 ${tagCount} 个`,
+    t("tagListStart", {
+      pattern,
+      category: categoryLabel,
+      skip: skipCount,
+      count: tagCount,
+    }),
   );
   const perTagProgress = 99.0 / tagCount;
 
@@ -478,7 +489,7 @@ async function crawlByTagList(baseUrl, quality, vars) {
     const { document } = await openDocument(pageUrl);
     const rows = parseTagRows(document);
     if (rows.length === 0) {
-      console.log(`[gelbooru][tag-list] 第 ${page} 页没有标签，结束`);
+      console.log(t("tagListEmptyPage", { page }));
       break;
     }
     for (const tag of rows) {
@@ -493,7 +504,7 @@ async function crawlByTagList(baseUrl, quality, vars) {
       await crawlTagPosts(baseUrl, quality, tag, maxPages, perTagProgress);
     }
   }
-  if (picked === 0) console.warn("[gelbooru][tag-list] 没有匹配到任何标签，检查匹配式、分类与跳过数量");
+  if (picked === 0) console.warn(t("tagListNoMatch"));
 }
 
 export async function crawl(common, custom) {
@@ -516,6 +527,6 @@ export async function crawl(common, custom) {
   } else if (mode === "tag_list") {
     await crawlByTagList(baseUrl, quality, vars);
   } else {
-    throw new Error(`未知的爬取模式: ${mode}`);
+    throw new Error(t("unknownMode", { mode }));
   }
 }

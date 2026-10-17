@@ -2,6 +2,7 @@
 // 取值归一、日志与分页窗口解析。
 
 import { DEFAULT_END_PAGE, DEFAULT_START_PAGE } from "./consts";
+import { t } from "./i18n";
 
 const { warn } = Kabegame;
 
@@ -45,7 +46,7 @@ export function globalPageWindow(vars) {
   const skipPages = skipPagesOf(vars);
   const endPage = toInt(vars.end_page, DEFAULT_END_PAGE);
   if (endPage < skipPages + 1) {
-    log(`[PixAI] 结束页 ${endPage} 早于起始页 ${skipPages + 1}，按只爬起始页处理`, "warn");
+    log(t("endPageBeforeStartHandled", { endPage, startPage: skipPages + 1 }), "warn");
     return { skipPages, maxPages: skipPages + 1 };
   }
   return { skipPages, maxPages: endPage };

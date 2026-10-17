@@ -1,0 +1,11 @@
+{
+  "endPageBeforeStart": "The end page must be at least the start page",
+  "crawlStarted": "[wallspic] Starting crawl",
+  "openStartPage": "Opening the start page: {url}",
+  "startPageBeyondMax": "Start page {startPage} is beyond the site's maximum page ({maxPage})",
+  "paginationSummary": "Site pagination limit: {maxPage}; effective end page: {endPage}; {totalPages} page(s) in this task",
+  "turningPage": "Turning to page {page}/{endPage}: {url}",
+  "processStartPage": "Processing page {page}/{endPage} (already on the start page)",
+  "pageImages": "Page {page}: found {count} image URL(s); starting download",
+  "crawlFinished": "[wallspic] Crawl finished"
+}

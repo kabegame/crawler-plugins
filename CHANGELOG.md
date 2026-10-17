@@ -8,6 +8,7 @@
 ### Added
 - pixiv 新增第三方api模式，目前支持lolicon api。
 - konachan（1.7.4）：任务日志与参数校验错误新增简中、英文、日文、韩文、繁中本地化。
+- 其余插件（aibooru、anihonet-wallpaper、anime-pictures、bilibili、bilibili-video、bluedafeiyu、danbooru、e-shuushuu、gelbooru、haowallpaper、heybox、kabegame-server、kemono、manyacg、miyoushe、nekos-moe、patreon-webview、pixai、pixiv、safebooru、wallhaven、wallpapers-craft、wallspic、weibo、x-webview、xhs、xhs-webview、yandere、zerochan、ziworld）：任务日志与参数校验错误同样跟随界面语言显示，支持简中、英文、日文、韩文、繁中。
 - safebooru（1.0.0）：safebooru.org 全年龄图库，走站点官方 dapi，一页一次请求拿到带分类的全量标签；支持标签 / 全部 / 标签列表三种模式与评论元数据。
 - aibooru（1.0.0）：aibooru.online（Danbooru 分支的 AI 生成图图库），走 JSON API 一页一次请求拿齐标签、AI 生成参数、作者评论与评论区；支持标签 / 人气榜 / 全部 / id 范围四种模式，分级默认只抓全年龄，标签新增 `model` 分类。
 

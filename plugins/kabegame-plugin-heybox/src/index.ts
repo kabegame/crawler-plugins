@@ -16,6 +16,7 @@ import {
   SEARCH_UNITS_PER_POST,
 } from "./consts";
 import { collectEmojiKeys, ensureEmojis } from "./emoji";
+import { t } from "./i18n";
 import { resolveOriginalUrl } from "./image";
 import {
   authorFromLink,
@@ -48,9 +49,9 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
   const treeUrl = signedUrl(API_HOST, PATH_TREE, commonParams, treeExtra);
   const tree = await fetchJson(treeUrl);
 
-  if (isChallenge(tree?.status)) challengeError("帖子树接口", tree?.status);
+  if (isChallenge(tree?.status)) challengeError(t("treeApiLabel"), tree?.status);
   if (tree?.status !== "ok") {
-    log(`tree 请求失败 link_id=${linkId} status=${coerceStr(tree?.status)}`, "warn");
+    log(t("treeFetchFailed", { linkId, status: coerceStr(tree?.status) }), "warn");
     addProgress(itemWeight);
     return;
   }
@@ -58,7 +59,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
   const treeResult = tree.result;
   const linkObj = treeResult?.link;
   if (!linkObj) {
-    log(`tree 无 result.link link_id=${linkId}`, "warn");
+    log(t("treeMissingLink", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
@@ -75,7 +76,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
 
   const textStr = coerceStr(linkObj.text);
   if (!textStr) {
-    log(`帖子正文为空 link_id=${linkId}`, "warn");
+    log(t("postTextEmpty", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
@@ -84,12 +85,12 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
   try {
     blocks = JSON.parse(textStr);
   } catch {
-    log(`解析帖子正文 JSON 失败 link_id=${linkId}`, "warn");
+    log(t("postTextJsonInvalid", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
   if (!Array.isArray(blocks)) {
-    log(`帖子正文 JSON 不是数组 link_id=${linkId}，跳过下载`, "warn");
+    log(t("postTextNotArray", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
@@ -102,7 +103,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
     displayName = stripEmojiBracketTokens(stripTags(descHtml).trim()) || `xhh_${linkId}`;
   }
 
-  log(`[小黑盒] link_id=${linkId} display_name=${displayName}`);
+  log(t("postParsed", { linkId, displayName }));
 
   const author = authorFromLink(linkObj);
   const tags = topicsToTags(linkObj);
@@ -125,7 +126,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
 
   const imageTotal = thumbUrls.length;
   if (imageTotal === 0) {
-    log(`已解析正文但未找到 type=img 配图缩略图 link_id=${linkId} display_name=${displayName}，跳过下载`, "warn");
+    log(t("noImageThumbs", { linkId, displayName }), "warn");
     addProgress(itemWeight);
     return;
   }
@@ -155,7 +156,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
 
   const deltaPerImage = itemWeight / imageTotal;
   for (let index = 0; index < thumbUrls.length; index += 1) {
-    const finalUrl = await resolveOriginalUrl(thumbUrls[index], commonParams, "原图接口");
+    const finalUrl = await resolveOriginalUrl(thumbUrls[index], commonParams, t("originalApiLabel"));
     if (finalUrl) {
       const imageDisplayName = imageTotal > 1 ? `${displayName}(${index + 1})` : displayName;
       await downloadImage(finalUrl, {
@@ -164,7 +165,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
         url: shareUrl,
       });
     } else {
-      log(`原图 URL 无效且无可用回退 link_id=${linkId} k=${index + 1}`, "warn");
+      log(t("originalUrlUnavailable", { linkId, index: index + 1 }), "warn");
     }
     addProgress(deltaPerImage);
   }
@@ -178,9 +179,9 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
       const inputUrl = commentImage.thumb || commentImage.url;
       if (!validHttpUrl(inputUrl)) continue;
 
-      const finalUrl = await resolveOriginalUrl(inputUrl, commonParams, "原图接口(评论图)");
+      const finalUrl = await resolveOriginalUrl(inputUrl, commonParams, t("commentOriginalApiLabel"));
       if (!finalUrl) {
-        log(`原图 URL 无效且无可用回退(评论图) link_id=${linkId} floor=${comment.floor_num}`, "warn");
+        log(t("commentOriginalUrlUnavailable", { linkId, floor: comment.floor_num }), "warn");
         continue;
       }
 
@@ -197,12 +198,12 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
 
 async function runSinglePost(commonParams, vars) {
   const inputUrl = coerceStr(vars?.post_share_url);
-  if (!inputUrl) throw new Error("单帖子模式：请填写帖子分享 URL");
+  if (!inputUrl) throw new Error(t("singlePostUrlRequired"));
 
   const linkId = extractLinkId(inputUrl);
-  if (!linkId) throw new Error("无法从 URL 中提取 link_id，请确认这是小黑盒帖子分享链接");
+  if (!linkId) throw new Error(t("linkIdExtractFailed"));
 
-  log(`[小黑盒] 单帖子模式：link_id=${linkId}`);
+  log(t("singlePostStart", { linkId }));
   await crawlPost(
     linkId,
     100.0,
@@ -218,14 +219,14 @@ async function runSearch(commonParams, vars) {
   const endPage = Number(vars?.end_page ?? startPage);
   const pageSize = Number(vars?.page_size ?? 5);
 
-  if (endPage < startPage) throw new Error("结束页须大于或等于起始页");
-  if (startPage < 1) throw new Error("起始页须至少为 1");
-  if (pageSize < 1) throw new Error("每页条数须至少为 1");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
+  if (startPage < 1) throw new Error(t("startPageMinimum"));
+  if (pageSize < 1) throw new Error(t("pageSizeMinimum"));
 
   const autoCommentText = resolveAutoCommentText(vars);
   const totalPages = endPage - startPage + 1;
   const pageWeight = 100.0 / totalPages;
-  log(`[小黑盒] 开始：关键词「${searchKeyword}」，第 ${startPage}～${endPage} 页，每页 ${pageSize} 条`);
+  log(t("searchStart", { keyword: searchKeyword, startPage, endPage, pageSize }));
 
   for (let page = startPage; page <= endPage; page += 1) {
     // pageSize 是「帖子条数」，接口单位要乘 SEARCH_UNITS_PER_POST，见 consts.ts。
@@ -235,15 +236,15 @@ async function runSearch(commonParams, vars) {
     const searchUrl = signedUrl(API_HOST, PATH_SEARCH, commonParams, extra);
     const response = await fetchJson(searchUrl);
 
-    if (isChallenge(response?.status)) challengeError("搜索接口", response?.status);
+    if (isChallenge(response?.status)) challengeError(t("searchApiLabel"), response?.status);
     if (response?.status !== "ok") {
-      log(`搜索请求失败: ${coerceStr(response?.status)}${loginHint()}`, "warn");
+      log(t("searchFailed", { status: coerceStr(response?.status), hint: loginHint() }), "warn");
       break;
     }
 
     const items = Array.isArray(response?.result?.items) ? response.result.items : [];
     if (items.length === 0) {
-      log(`第 ${page} 页无搜索结果`, "warn");
+      log(t("pageNoResults", { page }), "warn");
       addProgress(pageWeight);
       continue;
     }
@@ -259,13 +260,13 @@ async function runSearch(commonParams, vars) {
       .slice(0, pageSize);
 
     if (validItems.length === 0) {
-      log(`第 ${page} 页无含 link_id 的有效帖子`, "warn");
+      log(t("pageNoValidPosts", { page }), "warn");
       addProgress(pageWeight);
       continue;
     }
 
     const itemWeight = pageWeight / validItems.length;
-    log(`第 ${page}/${endPage} 页：共 ${validItems.length} 条有效帖子，开始解析`);
+    log(t("pageParseStart", { page, endPage, count: validItems.length }));
     for (const item of validItems) {
       const info = item.info || {};
       const linkId = extractLinkId(info.share_url) || coerceStr(info.linkid);
@@ -277,7 +278,7 @@ async function runSearch(commonParams, vars) {
         autoCommentText,
       );
     }
-    log(`第 ${page} 页处理完成`);
+    log(t("pageDone", { page }));
   }
 }
 
@@ -291,7 +292,7 @@ export async function crawl(_common, custom) {
   const cookieAvailable = requireCookie();
   setCookieAvailable(cookieAvailable);
   if (!cookieAvailable) {
-    warn("未从畅游获取到小黑盒 Cookie，将以未登录状态抓取；小黑盒多数接口需要登录，可能无结果。请先在畅游登录小黑盒后重试。");
+    warn(t("cookieMissing"));
   }
 
   if (vars?.crawl_mode === "single_post") {
@@ -300,5 +301,5 @@ export async function crawl(_common, custom) {
     await runSearch(commonParams, vars);
   }
 
-  log("[小黑盒] 任务结束");
+  log(t("taskFinished"));
 }

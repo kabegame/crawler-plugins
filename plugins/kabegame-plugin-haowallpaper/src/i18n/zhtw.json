@@ -1,0 +1,17 @@
+{
+  "pageParseFailed": "頁面解析失敗: {url}",
+  "missingJsonLd": "[haowallpaper] 詳情頁缺少 JSON-LD，跳過: {url}",
+  "missingContentUrl": "[haowallpaper] 詳情頁無 contentUrl，跳過: {url}",
+  "endPageBeforeStart": "結束頁面需要大於開始頁面",
+  "pageRangeTooLarge": "一次不允許爬取超過100頁，請友善使用站台資源",
+  "formatsRequired": "沒有勾選任何格式",
+  "defaultWpType": "預設",
+  "crawlStarted": "[haowallpaper] 開始爬取: 類型={wallpaperType}, 頁碼={startPage}-{endPage}, 搜尋=[{tags}], wpType={wpType}",
+  "startPageBeyondTotal": "[haowallpaper] 起始頁 {startPage} 超出站點總頁數 {totalPages}",
+  "totalPages": "[haowallpaper] 站點總頁數 {totalPages}，實際爬取 {startPage}-{endPage}",
+  "pageItems": "[haowallpaper] 第 {page}/{endPage} 頁: {count} 個條目",
+  "pageEmpty": "[haowallpaper] 第 {page} 頁無條目 (a={anchors}, card={cards}, cardMobile={mobileCards})",
+  "detailFailed": "[haowallpaper] 處理詳情頁失敗，跳過: {url} ({error})",
+  "pageDone": "[haowallpaper] 第 {page}/{endPage} 頁完成: 下載 {downloaded}/{total}",
+  "crawlFinished": "[haowallpaper] 爬取結束"
+}

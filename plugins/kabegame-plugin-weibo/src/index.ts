@@ -8,6 +8,7 @@
 //
 // 所有模式都依赖畅游里 weibo.com 的登录态：未登录时时间线 403、m 站 432、搜索跳登录页。
 import { POST_DELAY_MS, TIMELINE_FEATURES } from "./consts";
+import { t } from "./i18n";
 import { albumSource, resolveUser, searchSource, supertopicSource, timelineSource } from "./modes";
 import { fetchPost, processPost } from "./post";
 import { LoginError, parsePostInput, parseSupertopicInput, pause, str } from "./util";
@@ -21,22 +22,24 @@ function setup() {
   setHeader("Referer", "https://weibo.com/");
   setHeader("Accept", "application/json, text/plain, */*");
   if (!requireCookie("weibo.com")) {
-    throw new Error("未获取到微博登录态：请先在畅游打开 weibo.com 并登录，然后重新运行。");
+    throw new Error(t("loginRequired"));
   }
 }
 
 async function runSingle(vars, opts) {
   const id = parsePostInput(vars.post_url);
-  if (!id) throw new Error("请填写微博链接（如 https://weibo.com/<UID>/<微博ID>）或微博 ID");
+  if (!id) throw new Error(t("postInputRequired"));
   const mblog = await fetchPost(id);
-  if (mblog?.ok === 0 || !mblog?.id) throw new Error(`微博 ${id} 不可见：${str(mblog?.message) || "已删除或无权限"}`);
+  if (mblog?.ok === 0 || !mblog?.id) {
+    throw new Error(t("postNotVisible", { id, reason: str(mblog?.message) || t("deletedOrNoPermission") }));
+  }
   // 单条链接指向转发时，收原帖的图
   const own = await processPost(mblog, opts);
   if (own === 0 && mblog.retweeted_status) {
     const n = await processPost(mblog.retweeted_status, opts, mblog.user);
-    if (n === 0) warn("[weibo] 这条转发的原帖没有图片");
+    if (n === 0) warn(t("retweetNoImage"));
   } else if (own === 0) {
-    warn("[weibo] 这条微博没有图片");
+    warn(t("postNoImage"));
   }
   addProgress(100);
 }
@@ -46,22 +49,22 @@ async function sourceFor(vars) {
   if (mode === "album" || mode === "timeline") {
     const user = await resolveUser(vars.user);
     const uid = str(user.idstr || user.id);
-    console.log(`[weibo] 用户：${str(user.screen_name)}（${uid}），共 ${user.statuses_count ?? "?"} 条微博`);
+    console.log(t("userInfo", { name: str(user.screen_name), uid, count: user.statuses_count ?? "?" }));
     if (mode === "album") return albumSource(uid);
     const feature = TIMELINE_FEATURES[str(vars.timeline_filter)] ?? TIMELINE_FEATURES.all;
     return timelineSource(uid, feature, vars.include_retweets === true);
   }
   if (mode === "supertopic") {
     const topicId = parseSupertopicInput(vars.supertopic);
-    if (!topicId) throw new Error("请填写超话名（如：原神）或超话链接");
+    if (!topicId) throw new Error(t("supertopicRequired"));
     return supertopicSource(topicId, str(vars.supertopic_channel) || "latest", vars.supertopic_tag);
   }
   if (mode === "search") {
     const keyword = str(vars.keyword).trim();
-    if (!keyword) throw new Error("请填写搜索关键词");
+    if (!keyword) throw new Error(t("keywordRequired"));
     return searchSource(keyword, str(vars.search_sort), vars.search_original === true, str(vars.start_date), str(vars.end_date));
   }
-  throw new Error(`未知模式：${mode}`);
+  throw new Error(t("unknownMode", { mode }));
 }
 
 export async function crawl(_common, custom) {
@@ -92,16 +95,20 @@ export async function crawl(_common, custom) {
       posts += 1;
       files += n;
       addProgress(perPost);
-      console.log(`[weibo] ${posts}/${maxPosts} ${str(mblog?.user?.screen_name)} ${str(mblog?.mblogid)}：${n} 个文件`);
+      console.log(t("postProgress", {
+        posts, maxPosts, name: str(mblog?.user?.screen_name), mblogid: str(mblog?.mblogid), files: n,
+      }));
     } catch (e) {
       if (e instanceof LoginError) throw e;
       failed += 1;
-      warn(`[weibo] 微博 ${str(mblog?.mblogid) || mid} 处理失败：${e?.message ?? e}`);
+      warn(t("postFailed", { id: str(mblog?.mblogid) || mid, reason: e?.message ?? e }));
     }
     if (posts >= maxPosts) break;
     await pause(POST_DELAY_MS);
   }
-  console.log(`[weibo] 完成：${posts} 条微博、${files} 个文件${failed ? `，${failed} 条失败` : ""}`);
-  if (posts === 0 && failed === 0) warn("[weibo] 没有找到带图片的微博");
+  console.log(failed
+    ? t("doneWithFailures", { posts, files, failed })
+    : t("done", { posts, files }));
+  if (posts === 0 && failed === 0) warn(t("noImagePosts"));
   addProgress(Math.max(0, 100 - posts * perPost));
 }

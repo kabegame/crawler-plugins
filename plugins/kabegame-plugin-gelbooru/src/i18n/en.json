@@ -1,0 +1,14 @@
+{
+  "openPage": "[gelbooru][{label}] Opening page {page}/{total}: {url}",
+  "emptyPageStop": "[gelbooru][{label}] No posts on page {page}; stopping",
+  "imageMissing": "[gelbooru] No media URL was found on the detail page; skipping: {url}",
+  "tagListStart": "[gelbooru][tag-list] Starting tag-list mode: matching {pattern}{category}, skipping {skip}, taking {count}",
+  "onlyCategory": " (only {category})",
+  "tagListEmptyPage": "[gelbooru][tag-list] No tags on page {page}; stopping",
+  "tagListNoMatch": "[gelbooru][tag-list] No tags matched; check the pattern, category and skip count",
+  "tagDone": "[gelbooru][tag-list] Tag finished: {name} ({category}), downloaded {downloaded} / {count} on the site",
+  "tagsRequired": "Tag mode requires at least one tag",
+  "pageRangeTooLarge": "A single run cannot crawl more than 100 pages. Please crawl responsibly",
+  "endPageBeforeStart": "The end page must not be before the start page",
+  "unknownMode": "Unknown crawl mode: {mode}"
+}

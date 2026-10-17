@@ -1,0 +1,15 @@
+{
+  "rateLimited": "[nekos-moe] 속도 제한에 걸렸습니다. {seconds}초 후 재시도합니다 ({attempt}/{max})",
+  "searchHttpError": "검색 API 응답: HTTP {status}",
+  "searchHttpErrorWithMessage": "검색 API 응답: HTTP {status} — {message}",
+  "startPageOutOfRange": "[nekos-moe] 페이지당 {pageSize}장일 때 최대 {maxPage}페이지까지 볼 수 있습니다(사이트 제한 skip ≤ {maxSkip}). 시작 페이지 {startPage}이(가) 범위를 벗어났습니다",
+  "endPageClamped": "[nekos-moe] 페이지당 {pageSize}장일 때 최대 {maxPage}페이지까지 볼 수 있습니다. 끝 페이지 {endPage}은(는) {maxPage}(으)로 처리합니다",
+  "crawlSummary": "[nekos-moe] 정렬 {sort}, NSFW {nsfw}, 페이지당 {pageSize}장, {startPage}~{endPage} 페이지",
+  "pageFailed": "[nekos-moe] {page} 페이지 조회 실패: {error}",
+  "noResults": "[nekos-moe] {page} 페이지에 결과가 없어 마지막 페이지에 도달했습니다",
+  "pageStart": "[nekos-moe] ┌ {page} 페이지: {count}장",
+  "recordMissingId": "레코드에 id가 없습니다",
+  "imageFailed": "[nekos-moe] 이미지 {id} 다운로드 실패: {error}",
+  "pageDone": "[nekos-moe] └ {page} 페이지 완료",
+  "pageShort": "[nekos-moe] {page} 페이지가 {pageSize}장 미만이라 마지막 페이지에 도달했습니다"
+}

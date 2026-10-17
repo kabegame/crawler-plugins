@@ -1,0 +1,20 @@
+{
+  "emoticonSetFailed": "[미요우서] emoticon_set 요청에 실패했습니다 retcode={retcode}",
+  "emoticonSetNetworkError": "[미요우서] emoticon_set 네트워크 오류입니다. 이모지는 텍스트로 표시됩니다",
+  "repliesNetworkError": "[미요우서] getPostReplies 네트워크 오류입니다 post_id={postId}",
+  "repliesFailed": "[미요우서] getPostReplies에 실패했습니다: post_id={postId} retcode={retcode}",
+  "singlePostUrlRequired": "[미요우서] 단일 게시물 모드: 게시물 URL을 입력하세요",
+  "postIdExtractFailed": "[미요우서] URL에서 게시물 ID를 추출하지 못했습니다. https://www.miyoushe.com/<게임>/article/<게시물ID> 형식인지 확인하세요",
+  "postFullFailed": "[미요우서] getPostFull에 실패했습니다: post_id={postId} retcode={retcode} {message}",
+  "postFullNoPost": "[미요우서] getPostFull 응답에 data.post.post가 없습니다: post_id={postId}",
+  "postNoImages": "[미요우서] 게시물에 이미지가 없습니다: post_id={postId}",
+  "userUidRequired": "[미요우서] 작성자 게시물 모드: 작성자 UID를 입력하세요",
+  "endPageBeforeStart": "[미요우서] 끝 페이지는 시작 페이지보다 크거나 같아야 합니다",
+  "userPostsFailed": "[미요우서] userPostList에 실패했습니다: uid={uid} retcode={retcode} {message}",
+  "pageNoResults": "[미요우서] {page} 페이지에 결과가 없어 중단합니다",
+  "userPostsDone": "[미요우서] 작성자 게시물 목록 작업이 끝났습니다. 게시물 {count}개를 처리했습니다",
+  "searchFailed": "[미요우서] 검색에 실패했습니다: page={page} retcode={retcode} {message}",
+  "emoticonLoading": "[미요우서] 이모지 세트를 가져오는 중...",
+  "emoticonLoaded": "[미요우서] 이모지 세트 로드 완료",
+  "taskFinished": "[미요우서] 작업이 끝났습니다"
+}

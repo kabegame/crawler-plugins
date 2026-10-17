@@ -1,0 +1,17 @@
+{
+  "rateLimited": "[wallhaven] 觸發速率限制（429），{seconds} 秒後重試 {attempt}/{max}",
+  "categoriesAll": "[wallhaven] 未勾選分類，依全部分類搜尋",
+  "purityFallbackSfw": "[wallhaven] SFW 與擦邊都未勾選，站點會退回只搜 SFW",
+  "searchUrlRequired": "請填寫搜尋 URL",
+  "invalidUrl": "不是合法的 URL：{url}",
+  "searchUrlInvalid": "請填寫 wallhaven 搜尋頁網址（https://wallhaven.cc/search?…），收到：{url}",
+  "detailFailed": "[wallhaven] {id} 詳情讀取失敗，僅使用列表資訊：{error}",
+  "noImagePath": "[wallhaven] {id} 沒有原圖網址，跳過",
+  "openSearchParams": "[wallhaven] 搜尋條件 {query}：第 {startPage}~{endPage} 頁",
+  "openSearchUrl": "[wallhaven] 搜尋 URL {query}：第 {startPage}~{endPage} 頁",
+  "totalSummary": "[wallhaven] 共 {total} 張，{pages} 頁",
+  "pageReadFailed": "[wallhaven] 第 {page} 頁讀取失敗：{error}",
+  "pageStart": "[wallhaven] ┌ 第 {page} 頁：{count} 張",
+  "downloadFailed": "[wallhaven] {id} 下載失敗：{error}",
+  "pageDone": "[wallhaven] └ 第 {page} 頁完成"
+}

@@ -5,6 +5,7 @@
 // 所以这里没有 POST body，只有 buildGraphqlUrl。
 import { ARTWORK_DETAIL_QUERY, API_URL, MESSAGES_QUERY, OPERATION_GET_ARTWORK_DETAIL, OPERATION_MESSAGES, REQUEST_HEADERS } from "./consts";
 import { arrayValue, coerceStr, log } from "./util";
+import { t } from "./i18n";
 
 const { setHeader } = Kabegame;
 
@@ -49,7 +50,7 @@ export async function fetchPixaiComments(artworkId) {
     const edges = arrayValue(res?.data?.messages?.edges);
     return edges.map((edge) => edge?.node).filter(Boolean);
   } catch {
-    log(`[PixAI] 评论获取失败，artwork_id=${artworkIdStr}`, "warn");
+    log(t("commentsFailed", { artworkId: artworkIdStr }), "warn");
     return [];
   }
 }
@@ -66,7 +67,7 @@ export async function fetchPixaiArtworkDetail(artworkId) {
     );
     return res?.data?.artwork || null;
   } catch {
-    log(`[PixAI] 作品详情获取失败，artwork_id=${artworkIdStr}`, "warn");
+    log(t("artworkDetailFailed", { artworkId: artworkIdStr }), "warn");
     return null;
   }
 }

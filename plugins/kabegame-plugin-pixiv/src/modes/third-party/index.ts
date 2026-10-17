@@ -10,6 +10,7 @@
 //
 // fetchPage 期间关闭 pixiv 请求头（见 togglePixivHeaders），第三方 API 看不到 pixiv 的来源与 Cookie。
 import { addArtworkProgress, togglePixivHeaders } from "../../common";
+import { t } from "../../i18n";
 import { downloadIllust } from "../../illust";
 import { lolicon } from "./lolicon";
 
@@ -27,7 +28,7 @@ async function fetchPageWithoutPixivHeaders(adapter, vars, cursor) {
 export async function runThirdParty(vars) {
   const apiId = vars.third_party_api || lolicon.id;
   const adapter = ADAPTERS[apiId];
-  if (!adapter) throw new Error(`未知的第三方 API: ${apiId}`);
+  if (!adapter) throw new Error(t("unknownThirdParty", { apiId }));
   adapter.prepare?.(vars);
 
   const seen = new Set();
@@ -39,7 +40,7 @@ export async function runThirdParty(vars) {
       (id) => id && !seen.has(id),
     );
     if (!total) total = Number(page?.total) || ids.length;
-    console.log(`[Pixiv/${apiId}] 本页 ${ids.length} 个作品`);
+    console.log(t("thirdPartyPage", { apiId, count: ids.length }));
     for (const id of ids) {
       seen.add(id);
       await downloadIllust(id);

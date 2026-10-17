@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-kabegame-server",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "name.zh": "Kabegame 服务器",
   "name.en": "Kabegame Server",

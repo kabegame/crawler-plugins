@@ -8,6 +8,7 @@
 // API 匿名限流 45 次/分钟，所有 API 请求经 apiGet 串行节流，429 时等待后重试。
 
 import { sleep } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, downloadImage, warn } = Kabegame;
 
@@ -16,10 +17,6 @@ const DEFAULT_BASE_URL = "https://wallhaven.cc";
 const API_MIN_INTERVAL_MS = 1500;
 const API_RETRY_WAIT_MS = 20000;
 const API_MAX_RETRIES = 4;
-
-function log(message) {
-  console.log(`[wallhaven] ${message}`);
-}
 
 let lastApiAt = 0;
 
@@ -30,10 +27,12 @@ async function throttledGet(url) {
     lastApiAt = Date.now();
     const res = await fetch(url);
     if (res.status === 429 && attempt < API_MAX_RETRIES) {
-      log(
-        `限流（429），${API_RETRY_WAIT_MS / 1000}s 后重试 ${
-          attempt + 1
-        }/${API_MAX_RETRIES}`,
+      console.log(
+        t("rateLimited", {
+          seconds: API_RETRY_WAIT_MS / 1000,
+          attempt: attempt + 1,
+          max: API_MAX_RETRIES,
+        }),
       );
       await sleep(API_RETRY_WAIT_MS);
       continue;
@@ -124,7 +123,7 @@ function buildSearchParams(vars) {
   let categories = checked(vars.categories, ["general", "anime", "people"]);
   if (categories.length === 0) {
     // categories=000 时 API 返回全部分类，这里显式写出
-    log("未勾选分类，按全部分类搜索");
+    console.log(t("categoriesAll"));
     categories = ["general", "anime", "people"];
   }
   params.categories = bits(categories, ["general", "anime", "people"]);
@@ -132,7 +131,7 @@ function buildSearchParams(vars) {
   let purity = checked(vars.purity, ["sfw", "sketchy"]);
   if (purity.length === 0) {
     // purity=000 时站点网页与 API 都退回只搜 SFW（总数与 purity=100 相同），这里显式写出
-    warn("[wallhaven] SFW 与擦边都未勾选，站点会退回只搜 SFW");
+    warn(t("purityFallbackSfw"));
     purity = ["sfw"];
   }
   params.purity = `${bits(purity, ["sfw", "sketchy"])}0`;
@@ -163,22 +162,20 @@ function buildSearchParams(vars) {
 // 粘贴了 `?categories=…` 的查询串。
 function parseSearchUrl(input) {
   const raw = String(input || "").trim();
-  if (!raw) throw new Error("请填写搜索 URL");
+  if (!raw) throw new Error(t("searchUrlRequired"));
   let url;
   try {
     url = new URL(
       raw.startsWith("?") ? `${DEFAULT_BASE_URL}/search${raw}` : raw,
     );
   } catch {
-    throw new Error(`不是合法的 URL：${raw}`);
+    throw new Error(t("invalidUrl", { url: raw }));
   }
   if (
     !/(^|\.)wallhaven\.cc$/i.test(url.hostname) ||
     url.pathname.replace(/\/+$/, "") !== "/search"
   ) {
-    throw new Error(
-      `请填写 wallhaven 搜索页地址（https://wallhaven.cc/search?…），收到：${raw}`,
-    );
+    throw new Error(t("searchUrlInvalid", { url: raw }));
   }
   const params = new URLSearchParams(url.search);
   params.delete("page");
@@ -316,14 +313,12 @@ async function downloadOne(baseUrl, item) {
   try {
     detail = (await apiGet(`${baseUrl}/api/v1/w/${item.id}`))?.data || null;
   } catch (e) {
-    warn(
-      `[wallhaven] ${item.id} 详情读取失败，仅用列表信息：${e?.message ?? e}`,
-    );
+    warn(t("detailFailed", { id: item.id, error: e?.message ?? e }));
   }
   // 网页列表（随机排序）只有 ID，原图地址来自详情
   const path = item.path || detail?.path;
   if (!path) {
-    warn(`[wallhaven] ${item?.id} 没有原图地址，跳过`);
+    warn(t("noImagePath", { id: item?.id }));
     return;
   }
   const opts = {
@@ -363,22 +358,23 @@ export async function crawl(common, custom) {
   const pctPerPage = 100 / (endPage - startPage + 1);
   if (search.sorting === "random" && !search.seed) search.seed = randomSeed();
 
-  const title = mode === "url" ? "搜索 URL" : "搜索条件";
-  log(
-    `${title} ${
-      decodeURIComponent(new URLSearchParams(search).toString())
-    }：第 ${startPage}~${endPage} 页`,
+  console.log(
+    t(mode === "url" ? "openSearchUrl" : "openSearchParams", {
+      query: decodeURIComponent(new URLSearchParams(search).toString()),
+      startPage,
+      endPage,
+    }),
   );
   for (let page = startPage; page <= endPage; page += 1) {
     let result;
     try {
       result = await fetchListPage(baseUrl, search, page);
       if (page === startPage) {
-        log(`共 ${result.total} 张，${result.lastPage} 页`);
+        console.log(t("totalSummary", { total: result.total, pages: result.lastPage }));
         if (endPage > result.lastPage) endPage = result.lastPage;
       }
     } catch (e) {
-      warn(`[wallhaven] 第 ${page} 页读取失败：${e?.message ?? e}`);
+      warn(t("pageReadFailed", { page, error: e?.message ?? e }));
       addProgress(pctPerPage);
       continue;
     }
@@ -387,17 +383,17 @@ export async function crawl(common, custom) {
       break; // 越过最后一页
     }
 
-    log(`┌ 第 ${page} 页：${result.items.length} 张`);
+    console.log(t("pageStart", { page, count: result.items.length }));
     const pctPerItem = pctPerPage / result.items.length;
     for (const [i, item] of result.items.entries()) {
       try {
         await downloadOne(baseUrl, item);
-        log(`│ ${i + 1}/${result.items.length} ${item.id}`);
+        console.log(`[wallhaven] │ ${i + 1}/${result.items.length} ${item.id}`);
       } catch (e) {
-        warn(`[wallhaven] ${item?.id} 下载失败：${e?.message ?? e}`);
+        warn(t("downloadFailed", { id: item?.id, error: e?.message ?? e }));
       }
       addProgress(pctPerItem);
     }
-    log(`└ 第 ${page} 页完成`);
+    console.log(t("pageDone", { page }));
   }
 }

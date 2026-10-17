@@ -2,6 +2,7 @@
 // 站内关键词搜索与分页抓取。
 import { processDetailPage } from "./detail";
 import { coerceStr, openDocument, resolveUrl, textOf } from "./runtime";
+import { t } from "./i18n";
 
 const { addProgress, warn } = Kabegame;
 
@@ -40,7 +41,7 @@ function parseSearchTotalPages(document) {
 export async function crawlSearch(queryValue, orderValue, orderByValue, pageStart, pageEnd, baseUrl) {
   const query = coerceStr(queryValue).trim();
   if (!query) {
-    warn("[anihonet] 搜索关键词为空，未发起站内搜索");
+    warn(t("searchQueryEmpty"));
     addProgress(100.0);
     return;
   }
@@ -57,10 +58,16 @@ export async function crawlSearch(queryValue, orderValue, orderByValue, pageStar
   const requestedRange = `${start}-${end}`;
   const actualRange = `1-${totalPages}`;
   console.log(
-    `[anihonet] 站内搜索 关键词=${query} 方向=${order} 排序=${orderBy} 页数范围参数=${requestedRange}，检测到的实际页数范围=${actualRange}`,
+    t("searchStart", {
+      query,
+      order,
+      orderBy,
+      requestedRange,
+      actualRange,
+    }),
   );
   if (start > totalPages || end > totalPages) {
-    warn(`[anihonet] 检测到的实际页数范围 ${actualRange} 未覆盖输入范围 ${requestedRange}，超出部分不会抓取`);
+    warn(t("rangeNotCovered", { actualRange, requestedRange }));
   }
   if (start > totalPages) {
     addProgress(100.0);
@@ -75,7 +82,7 @@ export async function crawlSearch(queryValue, orderValue, orderByValue, pageStar
       ({ document, finalUrl } = await openDocument(searchPageUrl(baseUrl, query, order, orderBy, page)));
     }
     const detailHrefs = collectSearchDetailHrefs(document, finalUrl);
-    console.log(`[anihonet] 搜索结果第 ${page}/${totalPages} 页，详情页 ${detailHrefs.length} 条: ${finalUrl}`);
+    console.log(t("searchPageOpen", { page, total: totalPages, count: detailHrefs.length, url: finalUrl }));
     if (detailHrefs.length === 0) {
       addProgress(pctPerPage);
       continue;

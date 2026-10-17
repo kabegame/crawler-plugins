@@ -1,0 +1,8 @@
+{
+  "endPageBeforeStart": "結束頁數需要大於或等於起始頁數",
+  "crawlStarted": "[wallpapers-craft] 開始爬取",
+  "startPageBeyondMax": "起始頁 {startPage} 超出網站最大頁 {maxPage}",
+  "turningPage": "翻頁: {page}/{endPage} -> {url}",
+  "pageImages": "第 {page} 頁: 縮圖 {count} 張，開始處理下載",
+  "crawlFinished": "[wallpapers-craft] 爬取結束"
+}

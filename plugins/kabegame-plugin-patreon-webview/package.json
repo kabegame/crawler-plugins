@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-patreon-webview",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "name.zh": "Patreon创作者内容（WebView）",
   "name.en": "Patreon creator content (WebView)",

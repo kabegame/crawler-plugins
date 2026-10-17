@@ -4,6 +4,7 @@
 import { md5 } from "@kabegame/plugin-sdk";
 
 import { MIXIN_TAB, NAV_API } from "./consts";
+import { t } from "./i18n";
 import { coerceStr, fetchJson } from "./util";
 
 function wbiFilterValue(value) {
@@ -34,7 +35,7 @@ export async function getWbiKeys() {
   // nav 未登录时返回 code -101，但 wbi_img 照样下发，所以这里不当作错误。
   const wbi = nav?.data?.wbi_img || {};
   const keys = { img: stemFromWbiUrl(wbi.img_url), sub: stemFromWbiUrl(wbi.sub_url) };
-  if (!keys.img || !keys.sub) throw new Error("无法从 nav 获取 WBI 密钥");
+  if (!keys.img || !keys.sub) throw new Error(t("wbiKeysMissing"));
   return { keys, isLoggedIn: nav?.data?.isLogin === true };
 }
 

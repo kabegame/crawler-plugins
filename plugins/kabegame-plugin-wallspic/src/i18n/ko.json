@@ -1,0 +1,11 @@
+{
+  "endPageBeforeStart": "끝 페이지는 시작 페이지 이상이어야 합니다",
+  "crawlStarted": "[wallspic] 크롤을 시작합니다",
+  "openStartPage": "시작 페이지 열기: {url}",
+  "startPageBeyondMax": "시작 페이지 {startPage}이(가) 사이트 최대 페이지 {maxPage}를 넘었습니다",
+  "paginationSummary": "사이트 페이지 상한: {maxPage}, 실제 끝 페이지: {endPage}, 이번 작업은 총 {totalPages}페이지입니다",
+  "turningPage": "페이지 이동: {page}/{endPage} -> {url}",
+  "processStartPage": "{page}/{endPage} 페이지 처리 중(시작 페이지에 있음)",
+  "pageImages": "{page} 페이지: 이미지 URL {count}개를 찾았습니다. 다운로드를 시작합니다",
+  "crawlFinished": "[wallspic] 크롤을 종료했습니다"
+}

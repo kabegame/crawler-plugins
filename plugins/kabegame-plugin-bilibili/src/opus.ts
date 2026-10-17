@@ -3,6 +3,7 @@
 // 失败回退正则抠 bfs 链接；关联到 cv 时复用专栏的 metadata / 评论链路。
 import { buildArticleMetadata, signViewUrl } from "./article";
 import { OPUS_DETAIL_API } from "./consts";
+import { t } from "./i18n";
 import { labelsFromMetadata, searchTextsFromMetadata } from "./metadata-derived";
 import { fetchArticleReplies } from "./replies";
 import {
@@ -46,7 +47,9 @@ function collectOpusPicsFromState(state) {
   };
   for (const module of state?.detail?.modules || []) {
     if (module?.module_type === "MODULE_TYPE_BLOCKED") {
-      warn(`图文被内容门槛拦截：${coerceStr(module?.module_blocked?.hint_message) || "（如充电专属）"}`);
+      warn(t("opusBlocked", {
+        hint: coerceStr(module?.module_blocked?.hint_message) || t("blockedHintFallback"),
+      }));
     }
     for (const pic of module?.module_top?.display?.album?.pics || []) push(pic);
     for (const paragraph of module?.module_content?.paragraphs || []) {
@@ -109,9 +112,9 @@ export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
   if (pics.length === 0) {
     if (state) {
       // 结构化数据解析成功但确实没图：纯文字动态，批量模式下很常见，不当告警。
-      console.log(`[bilibili] opus ${opusId} 没有图片（纯文字动态），跳过`);
+      console.log(t("opusNoImage", { opusId }));
     } else {
-      warn("opus 页面未解析到 bfs 图片链接，可能为壳页或结构变化；可尝试先在畅游登录 bilibili 后重试。");
+      warn(t("opusParseFailed"));
     }
     addProgress(perTotal);
     return;
@@ -126,7 +129,9 @@ export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
     if (view?.code === 0) vd = view.data;
     else {
       checkBilibiliRisk(view?.code);
-      warn(`opus ${opusId} 关联 cv ${cvId} view 失败: ${coerceStr(view?.message)}，仍尝试拉取评论`);
+      warn(t("opusCvViewFailed", {
+        opusId, cvId, message: coerceStr(view?.message),
+      }));
     }
     repliesData = await fetchArticleReplies(cvId, img, sub);
   }

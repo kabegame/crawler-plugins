@@ -1,6 +1,7 @@
 // @ts-nocheck
 // 单个作品：详情、评论、标签、metadata 与全部分页原图下载。各模式只负责产出作品 id。
 import { coerceStr, fetchJson } from "./common";
+import { t } from "./i18n";
 
 const { createImageMetadata, downloadImage, setHeader, warn } = Kabegame;
 
@@ -361,7 +362,7 @@ async function fetchPixivComments(illustId) {
       return json.body.comments;
     }
   } catch {
-    warn(`[Pixiv] 评论获取失败，illust_id=${illustId}`);
+    warn(t("commentsFetchFailed", { illustId }));
   }
   return [];
 }

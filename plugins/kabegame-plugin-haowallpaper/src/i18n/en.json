@@ -1,0 +1,17 @@
+{
+  "pageParseFailed": "Failed to parse the page: {url}",
+  "missingJsonLd": "[haowallpaper] The detail page has no JSON-LD; skipping: {url}",
+  "missingContentUrl": "[haowallpaper] The detail page has no contentUrl; skipping: {url}",
+  "endPageBeforeStart": "The end page must be after the start page",
+  "pageRangeTooLarge": "A single run cannot crawl more than 100 pages. Please crawl responsibly",
+  "formatsRequired": "Select at least one format",
+  "defaultWpType": "default",
+  "crawlStarted": "[haowallpaper] Starting crawl: type={wallpaperType}, pages={startPage}-{endPage}, search=[{tags}], wpType={wpType}",
+  "startPageBeyondTotal": "[haowallpaper] Start page {startPage} is beyond the site's total pages ({totalPages})",
+  "totalPages": "[haowallpaper] The site has {totalPages} pages; crawling {startPage}-{endPage}",
+  "pageItems": "[haowallpaper] Page {page}/{endPage}: {count} item(s)",
+  "pageEmpty": "[haowallpaper] No items on page {page} (a={anchors}, card={cards}, cardMobile={mobileCards})",
+  "detailFailed": "[haowallpaper] Failed to process the detail page; skipping: {url} ({error})",
+  "pageDone": "[haowallpaper] Page {page}/{endPage} done: downloaded {downloaded}/{total}",
+  "crawlFinished": "[haowallpaper] Crawl finished"
+}

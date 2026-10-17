@@ -1,0 +1,17 @@
+{
+  "rateLimited": "[wallhaven] レート制限（429）。{seconds} 秒後に再試行します（{attempt}/{max}）",
+  "categoriesAll": "[wallhaven] カテゴリが未選択のため、全カテゴリで検索します",
+  "purityFallbackSfw": "[wallhaven] SFW もきわどいも未選択のため、サイトは SFW のみの検索に切り替わります",
+  "searchUrlRequired": "検索 URL を入力してください",
+  "invalidUrl": "有効な URL ではありません：{url}",
+  "searchUrlInvalid": "wallhaven の検索ページ URL（https://wallhaven.cc/search?…）を入力してください。受信値：{url}",
+  "detailFailed": "[wallhaven] {id} の詳細を取得できなかったため、一覧の情報のみ使用します：{error}",
+  "noImagePath": "[wallhaven] {id} に原画像の URL がないためスキップします",
+  "openSearchParams": "[wallhaven] 検索条件 {query}：{startPage}〜{endPage} ページ",
+  "openSearchUrl": "[wallhaven] 検索 URL {query}：{startPage}〜{endPage} ページ",
+  "totalSummary": "[wallhaven] 全 {total} 枚、{pages} ページ",
+  "pageReadFailed": "[wallhaven] {page} ページ目の取得に失敗しました：{error}",
+  "pageStart": "[wallhaven] ┌ {page} ページ目：{count} 枚",
+  "downloadFailed": "[wallhaven] {id} のダウンロードに失敗しました：{error}",
+  "pageDone": "[wallhaven] └ {page} ページ目 完了"
+}

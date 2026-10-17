@@ -5,6 +5,7 @@ import {
   IMAGE_WALL_API, MYMBLOG_API, PAGE_DELAY_MS, POST_DELAY_MS, PROFILE_INFO_API, SEARCH_MAX_PAGE, SEARCH_URL,
   SUPERTOPIC_API, SUPERTOPIC_SORTS,
 } from "./consts";
+import { t } from "./i18n";
 import { fetchPost } from "./post";
 import { LoginError, fetchHtml, fetchJson, parseUserInput, pause, str } from "./util";
 
@@ -14,7 +15,7 @@ const XHR = { "X-Requested-With": "XMLHttpRequest" };
 /** 用户输入 → 微博用户对象（含 idstr / screen_name）。 */
 export async function resolveUser(input) {
   const parsed = parseUserInput(input);
-  if (!parsed) throw new Error("请填写用户：UID、主页链接或昵称");
+  if (!parsed) throw new Error(t("userRequired"));
   const query = parsed.uid
     ? `uid=${parsed.uid}`
     : parsed.custom
@@ -25,10 +26,10 @@ export async function resolveUser(input) {
     json = await fetchJson(`${PROFILE_INFO_API}?${query}`);
   } catch (e) {
     if (e instanceof LoginError) throw e;
-    throw new Error(`找不到微博用户「${str(input).trim()}」：${e?.message ?? e}`);
+    throw new Error(t("userNotFoundWithReason", { name: str(input).trim(), reason: e?.message ?? e }));
   }
   const user = json?.data?.user;
-  if (!user?.idstr && !user?.id) throw new Error(`找不到微博用户「${str(input).trim()}」`);
+  if (!user?.idstr && !user?.id) throw new Error(t("userNotFound", { name: str(input).trim() }));
   return user;
 }
 
@@ -38,13 +39,16 @@ async function* postsByMids(mids) {
     try {
       const mblog = await fetchPost(mid);
       if (mblog?.ok === 0 || !mblog?.id) {
-        warn(`[weibo] 微博 ${mid} 不可见（${str(mblog?.message || mblog?.msg) || "已删除或无权限"}），跳过`);
+        warn(t("postSkippedNotVisible", {
+          id: mid,
+          reason: str(mblog?.message || mblog?.msg) || t("deletedOrNoPermission"),
+        }));
       } else {
         yield { mblog };
       }
     } catch (e) {
       if (e instanceof LoginError) throw e;
-      warn(`[weibo] 微博 ${mid} 详情获取失败：${e?.message ?? e}`);
+      warn(t("postDetailFailed", { id: mid, reason: e?.message ?? e }));
     }
     await pause(POST_DELAY_MS);
   }
@@ -65,7 +69,7 @@ export async function* albumSource(uid) {
         mids.push(mid);
       }
     }
-    console.log(`[weibo] 相册第 ${page} 页：${list.length} 张图，${mids.length} 条新微博`);
+    console.log(t("albumPage", { page, images: list.length, mids: mids.length }));
     yield* postsByMids(mids);
     since = str(json?.data?.since_id);
     if (list.length === 0 || !since || since === "0") return;
@@ -78,7 +82,7 @@ export async function* timelineSource(uid, feature, includeRetweets) {
   for (let page = 1; ; page += 1) {
     const json = await fetchJson(`${MYMBLOG_API}?uid=${uid}&page=${page}&feature=${feature}`);
     const list = Array.isArray(json?.data?.list) ? json.data.list : [];
-    console.log(`[weibo] 时间线第 ${page} 页：${list.length} 条`);
+    console.log(t("timelinePage", { page, count: list.length }));
     if (list.length === 0) return;
     for (const item of list) {
       if (item?.retweeted_status) {
@@ -99,8 +103,8 @@ async function resolveFlowId(topicId, channel, tagName) {
   const want = str(tagName).trim();
   const hit = channels.find((c) => str(c?.title).trim() === want);
   if (!hit?.flowId) {
-    const titles = channels.map((c) => str(c?.title)).filter(Boolean).join("、");
-    throw new Error(`超话里没有「${want}」频道。可选频道：${titles || "（无）"}`);
+    const titles = channels.map((c) => str(c?.title)).filter(Boolean).join(t("listSeparator"));
+    throw new Error(t("supertopicChannelMissing", { channel: want, channels: titles || t("none") }));
   }
   return str(hit.flowId);
 }
@@ -108,7 +112,9 @@ async function resolveFlowId(topicId, channel, tagName) {
 async function fetchSupertopicPage(query) {
   const json = await fetchJson(`${SUPERTOPIC_API}?${query}`, XHR);
   // 超话不存在时 HTTP 200 + {code:310105, msg:"超话不存在"}
-  if (!Array.isArray(json?.items)) throw new Error(`超话接口：${str(json?.msg) || "返回结构异常"}`);
+  if (!Array.isArray(json?.items)) {
+    throw new Error(t("supertopicApiError", { message: str(json?.msg) || t("abnormalStructure") }));
+  }
   return json;
 }
 
@@ -117,9 +123,14 @@ export async function* supertopicSource(topicId, channel, tagName) {
   let query = `containerid=${encodeURIComponent(flowId)}`;
   for (let page = 1; ; page += 1) {
     const json = await fetchSupertopicPage(query);
-    if (page === 1) console.log(`[weibo] 超话「${str(json?.header?.data?.nick) || topicId}」频道 ${flowId.slice(topicId.length)}`);
+    if (page === 1) {
+      console.log(t("supertopicChannel", {
+        topic: str(json?.header?.data?.nick) || topicId,
+        channel: flowId.slice(topicId.length),
+      }));
+    }
     const feeds = json.items.filter((x) => x?.category === "feed" && x?.data?.id).map((x) => x.data);
-    console.log(`[weibo] 超话第 ${page} 页：${feeds.length} 条`);
+    console.log(t("supertopicPage", { page, count: feeds.length }));
     for (const mblog of feeds) yield { mblog };
     const more = json?.moreInfo?.params;
     if (feeds.length === 0 || !more) return;
@@ -147,10 +158,10 @@ export async function* searchSource(keyword, sort, originalOnly, startDate, endD
   for (let page = 1; page <= SEARCH_MAX_PAGE; page += 1) {
     const html = await fetchHtml(`${SEARCH_URL}?${params.join("&")}&page=${page}`);
     const mids = [...new Set([...html.matchAll(/\bmid="(\d+)"/g)].map((x) => x[1]))].filter((mid) => !seen.has(mid));
-    console.log(`[weibo] 搜索第 ${page} 页：${mids.length} 条`);
+    console.log(t("searchPage", { page, count: mids.length }));
     if (mids.length === 0) {
       if (page === 1 && !/card-no-result/.test(html)) {
-        warn("[weibo] 搜索页没有解析到结果，可能触发了风控验证，可稍后在畅游打开 s.weibo.com 确认");
+        warn(t("searchNoResult"));
       }
       return;
     }

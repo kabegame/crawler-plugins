@@ -1,0 +1,15 @@
+{
+  "rateLimited": "[nekos-moe] レート制限に達しました。{seconds} 秒後に再試行します（{attempt}/{max}）",
+  "searchHttpError": "検索 API が HTTP {status} を返しました",
+  "searchHttpErrorWithMessage": "検索 API が HTTP {status} を返しました：{message}",
+  "startPageOutOfRange": "[nekos-moe] 1 ページ {pageSize} 枚では最大 {maxPage} ページまでです（サイトの制限 skip ≤ {maxSkip}）。開始ページ {startPage} は範囲外です",
+  "endPageClamped": "[nekos-moe] 1 ページ {pageSize} 枚では最大 {maxPage} ページまでです。終了ページ {endPage} は {maxPage} として扱います",
+  "crawlSummary": "[nekos-moe] 並び順 {sort}、NSFW {nsfw}、1 ページ {pageSize} 枚、{startPage}～{endPage} ページ",
+  "pageFailed": "[nekos-moe] {page} ページの読み込みに失敗しました：{error}",
+  "noResults": "[nekos-moe] {page} ページに結果がないため、最終ページに到達しました",
+  "pageStart": "[nekos-moe] ┌ {page} ページ：{count} 枚",
+  "recordMissingId": "レコードに id がありません",
+  "imageFailed": "[nekos-moe] 画像 {id} のダウンロードに失敗しました：{error}",
+  "pageDone": "[nekos-moe] └ {page} ページ完了",
+  "pageShort": "[nekos-moe] {page} ページは {pageSize} 枚未満のため、最終ページに到達しました"
+}

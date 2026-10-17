@@ -1,0 +1,12 @@
+{
+  "invalidWallpaperType": "[anihonet] 错误：wallpaper_type 必须是 all/sp/image/imgpc/pc",
+  "unknownMode": "[anihonet] 错误：crawl_mode 必须是 ranking、single_work 或 search",
+  "searchQueryEmpty": "[anihonet] 搜索关键词为空，未发起站内搜索",
+  "searchStart": "[anihonet] 站内搜索 关键词={query} 方向={order} 排序={orderBy} 页数范围参数={requestedRange}，检测到的实际页数范围={actualRange}",
+  "rangeNotCovered": "[anihonet] 检测到的实际页数范围 {actualRange} 未覆盖输入范围 {requestedRange}，超出部分不会抓取",
+  "searchPageOpen": "[anihonet] 搜索结果第 {page}/{total} 页，详情页 {count} 条：{url}",
+  "detailOpen": "[anihonet]   进入详情页 {index}/{total}：{url}",
+  "seriesListOpen": "[anihonet] 进入作品列表页 行={rowId} 第 {index}/{total} 个分类：{url}",
+  "allPages": "全部",
+  "seriesRangeInfo": "[anihonet] 作品页数范围参数={requestedRange}，检测到的实际页数范围={actualRange}"
+}

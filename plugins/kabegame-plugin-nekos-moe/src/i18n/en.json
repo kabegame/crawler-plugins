@@ -1,0 +1,15 @@
+{
+  "rateLimited": "[nekos-moe] Rate limited; retrying in {seconds}s ({attempt}/{max})",
+  "searchHttpError": "Search API returned HTTP {status}",
+  "searchHttpErrorWithMessage": "Search API returned HTTP {status}: {message}",
+  "startPageOutOfRange": "[nekos-moe] With {pageSize} images per page you can reach at most page {maxPage} (site limit skip ≤ {maxSkip}); start page {startPage} is out of range",
+  "endPageClamped": "[nekos-moe] With {pageSize} images per page you can reach at most page {maxPage}; end page {endPage} will be treated as {maxPage}",
+  "crawlSummary": "[nekos-moe] Sort {sort}, NSFW {nsfw}, {pageSize} per page, pages {startPage}~{endPage}",
+  "pageFailed": "[nekos-moe] Failed to read page {page}: {error}",
+  "noResults": "[nekos-moe] Page {page} returned no results; reached the last page",
+  "pageStart": "[nekos-moe] ┌ Page {page}: {count} image(s)",
+  "recordMissingId": "Record is missing an id",
+  "imageFailed": "[nekos-moe] Failed to download image {id}: {error}",
+  "pageDone": "[nekos-moe] └ Page {page} done",
+  "pageShort": "[nekos-moe] Page {page} has fewer than {pageSize} images; reached the last page"
+}

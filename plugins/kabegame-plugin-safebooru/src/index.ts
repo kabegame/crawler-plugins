@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, downloadImage, warn } = Kabegame;
 
@@ -99,9 +100,9 @@ class ApiOffsetLimitError extends Error {}
 function throwIfApiError(body) {
   const m = /<response\b[^>]*success="false"[^>]*>/i.exec(body);
   if (!m) return;
-  const reason = xmlAttrs(m[0]).reason || "未知原因";
+  const reason = xmlAttrs(m[0]).reason || t("unknownReason");
   if (/limited/i.test(reason)) throw new ApiOffsetLimitError(reason);
-  throw new Error(`站点 API 拒绝：${reason}`);
+  throw new Error(t("apiRejected", { reason }));
 }
 
 // 没有结果时 body 是空串，不是 []
@@ -137,7 +138,7 @@ async function fetchPostsXmlExtras(baseUrl, query, page) {
       });
     }
   } catch (e) {
-    warn(`[safebooru] 第 ${page} 页 XML 取发布时间失败（不影响下载）：${e?.message ?? e}`);
+    warn(t("xmlExtrasFailed", { page, error: e?.message ?? e }));
   }
   return extras;
 }
@@ -192,7 +193,7 @@ async function fetchComments(baseUrl, id, expected) {
       }
     }
   } catch (e) {
-    warn(`[safebooru] 帖子 ${id} 评论获取失败（已取到 ${comments.length} 条，不影响下载）：${e?.message ?? e}`);
+    warn(t("commentsFetchFailed", { id, count: comments.length, error: e?.message ?? e }));
   }
   return comments;
 }
@@ -334,7 +335,7 @@ function pickMediaUrl(post, quality) {
 async function processPost(post, extra, ctx) {
   const mediaUrl = pickMediaUrl(post, ctx.quality);
   if (!mediaUrl) {
-    warn(`[safebooru] 帖子 ${post.id} 没有媒体地址，跳过`);
+    warn(t("noMediaUrl", { id: post.id }));
     return;
   }
   const comments = ctx.fetchComments && Number(post.comment_count) > 0
@@ -391,7 +392,7 @@ function createPager(baseUrl, tokens) {
       cur = await hop(remaining - 1);
       if (cur == null) return null;
     }
-    console.log(`[safebooru] 第 ${page} 页超过 API 直接翻页的上限，经 ${hops} 次 id 游标跳转定位到 id<${cur}`);
+    console.log(t("pagerLocatedByHops", { page, hops, id: cur }));
     cursorId = cur;
     return { tokens: withCursor(tokens, cur), pid: 0 };
   }
@@ -406,7 +407,7 @@ function createPager(baseUrl, tokens) {
     },
     async jump(page) {
       if (idOrder && lastPage === page - 1 && lastId != null) {
-        console.log(`[safebooru] 第 ${page} 页超过 API 直接翻页的上限，接在上一页末条 id<${lastId} 之后继续`);
+        console.log(t("pagerContinueFromLast", { page, id: lastId }));
         cursorId = lastId;
         return { tokens: withCursor(tokens, cursorId), pid: 0 };
       }
@@ -422,17 +423,21 @@ function createPager(baseUrl, tokens) {
   };
 }
 
-// 与 kbConfig 的 sort_order 选项名一致；用户自己在标签里写的 sort: 元标签原样显示
-const SORT_NAMES = { "sort:score:desc": "高分优先", "sort:updated:desc": "最近更新", "sort:random": "随机" };
+// 与 kbConfig 的 sort_order 选项名一致；显示名走 i18n，用户自己在标签里写的 sort: 元标签原样显示
+const SORT_NAMES = { "sort:score:desc": "sortScoreDesc", "sort:updated:desc": "sortUpdatedDesc", "sort:random": "sortRandom" };
 
 function offsetLimitError(page, tokens) {
-  const sort = tokens.find((t) => /^sort:/i.test(t));
-  const sortName = SORT_NAMES[sort.toLowerCase()] ? `「${SORT_NAMES[sort.toLowerCase()]}」` : ` ${sort} `;
+  const sort = tokens.find((token) => /^sort:/i.test(token));
+  const sortName = sort ? (SORT_NAMES[sort.toLowerCase()] ? t(SORT_NAMES[sort.toLowerCase()]) : sort) : "";
   const lastPage = Math.floor(MAX_API_OFFSET / POSTS_PER_PAGE) + 1;
   return new Error(
-    `第 ${page} 页超出站点 API 的翻页上限：起始偏移最多 ${MAX_API_OFFSET} 条（每页 ${POSTS_PER_PAGE} 张时为第 ${lastPage} 页）。` +
-      `当前排序${sortName}无法翻过这里，只有「最新发布」排序（不带 sort: 元标签）能继续往后翻；` +
-      `也可以收窄标签，让结果总数落在上限以内`,
+    t("offsetLimit", {
+      page,
+      maxOffset: MAX_API_OFFSET,
+      perPage: POSTS_PER_PAGE,
+      lastPage,
+      sort: sortName,
+    }),
   );
 }
 
@@ -460,12 +465,12 @@ async function crawlApiPage(pager, page, ctx, pageProgress, label) {
   }
   pager.advance(page, posts);
   const extras = await fetchPostsXmlExtras(ctx.baseUrl, query, page);
-  console.log(`[safebooru][${label}] 第 ${page} 页：${posts.length} 个帖子`);
+  console.log(t("pagePosts", { label, page, count: posts.length }));
   for (const post of posts) {
     try {
       await processPost(post, extras.get(String(post.id)), ctx);
     } catch (e) {
-      warn(`[safebooru] 帖子 ${post?.id} 处理失败：${e?.message ?? e}`);
+      warn(t("postFailed", { id: post?.id, error: e?.message ?? e }));
     }
     addProgress(pageProgress / posts.length);
   }
@@ -475,12 +480,12 @@ async function crawlApiPage(pager, page, ctx, pageProgress, label) {
 // totalProgress：这段页范围占整个任务的进度份额
 async function crawlPages(tokens, ctx, startPage, endPage, label, totalProgress = 99.0) {
   const pageProgress = totalProgress / (endPage - startPage + 1);
-  console.log(`[safebooru][${label}] 搜索串：${tokens.join(" ") || "（全部）"}，第 ${startPage}–${endPage} 页`);
+  console.log(t("searchRange", { label, tags: tokens.join(" ") || t("allTags"), startPage, endPage }));
   const pager = createPager(ctx.baseUrl, tokens);
   for (let page = startPage; page <= endPage; page += 1) {
     const count = await crawlApiPage(pager, page, ctx, pageProgress, label);
     if (count === 0) {
-      console.log(`[safebooru][${label}] 第 ${page} 页没有帖子，结束`);
+      console.log(t("emptyPageStop", { label, page }));
       addProgress(pageProgress * (endPage - page));
       break;
     }
@@ -488,8 +493,8 @@ async function crawlPages(tokens, ctx, startPage, endPage, label, totalProgress 
 }
 
 function validatePageRange(startPage, endPage) {
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
-  if (endPage >= startPage + 100) throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
+  if (endPage >= startPage + 100) throw new Error(t("pageRangeTooLarge"));
 }
 
 function sortTokenOf(vars) {
@@ -510,16 +515,16 @@ const ID_RANGE_PER_PAGE = 100;
 function parsePostId(value, label) {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error(t("positiveIntegerRequired", { label, value: text }));
   return id;
 }
 
 function parseIdRange(vars) {
-  const startId = parsePostId(vars.id_start, "起始 id");
-  const endId = parsePostId(vars.id_end, "结束 id");
-  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  const startId = parsePostId(vars.id_start, t("startIdLabel"));
+  const endId = parsePostId(vars.id_end, t("endIdLabel"));
+  if (endId < startId) throw new Error(t("endIdBeforeStart", { endId, startId }));
   if (endId - startId > MAX_ID_SPAN) {
-    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+    throw new Error(t("idRangeTooLarge", { max: MAX_ID_SPAN, startId, endId, span: endId - startId }));
   }
   return { startId, endId };
 }
@@ -539,7 +544,7 @@ async function crawlByIdRange(ctx, vars) {
   const { startId, endId } = parseIdRange(vars);
   const tokens = [`id:>=${startId}`, `id:<=${endId}`, "sort:id:asc"];
   const total = await countPosts(ctx.baseUrl, tokens);
-  console.log(`[safebooru][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
   if (total === 0) return;
   // 区间宽度不小于帖子数，总数未知时按它估的页数也够翻完，翻到空页即停
   const pages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / ID_RANGE_PER_PAGE));
@@ -576,11 +581,11 @@ export async function crawl(common, custom) {
   } else if (mode === "tags") {
     validatePageRange(startPage, endPage);
     const tags = tagListOf(vars.mode_tag_value);
-    if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+    if (tags.length === 0) throw new Error(t("tagsRequired"));
     await crawlPages(tags.concat(sortTokenOf(vars)), ctx, startPage, endPage, "tags");
   } else if (mode === "id_range") {
     await crawlByIdRange(ctx, vars);
   } else {
-    throw new Error(`未知的爬取模式: ${mode}`);
+    throw new Error(t("unknownMode", { mode }));
   }
 }

@@ -1,0 +1,14 @@
+{
+  "openPage": "[gelbooru][{label}] 開啟頁面 {page}/{total}: {url}",
+  "emptyPageStop": "[gelbooru][{label}] 第 {page} 頁沒有作品，結束",
+  "imageMissing": "[gelbooru] 詳情頁沒解析出媒體位址，跳過：{url}",
+  "tagListStart": "[gelbooru][tag-list] 開始標籤列表模式：匹配 {pattern}{category}，跳過 {skip} 個，取 {count} 個",
+  "onlyCategory": "（僅 {category}）",
+  "tagListEmptyPage": "[gelbooru][tag-list] 第 {page} 頁沒有標籤，結束",
+  "tagListNoMatch": "[gelbooru][tag-list] 沒有匹配到任何標籤，檢查匹配式、分類與跳過數量",
+  "tagDone": "[gelbooru][tag-list] 標籤完成: {name}（{category}），實際下載 {downloaded} / 站內共 {count}",
+  "tagsRequired": "標籤模式需要至少填寫一個標籤",
+  "pageRangeTooLarge": "在一次之內不允許爬取超過100頁，咱二次元人要保持文明禮儀",
+  "endPageBeforeStart": "結束頁面需要比開始頁面大",
+  "unknownMode": "未知的爬取模式: {mode}"
+}

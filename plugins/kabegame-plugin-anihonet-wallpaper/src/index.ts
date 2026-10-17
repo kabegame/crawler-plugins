@@ -9,6 +9,7 @@
 //   ranking   排行榜分页
 //   search    站内关键词搜索与分页
 import { crawlKind } from "./ranking";
+import { t } from "./i18n";
 import { DEFAULT_BASE_URL, coerceStr } from "./runtime";
 import { crawlSearch } from "./search";
 import { crawlAnimeSeries } from "./series";
@@ -22,7 +23,7 @@ export async function crawl(common, custom) {
   const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
   const type = vars.wallpaper_type === "img-pc" ? "imgpc" : coerceStr(vars.wallpaper_type || "all");
   if (!["all", "sp", "image", "imgpc", "pc"].includes(type)) {
-    console.log("错误：wallpaper_type 必须是 all/sp/image/imgpc/pc");
+    console.log(t("invalidWallpaperType"));
     return;
   }
 
@@ -60,6 +61,6 @@ export async function crawl(common, custom) {
       baseUrl,
     );
   } else {
-    console.log("错误：crawl_mode 必须是 ranking、single_work 或 search");
+    console.log(t("unknownMode"));
   }
 }

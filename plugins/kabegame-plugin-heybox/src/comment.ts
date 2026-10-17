@@ -10,6 +10,7 @@ import {
   PATH_AWARD_LINK,
   PATH_COMMENT_CREATE,
 } from "./consts";
+import { t } from "./i18n";
 import { signedUrl } from "./sign";
 import {
   coerceStr,
@@ -64,17 +65,22 @@ async function awardPost(linkId, commonParams) {
   );
 
   if (isChallenge(response?.status)) {
-    log(`自动点赞触发风控/验证码 link_id=${linkId} status=${coerceStr(response?.status)}`, "warn");
+    log(t("awardChallenge", { linkId, status: coerceStr(response?.status) }), "warn");
     return;
   }
   if (response?.status !== "ok") {
     log(
-      `自动点赞失败 link_id=${linkId} status=${coerceStr(response?.status)} msg=${coerceStr(response?.msg)}${loginHint()}`,
+      t("awardFailed", {
+        linkId,
+        status: coerceStr(response?.status),
+        msg: coerceStr(response?.msg),
+        hint: loginHint(),
+      }),
       "warn",
     );
     return;
   }
-  log(`[小黑盒] 已点赞 link_id=${linkId}`);
+  log(t("awarded", { linkId }));
 }
 
 /**
@@ -88,7 +94,7 @@ async function postAutoComment(linkId, commentText, commentsSnapshot, commonPara
     (comment) => normalizeCommentText(comment.text) === target,
   );
   if (duplicated) {
-    log(`[小黑盒] link_id=${linkId} 已抓到的评论中存在相同内容，跳过自动评论`);
+    log(t("commentDuplicated", { linkId }));
     return;
   }
 
@@ -99,26 +105,31 @@ async function postAutoComment(linkId, commentText, commentsSnapshot, commonPara
   );
 
   if (isChallenge(response?.status)) {
-    log(`自动评论触发风控/验证码 link_id=${linkId} status=${coerceStr(response?.status)}`, "warn");
+    log(t("commentChallenge", { linkId, status: coerceStr(response?.status) }), "warn");
     return;
   }
   if (response?.status !== "ok") {
     log(
-      `自动评论失败 link_id=${linkId} status=${coerceStr(response?.status)} msg=${coerceStr(response?.msg)}${loginHint()}`,
+      t("commentFailed", {
+        linkId,
+        status: coerceStr(response?.status),
+        msg: coerceStr(response?.msg),
+        hint: loginHint(),
+      }),
       "warn",
     );
     return;
   }
 
   const floor = firstCommentFloor(response);
-  log(`[小黑盒] 已自动评论 link_id=${linkId}${floor ? ` floor=${floor}` : ""}`);
+  log(floor ? t("commentedWithFloor", { linkId, floor }) : t("commented", { linkId }));
 }
 
 async function safely(label, run) {
   try {
     await run();
   } catch (error) {
-    log(`${label}：${coerceStr(error?.message ?? error)}`, "warn");
+    log(t("autoInteractError", { label, error: coerceStr(error?.message ?? error) }), "warn");
   }
 }
 
@@ -127,8 +138,8 @@ async function safely(label, run) {
  * 既不影响另一步，也不打断图片下载。
  */
 export async function runAutoInteract(linkId, commentText, commentsSnapshot, commonParams) {
-  await safely(`自动点赞异常 link_id=${linkId}`, () => awardPost(linkId, commonParams));
-  await safely(`自动评论异常 link_id=${linkId}`, () =>
+  await safely(t("awardThrew", { linkId }), () => awardPost(linkId, commonParams));
+  await safely(t("commentThrew", { linkId }), () =>
     postAutoComment(linkId, commentText, commentsSnapshot, commonParams),
   );
 }

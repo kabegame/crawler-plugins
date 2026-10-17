@@ -1,0 +1,16 @@
+{
+  "archiveLabel": "the archive data",
+  "statsLabel": "the public stats",
+  "requestRetry": "Failed to load {label}; retrying in {delay} ms ({attempt}/{max}): {error}",
+  "requestFailed": "Failed to load {label}: {error}",
+  "statsUnavailable": "[bluedafeiyu] Public stats are unavailable; falling back to newest-first instead of {sort}",
+  "sortPopular": "popularity",
+  "sortDownloads": "downloads",
+  "readingArchive": "[bluedafeiyu] Reading the full archive: {url}",
+  "archiveEmpty": "No works in archive-data.json; the source site's data structure may have changed",
+  "statsReadFailed": "[bluedafeiyu] Failed to load public stats: {error}",
+  "all": "all",
+  "filterSummary": "[bluedafeiyu] {total} works in the archive, {selected} after filtering (character={character}, type={type}, sort={sort})",
+  "missingOriginalUrl": "Missing original image URL",
+  "workFailed": "[bluedafeiyu] Failed to process work {work}: {error}"
+}

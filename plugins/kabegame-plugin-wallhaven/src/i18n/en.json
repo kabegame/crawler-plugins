@@ -1,0 +1,17 @@
+{
+  "rateLimited": "[wallhaven] Rate limited (429); retrying in {seconds}s ({attempt}/{max})",
+  "categoriesAll": "[wallhaven] No category selected; searching all categories",
+  "purityFallbackSfw": "[wallhaven] Neither SFW nor Sketchy is selected; the site falls back to SFW only",
+  "searchUrlRequired": "Enter a search URL",
+  "invalidUrl": "Not a valid URL: {url}",
+  "searchUrlInvalid": "Enter a wallhaven search page URL (https://wallhaven.cc/search?…); got: {url}",
+  "detailFailed": "[wallhaven] Could not load details for {id}; using listing data only: {error}",
+  "noImagePath": "[wallhaven] No original image URL for {id}; skipping",
+  "openSearchParams": "[wallhaven] Search filters {query}: pages {startPage}–{endPage}",
+  "openSearchUrl": "[wallhaven] Search URL {query}: pages {startPage}–{endPage}",
+  "totalSummary": "[wallhaven] {total} wallpapers in {pages} pages",
+  "pageReadFailed": "[wallhaven] Failed to load page {page}: {error}",
+  "pageStart": "[wallhaven] ┌ Page {page}: {count} wallpapers",
+  "downloadFailed": "[wallhaven] Failed to download {id}: {error}",
+  "pageDone": "[wallhaven] └ Page {page} done"
+}

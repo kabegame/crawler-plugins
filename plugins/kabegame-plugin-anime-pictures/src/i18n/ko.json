@@ -1,0 +1,22 @@
+{
+  "userAgentFromCef": "[anime-pictures] User-Agent 출처: 서핑 CEF ({ua})",
+  "userAgentBuiltin": "[anime-pictures] User-Agent 출처: 내장 대체값",
+  "cookieMissing": "[anime-pictures] 서핑에서 Cookie를 가져오지 못해 내장 Cookie로 대체합니다. 403이 발생하면 먼저 서핑에서 anime-pictures를 열어 인증을 통과하세요",
+  "challengePage": "[anime-pictures] 인증 페이지가 감지되었습니다. V8 백엔드는 브라우저 인증을 처리할 수 없으니 잠시 후 다시 시도하거나 네트워크를 바꿔 주세요.",
+  "pickNameResolved": "[anime-pictures] pickName: title/author 작품={work} 캐릭터={character} 작가={artist} => {name}",
+  "pickNameNoLinks": "[anime-pictures] pickName: ul.tags 안에서 copyright/character/artist 링크를 찾지 못했습니다",
+  "pickNameNoTags": "[anime-pictures] pickName: ul.tags를 찾지 못해 대체 경로로 진행합니다",
+  "pickNameFallbackH1": "[anime-pictures] pickName: h1.copyright로 대체 -> {name}",
+  "pickNameFallbackTitleLine": "[anime-pictures] pickName: title 줄바꿈 두 번째 줄로 대체 -> {name}",
+  "pickNameFallbackTitleWord": "[anime-pictures] pickName: title 두 번째 단어로 대체 -> {name}",
+  "pickNameEmpty": "[anime-pictures] pickName: 여전히 비어 있음 title={title}",
+  "displayName": "[anime-pictures] downloadImage 표시 이름 name: {name}",
+  "metadata": "[anime-pictures] metadata: {metadata}",
+  "emptyValue": "(없음)",
+  "downloadLinkMissing": "[anime-pictures] 다운로드 링크를 찾지 못했습니다: {url}",
+  "pageRangeTooLarge": "한 번에 100페이지를 넘겨 크롤할 수 없습니다. 예의를 지켜 크롤해 주세요",
+  "endPageBeforeStart": "끝 페이지는 시작 페이지보다 뒤여야 합니다",
+  "crawlStart": "[anime-pictures] 시작: {startPage}～{endPage} 페이지, 태그={tag}",
+  "pageImages": "[anime-pictures] {page} 페이지 이미지 수: {count}",
+  "crawlDone": "[anime-pictures] 작업 종료"
+}

@@ -1,0 +1,8 @@
+{
+  "endPageBeforeStart": "The end page must be at least the start page",
+  "crawlStarted": "[wallpapers-craft] Starting crawl",
+  "startPageBeyondMax": "Start page {startPage} is beyond the site's maximum page ({maxPage})",
+  "turningPage": "Turning to page {page}/{endPage}: {url}",
+  "pageImages": "Page {page}: {count} thumbnail(s); starting download",
+  "crawlFinished": "[wallpapers-craft] Crawl finished"
+}

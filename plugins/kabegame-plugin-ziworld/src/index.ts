@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { t } from "./i18n";
+
 const { addProgress, downloadImage } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://t.ziworld.top";
@@ -51,7 +53,9 @@ export async function crawl(common, custom) {
   const res = await (await fetch(`${baseUrl}/date.json`)).json();
   // 站点现在直接返回顶层数组，旧版包在 { data: [...] } 里，两种都认
   const list = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
-  if (list.length === 0) throw new Error(`date.json 没有可用的目录列表，站点数据结构可能又变了：${baseUrl}/date.json`);
+  if (list.length === 0) {
+    throw new Error(t("dataListEmpty", { url: `${baseUrl}/date.json` }));
+  }
   const category = vars.category || {};
 
   let total = 0;

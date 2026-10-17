@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, currentHtml, downloadImage, to, warn } = Kabegame;
 
@@ -303,7 +304,7 @@ async function processDetailPage(href, baseUrl, quality) {
     imageUrl = resolveUrl(document.querySelector("#image")?.getAttribute("src"), finalUrl);
   }
   if (!imageUrl) {
-    console.warn(`[yandere] 详情页没解析出图片地址，跳过：${finalUrl}`);
+    console.warn(t("imageMissing", { url: finalUrl }));
     return;
   }
   const opts = { url: finalUrl };
@@ -324,9 +325,9 @@ function collectPostHrefs(document, pageUrl) {
 
 function validatePageRange(startPage, endPage) {
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
 // 列表页统一入口：给 URL 生成器，按页取详情页并均摊进度
@@ -335,11 +336,11 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const pageUrl = makePageUrl(page);
-    console.log(`[yandere][${label}] 打开页面 ${page}/${endPage}: ${pageUrl}`);
+    console.log(t("openPage", { label, page, total: endPage, url: pageUrl }));
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     if (hrefs.length === 0) {
-      console.log(`[yandere][${label}] 第 ${page} 页没有作品，结束`);
+      console.log(t("emptyPageStop", { label, page }));
       addProgress(pageProgress);
       break;
     }
@@ -362,7 +363,7 @@ async function crawlAll(baseUrl, quality, vars) {
 
 async function crawlByTags(baseUrl, quality, vars) {
   const tags = tagListOf(vars.mode_tag_value);
-  if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+  if (tags.length === 0) throw new Error(t("tagsRequired"));
   const tokens = tags.concat(metaTokensOf(vars));
   await crawlListPages(
     (page) => buildPostListUrl(baseUrl, tokens, page),
@@ -381,16 +382,20 @@ const MAX_ID_SPAN = 5000;
 function parsePostId(value, label) {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    throw new Error(t("positiveIntegerRequired", { label, value: text }));
+  }
   return id;
 }
 
 function parseIdRange(vars) {
-  const startId = parsePostId(vars.id_start, "起始 id");
-  const endId = parsePostId(vars.id_end, "结束 id");
-  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  const startId = parsePostId(vars.id_start, t("startIdLabel"));
+  const endId = parsePostId(vars.id_end, t("endIdLabel"));
+  if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
   if (endId - startId > MAX_ID_SPAN) {
-    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+    throw new Error(
+      t("idRangeTooLarge", { max: MAX_ID_SPAN, startId, endId, span: endId - startId }),
+    );
   }
   return { startId, endId };
 }
@@ -412,7 +417,7 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   const rating = trimText(vars.rating);
   const tokens = [`id:${startId}..${endId}`, "order:id"].concat(rating ? [`rating:${rating}`] : []);
   const total = await countPosts(baseUrl, tokens);
-  console.log(`[yandere][id] id ${startId}..${endId}，共 ${total ?? "未知"} 张`);
+  console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
   if (total === 0) return;
   // 总数未知时按区间宽度估页数，进度可能提前到顶，不影响抓取
   const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / 40));
@@ -423,7 +428,9 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   let seen = 0;
   for (let page = 1; page <= maxPages; page += 1) {
     const pageUrl = buildPostListUrl(baseUrl, tokens, page);
-    console.log(`[yandere][id] 打开页面 ${page}/${total == null ? "?" : estimatedPages}: ${pageUrl}`);
+    console.log(
+      t("openPage", { label: "id", page, total: total == null ? "?" : estimatedPages, url: pageUrl }),
+    );
     const { document, finalUrl } = await openDocument(pageUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
     if (hrefs.length === 0 || hrefs[0] === previousFirst) break;
@@ -497,7 +504,9 @@ function postIdOfHref(href) {
 async function crawlPopular(baseUrl, quality, vars) {
   const scale = coerceStr(vars.popular_scale || "day");
   const recent = POPULAR_RECENT_PERIODS.has(scale);
-  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) throw new Error(`未知的排行榜类型: ${scale}`);
+  if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) {
+    throw new Error(t("unknownRanking", { scale }));
+  }
   // 滚动窗口只有当期，回溯期数对它没有意义
   const periods = recent
     ? 1
@@ -508,13 +517,13 @@ async function crawlPopular(baseUrl, quality, vars) {
   const periodProgress = 90.0 / periods;
   for (let k = 0; k < periods; k += 1) {
     const pageUrl = buildPopularUrl(baseUrl, scale, shiftPopularDate(startDate, scale, k));
-    console.log(`[yandere][popular] 打开排行榜 ${k + 1}/${periods}: ${pageUrl}`);
+    console.log(t("openPopular", { period: k + 1, total: periods, url: pageUrl }));
     const { document, finalUrl, html } = await openDocument(pageUrl);
     let hrefs = collectPostHrefs(document, finalUrl);
     if (ratingLetter && hrefs.length > 0) {
       const ratings = postRatingsOf(html);
       if (ratings.size === 0) {
-        warn(`[yandere][popular] 页面里没找到作品分级信息，本期不做分级过滤：${finalUrl}`);
+        warn(t("ratingInfoMissing", { url: finalUrl }));
       } else {
         const before = hrefs.length;
         // 取不到分级的作品保留，宁可多下也不静默漏掉
@@ -522,11 +531,11 @@ async function crawlPopular(baseUrl, quality, vars) {
           const rating = ratings.get(postIdOfHref(href));
           return !rating || rating === ratingLetter;
         });
-        console.log(`[yandere][popular] 分级过滤 ${ratingName}：${before} → ${hrefs.length}`);
+        console.log(t("ratingFiltered", { rating: ratingName, before, after: hrefs.length }));
       }
     }
     if (hrefs.length === 0) {
-      console.log(`[yandere][popular] 本期没有符合条件的作品：${finalUrl}`);
+      console.log(t("popularEmpty", { url: finalUrl }));
       addProgress(periodProgress);
       continue;
     }
@@ -554,6 +563,6 @@ export async function crawl(common, custom) {
   } else if (mode === "id_range") {
     await crawlByIdRange(baseUrl, quality, vars);
   } else {
-    throw new Error(`未知的爬取模式: ${mode}`);
+    throw new Error(t("unknownMode", { mode }));
   }
 }

@@ -1,0 +1,23 @@
+{
+  "requestSkipped": "{url} 요청이 {status}을(를) 반환하여 건너뜁니다",
+  "requestRetryStatus": "{url} 요청이 {status}을(를) 반환했습니다. {attempt}번째로 다시 시도합니다",
+  "requestRetryError": "{url} 요청 실패: {error}. {attempt}번째로 다시 시도합니다",
+  "parseStateFailed": "__INITIAL_STATE__ 파싱 실패: {error}",
+  "noMedia": "작품 {id}에 다운로드할 미디어가 없어 건너뜁니다",
+  "downloadFailed": "다운로드 실패 {url}: {error}",
+  "noteParseFailed": "{url}에서 작품 데이터를 추출하지 못했습니다(삭제되었거나 로그인 전용이거나 링크가 잘못되었을 수 있습니다)",
+  "noValidLinks": "유효한 샤오훙수 작품 링크를 찾지 못했습니다. explore / discovery/item / user/profile 작품 링크와 xhslink.com 단축 링크를 지원합니다.",
+  "linkCount": "[xhs] 작품 링크 {count}개",
+  "fileCount": "[xhs] [{done}] {link} → 파일 {ok}개",
+  "doneDownloads": "[xhs] 완료했습니다. 파일 {count}개를 다운로드했습니다",
+  "cookieMissingRecommend": "서핑에서 샤오훙수 Cookie를 가져오지 못해 로그아웃 상태로 일반 추천을 수집합니다. 맞춤 추천을 받으려면 먼저 서핑에서 샤오훙수에 로그인하세요.",
+  "cookieInjectedRecommend": "[xhs] 서핑 Cookie를 주입했습니다. 맞춤 추천을 수집합니다",
+  "roundFetchFailed": "{round}번째 추천 페이지를 가져오지 못해 건너뜁니다",
+  "roundEmpty": "{round}번째 추천 항목을 파싱하지 못했습니다",
+  "roundSummary": "[xhs] {round}/{rounds}번째: {feeds}개 중 {fresh}개가 새 항목",
+  "doneRecommend": "[xhs] 완료했습니다. 작품 {processed}개를 처리하고 파일 {files}개를 다운로드했습니다",
+  "modeRecommend": "[xhs] 모드: 홈 추천, 새로고침 {rounds}회, 최대 {max}개 작품",
+  "unlimited": "무제한",
+  "modeNote": "[xhs] 모드: 노트 링크",
+  "cookieMissing": "서핑에서 샤오훙수 Cookie를 가져오지 못해 로그아웃 상태로 수집합니다. 일부 작품은 접근하지 못할 수 있습니다."
+}

@@ -4,16 +4,14 @@
 // 主页 `/?page=N` 与 JSON API `/api/v1/images?page=N` 是同一份列表（每页 20 条、最新在前），
 // API 一条记录里已经带齐原图 URL、标签与出处，所以不进详情页；评论用 include_comments 随列表返回。
 
+import { t } from "./i18n";
+
 const { addProgress, downloadImage, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://e-shuushuu.net";
 
 // 站点标签只有四类，映射到 `e-shuushuu/<分类>` 目录；未知类型归入 theme，保证不会多出目录。
 const LABEL_CATEGORIES = new Set(["artist", "source", "character", "theme"]);
-
-function log(message) {
-  console.log(`[e-shuushuu] ${message}`);
-}
 
 function labelCategory(typeName) {
   const value = String(typeName || "").trim().toLowerCase();
@@ -154,15 +152,15 @@ function isoDateDaysAgo(days) {
 // 所以直接搬过来，只去掉 page（由起止页控制）。接受完整 URL，也接受只粘贴了 `?tags=…` 的查询串。
 function parseSearchUrl(input) {
   const raw = String(input || "").trim();
-  if (!raw) throw new Error("请填写搜索 URL");
+  if (!raw) throw new Error(t("searchUrlRequired"));
   let url;
   try {
     url = new URL(raw.startsWith("?") ? `${DEFAULT_BASE_URL}/search${raw}` : raw);
   } catch {
-    throw new Error(`不是合法的 URL：${raw}`);
+    throw new Error(t("invalidUrl", { url: raw }));
   }
   if (!/(^|\.)e-shuushuu\.net$/i.test(url.hostname) || url.pathname.replace(/\/+$/, "") !== "/search") {
-    throw new Error(`请填写 e-shuushuu 搜索页地址（https://e-shuushuu.net/search?…），收到：${raw}`);
+    throw new Error(t("searchUrlInvalid", { url: raw }));
   }
   const params = new URLSearchParams(url.search);
   params.delete("page");
@@ -193,7 +191,7 @@ async function fetchPage(baseUrl, query, page) {
   const params = new URLSearchParams(query);
   params.set("page", String(page));
   const res = await fetch(`${baseUrl}/api/v1/images?${params}`);
-  if (!res.ok) throw new Error(`列表接口 HTTP ${res.status}`);
+  if (!res.ok) throw new Error(t("listHttpError", { status: res.status }));
   const data = await res.json();
   return {
     images: Array.isArray(data?.images) ? data.images : [],
@@ -205,7 +203,7 @@ async function fetchPage(baseUrl, query, page) {
 
 async function downloadOne(baseUrl, image, rawComments) {
   if (!image?.url) {
-    warn(`[e-shuushuu] 图片 #${image?.image_id} 没有原图地址，跳过`);
+    warn(t("noImageUrl", { id: image?.image_id }));
     return;
   }
   const pageUrl = `${baseUrl}/images/${image.image_id}`;
@@ -236,29 +234,36 @@ export async function crawl(common, custom) {
   const startPage = Math.max(1, Number(vars.start_page ?? 1) || 1);
   let endPage = Math.max(startPage, Number(vars.end_page ?? startPage) || startPage);
   if (mode === "top" && endPage > TOP_MAX_PAGES) {
-    log(`排行榜最多 ${TOP_MAX_PAGES} 页，结束页 ${endPage} 按 ${TOP_MAX_PAGES} 处理`);
+    console.log(t("topPageCapped", { max: TOP_MAX_PAGES, endPage }));
     endPage = TOP_MAX_PAGES;
   }
   if (startPage > endPage) {
-    warn(`[e-shuushuu] 起始页 ${startPage} 超出范围，任务结束`);
+    warn(t("startPageOutOfRange", { startPage }));
     addProgress(100);
     return;
   }
   const query = buildListQuery(mode, period, searchParams);
   const pctPerPage = 100 / (endPage - startPage + 1);
 
-  const title = mode === "top" ? `排行榜（${period}）` : mode === "search" ? `搜索（${searchParams.toString() || "全部"}）` : "主页翻页";
-  log(`${title}：第 ${startPage}~${endPage} 页`);
+  const titleKey = mode === "top" ? "openTop" : mode === "search" ? "openSearch" : "openHome";
+  console.log(
+    t(titleKey, {
+      period,
+      query: searchParams?.toString() || t("all"),
+      startPage,
+      endPage,
+    }),
+  );
   for (let page = startPage; page <= endPage; page += 1) {
     let result;
     try {
       result = await fetchPage(baseUrl, query, page);
       if (page === startPage) {
-        log(`共 ${result.total} 张，${result.lastPage} 页`);
+        console.log(t("totalSummary", { total: result.total, pages: result.lastPage }));
         if (endPage > result.lastPage) endPage = result.lastPage;
       }
     } catch (e) {
-      warn(`[e-shuushuu] 第 ${page} 页读取失败：${e?.message ?? e}`);
+      warn(t("pageReadFailed", { page, error: e?.message ?? e }));
       addProgress(pctPerPage);
       continue;
     }
@@ -269,7 +274,7 @@ export async function crawl(common, custom) {
       break; // 越过最后一页
     }
     const images = filterVisible ? result.images.filter((image) => image?.status === 1) : result.images;
-    log(`┌ 第 ${page} 页：${result.images.length} 条，源站可见 ${images.length} 条`);
+    console.log(t("pageStart", { page, total: result.images.length, visible: images.length }));
     if (images.length === 0) {
       addProgress(pctPerPage);
       continue;
@@ -280,10 +285,10 @@ export async function crawl(common, custom) {
       try {
         await downloadOne(baseUrl, image, comments[String(image.image_id)]);
       } catch (e) {
-        warn(`[e-shuushuu] 图片 #${image.image_id} 下载失败：${e?.message ?? e}`);
+        warn(t("downloadFailed", { id: image.image_id, error: e?.message ?? e }));
       }
       addProgress(pctPerImage);
     }
-    log(`└ 第 ${page} 页完成`);
+    console.log(t("pageDone", { page }));
   }
 }

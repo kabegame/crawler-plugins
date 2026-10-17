@@ -1,0 +1,12 @@
+{
+  "invalidWallpaperType": "[anihonet] 錯誤：壁紙類型必須是 all/sp/image/imgpc/pc",
+  "unknownMode": "[anihonet] 錯誤：crawl_mode 必須是 ranking、single_work 或 search",
+  "searchQueryEmpty": "[anihonet] 搜尋關鍵字為空，未發起站內搜尋",
+  "searchStart": "[anihonet] 站內搜尋 關鍵字={query} 方向={order} 排序={orderBy} 頁數範圍參數={requestedRange}，偵測到的實際頁數範圍={actualRange}",
+  "rangeNotCovered": "[anihonet] 偵測到的實際頁數範圍 {actualRange} 未涵蓋輸入範圍 {requestedRange}，超出部分不會爬取",
+  "searchPageOpen": "[anihonet] 搜尋結果第 {page}/{total} 頁，詳情頁 {count} 筆：{url}",
+  "detailOpen": "[anihonet]   進入詳情頁 {index}/{total}：{url}",
+  "seriesListOpen": "[anihonet] 進入作品列表頁 列={rowId} 第 {index}/{total} 個分類：{url}",
+  "allPages": "全部",
+  "seriesRangeInfo": "[anihonet] 作品頁數範圍參數={requestedRange}，偵測到的實際頁數範圍={actualRange}"
+}

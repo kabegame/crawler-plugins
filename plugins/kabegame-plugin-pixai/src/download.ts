@@ -6,6 +6,7 @@ import { fetchPixaiArtworkDetail, fetchPixaiComments } from "./api";
 import { labelsFromArtworkDetail } from "./labels";
 import { searchTextsFromDetail } from "./search-texts";
 import { arrayValue, coerceStr, log } from "./util";
+import { t } from "./i18n";
 
 const { addProgress, createImageMetadata: createImageMetadataRow, downloadImage } = Kabegame;
 
@@ -56,7 +57,7 @@ async function downloadArtwork(finalDownloadUrl, artworkDetail, displayName, pix
 async function enrichArtworkDetail(artworkId, fallbackTitle) {
   const detail = await fetchPixaiArtworkDetail(artworkId);
   if (!detail) {
-    log(`[PixAI] 跳过作品：详情为空，artwork_id=${artworkId}`, "warn");
+    log(t("skipArtworkNoDetail", { artworkId }), "warn");
     return null;
   }
   detail.comments = await fetchPixaiComments(artworkId);
@@ -85,7 +86,7 @@ export async function processArtworksEdgesForDownload(
   let downloaded = 0;
   if (useMediaApi) {
     const countOk = artworkEdges.filter((edge) => pickMediaIdForDownload(edge?.node)).length;
-    log(`[PixAI] ${label} ${contextId} 可经 media API 下载 ${countOk}/${artworkEdges.length} 条`);
+    log(t("mediaApiAvailable", { label, contextId, ok: countOk, total: artworkEdges.length }));
     const progressPer = countOk > 0 ? progressBudget / countOk : 0.0;
 
     for (let edgeIndex = 0; edgeIndex < artworkEdges.length; edgeIndex += 1) {
@@ -96,7 +97,14 @@ export async function processArtworksEdgesForDownload(
       const title = coerceStr(node?.title);
       const artworkId = coerceStr(node?.id);
       log(
-        `[PixAI] 下载 ${label} ${contextId} 第 ${downloadedOffset + downloaded + 1} 张（第 ${edgeIndex + 1}/${artworkEdges.length} 条）：${title}`,
+        t("downloadingArtwork", {
+          label,
+          contextId,
+          index: downloadedOffset + downloaded + 1,
+          edgeIndex: edgeIndex + 1,
+          total: artworkEdges.length,
+          title,
+        }),
       );
 
       const detail = await enrichArtworkDetail(artworkId, title);
@@ -116,7 +124,7 @@ export async function processArtworksEdgesForDownload(
   for (const edge of artworkEdges) {
     publicCount += countPublicUrls(edge?.node?.media?.urls);
   }
-  log(`[PixAI] ${label} ${contextId} 作品页 PUBLIC 图片数 ${publicCount}`);
+  log(t("publicImageCount", { label, contextId, count: publicCount }));
   const progressPerDownload = publicCount > 0 ? progressBudget / publicCount : 0.0;
 
   for (let edgeIndex = 0; edgeIndex < artworkEdges.length; edgeIndex += 1) {
@@ -128,7 +136,14 @@ export async function processArtworksEdgesForDownload(
     const title = coerceStr(node?.title);
     const artworkId = coerceStr(node?.id);
     log(
-      `[PixAI] 下载 ${label} ${contextId} 第 ${downloadedOffset + downloaded + 1} 张（第 ${edgeIndex + 1}/${artworkEdges.length} 条）：${title}`,
+      t("downloadingArtwork", {
+        label,
+        contextId,
+        index: downloadedOffset + downloaded + 1,
+        edgeIndex: edgeIndex + 1,
+        total: artworkEdges.length,
+        title,
+      }),
     );
 
     const detail = await enrichArtworkDetail(artworkId, title);

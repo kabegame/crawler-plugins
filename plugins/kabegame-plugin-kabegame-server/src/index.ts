@@ -13,9 +13,10 @@
 // 详情模板执行来源插件自己的 description.ejs：模板文本与该插件的 plugin_data 由这里抓下来存进
 // 本插件的 plugin_data，templates/description.src.ejs 在 iframe 里读出后用同版本 ejs 渲染。
 
+import { t } from "./i18n";
+
 const { addProgress, downloadImage, createImageMetadata, warn, pluginData, setPluginData } = Kabegame;
 
-const PLUGIN_ID = "kabegame-server";
 const DEFAULT_SERVER = "https://demo.kabegame.com";
 const MAX_PAGE_SIZE = 100;
 // 一次运行最多翻的页数（与 konachan 的 100 页限制同理：超出直接拒绝，不静默截断）
@@ -26,8 +27,9 @@ const LABEL_PAGE_SIZE = 1000;
 const RPC_CONCURRENCY = 8;
 const METADATA_SCHEMA = 1;
 
+// [kabegame-server] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
 function log(message) {
-  console.log(`[${PLUGIN_ID}] ${message}`);
+  console.log(message);
 }
 
 function errText(e) {
@@ -44,8 +46,8 @@ function normalizeServer(raw) {
 
 // 服务器画廊续接段的两种方言：4.5.1 起全局化为 `_kb_*`，之前是裸段名。
 const DIALECTS = {
-  kb: { name: "_kb_*（4.5.1+）", fc: "_kb_fc", desc: "_kb_desc", page: (n, p) => `_kb_x${n}x/${p}` },
-  legacy: { name: "旧版（<4.5.1）", fc: "filter_comb", desc: "desc", page: (n, p) => `x${n}x/${p}` },
+  kb: { labelKey: "dialectKb", fc: "_kb_fc", desc: "_kb_desc", page: (n, p) => `_kb_x${n}x/${p}` },
+  legacy: { labelKey: "dialectLegacy", fc: "filter_comb", desc: "desc", page: (n, p) => `x${n}x/${p}` },
 };
 
 // 各取一张图试两种分页尾；先试新语法。两种都失败时把两条错误一起报出来。
@@ -56,10 +58,10 @@ async function detectDialect(server) {
       await rpc(server, "pathql_fetch", { path: `images://gallery/all/${d.page(1, 1)}` });
       return d;
     } catch (e) {
-      errors.push(`${d.name}：${errText(e)}`);
+      errors.push(t("probeFailed", { dialect: t(d.labelKey), error: errText(e) }));
     }
   }
-  throw new Error(`无法识别服务器的 PathQL 分页语法（${errors.join("；")}）`);
+  throw new Error(t("dialectUnknown", { errors: errors.join("；") }));
 }
 
 // 全站模式的排序段。随机种子每次运行生成一次，同一次运行的各页共用同一个排列，翻页不重复；
@@ -76,9 +78,9 @@ function siteSortSegment(sort, dialect) {
 // 原样保留；省略 scheme 时按画廊路径补全。
 function normalizeFilterPath(raw) {
   let s = String(raw ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
-  if (!s) throw new Error("过滤模式需要填写 PathQL 查询");
+  if (!s) throw new Error(t("filterPathRequired"));
   if (!s.includes("://")) s = `images://gallery/${s.replace(/^\/+/, "")}`;
-  if (!s.startsWith("images://")) throw new Error(`PathQL 查询必须是 images:// 路径：${s}`);
+  if (!s.startsWith("images://")) throw new Error(t("filterPathInvalid", { path: s }));
   const segs = s.slice("images://".length).split("/").filter(Boolean);
   if (segs.length > 1 && /^[1-9][0-9]*$/.test(segs[segs.length - 1])) {
     segs.pop();
@@ -176,18 +178,24 @@ function createSourceCache(server) {
       entry.template = typeof detail?.descriptionTemplate === "string" ? detail.descriptionTemplate : null;
     } catch (e) {
       // 内建插件（local-import / webpage）或服务器已卸载的插件没有详情，按无模板处理
-      log(`插件 ${pluginId} 无详情：${errText(e)}`);
+      log(t("pluginDetailMissing", { plugin: pluginId, error: errText(e) }));
     }
     try {
       const data = await rpc(server, "get_plugin_data", { pluginId });
       entry.data = data && typeof data === "object" && !Array.isArray(data) ? data : {};
     } catch (e) {
-      warn(`[${PLUGIN_ID}] 读取插件 ${pluginId} 的 plugin_data 失败：${errText(e)}`);
+      warn(t("pluginDataReadFailed", { plugin: pluginId, error: errText(e) }));
       entry.data = serverEntry.plugins[pluginId]?.data ?? {};
     }
     serverEntry.plugins[pluginId] = entry;
     setPluginData(store);
-    log(`已缓存插件 ${pluginId} v${entry.version ?? "?"}：模板 ${entry.template ? `${entry.template.length} 字符` : "无"}`);
+    log(
+      t("pluginCached", {
+        plugin: pluginId,
+        version: entry.version ?? "?",
+        template: entry.template ? t("templateChars", { length: entry.template.length }) : t("templateNone"),
+      }),
+    );
   }
 
   return {
@@ -252,15 +260,13 @@ export async function crawl(common, custom) {
   const startPage = clampInt(vars.start_page, 1, 1, Number.MAX_SAFE_INTEGER);
   const endPage = Math.max(startPage, clampInt(vars.end_page, startPage, 1, Number.MAX_SAFE_INTEGER));
   if (endPage - startPage + 1 > MAX_PAGES_PER_RUN) {
-    throw new Error(`一次最多复制 ${MAX_PAGES_PER_RUN} 页，当前为第 ${startPage}-${endPage} 页，请分几次运行`);
+    throw new Error(t("tooManyPages", { max: MAX_PAGES_PER_RUN, startPage, endPage }));
   }
   // 先连通性检查，再探测语法、取总数：分开做，过滤路径写错时不会被误报成连不上服务器
   try {
     await rpc(server, "pathql_entry", { path: "images://gallery" });
   } catch (e) {
-    throw new Error(
-      `无法访问 ${server}/rpc（${errText(e)}）。请确认地址正确；桌面端需在「设置 → 高级」开启 Web 服务器。`,
-    );
+    throw new Error(t("serverUnreachable", { server, error: errText(e) }));
   }
   const dialect = await detectDialect(server);
 
@@ -287,17 +293,26 @@ export async function crawl(common, custom) {
       firstError ??= e;
     }
   }
-  if (basePath == null) throw new Error(`服务器无法解析查询 ${candidates[0]}：${errText(firstError)}`);
+  if (basePath == null) {
+    throw new Error(t("queryNotResolved", { path: candidates[0], error: errText(firstError) }));
+  }
   log(
-    `服务器 ${server}（${dialect.name} 语法），${filterMode ? "过滤" : "全站"} ${basePath}，每页 ${pageSize}，` +
-      `第 ${startPage}-${endPage} 页` +
-      (filterMode ? "" : `，${vars.include_hidden === true ? "包含" : "跳过"}隐藏图片`),
+    t("crawlStart", {
+      server,
+      dialect: t(dialect.labelKey),
+      scope: t(filterMode ? "scopeFilter" : "scopeAll"),
+      path: basePath,
+      pageSize,
+      startPage,
+      endPage,
+      hidden: filterMode ? "" : t(vars.include_hidden === true ? "hiddenIncluded" : "hiddenSkipped"),
+    }),
   );
   const lastPage = total == null ? endPage : Math.max(1, Math.ceil(total / pageSize));
   const finalPage = Math.min(endPage, lastPage);
-  log(`服务器共 ${total ?? "?"} 张，最后一页为第 ${lastPage} 页`);
+  log(t("serverTotal", { total: total ?? "?", lastPage }));
   if (startPage > finalPage) {
-    warn(`[${PLUGIN_ID}] 起始页 ${startPage} 超过服务器最后一页 ${lastPage}，没有可复制的图片`);
+    warn(t("startPageBeyond", { startPage, lastPage }));
     addProgress(100);
     return;
   }
@@ -311,12 +326,19 @@ export async function crawl(common, custom) {
     try {
       rows = await rpc(server, "pathql_fetch", { path: `${basePath}/${dialect.page(pageSize, page)}` });
     } catch (e) {
-      warn(`[${PLUGIN_ID}] 第 ${page} 页读取失败：${errText(e)}`);
+      warn(t("pageReadFailed", { page, error: errText(e) }));
       addProgress(perPage);
       continue;
     }
     rows = Array.isArray(rows) ? rows : [];
-    log(`第 ${page} 页：${rows.length} 张（id ${rows[0]?.id ?? "-"} … ${rows[rows.length - 1]?.id ?? "-"}）`);
+    log(
+      t("pageFetched", {
+        page,
+        count: rows.length,
+        first: rows[0]?.id ?? "-",
+        last: rows[rows.length - 1]?.id ?? "-",
+      }),
+    );
     if (rows.length === 0) {
       addProgress(perPage * (finalPage - page + 1));
       break;
@@ -334,7 +356,7 @@ export async function crawl(common, custom) {
           sources.ensure(image.plugin_id),
         ]);
         const url = mediaUrl(server, image);
-        if (!url) throw new Error("没有可下载的地址");
+        if (!url) throw new Error(t("noDownloadUrl"));
         const postUrl = String(image.post_url ?? "").trim();
         await downloadImage(url, {
           name: image.display_name || null,
@@ -344,10 +366,10 @@ export async function crawl(common, custom) {
         });
         ok++;
       } catch (e) {
-        warn(`[${PLUGIN_ID}] 图片 #${image.id} 失败：${errText(e)}`);
+        warn(t("imageFailed", { id: image.id, error: errText(e) }));
       }
       addProgress(perImage);
     });
-    log(`第 ${page} 页完成：入队 ${ok}/${rows.length}`);
+    log(t("pageDone", { page, ok, count: rows.length }));
   }
 }

@@ -1,0 +1,14 @@
+{
+  "openPage": "[gelbooru][{label}] ページ {page}/{total} を開いています：{url}",
+  "emptyPageStop": "[gelbooru][{label}] {page} ページ目に投稿がないため終了します",
+  "imageMissing": "[gelbooru] 詳細ページからメディア URL を取得できず、スキップします：{url}",
+  "tagListStart": "[gelbooru][tag-list] タグ一覧モードを開始します：{pattern}{category} に一致、{skip} 個をスキップして {count} 個を取得",
+  "onlyCategory": "（{category} のみ）",
+  "tagListEmptyPage": "[gelbooru][tag-list] {page} ページ目にタグがないため終了します",
+  "tagListNoMatch": "[gelbooru][tag-list] 一致するタグがありませんでした。パターン・カテゴリ・スキップ数を確認してください",
+  "tagDone": "[gelbooru][tag-list] タグ完了：{name}（{category}）、実ダウンロード {downloaded} / サイト内 {count} 件",
+  "tagsRequired": "タグモードではタグを1つ以上入力してください",
+  "pageRangeTooLarge": "1回の実行で100ページを超えてクロールすることはできません。節度あるクロールにご協力ください",
+  "endPageBeforeStart": "終了ページは開始ページ以降にしてください",
+  "unknownMode": "不明なクロールモード：{mode}"
+}

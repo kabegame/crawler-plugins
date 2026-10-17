@@ -3,6 +3,7 @@
 import { parseMetadata } from "./metadata";
 import { coerceStr, isImageUrl, openDocument, resolveUrl, textOf } from "./runtime";
 import { searchTextsFromMetadata } from "./search-texts";
+import { t } from "./i18n";
 
 const { addProgress, createImageMetadata, downloadImage } = Kabegame;
 
@@ -84,7 +85,7 @@ async function processDownloadHref(href, progressSlice, opts, baseUrl) {
 
 export async function processDetailPage(href, workPctBudget, workIdx, workTotal, baseUrl) {
   const full = resolveUrl(href, baseUrl);
-  console.log(`[anihonet]   进入详情页 ${workIdx}/${workTotal}: ${full}`);
+  console.log(t("detailOpen", { index: workIdx, total: workTotal, url: full }));
   const { document, finalUrl } = await openDocument(full);
   const metadata = parseMetadata(document, finalUrl);
   const metadataId = Number(

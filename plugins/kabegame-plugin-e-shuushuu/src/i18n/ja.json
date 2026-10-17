@@ -1,0 +1,18 @@
+{
+  "searchUrlRequired": "検索 URL を入力してください",
+  "invalidUrl": "有効な URL ではありません：{url}",
+  "searchUrlInvalid": "e-shuushuu の検索ページ URL（https://e-shuushuu.net/search?…）を入力してください。受信値：{url}",
+  "listHttpError": "一覧 API が HTTP {status} を返しました",
+  "noImageUrl": "[e-shuushuu] 画像 #{id} に原画像の URL がないためスキップします",
+  "topPageCapped": "[e-shuushuu] ランキングは最大 {max} ページです。終了ページ {endPage} は {max} として扱います",
+  "startPageOutOfRange": "[e-shuushuu] 開始ページ {startPage} が範囲外のため、タスクを終了します",
+  "openTop": "[e-shuushuu] ランキング（{period}）：{startPage}〜{endPage} ページ",
+  "openSearch": "[e-shuushuu] 検索（{query}）：{startPage}〜{endPage} ページ",
+  "openHome": "[e-shuushuu] トップページ：{startPage}〜{endPage} ページ",
+  "all": "すべて",
+  "totalSummary": "[e-shuushuu] 全 {total} 枚、{pages} ページ",
+  "pageReadFailed": "[e-shuushuu] {page} ページ目の取得に失敗しました：{error}",
+  "pageStart": "[e-shuushuu] ┌ {page} ページ目：{total} 件、サイト上で表示 {visible} 件",
+  "downloadFailed": "[e-shuushuu] 画像 #{id} のダウンロードに失敗しました：{error}",
+  "pageDone": "[e-shuushuu] └ {page} ページ目 完了"
+}

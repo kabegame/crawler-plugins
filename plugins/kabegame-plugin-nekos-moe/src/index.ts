@@ -10,6 +10,7 @@
 // 原图是 /image/<id>，无需 Referer。
 
 import { sleep } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, downloadImage, warn } = Kabegame;
 
@@ -21,8 +22,9 @@ const SEARCH_INTERVAL_MS = 2100;
 const MAX_RETRIES = 3;
 const SORTS = new Set(["newest", "likes", "oldest"]);
 
+// [nekos-moe] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
 function log(message) {
-  console.log(`[nekos-moe] ${message}`);
+  console.log(message);
 }
 
 let lastSearchAt = 0;
@@ -40,11 +42,23 @@ async function searchPage(baseUrl, body) {
     const data = await res.json().catch(() => ({}));
     if (res.status === 429 && attempt < MAX_RETRIES) {
       const retryAfter = Number(data?.retryAfter) > 0 ? Number(data.retryAfter) : 10000;
-      log(`触发限流，${Math.ceil(retryAfter / 1000)} 秒后重试（${attempt + 1}/${MAX_RETRIES}）`);
+      log(
+        t("rateLimited", {
+          seconds: Math.ceil(retryAfter / 1000),
+          attempt: attempt + 1,
+          max: MAX_RETRIES,
+        }),
+      );
       await sleep(retryAfter + 500);
       continue;
     }
-    if (!res.ok) throw new Error(`搜索接口 HTTP ${res.status}${data?.message ? `：${data.message}` : ""}`);
+    if (!res.ok) {
+      throw new Error(
+        data?.message
+          ? t("searchHttpErrorWithMessage", { status: res.status, message: data.message })
+          : t("searchHttpError", { status: res.status }),
+      );
+    }
     return Array.isArray(data?.images) ? data.images : [];
   }
 }
@@ -124,17 +138,24 @@ export async function crawl(common, custom) {
   // 服务端 skip 上限 2500：能翻到的最后一页是 skip = (page - 1) * pageSize ≤ 2500
   const maxPage = Math.floor(MAX_SKIP / pageSize) + 1;
   if (startPage > maxPage) {
-    warn(`[nekos-moe] 每页 ${pageSize} 张时最多翻到第 ${maxPage} 页（站点限制 skip ≤ ${MAX_SKIP}），起始页 ${startPage} 超出范围`);
+    warn(
+      t("startPageOutOfRange", {
+        pageSize,
+        maxPage,
+        maxSkip: MAX_SKIP,
+        startPage,
+      }),
+    );
     addProgress(100);
     return;
   }
   if (endPage > maxPage) {
-    log(`每页 ${pageSize} 张时最多翻到第 ${maxPage} 页，结束页 ${endPage} 按 ${maxPage} 处理`);
+    log(t("endPageClamped", { pageSize, maxPage, endPage }));
     endPage = maxPage;
   }
 
   const pctPerPage = 100 / (endPage - startPage + 1);
-  log(`排序 ${sort}，NSFW ${nsfw}，每页 ${pageSize} 张，第 ${startPage}~${endPage} 页`);
+  log(t("crawlSummary", { sort, nsfw, pageSize, startPage, endPage }));
 
   for (let page = startPage; page <= endPage; page += 1) {
     const body = { limit: pageSize, skip: (page - 1) * pageSize, sort };
@@ -143,21 +164,21 @@ export async function crawl(common, custom) {
     try {
       images = await searchPage(baseUrl, body);
     } catch (e) {
-      warn(`[nekos-moe] 第 ${page} 页读取失败：${e?.message ?? e}`);
+      warn(t("pageFailed", { page, error: e?.message ?? e }));
       addProgress(pctPerPage);
       continue;
     }
     if (images.length === 0) {
-      log(`第 ${page} 页没有结果，已到最后一页`);
+      log(t("noResults", { page }));
       addProgress(100);
       break;
     }
 
-    log(`┌ 第 ${page} 页：${images.length} 张`);
+    log(t("pageStart", { page, count: images.length }));
     const pctPerImage = pctPerPage / images.length;
     for (const image of images) {
       try {
-        if (!image?.id) throw new Error("记录缺少 id");
+        if (!image?.id) throw new Error(t("recordMissingId"));
         const metadata = buildMetadata(image, baseUrl);
         const opts = {
           name: displayName(image),
@@ -169,14 +190,14 @@ export async function crawl(common, custom) {
         if (labels.length > 0) opts.labels = labels;
         await downloadImage(metadata.image_url, opts);
       } catch (e) {
-        warn(`[nekos-moe] 图片 ${image?.id} 下载失败：${e?.message ?? e}`);
+        warn(t("imageFailed", { id: image?.id, error: e?.message ?? e }));
       }
       addProgress(pctPerImage);
     }
-    log(`└ 第 ${page} 页完成`);
+    log(t("pageDone", { page }));
 
     if (images.length < pageSize) {
-      log(`第 ${page} 页不足 ${pageSize} 张，已到最后一页`);
+      log(t("pageShort", { page, pageSize }));
       addProgress(100);
       break;
     }

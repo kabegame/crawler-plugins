@@ -1,0 +1,16 @@
+{
+  "archiveLabel": "歸檔資料",
+  "statsLabel": "公開統計",
+  "requestRetry": "{label}讀取失敗，{delay}ms 後重試 {attempt}/{max}：{error}",
+  "requestFailed": "{label}請求失敗：{error}",
+  "statsUnavailable": "[bluedafeiyu] 公開統計不可用，{sort}排序回退為最新順序",
+  "sortPopular": "熱度",
+  "sortDownloads": "下載量",
+  "readingArchive": "[bluedafeiyu] 讀取完整歸檔：{url}",
+  "archiveEmpty": "archive-data.json 中沒有作品，來源站資料結構可能已變更",
+  "statsReadFailed": "[bluedafeiyu] 公開統計讀取失敗：{error}",
+  "all": "全部",
+  "filterSummary": "[bluedafeiyu] 歸檔 {total} 筆，篩選後 {selected} 筆（角色={character}，類型={type}，排序={sort}）",
+  "missingOriginalUrl": "缺少原圖網址",
+  "workFailed": "[bluedafeiyu] 作品 {work} 失敗：{error}"
+}

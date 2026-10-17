@@ -1,0 +1,22 @@
+{
+  "userAgentFromCef": "[anime-pictures] User-Agent 来源：畅游 CEF（{ua}）",
+  "userAgentBuiltin": "[anime-pictures] User-Agent 来源：内置兜底",
+  "cookieMissing": "[anime-pictures] 未取到畅游 Cookie，回退到内置 Cookie；若 403 请先在畅游打开 anime-pictures 通过验证",
+  "challengePage": "[anime-pictures] 检测到挑战页，V8 后端无法处理浏览器验证，请稍后重试或切换网络。",
+  "pickNameResolved": "[anime-pictures] pickName: title/author 作品={work} 角色={character} 作家={artist} => {name}",
+  "pickNameNoLinks": "[anime-pictures] pickName: ul.tags 内未找到 copyright/character/artist 链接",
+  "pickNameNoTags": "[anime-pictures] pickName: 未找到 ul.tags，走回退",
+  "pickNameFallbackH1": "[anime-pictures] pickName: 回退 h1.copyright -> {name}",
+  "pickNameFallbackTitleLine": "[anime-pictures] pickName: 回退 title 换行第2段 -> {name}",
+  "pickNameFallbackTitleWord": "[anime-pictures] pickName: 回退 title 分词第2词 -> {name}",
+  "pickNameEmpty": "[anime-pictures] pickName: 仍为空 title={title}",
+  "displayName": "[anime-pictures] downloadImage 展示名 name: {name}",
+  "metadata": "[anime-pictures] metadata: {metadata}",
+  "emptyValue": "(空)",
+  "downloadLinkMissing": "[anime-pictures] 未找到下载链接: {url}",
+  "pageRangeTooLarge": "在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪",
+  "endPageBeforeStart": "结束页面需要比开始页面大",
+  "crawlStart": "[anime-pictures] 开始：第 {startPage}～{endPage} 页，标签={tag}",
+  "pageImages": "[anime-pictures] 第 {page} 页图片数量: {count}",
+  "crawlDone": "[anime-pictures] 任务结束"
+}

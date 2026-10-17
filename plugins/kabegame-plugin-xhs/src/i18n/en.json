@@ -1,0 +1,23 @@
+{
+  "requestSkipped": "Request to {url} returned {status}; skipping",
+  "requestRetryStatus": "Request to {url} returned {status}; retrying (attempt {attempt})",
+  "requestRetryError": "Request to {url} failed: {error}; retrying (attempt {attempt})",
+  "parseStateFailed": "Failed to parse __INITIAL_STATE__: {error}",
+  "noMedia": "Note {id} has no downloadable media; skipping",
+  "downloadFailed": "Download failed for {url}: {error}",
+  "noteParseFailed": "Could not extract note data from {url} (it may be deleted, visible only to logged-in users, or the link is invalid)",
+  "noValidLinks": "No valid XiaoHongShu note links were found. Supported: explore / discovery/item / user/profile note links and xhslink.com short links.",
+  "linkCount": "[xhs] {count} note links",
+  "fileCount": "[xhs] [{done}] {link} → {ok} file(s)",
+  "doneDownloads": "[xhs] Done; {count} file(s) downloaded",
+  "cookieMissingRecommend": "No XiaoHongShu Cookie was found in Surf; crawling the general recommendations while logged out. To get personalized recommendations, sign in to XiaoHongShu in Surf first.",
+  "cookieInjectedRecommend": "[xhs] Injected the Cookie from Surf; crawling personalized recommendations",
+  "roundFetchFailed": "Failed to fetch the recommendation page in round {round}; skipping",
+  "roundEmpty": "No recommendation entries were parsed in round {round}",
+  "roundSummary": "[xhs] Round {round}/{rounds}: {feeds} entries, {fresh} of them new",
+  "doneRecommend": "[xhs] Done; {processed} note(s) processed, {files} file(s) downloaded",
+  "modeRecommend": "[xhs] Mode: homepage recommendations; {rounds} refresh round(s), up to {max} note(s)",
+  "unlimited": "unlimited",
+  "modeNote": "[xhs] Mode: note links",
+  "cookieMissing": "No XiaoHongShu Cookie was found in Surf; crawling while logged out. Some notes may not be accessible."
+}

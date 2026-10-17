@@ -3,6 +3,7 @@
 // 五种模式最后都汇到 processPost，入参是 statuses/show、mymblog、超话 feed 共用的 mblog 结构。
 import { COMMENTS_API, LONGTEXT_API, POST_DELAY_MS, SHOW_API, SUPERTOPIC_PREFIX } from "./consts";
 import { labelsFromMetadata, searchTextsFromMetadata } from "./derived";
+import { t } from "./i18n";
 import { LoginError, fetchJson, https, isoTime, pause, record, str } from "./util";
 
 const { createImageMetadata, downloadImage, warn } = Kabegame;
@@ -113,7 +114,7 @@ async function fullText(m) {
     return cleanText(json?.data?.longTextContent || m.text_raw);
   } catch (e) {
     if (e instanceof LoginError) throw e;
-    warn(`[weibo] ${m.mblogid} 长文补全失败：${e?.message ?? e}，使用截断正文`);
+    warn(t("longTextFailed", { mblogid: m.mblogid, reason: e?.message ?? e }));
     return cleanText(m.text_raw);
   }
 }
@@ -193,7 +194,7 @@ async function fetchComments(m, max) {
     }
   } catch (e) {
     if (e instanceof LoginError) throw e;
-    warn(`[weibo] ${m.mblogid} 评论拉取中断（已取 ${out.length} 条）：${e?.message ?? e}`);
+    warn(t("commentsInterrupted", { mblogid: m.mblogid, count: out.length, reason: e?.message ?? e }));
   }
   return out;
 }
@@ -223,7 +224,7 @@ export async function processPost(mblog, opts, retweetedBy) {
       }
     } catch (e) {
       if (e instanceof LoginError) throw e;
-      warn(`[weibo] ${m.mblogid} 详情补拉失败：${e?.message ?? e}`);
+      warn(t("detailRefetchFailed", { mblogid: m.mblogid, reason: e?.message ?? e }));
     }
   }
 

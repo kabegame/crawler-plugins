@@ -1,0 +1,12 @@
+{
+  "invalidWallpaperType": "[anihonet] エラー：wallpaper_type は all/sp/image/imgpc/pc のいずれかにしてください",
+  "unknownMode": "[anihonet] エラー：crawl_mode は ranking、single_work、search のいずれかにしてください",
+  "searchQueryEmpty": "[anihonet] 検索キーワードが空のため、サイト内検索を開始しませんでした",
+  "searchStart": "[anihonet] サイト内検索 キーワード={query} 方向={order} 並び順={orderBy} 指定ページ範囲={requestedRange}、検出した実際のページ範囲={actualRange}",
+  "rangeNotCovered": "[anihonet] 検出した実際のページ範囲 {actualRange} が入力範囲 {requestedRange} をカバーしていないため、超えた部分はクロールしません",
+  "searchPageOpen": "[anihonet] 検索結果 {page}/{total} ページ、詳細ページ {count} 件：{url}",
+  "detailOpen": "[anihonet]   詳細ページ {index}/{total} を開きます：{url}",
+  "seriesListOpen": "[anihonet] 作品一覧ページを開きます 行={rowId} {index}/{total} 番目のカテゴリ：{url}",
+  "allPages": "すべて",
+  "seriesRangeInfo": "[anihonet] 作品ページ範囲の指定={requestedRange}、検出した実際のページ範囲={actualRange}"
+}

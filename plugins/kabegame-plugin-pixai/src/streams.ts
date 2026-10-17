@@ -8,6 +8,7 @@ import { DEFAULT_AUTHOR_ARTWORK_PAGES, DEFAULT_TAG_ARTWORK_PAGES } from "./const
 import { processArtworks, processAuthorArtworks } from "./artworks";
 import { resolveTackId } from "./tacks";
 import { arrayValue, coerceStr, globalPageWindow, log, skipPagesOf, toInt } from "./util";
+import { t } from "./i18n";
 
 const { addProgress } = Kabegame;
 
@@ -15,17 +16,17 @@ export async function runGlobal(vars) {
   const artworkSort = coerceStr(vars.artwork_sort) || "trending";
   const { skipPages, maxPages } = globalPageWindow(vars);
 
-  log(`[PixAI] 全站流：排序=${artworkSort}，第 ${skipPages + 1} 页到第 ${maxPages} 页`);
+  log(t("globalFlowStart", { sort: artworkSort, startPage: skipPages + 1, endPage: maxPages }));
   const downloadCount = await processArtworks(
     "",
     "",
-    "全站",
+    t("labelGlobal"),
     maxPages,
     100.0,
     artworkSort,
     skipPages,
   );
-  log(`[PixAI] 全站流结束：下载图片 ${downloadCount} 张`);
+  log(t("globalFlowDone", { count: downloadCount }));
   if (downloadCount === 0) addProgress(100.0);
 }
 
@@ -36,22 +37,26 @@ export async function runTag(vars) {
   const skipArtworkPages = skipPagesOf(vars);
 
   if (tagCodeNames.length === 0) {
-    log("[PixAI] 未输入任何标签 codeName，结束");
+    log(t("tagsEmpty"));
     addProgress(100.0);
     return;
   }
 
-  log(`[PixAI] 标签流：共 ${tagCodeNames.length} 个 codeName，每标签最多 ${maxTagArtworkPages} 页，从第 ${skipArtworkPages + 1} 页开始`);
+  log(t("tagFlowStart", {
+    count: tagCodeNames.length,
+    maxPages: maxTagArtworkPages,
+    startPage: skipArtworkPages + 1,
+  }));
   const perTagProgress = 100.0 / tagCodeNames.length;
   let downloadCount = 0;
   let resolvedCount = 0;
 
   for (let index = 0; index < tagCodeNames.length; index += 1) {
     const codeName = coerceStr(tagCodeNames[index]);
-    log(`[PixAI] 处理标签 ${index + 1}/${tagCodeNames.length}：codeName=${codeName}`);
+    log(t("tagProcessing", { index: index + 1, total: tagCodeNames.length, codeName }));
     const tagId = await resolveTackId(codeName);
     if (!tagId) {
-      log(`[PixAI] 跳过标签：codeName=${codeName} 无效或未找到对应 tackId`);
+      log(t("tagSkipped", { codeName }));
       addProgress(perTagProgress);
       continue;
     }
@@ -61,7 +66,7 @@ export async function runTag(vars) {
     downloadCount += await processArtworks(
       "tackId",
       tagId,
-      "标签",
+      t("labelTags"),
       maxTagArtworkPages,
       perTagProgress,
       artworkSort,
@@ -69,14 +74,18 @@ export async function runTag(vars) {
     );
   }
 
-  log(`[PixAI] 标签流结束：输入 codeName ${tagCodeNames.length} 个，解析成功 ${resolvedCount} 个，下载图片 ${downloadCount} 张`);
+  log(t("tagFlowDone", {
+    input: tagCodeNames.length,
+    resolved: resolvedCount,
+    count: downloadCount,
+  }));
   if (downloadCount === 0) addProgress(100.0);
 }
 
 export async function runAuthor(vars) {
   const authorId = coerceStr(vars.author_id);
   if (!authorId) {
-    log("[PixAI] 未输入作者 ID，结束");
+    log(t("authorIdMissing"));
     addProgress(100.0);
     return;
   }
@@ -86,9 +95,15 @@ export async function runAuthor(vars) {
   const maxAuthorArtworkPages = toInt(vars.max_author_artwork_pages, DEFAULT_AUTHOR_ARTWORK_PAGES);
   const animated = coerceStr(vars.author_artwork_type) === "animated";
   const authorTypes = animated ? ["ANIMATED_ARTWORK"] : ["DEFAULT", "ALBUM"];
-  const authorTypeLabel = animated ? "动图(ANIMATED_ARTWORK)" : "图片(DEFAULT+ALBUM)";
+  const authorTypeLabel = animated ? t("authorTypeAnimated") : t("authorTypeImage");
 
-  log(`[PixAI] 作者流：authorId=${authorId}，类型=${authorTypeLabel}，排序=${artworkSort}，最多 ${maxAuthorArtworkPages} 页，从第 ${skipArtworkPages + 1} 页开始`);
+  log(t("authorFlowStart", {
+    authorId,
+    type: authorTypeLabel,
+    sort: artworkSort,
+    maxPages: maxAuthorArtworkPages,
+    startPage: skipArtworkPages + 1,
+  }));
   const downloadCount = await processAuthorArtworks(
     authorId,
     authorTypes,
@@ -98,6 +113,6 @@ export async function runAuthor(vars) {
     artworkSort,
     skipArtworkPages,
   );
-  log(`[PixAI] 作者流结束：authorId=${authorId}，下载图片 ${downloadCount} 张`);
+  log(t("authorFlowDone", { authorId, count: downloadCount }));
   if (downloadCount === 0) addProgress(100.0);
 }

@@ -4,6 +4,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { SPACE_API, SPACE_BASE, SPACE_PAGE_SIZE } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds, parseMid } from "./util";
 import { buildDmParams, signQuery } from "./wbi";
 
@@ -15,9 +16,7 @@ const { warn } = Kabegame;
  */
 function checkSpaceBlocked(code) {
   if (code === -401 || code === -352 || code === 412) {
-    throw new Error(
-      `UP 主投稿接口被风控拦截（${code}）：请稍后再试，或先在畅游登录 bilibili 降低触发概率。`,
-    );
+    throw new Error(t("spaceBlocked", { code }));
   }
 }
 
@@ -55,7 +54,7 @@ async function fetchSpacePage(mid, pageNo, order, keys) {
   if (json?.code !== 0) {
     checkSpaceBlocked(json?.code);
     checkBilibiliRisk(json?.code);
-    throw new Error(`UP 主投稿接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    throw new Error(t("spaceFailed", { code: json?.code, message: coerceStr(json?.message) }));
   }
   return json.data;
 }
@@ -63,7 +62,7 @@ async function fetchSpacePage(mid, pageNo, order, keys) {
 /** 返回 [{ bvid, title }]，按页收集并受 max_videos 截断。页间等待 intervalMs。 */
 export async function collectSpaceEntries(vars, keys, intervalMs) {
   const mid = parseMid(vars.mid);
-  if (!mid) throw new Error("请填写 UP 主 UID（纯数字）或主页链接（space.bilibili.com/<UID>）");
+  if (!mid) throw new Error(t("midRequired"));
 
   const startPage = Math.max(1, Number(vars.start_page ?? 1));
   const endPage = Math.max(startPage, Number(vars.end_page ?? startPage));
@@ -89,7 +88,7 @@ export async function collectSpaceEntries(vars, keys, intervalMs) {
       if (entries.length >= maxVideos) break;
       // attribute 156 = 隐藏模式合集，投稿列表里不展开其视频，需要走合集接口。
       if (Number(item?.meta?.attribute ?? 0) === 156) {
-        warn(`跳过隐藏模式合集「${coerceStr(item?.title)}」：需要合集接口，当前插件尚未支持。`);
+        warn(t("hiddenCollectionSkipped", { title: coerceStr(item?.title) }));
         continue;
       }
       const bvid = coerceStr(item?.bvid);
@@ -106,11 +105,16 @@ export async function collectSpaceEntries(vars, keys, intervalMs) {
     if (pageNo >= pageCount) break;
   }
 
-  console.log(
-    `[bilibili-video] UP 主 ${mid} 共 ${totalCount} 个投稿 / ${pageCount} 页，`
-    + `本次取第 ${startPage}~${Math.min(endPage, pageCount || endPage)} 页，命中 ${entries.length} 个（上限 ${maxVideos}）`,
-  );
-  if (dead > 0) warn(`投稿列表里有 ${dead} 个已失效稿件，已跳过。`);
-  if (entries.length === 0) throw new Error("未取到任何投稿，请检查 UID 与页码范围");
+  console.log(t("spaceSummary", {
+    mid,
+    total: totalCount,
+    pages: pageCount,
+    start: startPage,
+    end: Math.min(endPage, pageCount || endPage),
+    count: entries.length,
+    max: maxVideos,
+  }));
+  if (dead > 0) warn(t("spaceDeadSkipped", { count: dead }));
+  if (entries.length === 0) throw new Error(t("spaceEmpty"));
   return entries;
 }

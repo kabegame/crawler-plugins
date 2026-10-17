@@ -1,0 +1,20 @@
+{
+  "emoticonSetFailed": "[Miyoushe] emoticon_set request failed: retcode={retcode}",
+  "emoticonSetNetworkError": "[Miyoushe] emoticon_set network error; emoji will fall back to text",
+  "repliesNetworkError": "[Miyoushe] getPostReplies network error: post_id={postId}",
+  "repliesFailed": "[Miyoushe] getPostReplies failed: post_id={postId} retcode={retcode}",
+  "singlePostUrlRequired": "[Miyoushe] Single post mode: please enter the post URL",
+  "postIdExtractFailed": "[Miyoushe] Could not extract the post ID from the URL; make sure it looks like https://www.miyoushe.com/<game>/article/<post-id>",
+  "postFullFailed": "[Miyoushe] getPostFull failed: post_id={postId} retcode={retcode} {message}",
+  "postFullNoPost": "[Miyoushe] getPostFull response has no data.post.post: post_id={postId}",
+  "postNoImages": "[Miyoushe] The post has no images: post_id={postId}",
+  "userUidRequired": "[Miyoushe] User posts mode: please enter the author UID",
+  "endPageBeforeStart": "[Miyoushe] The end page must be greater than or equal to the start page",
+  "userPostsFailed": "[Miyoushe] userPostList failed: uid={uid} retcode={retcode} {message}",
+  "pageNoResults": "[Miyoushe] Page {page} has no results; stopping",
+  "userPostsDone": "[Miyoushe] User post list task finished, {count} posts processed",
+  "searchFailed": "[Miyoushe] Search failed: page={page} retcode={retcode} {message}",
+  "emoticonLoading": "[Miyoushe] Loading the emoticon set...",
+  "emoticonLoaded": "[Miyoushe] Emoticon set loaded",
+  "taskFinished": "[Miyoushe] Task finished"
+}

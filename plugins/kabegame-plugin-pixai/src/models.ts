@@ -6,6 +6,7 @@ import { DEFAULT_ARTWORK_PAGES, DEFAULT_MODEL_PAGES, DEFAULT_SKIP_MODEL_PAGES, M
 import { fetchGraphql } from "./api";
 import { processArtworks } from "./artworks";
 import { arrayValue, coerceStr, log, skipPagesOf, toInt } from "./util";
+import { t } from "./i18n";
 
 const { addProgress } = Kabegame;
 
@@ -56,13 +57,18 @@ export async function runModel(vars) {
   let processedModels = 0;
   let downloadCount = 0;
 
-  log(`[PixAI] 模型流排序：${modelSort}，最多 ${maxModelPages} 页，跳过 ${skipModelPages} 页`);
+  log(t("modelSortSummary", { sort: modelSort, maxPages: maxModelPages, skipPages: skipModelPages }));
 
   while (modelPage < maxModelPages) {
     if (modelPage < skipModelPages) {
-      log(`[PixAI] 进入模型页：第 ${modelPage + 1}/${maxModelPages} 页（跳过）`);
+      log(t("modelPageSkipped", { page: modelPage + 1, maxPages: maxModelPages }));
     } else {
-      log(`[PixAI] 进入模型页：第 ${modelPage + 1}/${maxModelPages} 页（有效第 ${modelPage - skipModelPages + 1}/${effectiveModelPages} 页）`);
+      log(t("modelPageProgress", {
+        page: modelPage + 1,
+        maxPages: maxModelPages,
+        effectivePage: modelPage - skipModelPages + 1,
+        effectivePages: effectiveModelPages,
+      }));
     }
 
     const variables = {};
@@ -72,16 +78,16 @@ export async function runModel(vars) {
     const res = await fetchGraphql(OPERATION_MODELS, variables, MODELS_QUERY);
     const generationModels = res?.data?.generationModels;
     if (!generationModels) {
-      log("[PixAI] 模型响应缺少 generationModels，结束");
+      log(t("modelsMissing"));
       break;
     }
 
     const edges = arrayValue(generationModels.edges);
     if (edges.length === 0) {
-      log("[PixAI] 当前模型页无数据，结束");
+      log(t("modelPageEmpty"));
       break;
     }
-    log(`[PixAI] 当前模型页模型数 ${edges.length}`);
+    log(t("modelPageCount", { count: edges.length }));
 
     if (modelPage >= skipModelPages) {
       const perModelProgress = edges.length > 0 ? progressPerModelPage / edges.length : 0.0;
@@ -89,16 +95,21 @@ export async function runModel(vars) {
         const modelId = coerceStr(edges[edgeIndex]?.node?.id);
         if (!modelId) continue;
         if (seenModelIds.has(modelId)) {
-          log(`[PixAI] 跳过重复模型：模型页 ${modelPage + 1} 第 ${edgeIndex + 1} 个，loraId=${modelId}`);
+          log(t("duplicateModel", { page: modelPage + 1, index: edgeIndex + 1, modelId }));
           continue;
         }
 
-        log(`[PixAI] 获取模型：模型页 ${modelPage + 1} 的第 ${edgeIndex + 1}/${edges.length} 个，loraId=${modelId}`);
+        log(t("fetchingModel", {
+          page: modelPage + 1,
+          index: edgeIndex + 1,
+          total: edges.length,
+          modelId,
+        }));
         seenModelIds.add(modelId);
         downloadCount += await processArtworks(
           "loraId",
           modelId,
-          "模型",
+          t("labelModels"),
           maxArtworkPages,
           perModelProgress,
           artworkSort,
@@ -121,6 +132,6 @@ export async function runModel(vars) {
     modelPage += 1;
   }
 
-  log(`[PixAI] 任务结束：处理模型 ${processedModels} 个，下载图片 ${downloadCount} 张`);
+  log(t("modelTaskFinished", { models: processedModels, downloads: downloadCount }));
   if (processedModels === 0) addProgress(100.0);
 }

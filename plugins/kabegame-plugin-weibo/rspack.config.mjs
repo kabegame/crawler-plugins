@@ -29,5 +29,5 @@ export default defineConfig({
       },
     ],
   },
-  resolve: { extensions: [".ts", ".js"], fullySpecified: false },
+  resolve: { extensions: [".ts", ".js", ".json"], fullySpecified: false },
 });

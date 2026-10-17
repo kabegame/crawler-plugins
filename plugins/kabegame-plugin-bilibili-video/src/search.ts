@@ -6,6 +6,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { SEARCH_API, SEARCH_PAGE_SIZE, WEB_BASE } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds } from "./util";
 import { buildDmParams, signQuery } from "./wbi";
 
@@ -40,7 +41,7 @@ async function fetchSearchPage(vars, pageNo, keys) {
   });
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
-    throw new Error(`搜索接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+    throw new Error(t("searchFailed", { code: json?.code, message: coerceStr(json?.message) }));
   }
   return json.data;
 }
@@ -51,7 +52,7 @@ async function fetchSearchPage(vars, pageNo, keys) {
  */
 export async function collectSearchEntries(vars, keys, intervalMs) {
   const keyword = coerceStr(vars.keyword).trim();
-  if (!keyword) throw new Error("请填写搜索关键词");
+  if (!keyword) throw new Error(t("keywordRequired"));
 
   const startPage = Math.max(1, Number(vars.start_page ?? 1));
   const endPage = Math.max(startPage, Number(vars.end_page ?? startPage));
@@ -93,14 +94,19 @@ export async function collectSearchEntries(vars, keys, intervalMs) {
     if (totalPages > 0 && pageNo >= totalPages) break;
   }
 
-  console.log(
-    `[bilibili-video] 搜索「${keyword}」共 ${totalResults} 个结果 / ${totalPages} 页，`
-    + `本次取第 ${startPage}~${Math.min(endPage, totalPages || endPage)} 页，命中 ${entries.length} 个（上限 ${maxVideos}）`,
-  );
-  if (dead > 0) warn(`搜索结果里有 ${dead} 个已失效稿件，已跳过。`);
+  console.log(t("searchSummary", {
+    keyword,
+    total: totalResults,
+    pages: totalPages,
+    start: startPage,
+    end: Math.min(endPage, totalPages || endPage),
+    count: entries.length,
+    max: maxVideos,
+  }));
+  if (dead > 0) warn(t("searchDeadSkipped", { count: dead }));
   if (entries.length === 0) {
-    warn("搜索没有命中任何投稿视频，可换关键词或放宽时长筛选。");
-    throw new Error("搜索未取到任何视频");
+    warn(t("searchNoMatch"));
+    throw new Error(t("searchEmpty"));
   }
   return entries;
 }

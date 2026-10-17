@@ -2,6 +2,8 @@
 // 通用小工具：取值归一、风控码判定、HTTP JSON、-509 退避、图链与输入解析。
 import { sleep } from "@kabegame/plugin-sdk";
 
+import { t } from "./i18n";
+
 const { warn } = Kabegame;
 
 export function coerceStr(value) {
@@ -12,10 +14,10 @@ export function coerceStr(value) {
 // 风控（-352）：不一定与登录有关，保持告警不中断。
 export function checkBilibiliRisk(code) {
   if (code === -101) {
-    throw new Error("B 站接口返回未登录（-101）：未获取到有效登录态，请先在畅游登录 bilibili 后重试。");
+    throw new Error(t("loginExpired"));
   }
   if (code === -352) {
-    warn("B 站接口触发风控（-352），可稍后重试或更换网络；若持续失败请在畅游重新登录 bilibili。");
+    warn(t("riskControl"));
   }
 }
 
@@ -29,7 +31,7 @@ export async function fetchWith509Retry(makeUrl, label) {
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     const json = await fetchJson(makeUrl());
     if (json?.code !== -509) return json;
-    warn(`${label} -509 过于频繁，${attempt}/5`);
+    warn(t("rateLimited", { label, attempt, total: 5 }));
     if (attempt >= 5) return json;
     await sleep(3000);
   }

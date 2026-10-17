@@ -1,0 +1,23 @@
+{
+  "requestSkipped": "{url} へのリクエストが {status} を返したためスキップします",
+  "requestRetryStatus": "{url} へのリクエストが {status} を返しました。再試行します（{attempt} 回目）",
+  "requestRetryError": "{url} へのリクエストに失敗しました：{error}。再試行します（{attempt} 回目）",
+  "parseStateFailed": "__INITIAL_STATE__ の解析に失敗しました：{error}",
+  "noMedia": "作品 {id} にダウンロードできるメディアがないためスキップします",
+  "downloadFailed": "ダウンロードに失敗しました {url}：{error}",
+  "noteParseFailed": "{url} から作品データを取得できませんでした（削除済み、ログイン限定公開、またはリンクが無効の可能性があります）",
+  "noValidLinks": "有効な小紅書の作品リンクが見つかりませんでした。explore / discovery/item / user/profile の作品リンクと xhslink.com の短縮リンクに対応しています。",
+  "linkCount": "[xhs] 作品リンク {count} 件",
+  "fileCount": "[xhs] [{done}] {link} → {ok} ファイル",
+  "doneDownloads": "[xhs] 完了しました。{count} ファイルをダウンロードしました",
+  "cookieMissingRecommend": "サーフから小紅書の Cookie を取得できなかったため、未ログインのまま一般向けのおすすめを取得します。パーソナライズされたおすすめを取得するには、先にサーフで小紅書にログインしてください。",
+  "cookieInjectedRecommend": "[xhs] サーフの Cookie を注入しました。パーソナライズされたおすすめを取得します",
+  "roundFetchFailed": "{round} 回目の推薦ページ取得に失敗したためスキップします",
+  "roundEmpty": "{round} 回目で推薦項目を解析できませんでした",
+  "roundSummary": "[xhs] {round}/{rounds} 回目：{feeds} 件、うち {fresh} 件が新規",
+  "doneRecommend": "[xhs] 完了しました。{processed} 件の作品を処理し、{files} ファイルをダウンロードしました",
+  "modeRecommend": "[xhs] モード：ホームおすすめ、更新 {rounds} 回、上限 {max} 件",
+  "unlimited": "無制限",
+  "modeNote": "[xhs] モード：ノートリンク",
+  "cookieMissing": "サーフから小紅書の Cookie を取得できませんでした。未ログインのまま取得します。一部の作品は閲覧できない場合があります。"
+}

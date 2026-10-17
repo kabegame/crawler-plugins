@@ -1,0 +1,16 @@
+{
+  "archiveLabel": "アーカイブデータ",
+  "statsLabel": "公開統計",
+  "requestRetry": "{label}の読み込みに失敗しました。{delay} ms 後に再試行します（{attempt}/{max}）：{error}",
+  "requestFailed": "{label}の取得に失敗しました：{error}",
+  "statsUnavailable": "[bluedafeiyu] 公開統計が利用できないため、{sort}順ではなく最新順で並べます",
+  "sortPopular": "人気",
+  "sortDownloads": "ダウンロード数",
+  "readingArchive": "[bluedafeiyu] アーカイブ全体を読み込んでいます：{url}",
+  "archiveEmpty": "archive-data.json に作品がありません。サイトのデータ構造が変わった可能性があります",
+  "statsReadFailed": "[bluedafeiyu] 公開統計の取得に失敗しました：{error}",
+  "all": "すべて",
+  "filterSummary": "[bluedafeiyu] アーカイブ {total} 件、絞り込み後 {selected} 件（キャラクター={character}、種類={type}、並び順={sort}）",
+  "missingOriginalUrl": "原画像の URL がありません",
+  "workFailed": "[bluedafeiyu] 作品 {work} の処理に失敗しました：{error}"
+}

@@ -1,0 +1,18 @@
+{
+  "searchUrlRequired": "검색 URL을 입력하세요",
+  "invalidUrl": "올바른 URL이 아닙니다: {url}",
+  "searchUrlInvalid": "e-shuushuu 검색 페이지 주소(https://e-shuushuu.net/search?…)를 입력하세요. 받은 값: {url}",
+  "listHttpError": "목록 API가 HTTP {status}를 반환했습니다",
+  "noImageUrl": "[e-shuushuu] 이미지 #{id}에 원본 주소가 없어 건너뜁니다",
+  "topPageCapped": "[e-shuushuu] 랭킹은 최대 {max}페이지이므로 끝 페이지 {endPage}는 {max}로 조정합니다",
+  "startPageOutOfRange": "[e-shuushuu] 시작 페이지 {startPage}이(가) 범위를 벗어나 작업을 종료합니다",
+  "openTop": "[e-shuushuu] 랭킹({period}): {startPage}~{endPage}페이지",
+  "openSearch": "[e-shuushuu] 검색({query}): {startPage}~{endPage}페이지",
+  "openHome": "[e-shuushuu] 홈 페이지: {startPage}~{endPage}페이지",
+  "all": "전체",
+  "totalSummary": "[e-shuushuu] 총 {total}장, {pages}페이지",
+  "pageReadFailed": "[e-shuushuu] {page}페이지를 불러오지 못했습니다: {error}",
+  "pageStart": "[e-shuushuu] ┌ {page}페이지: {total}건, 사이트 표시 {visible}건",
+  "downloadFailed": "[e-shuushuu] 이미지 #{id} 다운로드 실패: {error}",
+  "pageDone": "[e-shuushuu] └ {page}페이지 완료"
+}

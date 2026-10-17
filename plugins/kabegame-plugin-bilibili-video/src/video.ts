@@ -4,6 +4,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { FNVAL_DASH, PLAYURL_API, VIEW_API, WEB_BASE } from "./consts";
+import { t } from "./i18n";
 import { ingestDash } from "./ingest";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds } from "./util";
 import { buildDmParams, signQuery } from "./wbi";
@@ -75,12 +76,12 @@ async function processPart(view, page, keys, vars, budget) {
   const play = await fetchJson(signQuery(PLAYURL_API, playParams, keys.img, keys.sub));
   if (play?.code !== 0) {
     checkBilibiliRisk(play?.code);
-    throw new Error(`playurl 失败（${play?.code}）: ${coerceStr(play?.message)}`);
+    throw new Error(t("playurlFailed", { code: play?.code, message: coerceStr(play?.message) }));
   }
 
   const dash = play?.data?.dash;
   if (!dash) {
-    throw new Error("playurl 未返回 DASH 流（可能是番剧/课程等需要专用接口的内容）");
+    throw new Error(t("ugcNoDash"));
   }
 
   const pageUrl = isMultiPart
@@ -104,13 +105,13 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
   const view = await fetchJson(`${VIEW_API}?${query}`);
   if (view?.code !== 0) {
     checkBilibiliRisk(view?.code);
-    throw new Error(`view 接口失败（${view?.code}）: ${coerceStr(view?.message)}`);
+    throw new Error(t("viewFailed", { code: view?.code, message: coerceStr(view?.message) }));
   }
 
   const data = view.data;
   // 失效稿件会返回一段占位视频，下下来毫无意义；重试也不会变好，所以标记 noRetry。
   if (isUnavailableTitle(data?.title)) {
-    const dead = new Error(`稿件已失效（标题为「${coerceStr(data?.title)}」），跳过`);
+    const dead = new Error(t("videoUnavailable", { title: coerceStr(data?.title) }));
     dead.noRetry = true;
     throw dead;
   }
@@ -124,13 +125,16 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
     pages = allPages;
   } else {
     const found = allPages.find((p) => Number(p?.page ?? 0) === partIndex);
-    if (!found) throw new Error(`该视频只有 ${allPages.length} 个分 P，没有第 ${partIndex} P`);
+    if (!found) throw new Error(t("partOutOfRange", { total: allPages.length, part: partIndex }));
     pages = [found];
   }
 
-  console.log(
-    `[bilibili-video] ${coerceStr(data?.bvid)} 「${coerceStr(data?.title)}」共 ${allPages.length} P，本次下载 ${pages.length} P`,
-  );
+  console.log(t("videoSummary", {
+    bvid: coerceStr(data?.bvid),
+    title: coerceStr(data?.title),
+    total: allPages.length,
+    count: pages.length,
+  }));
 
   const perPart = budget / pages.length;
   let failed = 0;
@@ -139,11 +143,11 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
       await processPart(data, page, keys, vars, perPart);
     } catch (error) {
       failed += 1;
-      warn(`P${Number(page?.page ?? 0)} 下载失败：${coerceStr(error?.message ?? error)}`);
+      warn(t("partFailed", { part: Number(page?.page ?? 0), error: coerceStr(error?.message ?? error) }));
       if (pages.length === 1) throw error;
     }
   }
-  if (failed > 0 && failed === pages.length) throw new Error("所有分 P 均下载失败");
+  if (failed > 0 && failed === pages.length) throw new Error(t("allPartsFailed"));
 }
 
 /** 单个视频失败后等 intervalMs 再重试，最多 retries 次。 */
@@ -156,10 +160,13 @@ export async function downloadWithRetry(videoRef, keys, vars, budget, partIndex,
       // noRetry：失效稿件之类重试也不会变好的情形，直接上抛。
       if (attempt >= retries || error?.noRetry) throw error;
       const label = videoRef.bvid || `av${videoRef.aid}`;
-      warn(
-        `${label} 下载失败（${coerceStr(error?.message ?? error)}），`
-        + `${Math.round(intervalMs / 1000)}s 后重试（第 ${attempt + 1}/${retries} 次）`,
-      );
+      warn(t("retryLater", {
+        label,
+        error: coerceStr(error?.message ?? error),
+        seconds: Math.round(intervalMs / 1000),
+        attempt: attempt + 1,
+        total: retries,
+      }));
       await sleep(intervalMs);
     }
   }

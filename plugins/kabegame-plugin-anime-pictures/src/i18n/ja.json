@@ -1,0 +1,22 @@
+{
+  "userAgentFromCef": "[anime-pictures] User-Agent の取得元：サーフの CEF（{ua}）",
+  "userAgentBuiltin": "[anime-pictures] User-Agent の取得元：内蔵のフォールバック",
+  "cookieMissing": "[anime-pictures] サーフの Cookie を取得できなかったため、内蔵 Cookie にフォールバックします。403 になる場合は、先にサーフで anime-pictures を開いて認証を通過してください",
+  "challengePage": "[anime-pictures] 認証ページを検出しました。V8 バックエンドではブラウザ認証を処理できないため、しばらくしてから再試行するか、ネットワークを切り替えてください。",
+  "pickNameResolved": "[anime-pictures] pickName: title/author 作品={work} キャラ={character} 作家={artist} => {name}",
+  "pickNameNoLinks": "[anime-pictures] pickName: ul.tags 内に copyright/character/artist のリンクが見つかりません",
+  "pickNameNoTags": "[anime-pictures] pickName: ul.tags が見つからないためフォールバックします",
+  "pickNameFallbackH1": "[anime-pictures] pickName: h1.copyright にフォールバック -> {name}",
+  "pickNameFallbackTitleLine": "[anime-pictures] pickName: title の改行2行目にフォールバック -> {name}",
+  "pickNameFallbackTitleWord": "[anime-pictures] pickName: title の分割2語目にフォールバック -> {name}",
+  "pickNameEmpty": "[anime-pictures] pickName: 依然として空です title={title}",
+  "displayName": "[anime-pictures] downloadImage の表示名 name: {name}",
+  "metadata": "[anime-pictures] metadata: {metadata}",
+  "emptyValue": "（空）",
+  "downloadLinkMissing": "[anime-pictures] ダウンロードリンクが見つかりません: {url}",
+  "pageRangeTooLarge": "1回の実行で100ページを超えてクロールすることはできません。節度あるクロールをお願いします",
+  "endPageBeforeStart": "終了ページは開始ページより後にしてください",
+  "crawlStart": "[anime-pictures] 開始：{startPage}～{endPage} ページ、タグ={tag}",
+  "pageImages": "[anime-pictures] {page} ページの画像数: {count}",
+  "crawlDone": "[anime-pictures] タスク終了"
+}

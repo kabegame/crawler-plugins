@@ -8,6 +8,7 @@ import { fetchGraphql } from "./api";
 import { processArtworks } from "./artworks";
 import { processArtworksEdgesForDownload } from "./download";
 import { arrayValue, coerceStr, log, toInt } from "./util";
+import { t } from "./i18n";
 
 const { addProgress } = Kabegame;
 
@@ -18,7 +19,7 @@ async function runRankingArtworks(rankType, rankPeriod) {
       ? "rankv2_weekly"
       : "rankv2_monthly";
   const rankMediaType = rankType === "artwork" ? "ARTWORK" : "ARTWORK_ANIMATED";
-  log(`[PixAI] 排行榜：${rankType} / ${rankPeriod}，feed=${feed}，rankMediaType=${rankMediaType}`);
+  log(t("rankingArtworksStart", { rankType, rankPeriod, feed, rankMediaType }));
 
   const res = await fetchGraphql(
     OPERATION_ARTWORKS,
@@ -27,29 +28,29 @@ async function runRankingArtworks(rankType, rankPeriod) {
   );
   const artworks = res?.data?.artworks;
   if (!artworks) {
-    log("[PixAI] 排行榜响应缺少 artworks，结束");
+    log(t("rankingArtworksMissing"));
     addProgress(100.0);
     return;
   }
 
   const edges = arrayValue(artworks.edges);
   if (edges.length === 0) {
-    log("[PixAI] 排行榜无数据");
+    log(t("rankingArtworksEmpty"));
     addProgress(100.0);
     return;
   }
 
-  log(`[PixAI] 排行榜返回 ${edges.length} 条作品`);
+  log(t("rankingArtworksReturned", { count: edges.length }));
   const rankCtx = `${rankType}/${rankPeriod}`;
   const downloadCount = await processArtworksEdgesForDownload(
     edges,
-    "排行榜",
+    t("labelRanking"),
     rankCtx,
     100.0,
     true,
     0,
   );
-  log(`[PixAI] 排行榜（${rankCtx}）结束：下载 ${downloadCount} 张`);
+  log(t("rankingArtworksDone", { rankContext: rankCtx, count: downloadCount }));
   if (downloadCount === 0) addProgress(100.0);
 }
 
@@ -62,7 +63,7 @@ async function runRankingModels(rankType, rankPeriod, vars) {
       : "-markInfo.artworkLikedCountAvgMonthly";
   const maxArtworkPagesRanking = toInt(vars.max_artwork_pages_ranking, DEFAULT_RANKING_ARTWORK_PAGES);
 
-  log(`[PixAI] 排行榜：${rankType} / ${rankPeriod}，type=${modelType}，orderBy=${orderBy}`);
+  log(t("rankingModelsStart", { rankType, rankPeriod, modelType, orderBy }));
   const res = await fetchGraphql(
     OPERATION_MODELS,
     { type: modelType, orderBy, first: 100 },
@@ -70,19 +71,19 @@ async function runRankingModels(rankType, rankPeriod, vars) {
   );
   const generationModels = res?.data?.generationModels;
   if (!generationModels) {
-    log("[PixAI] 排行榜模型响应缺少 generationModels，结束");
+    log(t("rankingModelsMissing"));
     addProgress(100.0);
     return;
   }
 
   const edges = arrayValue(generationModels.edges);
   if (edges.length === 0) {
-    log("[PixAI] 排行榜模型无数据");
+    log(t("rankingModelsEmpty"));
     addProgress(100.0);
     return;
   }
 
-  log(`[PixAI] 排行榜返回 ${edges.length} 个模型`);
+  log(t("rankingModelsReturned", { count: edges.length }));
   const perModelProgress = 100.0 / edges.length;
   let downloadCount = 0;
   let processedModels = 0;
@@ -92,11 +93,11 @@ async function runRankingModels(rankType, rankPeriod, vars) {
     const modelId = coerceStr(node?.id);
     if (!modelId) continue;
     const title = coerceStr(node?.title);
-    log(`[PixAI] 排行榜模型 ${edgeIndex + 1}/${edges.length}：${title} (loraId=${modelId})`);
+    log(t("rankingModelItem", { index: edgeIndex + 1, total: edges.length, title, modelId }));
     downloadCount += await processArtworks(
       "loraId",
       modelId,
-      "排行榜模型",
+      t("labelRankingModels"),
       maxArtworkPagesRanking,
       perModelProgress,
       "trending",
@@ -105,7 +106,7 @@ async function runRankingModels(rankType, rankPeriod, vars) {
     processedModels += 1;
   }
 
-  log(`[PixAI] 排行榜（${rankType}/${rankPeriod}）结束：处理模型 ${processedModels} 个，下载 ${downloadCount} 张`);
+  log(t("rankingModelsDone", { rankType, rankPeriod, models: processedModels, count: downloadCount }));
   if (downloadCount === 0) addProgress(100.0);
 }
 

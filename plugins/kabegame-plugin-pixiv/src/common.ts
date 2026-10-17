@@ -1,5 +1,7 @@
 // @ts-nocheck
 // pixiv 各模式共用：请求头、登录态、JSON 请求与进度。
+import { t } from "./i18n";
+
 const { addProgress, requireCookie, setHeader } = Kabegame;
 
 export function coerceStr(value) {
@@ -13,9 +15,7 @@ let pixivCookieInjected = false;
 // 取不到（畅游无该站 Cookie）直接抛错终止任务，提示用户先去畅游登录 pixiv。
 export function ensurePixivCookie(reason) {
   if (!requireCookie()) {
-    throw new Error(
-      `${reason}需要登录：未从畅游获取到 Cookie，请先在畅游登录 pixiv 后重试`,
-    );
+    throw new Error(t("loginRequired", { reason }));
   }
   pixivCookieInjected = true;
 }
@@ -24,9 +24,7 @@ export function ensurePixivCookie(reason) {
 // 其它错误交回调用方按原逻辑处理（通常是到底/瞬时错误后 break）。
 export function rethrowIfLoginFailed(error, reason, loginRequired) {
   if (loginRequired && error?.status === 403) {
-    throw new Error(
-      `${reason}失败：pixiv 登录态失效（403），请在畅游重新登录 pixiv 后重试`,
-    );
+    throw new Error(t("loginExpired", { reason }));
   }
 }
 

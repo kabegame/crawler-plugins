@@ -1,0 +1,17 @@
+{
+  "rateLimited": "[wallhaven] 요청 제한(429). {seconds}초 후 {attempt}/{max}회차로 다시 시도합니다",
+  "categoriesAll": "[wallhaven] 선택된 카테고리가 없어 전체 카테고리로 검색합니다",
+  "purityFallbackSfw": "[wallhaven] SFW와 선정적 모두 선택되지 않아 사이트는 SFW만 검색합니다",
+  "searchUrlRequired": "검색 URL을 입력하세요",
+  "invalidUrl": "올바른 URL이 아닙니다: {url}",
+  "searchUrlInvalid": "wallhaven 검색 페이지 주소(https://wallhaven.cc/search?…)를 입력하세요. 받은 값: {url}",
+  "detailFailed": "[wallhaven] {id}의 상세 정보를 불러오지 못해 목록 정보만 사용합니다: {error}",
+  "noImagePath": "[wallhaven] {id}에 원본 이미지 주소가 없어 건너뜁니다",
+  "openSearchParams": "[wallhaven] 검색 조건 {query}: {startPage}~{endPage}페이지",
+  "openSearchUrl": "[wallhaven] 검색 URL {query}: {startPage}~{endPage}페이지",
+  "totalSummary": "[wallhaven] 총 {total}장, {pages}페이지",
+  "pageReadFailed": "[wallhaven] {page}페이지를 불러오지 못했습니다: {error}",
+  "pageStart": "[wallhaven] ┌ {page}페이지: {count}장",
+  "downloadFailed": "[wallhaven] {id} 다운로드 실패: {error}",
+  "pageDone": "[wallhaven] └ {page}페이지 완료"
+}

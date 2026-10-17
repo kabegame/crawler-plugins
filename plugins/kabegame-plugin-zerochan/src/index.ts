@@ -2,6 +2,7 @@
 // zerochan.net V8 crawler：站点是纯 SSR，列表/详情全在首屏 HTML 里，
 // 所以整条链路是 fetch + DOMParser，不需要 WebView。
 import { resolveUrl as resolveSdkUrl, sleep } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, downloadImage, setHeader, warn } = Kabegame;
 
@@ -95,17 +96,17 @@ async function solveBotCheck(challengeHtml, pageUrl) {
   const matched = BOT_CHECK_RE.exec(coerceStr(challengeHtml));
   if (!matched) return false;
   const probeUrl = resolveUrl(matched[0], pageUrl);
-  console.log(`[zerochan] 触发站点 bot 校验，取 cookie：${probeUrl}`);
+  console.log(t("botCheckTriggered", { url: probeUrl }));
   let response;
   try {
     response = await fetch(probeUrl, { headers: { Accept: "image/svg+xml,image/*,*/*;q=0.8" } });
     await response.bytes();
   } catch (error) {
-    warn(`[zerochan] bot 校验请求失败：${String(error?.message || error)}`);
+    warn(t("botCheckFailed", { error: String(error?.message || error) }));
     return false;
   }
   const ok = absorbSetCookie(response);
-  if (!ok) warn("[zerochan] bot 校验响应里没有 Set-Cookie，后续请求可能仍被拦截");
+  if (!ok) warn(t("botCheckNoCookie"));
   return ok;
 }
 
@@ -128,7 +129,7 @@ async function fetchDocument(url) {
       lastError = String(error?.message || error);
       if (networkRetries >= MAX_NETWORK_RETRIES) break;
       networkRetries += 1;
-      warn(`[zerochan] 请求失败（${lastError}），${networkRetries * 3}s 后重试：${url}`);
+      warn(t("requestRetry", { error: lastError, delay: networkRetries * 3, url }));
       await sleep(networkRetries * 3000);
       continue;
     }
@@ -148,15 +149,15 @@ async function fetchDocument(url) {
         await sleep(1000);
         continue;
       }
-      if (botChecks >= MAX_BOT_CHECKS) lastError = "反复触发 bot 校验";
+      if (botChecks >= MAX_BOT_CHECKS) lastError = t("botCheckRepeated");
     }
     if (networkRetries >= MAX_NETWORK_RETRIES) break;
     networkRetries += 1;
-    warn(`[zerochan] HTTP ${response.status}，${networkRetries * 3}s 后重试：${url}`);
+    warn(t("httpRetry", { status: response.status, delay: networkRetries * 3, url }));
     await sleep(networkRetries * 3000);
   }
 
-  throw new Error(`[zerochan] 打开页面失败（${lastError}）：${url}`);
+  throw new Error(t("openPageFailed", { error: lastError, url }));
 }
 
 // ---------------------------------------------------------------- 列表页
@@ -177,7 +178,7 @@ function collectPostHrefs(document, pageUrl) {
   // 空结果页仍然有 #thumbs2 容器；连容器都没有说明拿到的不是列表页
   // （挑战页 / 错误页 / 标签不存在），不区分的话会伪装成「这个标签没图」静默跑完。
   if (hrefs.length === 0 && !document.querySelector(THUMB_CONTAINER_SELECTOR)) {
-    warn(`[zerochan] 页面里没有作品列表容器，可能被站点拦截或标签不存在：${pageUrl}`);
+    warn(t("listContainerMissing", { url: pageUrl }));
   }
   return hrefs;
 }
@@ -200,14 +201,19 @@ async function resolveListBase(baseUrl, mode, keyword) {
   const probeUrl = `${baseUrl}/search?q=${encodeURIComponent(keyword)}`;
   const { finalUrl } = await fetchDocument(probeUrl);
   if (/\/search\b/.test(finalUrl)) {
-    warn(`[zerochan] 搜索词没能匹配到站内标签，站点仍停在 /search：${finalUrl}`);
+    warn(t("searchNotMatched", { url: finalUrl }));
   } else {
-    console.log(`[zerochan] 搜索「${keyword}」解析到：${finalUrl}`);
+    console.log(t("searchResolved", { keyword, url: finalUrl }));
   }
   return finalUrl;
 }
 
-const SORT_LABELS = { id: "最新", fav: "人气", random: "随机" };
+// 排序键 → i18n 展示文案；键本身也用来校验配置值
+const SORT_LABELS = {
+  id: "sortNewest",
+  fav: "sortPopular",
+  random: "sortRandom",
+} as const;
 
 // 首页人气榜的时间范围 t：1 = 近一周，2 = 近三个月。
 // 站点的「全部时间」（t=0，也是不带 t 时的默认）在首页上返回 500（2026-10 实测，
@@ -492,7 +498,7 @@ async function processDetailPage(url, quality) {
   const metadata = buildMetadata(document, finalUrl);
   const imageUrl = pickImageUrl(metadata, quality);
   if (!imageUrl) {
-    warn(`[zerochan] 详情页没解析出图片地址，跳过：${finalUrl}`);
+    warn(t("imageMissing", { url: finalUrl }));
     return;
   }
   const opts = { cookie: true, url: finalUrl, metadata };
@@ -506,21 +512,21 @@ async function processDetailPage(url, quality) {
 // ---------------------------------------------------------------- 入口
 
 function validatePageRange(startPage, endPage) {
-  if (endPage < startPage) throw new Error("结束页面需要比开始页面大");
+  if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
 }
 
 function resolveKeyword(mode, vars) {
   if (mode === "tag") {
     const tag = trimText(vars.tag);
-    if (!tag) throw new Error("标签模式需要填写一个站内标签，例如 Arknights");
+    if (!tag) throw new Error(t("tagRequired"));
     return tag;
   }
   if (mode === "search") {
     const query = trimText(vars.search_query);
-    if (!query) throw new Error("搜索模式需要填写搜索词");
+    if (!query) throw new Error(t("searchRequired"));
     return query;
   }
   return "";
@@ -536,16 +542,23 @@ export async function crawl(common, custom) {
   const endPage = Math.max(1, Number(vars.end_page ?? startPage));
 
   if (mode !== "all" && mode !== "tag" && mode !== "search") {
-    throw new Error(`未知的爬取模式: ${mode}`);
+    throw new Error(t("unknownMode", { mode }));
   }
-  if (!SORT_LABELS[sortOrder]) throw new Error(`未知的排序: ${sortOrder}`);
+  if (!SORT_LABELS[sortOrder]) throw new Error(t("unknownSort", { sort: sortOrder }));
   const timeRange = popularRangeOf(mode, sortOrder, vars);
   validatePageRange(startPage, endPage);
   const keyword = resolveKeyword(mode, vars);
 
   applyRequestHeaders();
   console.log(
-    `[zerochan] 开始：模式=${mode}${keyword ? `(${keyword})` : ""} 排序=${SORT_LABELS[sortOrder]}${timeRange ? `(t=${timeRange})` : ""} 第 ${startPage}~${endPage} 页`,
+    t("crawlStart", {
+      mode,
+      keyword: keyword ? `(${keyword})` : "",
+      sort: t(SORT_LABELS[sortOrder]),
+      time: timeRange ? `(t=${timeRange})` : "",
+      startPage,
+      endPage,
+    }),
   );
 
   const listBase = await resolveListBase(baseUrl, mode, keyword);
@@ -553,10 +566,10 @@ export async function crawl(common, custom) {
   const pageProgress = 99.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
     const listUrl = buildListUrl(listBase, sortOrder, page, timeRange);
-    console.log(`[zerochan] 打开列表页 ${page}/${endPage}: ${listUrl}`);
+    console.log(t("openListPage", { page, total: endPage, url: listUrl }));
     const { finalUrl, document } = await fetchDocument(listUrl);
     const hrefs = collectPostHrefs(document, finalUrl);
-    console.log(`[zerochan] 第 ${page} 页作品数量: ${hrefs.length}（站点每页 ${ITEMS_PER_PAGE} 条，匿名可见的会更少）`);
+    console.log(t("pagePostCount", { page, count: hrefs.length, perPage: ITEMS_PER_PAGE }));
     if (hrefs.length === 0) {
       addProgress(pageProgress * (endPage - page + 1));
       break;
@@ -569,11 +582,11 @@ export async function crawl(common, custom) {
       } catch (error) {
         // 单张图打不开（走代理连该站超时并不罕见）不该把整个任务带走：
         // 列表页失败才是致命的，详情页记一条 WARN 跳过就行。
-        warn(`[zerochan] 跳过这张：${String(error?.message || error)}`);
+        warn(t("skipPost", { error: String(error?.message || error) }));
       }
       addProgress(itemProgress);
     }
   }
 
-  console.log("[zerochan] 任务结束");
+  console.log(t("taskFinished"));
 }

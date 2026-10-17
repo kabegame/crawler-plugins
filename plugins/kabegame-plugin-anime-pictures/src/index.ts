@@ -1,6 +1,7 @@
 // @ts-nocheck
 // anime-pictures V8 crawler: parse host HTML with DOMParser and store schema 1 metadata.
 import { resolveUrl as resolveSdkUrl, sleep } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 import { searchTextsFromMetadata } from "./search-texts";
 
 const {
@@ -32,10 +33,10 @@ function setRequestHeaders() {
   // cf_clearance 绑定签发时的 UA：用畅游的真实 UA 覆盖上面写死的（旧版应用无此接口时保留兜底值）
   const cefUa = Kabegame.cefUserAgent?.();
   if (cefUa) setHeader("User-Agent", cefUa);
-  log(`[anime-pictures] User-Agent 来源：${cefUa ? `畅游 CEF (${cefUa})` : "内置兜底"}`);
+  log(cefUa ? t("userAgentFromCef", { ua: cefUa }) : t("userAgentBuiltin"));
   // 优先用畅游持久化的 Cookie（含 HttpOnly 的 cf_clearance），会覆盖上面写死的 Cookie
   if (!requireCookie()) {
-    log("[anime-pictures] 未取到畅游 Cookie，回退到内置 Cookie；若 403 请先在畅游打开 anime-pictures 通过验证", "warn");
+    log(t("cookieMissing"), "warn");
   }
 }
 
@@ -76,9 +77,7 @@ async function openDocument(url) {
   const html = await currentHtml();
   const document = parseHtml(html);
   if (isChallengePage(document)) {
-    throw new Error(
-      "[anime-pictures] 检测到挑战页，V8 后端无法处理浏览器验证，请稍后重试或切换网络。",
-    );
+    throw new Error(t("challengePage"));
   }
   return { finalUrl, document };
 }
@@ -140,13 +139,18 @@ function pickAnimePicturesDisplayName(document) {
     const name = [titleSeg, artist].filter(Boolean).join(" / ");
     if (name) {
       log(
-        `[anime-pictures] pickName: title/author 作品=${JSON.stringify(work || null)} 角色=${JSON.stringify(character || null)} 作家=${JSON.stringify(artist || null)} => ${JSON.stringify(name)}`,
+        t("pickNameResolved", {
+          work: JSON.stringify(work || null),
+          character: JSON.stringify(character || null),
+          artist: JSON.stringify(artist || null),
+          name: JSON.stringify(name),
+        }),
       );
       return name;
     }
-    log("[anime-pictures] pickName: ul.tags 内未找到 copyright/character/artist 链接");
+    log(t("pickNameNoLinks"));
   } else {
-    log("[anime-pictures] pickName: 未找到 ul.tags，走回退");
+    log(t("pickNameNoTags"));
   }
 
   const illustRe = /^(イラスト|illustration|illustrations|арт|插画|圖片|图片)/i;
@@ -155,7 +159,7 @@ function pickAnimePicturesDisplayName(document) {
   );
   const h1One = textOf(h1A);
   if (h1One) {
-    log(`[anime-pictures] pickName: 回退 h1.copyright -> ${JSON.stringify(h1One)}`);
+    log(t("pickNameFallbackH1", { name: JSON.stringify(h1One) }));
     return h1One;
   }
 
@@ -165,24 +169,18 @@ function pickAnimePicturesDisplayName(document) {
     .map((s) => s.trim())
     .filter(Boolean);
   if (lines.length >= 2 && illustRe.test(lines[0])) {
-    log(
-      `[anime-pictures] pickName: 回退 title 换行第2段 -> ${JSON.stringify(lines[1])}`,
-    );
+    log(t("pickNameFallbackTitleLine", { name: JSON.stringify(lines[1]) }));
     return lines[1];
   }
 
   const oneLine = titleRaw.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
   const tokens = oneLine.split(" ").filter(Boolean);
   if (tokens.length >= 2 && illustRe.test(tokens[0])) {
-    log(
-      `[anime-pictures] pickName: 回退 title 分词第2词 -> ${JSON.stringify(tokens[1])}`,
-    );
+    log(t("pickNameFallbackTitleWord", { name: JSON.stringify(tokens[1]) }));
     return tokens[1];
   }
 
-  log(
-    `[anime-pictures] pickName: 仍为空 title=${JSON.stringify(oneLine.slice(0, 200))}`,
-  );
+  log(t("pickNameEmpty", { title: JSON.stringify(oneLine.slice(0, 200)) }));
   return "";
 }
 
@@ -381,15 +379,15 @@ async function crawlDetail(url, pageWeight) {
   const downloadUrl = findDownloadUrl(document, finalUrl);
 
   log(
-    `[anime-pictures] downloadImage 展示名 name: ${displayName ? JSON.stringify(displayName) : "(空)"}`,
+    t("displayName", { name: displayName ? JSON.stringify(displayName) : t("emptyValue") }),
   );
   log(
-    `[anime-pictures] metadata: ${metadata ? JSON.stringify(metadata).slice(0, 500) : "(空)"}`,
+    t("metadata", { metadata: metadata ? JSON.stringify(metadata).slice(0, 500) : t("emptyValue") }),
   );
 
   await sleep(3000);
   if (!downloadUrl) {
-    log(`[anime-pictures] 未找到下载链接: ${finalUrl}`, "warn");
+    log(t("downloadLinkMissing", { url: finalUrl }), "warn");
     addProgress(pageWeight);
     return;
   }
@@ -424,22 +422,22 @@ export async function crawl(common, custom) {
   const tag = coerceStr(custom?.tag).trim();
 
   if (endPage >= startPage + 100) {
-    throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+    throw new Error(t("pageRangeTooLarge"));
   }
   if (endPage < startPage) {
-    throw new Error("结束页面需要比开始页面大");
+    throw new Error(t("endPageBeforeStart"));
   }
 
   const totalPages = endPage - startPage + 1;
   const pageProgress = totalPages > 0 ? 100 / totalPages : 100;
-  log(`[anime-pictures] 开始：第 ${startPage}～${endPage} 页，标签=${tag || "(空)"}`);
+  log(t("crawlStart", { startPage, endPage, tag: tag || t("emptyValue") }));
 
   for (let page = startPage; page <= endPage; page += 1) {
     const listUrl = pageUrl(baseUrl, page, tag);
     await sleep(2000);
     const { finalUrl, document } = await openDocument(listUrl);
     const links = extractPostLinks(document, finalUrl);
-    log(`[anime-pictures] 第 ${page} 页图片数量: ${links.length}`);
+    log(t("pageImages", { page, count: links.length }));
 
     if (links.length === 0) {
       addProgress(pageProgress);
@@ -453,5 +451,5 @@ export async function crawl(common, custom) {
     }
   }
 
-  log("[anime-pictures] 任务结束");
+  log(t("crawlDone"));
 }

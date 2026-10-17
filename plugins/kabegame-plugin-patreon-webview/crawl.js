@@ -37,12 +37,551 @@ function errorMessage(error) {
 }
 
 function log(message) {
-  return Kabegame.log(`[patreon] ${message}`);
+  return Kabegame.log(message);
 }
 
 function warn(message) {
-  return Kabegame.warn(`[patreon] ${message}`);
+  return Kabegame.warn(message);
 }
+
+// 用户可见文案跟随界面语言。zh 是基准表，其余语言必须覆盖全部 key。
+// WebView 插件不经过打包，无法 import JSON，因此把五语言表内联在这里。
+const MESSAGES = {
+  zh: {
+    parseTargetRequired: "请填写创作者或合集",
+    parseCampaignIdRequired: "id: 后面要跟 campaign id",
+    parseCollectionIdNumeric: "合集 id 必须是数字，收到「{value}」",
+    parseUrlInvalid: "无法解析链接：{value}",
+    parseCollectionFromUrl: "无法从「{value}」解析出合集 id",
+    parseCreatorFromUrl: "无法从「{value}」解析出创作者名",
+    apiFailed: "接口请求失败({status}): {url}",
+    postLabel: "「{title}」({id})",
+    diagHeader: "[patreon]   ┏━ 下载失败诊断 ━━━━━━━━━━━━━━",
+    diagUrl: "[patreon]   ┃ URL: {url}",
+    diagPageOrigin: "[patreon]   ┃ 页面 origin: {origin}",
+    diagTargetOrigin: "[patreon]   ┃ 目标 origin: {origin}（{scope}）",
+    sameOrigin: "同源",
+    crossOrigin: "**跨源**",
+    diagTargetOriginFailed: "[patreon]   ┃ 目标 origin: (URL 解析失败)",
+    diagRawError: "[patreon]   ┃ 原始错误: {name} / {ctor}：{message}",
+    probeSameOrigin: "same-origin(实际用法)",
+    probeCorsAnon: "cors 无凭据",
+    probeCorsCred: "cors + credentials",
+    probeNoCors: "no-cors",
+    none: "无",
+    diagProbeResult: "[patreon]   ┃ [{label}] status={status} type={type} redirected={redirected} bodyNull={bodyNull}",
+    diagFinalUrl: "[patreon]   ┃     最终 URL: {url}",
+    notVisible: "(不可见)",
+    magicBytes: "[patreon]       魔数: {hex}",
+    diagHeaders: "[patreon]   ┃     content-type={ct} content-length={cl} Access-Control-Allow-Origin={acao}",
+    diagProbeError: "[patreon]   ┃ [{label}] 抛错: {name}：{message}",
+    diagFooter: "[patreon]   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    downloadStart: "[patreon]     ↓ 开始下载 {name}",
+    attachmentUrl: "[patreon]       URL: {url}",
+    attachmentAscii: "[patreon]       ASCII: {ascii}",
+    attachmentHttpFailed: "[patreon] 附件下载失败({status})：{name}",
+    attachmentEmpty: "[patreon] 附件落盘 0 字节：{name}（status={status}）",
+    downloadFinished: "[patreon]     ↓ {name}（{bytes} 字节，最终 URL: {url}）",
+    inspectFailed: "[patreon]       落盘文件无法读取：{error}",
+    notArchive: "[patreon]       ✗ 下载到的不是归档而是 {kind}——多半是被重定向到了登录页 / 错误页 / Cloudflare 挑战页。",
+    archiveKindDetected: "[patreon]       判定格式: {kind}（声明为 {declared}）",
+    archiveKindUnknown: "[patreon]       判定格式: 未识别（tar 的 ustar 标记在偏移 257，属正常）",
+    unrecognized: "未识别",
+    archiveExtracted: "[patreon]     ⇲ 解出 {count} 个文件（跳过 {skipped}，共 {bytes} 字节）",
+    ingestFailed: "[patreon] 入库失败：{file}（{error}）",
+    archiveFailed: "[patreon] 归档处理失败：{name}（{errorName}：{error}）",
+    failedProbe: "[patreon]       失败时落盘内容：{kind} | {hex}",
+    unsupportedArchive: "[patreon] 跳过不支持的归档格式：{name}",
+    postSummary: "[patreon]   → {post}：{archives} 个压缩包，{images} 张正文图",
+    postFinished: "[patreon]   ← {post}：成功 {ok}，失败 {failed}",
+    postImageFailed: "[patreon] 正文图下载失败：{url}（{error}）",
+    watermarkReadFailed: "[patreon] 读取上次爬取记录失败，本次按全量处理：{error}",
+    watermarkSaved: "[patreon]   · 已记录本次爬取水位线：{value}",
+    watermarkWriteFailed: "[patreon] 写入爬取记录失败（下次会重复抓取）：{error}",
+    timeMinLabel: "最旧时间",
+    timeMaxLabel: "最新时间",
+    boundaryInvalid: "{label}「{value}」无法解析为日期。请用日期选择器，或填形如 2026-01-31 的格式。",
+    timeRangeInvalid: "时间范围：最旧时间（{min}）不能晚于最新时间（{max}）",
+    direction: "[patreon] ▶ 方向：{direction}",
+    directionAsc: "从旧到新",
+    directionDesc: "从新到旧",
+    timeWindow: "[patreon] ▶ 时间窗：{min}{fromWatermark} ~ {max}",
+    oldestReachable: "能扒到的最旧",
+    newestReachable: "能扒到的最新",
+    fromWatermark: "（来自上次爬取记录）",
+    collectionOrderNote: "[patreon] ▶ 合集按合集内顺序排列，不按时间——方向与时间窗设置对它不生效",
+    pageHeader: "[patreon]   ┌ 第 {page} 页：{count} 个帖子 · {span}",
+    noTimeInfo: "无时间信息",
+    pastNewest: "[patreon]   · 已越过最新时间（本篇 {time}），停止翻页",
+    caughtWatermark: "[patreon]   · 已追上上次进度（本篇 {time}），停止翻页",
+    pastOldest: "[patreon]   · 已越过最旧时间（本篇 {time}），停止翻页",
+    skippedNoAccess: "[patreon]   · 无权查看，跳过 {post}",
+    pageAllOutside: "[patreon]   └ 本页 {skipped} 篇都在时间窗外，尚未到达 {goal}，继续翻页…",
+    pagePartlyOutside: "[patreon]   └ 本页处理 {handled} 篇，{skipped} 篇在时间窗外",
+    goalAfter: "{time} 之后",
+    goalBefore: "{time} 之前",
+    goalEarliest: "最早的帖子",
+    goalLatest: "最新的帖子",
+    lastPage: "[patreon]   · 已翻到最后一页（共 {page} 页）",
+    crawlFinished: "[patreon] ◀ 结束：共翻 {page} 页，成功 {ok}，失败 {failed}",
+    noFilesWindowed: "[patreon] 没有下载到任何文件。先确认时间窗是否设得太窄{watermark}；其次才是该创作者没有压缩包附件、当前账号未订阅、或提取规则把包内文件全滤掉了。",
+    noFilesWatermark: "（下界来自上次爬取记录，可能已经追平）",
+    noFilesGeneral: "[patreon] 没有下载到任何文件。可能原因：该创作者的帖子没有压缩包附件、当前账号未订阅、或提取规则把包内文件全滤掉了。",
+    targetType: "[patreon] ▶ 目标类型：{label}（{value}）",
+    targetCreator: "创作者主页",
+    targetCollection: "合集页",
+    targetCampaign: "站内页",
+    openPage: "[patreon] ▶ 打开 {url}",
+    challengePassing: "[patreon]   · 正在过 Cloudflare 挑战…",
+    campaignParseFailed: "未能解析出 campaign id。若页面停在 Cloudflare challenge，请在弹出的窗口里手动完成验证；若 Patreon 前端已改版，可在浏览器里找到 campaign id 后填成 id:<campaign_id>。",
+    campaignLog: "[patreon] ▶ campaign {id}",
+    collectionPageFailed: "合集页未能加载完成（可能卡在 Cloudflare challenge）。请在弹出的窗口里手动完成验证后重试。",
+    collectionThumbMissing: "[patreon]   · 合集缩略图里没有 campaign id，改从页面解析",
+    collectionApiFailed: "[patreon]   · /api/collection 读取失败（{error}），改从页面解析",
+    collectionCampaignFailed: "未能解析出合集 {id} 所属的 campaign id。Patreon 的合集接口缺 campaign_id 会直接 400，所以这一步是必需的。可以改用「创作者」形式抓取，或填 id:<campaign_id>。",
+    collectionLog: "[patreon] ▶ 合集 {id}{title}，campaign {campaignId}",
+    collectionTitle: "「{title}」",
+    campaignDirect: "[patreon] ▶ 直接使用 campaign {id}",
+    homePageFailed: "关注流页面未能加载完成（可能卡在 Cloudflare challenge）。请在弹出的窗口里手动完成验证后重试。",
+    homeLog: "[patreon] ▶ 关注流（你订阅的全部创作者）",
+    postPageFailed: "未能从帖子页解析出内容。若停在 Cloudflare challenge 请手动完成验证；若该帖需要订阅才能查看，请确认当前账号有权限。",
+    postNoAccess: "[patreon] 无权查看该帖 {post}（需要订阅对应档位）",
+    singlePostLog: "[patreon] ▶ 单帖 {post}",
+    singlePostFinished: "[patreon] ◀ 结束：成功 {ok}，失败 {failed}",
+    postEmpty: "[patreon] 该帖没有可下载的压缩包或图片。",
+    stageEnded: "[patreon] 阶段={phase}，结束",
+    pluginFailed: "[patreon] 插件运行失败：{error}"
+  },
+  en: {
+    parseTargetRequired: "Enter a creator or collection",
+    parseCampaignIdRequired: "id: must be followed by a campaign id",
+    parseCollectionIdNumeric: "A collection id must be numeric; received “{value}”",
+    parseUrlInvalid: "Could not parse the link: {value}",
+    parseCollectionFromUrl: "Could not extract a collection id from “{value}”",
+    parseCreatorFromUrl: "Could not extract a creator name from “{value}”",
+    apiFailed: "API request failed ({status}): {url}",
+    postLabel: "“{title}” ({id})",
+    diagHeader: "[patreon]   ┏━ Download failure diagnostics ━━━━━━━━━━━━━━",
+    diagUrl: "[patreon]   ┃ URL: {url}",
+    diagPageOrigin: "[patreon]   ┃ Page origin: {origin}",
+    diagTargetOrigin: "[patreon]   ┃ Target origin: {origin} ({scope})",
+    sameOrigin: "same origin",
+    crossOrigin: "**cross-origin**",
+    diagTargetOriginFailed: "[patreon]   ┃ Target origin: (URL parse failed)",
+    diagRawError: "[patreon]   ┃ Raw error: {name} / {ctor}: {message}",
+    probeSameOrigin: "same-origin (actual usage)",
+    probeCorsAnon: "cors without credentials",
+    probeCorsCred: "cors + credentials",
+    probeNoCors: "no-cors",
+    none: "none",
+    diagProbeResult: "[patreon]   ┃ [{label}] status={status} type={type} redirected={redirected} bodyNull={bodyNull}",
+    diagFinalUrl: "[patreon]   ┃     Final URL: {url}",
+    notVisible: "(not visible)",
+    magicBytes: "[patreon]       Magic bytes: {hex}",
+    diagHeaders: "[patreon]   ┃     content-type={ct} content-length={cl} Access-Control-Allow-Origin={acao}",
+    diagProbeError: "[patreon]   ┃ [{label}] threw: {name}: {message}",
+    diagFooter: "[patreon]   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    downloadStart: "[patreon]     ↓ Downloading {name}",
+    attachmentUrl: "[patreon]       URL: {url}",
+    attachmentAscii: "[patreon]       ASCII: {ascii}",
+    attachmentHttpFailed: "[patreon] Attachment download failed ({status}): {name}",
+    attachmentEmpty: "[patreon] Attachment saved 0 bytes: {name} (status={status})",
+    downloadFinished: "[patreon]     ↓ {name} ({bytes} bytes, final URL: {url})",
+    inspectFailed: "[patreon]       Could not read the downloaded file: {error}",
+    notArchive: "[patreon]       ✗ The download is not an archive but {kind} — it was most likely redirected to a sign-in page, an error page, or a Cloudflare challenge page.",
+    archiveKindDetected: "[patreon]       Detected format: {kind} (declared as {declared})",
+    archiveKindUnknown: "[patreon]       Detected format: unrecognized (tar's ustar marker sits at offset 257, so this is normal)",
+    unrecognized: "unrecognized",
+    archiveExtracted: "[patreon]     ⇲ Extracted {count} files ({skipped} skipped, {bytes} bytes in total)",
+    ingestFailed: "[patreon] Import failed: {file} ({error})",
+    archiveFailed: "[patreon] Archive processing failed: {name} ({errorName}: {error})",
+    failedProbe: "[patreon]       Downloaded content at failure: {kind} | {hex}",
+    unsupportedArchive: "[patreon] Skipping unsupported archive format: {name}",
+    postSummary: "[patreon]   → {post}: {archives} archive(s), {images} inline image(s)",
+    postFinished: "[patreon]   ← {post}: {ok} succeeded, {failed} failed",
+    postImageFailed: "[patreon] Inline image download failed: {url} ({error})",
+    watermarkReadFailed: "[patreon] Failed to read the previous crawl record; doing a full crawl this time: {error}",
+    watermarkSaved: "[patreon]   · Saved the crawl watermark for this run: {value}",
+    watermarkWriteFailed: "[patreon] Failed to save the crawl record (posts will repeat next time): {error}",
+    timeMinLabel: "Oldest time",
+    timeMaxLabel: "Newest time",
+    boundaryInvalid: "{label} “{value}” could not be parsed as a date. Use the date picker or a format like 2026-01-31.",
+    timeRangeInvalid: "Time range: the oldest time ({min}) cannot be later than the newest time ({max})",
+    direction: "[patreon] ▶ Direction: {direction}",
+    directionAsc: "oldest to newest",
+    directionDesc: "newest to oldest",
+    timeWindow: "[patreon] ▶ Time window: {min}{fromWatermark} ~ {max}",
+    oldestReachable: "oldest reachable",
+    newestReachable: "newest reachable",
+    fromWatermark: " (from the previous crawl record)",
+    collectionOrderNote: "[patreon] ▶ Collections are ordered by their internal order, not by time — direction and time window settings do not apply",
+    pageHeader: "[patreon]   ┌ Page {page}: {count} posts · {span}",
+    noTimeInfo: "no time information",
+    pastNewest: "[patreon]   · Passed the newest time (this post: {time}); stopping pagination",
+    caughtWatermark: "[patreon]   · Caught up with the previous crawl (this post: {time}); stopping pagination",
+    pastOldest: "[patreon]   · Passed the oldest time (this post: {time}); stopping pagination",
+    skippedNoAccess: "[patreon]   · No access; skipping {post}",
+    pageAllOutside: "[patreon]   └ All {skipped} posts on this page are outside the time window; still before {goal}, continuing…",
+    pagePartlyOutside: "[patreon]   └ Processed {handled} posts on this page; {skipped} are outside the time window",
+    goalAfter: "after {time}",
+    goalBefore: "before {time}",
+    goalEarliest: "the earliest post",
+    goalLatest: "the latest post",
+    lastPage: "[patreon]   · Reached the last page ({page} pages in total)",
+    crawlFinished: "[patreon] ◀ Finished: {page} pages, {ok} succeeded, {failed} failed",
+    noFilesWindowed: "[patreon] Nothing was downloaded. First check whether the time window is too narrow{watermark}; then consider that this creator has no archive attachments, the current account is not subscribed, or the extraction rule filtered out every file in the archives.",
+    noFilesWatermark: " (the lower bound comes from the previous crawl record and may already be caught up)",
+    noFilesGeneral: "[patreon] Nothing was downloaded. Possible reasons: this creator's posts have no archive attachments, the current account is not subscribed, or the extraction rule filtered out every file in the archives.",
+    targetType: "[patreon] ▶ Target type: {label} ({value})",
+    targetCreator: "creator page",
+    targetCollection: "collection page",
+    targetCampaign: "on-site page",
+    openPage: "[patreon] ▶ Opening {url}",
+    challengePassing: "[patreon]   · Passing the Cloudflare challenge…",
+    campaignParseFailed: "Could not parse the campaign id. If the page is stuck on a Cloudflare challenge, complete the check manually in the window that opened; if Patreon's frontend has changed, find the campaign id in the browser and enter it as id:<campaign_id>.",
+    campaignLog: "[patreon] ▶ campaign {id}",
+    collectionPageFailed: "The collection page did not finish loading (it may be stuck on a Cloudflare challenge). Complete the check manually in the window that opened and try again.",
+    collectionThumbMissing: "[patreon]   · No campaign id in the collection thumbnail; parsing it from the page instead",
+    collectionApiFailed: "[patreon]   · Could not read /api/collection ({error}); parsing from the page instead",
+    collectionCampaignFailed: "Could not parse the campaign id for collection {id}. Patreon's collection API returns 400 without a campaign_id, so this step is required. Try crawling it as a creator instead, or enter id:<campaign_id>.",
+    collectionLog: "[patreon] ▶ Collection {id}{title}, campaign {campaignId}",
+    collectionTitle: " “{title}”",
+    campaignDirect: "[patreon] ▶ Using campaign {id} directly",
+    homePageFailed: "The following-feed page did not finish loading (it may be stuck on a Cloudflare challenge). Complete the check manually in the window that opened and try again.",
+    homeLog: "[patreon] ▶ Following feed (all creators you subscribe to)",
+    postPageFailed: "Could not parse content from the post page. If it is stuck on a Cloudflare challenge, complete the check manually; if the post requires a subscription, make sure the current account has access.",
+    postNoAccess: "[patreon] No access to post {post} (a subscription to the matching tier is required)",
+    singlePostLog: "[patreon] ▶ Single post {post}",
+    singlePostFinished: "[patreon] ◀ Finished: {ok} succeeded, {failed} failed",
+    postEmpty: "[patreon] This post has no downloadable archives or images.",
+    stageEnded: "[patreon] Phase={phase}; exiting",
+    pluginFailed: "[patreon] Plugin run failed: {error}"
+  },
+  ja: {
+    parseTargetRequired: "クリエイターまたはコレクションを入力してください",
+    parseCampaignIdRequired: "id: の後ろに campaign id を指定してください",
+    parseCollectionIdNumeric: "コレクション id は数字で指定してください（入力値「{value}」）",
+    parseUrlInvalid: "リンクを解析できません：{value}",
+    parseCollectionFromUrl: "「{value}」からコレクション id を解析できません",
+    parseCreatorFromUrl: "「{value}」からクリエイター名を解析できません",
+    apiFailed: "API リクエストに失敗しました({status}): {url}",
+    postLabel: "「{title}」({id})",
+    diagHeader: "[patreon]   ┏━ ダウンロード失敗の診断 ━━━━━━━━━━━━━━",
+    diagUrl: "[patreon]   ┃ URL: {url}",
+    diagPageOrigin: "[patreon]   ┃ ページの origin: {origin}",
+    diagTargetOrigin: "[patreon]   ┃ 対象の origin: {origin}（{scope}）",
+    sameOrigin: "同一オリジン",
+    crossOrigin: "**クロスオリジン**",
+    diagTargetOriginFailed: "[patreon]   ┃ 対象の origin: (URL 解析失敗)",
+    diagRawError: "[patreon]   ┃ 元のエラー: {name} / {ctor}：{message}",
+    probeSameOrigin: "same-origin（実際の使用法）",
+    probeCorsAnon: "cors 認証情報なし",
+    probeCorsCred: "cors + credentials",
+    probeNoCors: "no-cors",
+    none: "なし",
+    diagProbeResult: "[patreon]   ┃ [{label}] status={status} type={type} redirected={redirected} bodyNull={bodyNull}",
+    diagFinalUrl: "[patreon]   ┃     最終 URL: {url}",
+    notVisible: "(不可視)",
+    magicBytes: "[patreon]       マジックバイト: {hex}",
+    diagHeaders: "[patreon]   ┃     content-type={ct} content-length={cl} Access-Control-Allow-Origin={acao}",
+    diagProbeError: "[patreon]   ┃ [{label}] 例外: {name}：{message}",
+    diagFooter: "[patreon]   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    downloadStart: "[patreon]     ↓ {name} のダウンロードを開始",
+    attachmentUrl: "[patreon]       URL: {url}",
+    attachmentAscii: "[patreon]       ASCII: {ascii}",
+    attachmentHttpFailed: "[patreon] 添付ファイルのダウンロード失敗({status})：{name}",
+    attachmentEmpty: "[patreon] 添付ファイルが 0 バイトで保存されました：{name}（status={status}）",
+    downloadFinished: "[patreon]     ↓ {name}（{bytes} バイト、最終 URL: {url}）",
+    inspectFailed: "[patreon]       保存されたファイルを読み込めません：{error}",
+    notArchive: "[patreon]       ✗ ダウンロードしたのはアーカイブではなく {kind} です。ログインページ／エラーページ／Cloudflare の認証ページにリダイレクトされた可能性が高いです。",
+    archiveKindDetected: "[patreon]       判定形式: {kind}（宣言は {declared}）",
+    archiveKindUnknown: "[patreon]       判定形式: 不明（tar の ustar マーカーはオフセット 257 にあるため正常です）",
+    unrecognized: "不明",
+    archiveExtracted: "[patreon]     ⇲ {count} 個のファイルを展開（スキップ {skipped}、合計 {bytes} バイト）",
+    ingestFailed: "[patreon] 取り込み失敗：{file}（{error}）",
+    archiveFailed: "[patreon] アーカイブ処理に失敗しました：{name}（{errorName}：{error}）",
+    failedProbe: "[patreon]       失敗時の保存内容：{kind} | {hex}",
+    unsupportedArchive: "[patreon] 未対応のアーカイブ形式をスキップします：{name}",
+    postSummary: "[patreon]   → {post}：アーカイブ {archives} 個、本文画像 {images} 枚",
+    postFinished: "[patreon]   ← {post}：成功 {ok}、失敗 {failed}",
+    postImageFailed: "[patreon] 本文画像のダウンロード失敗：{url}（{error}）",
+    watermarkReadFailed: "[patreon] 前回のクロール記録を読み込めませんでした。今回は全件取得します：{error}",
+    watermarkSaved: "[patreon]   · 今回のクロール水位線を記録しました：{value}",
+    watermarkWriteFailed: "[patreon] クロール記録を保存できませんでした（次回同じ投稿を再度取得します）：{error}",
+    timeMinLabel: "最古時間",
+    timeMaxLabel: "最新時間",
+    boundaryInvalid: "{label}「{value}」を日付として解析できません。日付ピッカーを使うか、2026-01-31 のような形式で入力してください。",
+    timeRangeInvalid: "時間範囲：最古時間（{min}）は最新時間（{max}）より後にできません",
+    direction: "[patreon] ▶ 方向：{direction}",
+    directionAsc: "古い順から新しい順",
+    directionDesc: "新しい順から古い順",
+    timeWindow: "[patreon] ▶ 時間帯：{min}{fromWatermark} ~ {max}",
+    oldestReachable: "取得できる最古",
+    newestReachable: "取得できる最新",
+    fromWatermark: "（前回のクロール記録から）",
+    collectionOrderNote: "[patreon] ▶ コレクションはコレクション内の順序で並び、時系列ではありません。方向と時間帯の設定は反映されません",
+    pageHeader: "[patreon]   ┌ {page} ページ目：投稿 {count} 件 · {span}",
+    noTimeInfo: "時間情報なし",
+    pastNewest: "[patreon]   · 最新時間を超えました（この投稿 {time}）。ページ送りを停止します",
+    caughtWatermark: "[patreon]   · 前回の進捗に追いつきました（この投稿 {time}）。ページ送りを停止します",
+    pastOldest: "[patreon]   · 最古時間を超えました（この投稿 {time}）。ページ送りを停止します",
+    skippedNoAccess: "[patreon]   · 閲覧権限がないためスキップします {post}",
+    pageAllOutside: "[patreon]   └ このページの {skipped} 件はすべて時間帯の外にあり、まだ {goal} に達していません。ページ送りを続けます…",
+    pagePartlyOutside: "[patreon]   └ このページで {handled} 件を処理、{skipped} 件は時間帯の外です",
+    goalAfter: "{time} より後",
+    goalBefore: "{time} より前",
+    goalEarliest: "最も古い投稿",
+    goalLatest: "最も新しい投稿",
+    lastPage: "[patreon]   · 最後のページまで到達しました（全 {page} ページ）",
+    crawlFinished: "[patreon] ◀ 終了：{page} ページ、成功 {ok}、失敗 {failed}",
+    noFilesWindowed: "[patreon] ファイルを 1 件もダウンロードできませんでした。まず時間帯が狭すぎないか確認してください{watermark}。次に、このクリエイターにアーカイブ添付がない、現在のアカウントが未購読、または抽出ルールがアーカイブ内のファイルをすべて除外した可能性があります。",
+    noFilesWatermark: "（下限は前回のクロール記録によるもので、すでに追いついている可能性があります）",
+    noFilesGeneral: "[patreon] ファイルを 1 件もダウンロードできませんでした。考えられる原因：このクリエイターの投稿にアーカイブ添付がない、現在のアカウントが未購読、または抽出ルールがアーカイブ内のファイルをすべて除外した。",
+    targetType: "[patreon] ▶ 対象の種類：{label}（{value}）",
+    targetCreator: "クリエイターページ",
+    targetCollection: "コレクションページ",
+    targetCampaign: "サイト内ページ",
+    openPage: "[patreon] ▶ {url} を開きます",
+    challengePassing: "[patreon]   · Cloudflare の認証を通過中…",
+    campaignParseFailed: "campaign id を解析できませんでした。ページが Cloudflare の認証で止まっている場合は、開いたウィンドウで手動で認証を完了してください。Patreon のフロントエンドが改版されている場合は、ブラウザで campaign id を確認して id:<campaign_id> の形式で入力してください。",
+    campaignLog: "[patreon] ▶ campaign {id}",
+    collectionPageFailed: "コレクションページが読み込み完了しませんでした（Cloudflare の認証で止まっている可能性があります）。開いたウィンドウで手動で認証を完了してから再試行してください。",
+    collectionThumbMissing: "[patreon]   · コレクションのサムネイルに campaign id がないため、ページから解析します",
+    collectionApiFailed: "[patreon]   · /api/collection の読み込みに失敗しました（{error}）。ページから解析します",
+    collectionCampaignFailed: "コレクション {id} の campaign id を解析できませんでした。Patreon のコレクション API は campaign_id がないと 400 を返すため、この手順は必須です。「クリエイター」形式で取得するか、id:<campaign_id> を入力してください。",
+    collectionLog: "[patreon] ▶ コレクション {id}{title}、campaign {campaignId}",
+    collectionTitle: "「{title}」",
+    campaignDirect: "[patreon] ▶ campaign {id} を直接使用",
+    homePageFailed: "フォロー中フィードのページが読み込み完了しませんでした（Cloudflare の認証で止まっている可能性があります）。開いたウィンドウで手動で認証を完了してから再試行してください。",
+    homeLog: "[patreon] ▶ フォロー中フィード（購読中のすべてのクリエイター）",
+    postPageFailed: "投稿ページから内容を解析できませんでした。Cloudflare の認証で止まっている場合は手動で完了してください。購読が必要な投稿の場合は、現在のアカウントに権限があるか確認してください。",
+    postNoAccess: "[patreon] この投稿を閲覧できません {post}（対応するプランの購読が必要です）",
+    singlePostLog: "[patreon] ▶ 単一投稿 {post}",
+    singlePostFinished: "[patreon] ◀ 終了：成功 {ok}、失敗 {failed}",
+    postEmpty: "[patreon] この投稿にはダウンロードできるアーカイブや画像がありません。",
+    stageEnded: "[patreon] フェーズ={phase} のため終了します",
+    pluginFailed: "[patreon] プラグインの実行に失敗しました：{error}"
+  },
+  ko: {
+    parseTargetRequired: "크리에이터 또는 컬렉션을 입력해 주세요",
+    parseCampaignIdRequired: "id: 뒤에 campaign id를 입력해 주세요",
+    parseCollectionIdNumeric: "컬렉션 id는 숫자여야 합니다. 입력값 “{value}”",
+    parseUrlInvalid: "링크를 해석할 수 없습니다: {value}",
+    parseCollectionFromUrl: "“{value}”에서 컬렉션 id를 추출할 수 없습니다",
+    parseCreatorFromUrl: "“{value}”에서 크리에이터 이름을 추출할 수 없습니다",
+    apiFailed: "API 요청 실패({status}): {url}",
+    postLabel: "“{title}” ({id})",
+    diagHeader: "[patreon]   ┏━ 다운로드 실패 진단 ━━━━━━━━━━━━━━",
+    diagUrl: "[patreon]   ┃ URL: {url}",
+    diagPageOrigin: "[patreon]   ┃ 페이지 origin: {origin}",
+    diagTargetOrigin: "[patreon]   ┃ 대상 origin: {origin} ({scope})",
+    sameOrigin: "동일 출처",
+    crossOrigin: "**교차 출처**",
+    diagTargetOriginFailed: "[patreon]   ┃ 대상 origin: (URL 해석 실패)",
+    diagRawError: "[patreon]   ┃ 원래 오류: {name} / {ctor}: {message}",
+    probeSameOrigin: "same-origin(실제 사용)",
+    probeCorsAnon: "cors 자격 증명 없음",
+    probeCorsCred: "cors + credentials",
+    probeNoCors: "no-cors",
+    none: "없음",
+    diagProbeResult: "[patreon]   ┃ [{label}] status={status} type={type} redirected={redirected} bodyNull={bodyNull}",
+    diagFinalUrl: "[patreon]   ┃     최종 URL: {url}",
+    notVisible: "(표시되지 않음)",
+    magicBytes: "[patreon]       매직 바이트: {hex}",
+    diagHeaders: "[patreon]   ┃     content-type={ct} content-length={cl} Access-Control-Allow-Origin={acao}",
+    diagProbeError: "[patreon]   ┃ [{label}] 예외: {name}: {message}",
+    diagFooter: "[patreon]   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    downloadStart: "[patreon]     ↓ {name} 다운로드 시작",
+    attachmentUrl: "[patreon]       URL: {url}",
+    attachmentAscii: "[patreon]       ASCII: {ascii}",
+    attachmentHttpFailed: "[patreon] 첨부 파일 다운로드 실패({status}): {name}",
+    attachmentEmpty: "[patreon] 첨부 파일이 0바이트로 저장되었습니다: {name}(status={status})",
+    downloadFinished: "[patreon]     ↓ {name}({bytes}바이트, 최종 URL: {url})",
+    inspectFailed: "[patreon]       저장된 파일을 읽을 수 없습니다: {error}",
+    notArchive: "[patreon]       ✗ 받은 파일이 아카이브가 아니라 {kind}입니다. 로그인 페이지 / 오류 페이지 / Cloudflare 인증 페이지로 리디렉션되었을 가능성이 큽니다.",
+    archiveKindDetected: "[patreon]       판정 형식: {kind}(선언: {declared})",
+    archiveKindUnknown: "[patreon]       판정 형식: 미확인(tar의 ustar 마커는 오프셋 257에 있어 정상입니다)",
+    unrecognized: "미확인",
+    archiveExtracted: "[patreon]     ⇲ 파일 {count}개 추출(건너뜀 {skipped}, 총 {bytes}바이트)",
+    ingestFailed: "[patreon] 가져오기 실패: {file}({error})",
+    archiveFailed: "[patreon] 아카이브 처리 실패: {name}({errorName}: {error})",
+    failedProbe: "[patreon]       실패 시 저장된 내용: {kind} | {hex}",
+    unsupportedArchive: "[patreon] 지원하지 않는 아카이브 형식을 건너뜁니다: {name}",
+    postSummary: "[patreon]   → {post}: 아카이브 {archives}개, 본문 이미지 {images}장",
+    postFinished: "[patreon]   ← {post}: 성공 {ok}, 실패 {failed}",
+    postImageFailed: "[patreon] 본문 이미지 다운로드 실패: {url}({error})",
+    watermarkReadFailed: "[patreon] 이전 크롤 기록을 읽지 못했습니다. 이번에는 전체를 수집합니다: {error}",
+    watermarkSaved: "[patreon]   · 이번 크롤 워터마크 기록: {value}",
+    watermarkWriteFailed: "[patreon] 크롤 기록을 저장하지 못했습니다(다음에 같은 게시물을 다시 수집합니다): {error}",
+    timeMinLabel: "가장 오래된 시간",
+    timeMaxLabel: "최신 시간",
+    boundaryInvalid: "{label} “{value}”을(를) 날짜로 해석할 수 없습니다. 날짜 선택기를 사용하거나 2026-01-31 같은 형식으로 입력해 주세요.",
+    timeRangeInvalid: "시간 범위: 가장 오래된 시간({min})은 최신 시간({max})보다 늦을 수 없습니다",
+    direction: "[patreon] ▶ 방향: {direction}",
+    directionAsc: "오래된 것부터",
+    directionDesc: "최신 것부터",
+    timeWindow: "[patreon] ▶ 시간 범위: {min}{fromWatermark} ~ {max}",
+    oldestReachable: "수집 가능한 가장 오래된 시점",
+    newestReachable: "수집 가능한 가장 최신 시점",
+    fromWatermark: "(이전 크롤 기록 기준)",
+    collectionOrderNote: "[patreon] ▶ 컬렉션은 컬렉션 내부 순서로 정렬되며 시간순이 아닙니다. 방향과 시간 범위 설정은 적용되지 않습니다",
+    pageHeader: "[patreon]   ┌ {page}페이지: 게시물 {count}개 · {span}",
+    noTimeInfo: "시간 정보 없음",
+    pastNewest: "[patreon]   · 최신 시간을 지났습니다(이 게시물 {time}). 페이지 넘김을 중지합니다",
+    caughtWatermark: "[patreon]   · 이전 진행 지점에 도달했습니다(이 게시물 {time}). 페이지 넘김을 중지합니다",
+    pastOldest: "[patreon]   · 가장 오래된 시간을 지났습니다(이 게시물 {time}). 페이지 넘김을 중지합니다",
+    skippedNoAccess: "[patreon]   · 열람 권한이 없어 건너뜁니다 {post}",
+    pageAllOutside: "[patreon]   └ 이 페이지의 {skipped}개가 모두 시간 범위 밖이며 아직 {goal}에 도달하지 않았습니다. 계속 넘깁니다…",
+    pagePartlyOutside: "[patreon]   └ 이 페이지에서 {handled}개 처리, {skipped}개는 시간 범위 밖",
+    goalAfter: "{time} 이후",
+    goalBefore: "{time} 이전",
+    goalEarliest: "가장 오래된 게시물",
+    goalLatest: "가장 최신 게시물",
+    lastPage: "[patreon]   · 마지막 페이지까지 왔습니다(총 {page}페이지)",
+    crawlFinished: "[patreon] ◀ 종료: {page}페이지, 성공 {ok}, 실패 {failed}",
+    noFilesWindowed: "[patreon] 파일을 하나도 다운로드하지 못했습니다. 먼저 시간 범위가 너무 좁지 않은지 확인하세요{watermark}. 그다음으로 이 크리에이터의 게시물에 아카이브 첨부가 없는지, 현재 계정이 구독하지 않았는지, 추출 규칙이 아카이브 내 파일을 모두 걸러냈는지 확인하세요.",
+    noFilesWatermark: "(하한은 이전 크롤 기록에서 왔으며 이미 따라잡았을 수 있습니다)",
+    noFilesGeneral: "[patreon] 파일을 하나도 다운로드하지 못했습니다. 가능한 원인: 이 크리에이터의 게시물에 아카이브 첨부가 없음, 현재 계정 미구독, 또는 추출 규칙이 아카이브 내 파일을 모두 걸러냄.",
+    targetType: "[patreon] ▶ 대상 유형: {label}({value})",
+    targetCreator: "크리에이터 페이지",
+    targetCollection: "컬렉션 페이지",
+    targetCampaign: "사이트 내 페이지",
+    openPage: "[patreon] ▶ {url} 열기",
+    challengePassing: "[patreon]   · Cloudflare 인증을 통과하는 중…",
+    campaignParseFailed: "campaign id를 해석하지 못했습니다. 페이지가 Cloudflare 인증에서 멈춰 있다면 열린 창에서 직접 인증을 완료해 주세요. Patreon 프런트엔드가 개편되었다면 브라우저에서 campaign id를 찾아 id:<campaign_id> 형식으로 입력하세요.",
+    campaignLog: "[patreon] ▶ campaign {id}",
+    collectionPageFailed: "컬렉션 페이지가 로드를 완료하지 못했습니다(Cloudflare 인증에서 멈췄을 수 있습니다). 열린 창에서 직접 인증을 완료한 뒤 다시 시도해 주세요.",
+    collectionThumbMissing: "[patreon]   · 컬렉션 썸네일에 campaign id가 없어 페이지에서 파싱합니다",
+    collectionApiFailed: "[patreon]   · /api/collection 읽기 실패({error}), 페이지에서 파싱합니다",
+    collectionCampaignFailed: "컬렉션 {id}의 campaign id를 해석하지 못했습니다. Patreon의 컬렉션 API는 campaign_id가 없으면 400을 반환하므로 이 단계가 필요합니다. “크리에이터” 형식으로 수집하거나 id:<campaign_id>를 입력하세요.",
+    collectionLog: "[patreon] ▶ 컬렉션 {id}{title}, campaign {campaignId}",
+    collectionTitle: " “{title}”",
+    campaignDirect: "[patreon] ▶ campaign {id} 직접 사용",
+    homePageFailed: "팔로잉 피드 페이지가 로드를 완료하지 못했습니다(Cloudflare 인증에서 멈췄을 수 있습니다). 열린 창에서 직접 인증을 완료한 뒤 다시 시도해 주세요.",
+    homeLog: "[patreon] ▶ 팔로잉 피드(구독 중인 모든 크리에이터)",
+    postPageFailed: "게시물 페이지에서 내용을 해석하지 못했습니다. Cloudflare 인증에서 멈췄다면 직접 완료해 주세요. 구독이 필요한 게시물이라면 현재 계정에 권한이 있는지 확인하세요.",
+    postNoAccess: "[patreon] 이 게시물을 볼 권한이 없습니다 {post}(해당 등급 구독 필요)",
+    singlePostLog: "[patreon] ▶ 단일 게시물 {post}",
+    singlePostFinished: "[patreon] ◀ 종료: 성공 {ok}, 실패 {failed}",
+    postEmpty: "[patreon] 이 게시물에는 다운로드할 아카이브나 이미지가 없습니다.",
+    stageEnded: "[patreon] 단계={phase}, 종료합니다",
+    pluginFailed: "[patreon] 플러그인 실행 실패: {error}"
+  },
+  zhtw: {
+    parseTargetRequired: "請填寫創作者或合集",
+    parseCampaignIdRequired: "id: 後面要接 campaign id",
+    parseCollectionIdNumeric: "合集 id 必須是數字，收到「{value}」",
+    parseUrlInvalid: "無法解析連結：{value}",
+    parseCollectionFromUrl: "無法從「{value}」解析出合集 id",
+    parseCreatorFromUrl: "無法從「{value}」解析出創作者名稱",
+    apiFailed: "介面請求失敗({status}): {url}",
+    postLabel: "「{title}」({id})",
+    diagHeader: "[patreon]   ┏━ 下載失敗診斷 ━━━━━━━━━━━━━━",
+    diagUrl: "[patreon]   ┃ URL: {url}",
+    diagPageOrigin: "[patreon]   ┃ 頁面 origin: {origin}",
+    diagTargetOrigin: "[patreon]   ┃ 目標 origin: {origin}（{scope}）",
+    sameOrigin: "同源",
+    crossOrigin: "**跨源**",
+    diagTargetOriginFailed: "[patreon]   ┃ 目標 origin: (URL 解析失敗)",
+    diagRawError: "[patreon]   ┃ 原始錯誤: {name} / {ctor}：{message}",
+    probeSameOrigin: "same-origin(實際用法)",
+    probeCorsAnon: "cors 無憑證",
+    probeCorsCred: "cors + credentials",
+    probeNoCors: "no-cors",
+    none: "無",
+    diagProbeResult: "[patreon]   ┃ [{label}] status={status} type={type} redirected={redirected} bodyNull={bodyNull}",
+    diagFinalUrl: "[patreon]   ┃     最終 URL: {url}",
+    notVisible: "(不可見)",
+    magicBytes: "[patreon]       魔數: {hex}",
+    diagHeaders: "[patreon]   ┃     content-type={ct} content-length={cl} Access-Control-Allow-Origin={acao}",
+    diagProbeError: "[patreon]   ┃ [{label}] 拋錯: {name}：{message}",
+    diagFooter: "[patreon]   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+    downloadStart: "[patreon]     ↓ 開始下載 {name}",
+    attachmentUrl: "[patreon]       URL: {url}",
+    attachmentAscii: "[patreon]       ASCII: {ascii}",
+    attachmentHttpFailed: "[patreon] 附件下載失敗({status})：{name}",
+    attachmentEmpty: "[patreon] 附件落地 0 位元組：{name}（status={status}）",
+    downloadFinished: "[patreon]     ↓ {name}（{bytes} 位元組，最終 URL: {url}）",
+    inspectFailed: "[patreon]       落地檔案無法讀取：{error}",
+    notArchive: "[patreon]       ✗ 下載到的不是封存檔而是 {kind}——多半是被重新導向到登入頁 / 錯誤頁 / Cloudflare 驗證頁。",
+    archiveKindDetected: "[patreon]       判定格式: {kind}（宣告為 {declared}）",
+    archiveKindUnknown: "[patreon]       判定格式: 未識別（tar 的 ustar 標記在偏移 257，屬正常）",
+    unrecognized: "未識別",
+    archiveExtracted: "[patreon]     ⇲ 解出 {count} 個檔案（跳過 {skipped}，共 {bytes} 位元組）",
+    ingestFailed: "[patreon] 入庫失敗：{file}（{error}）",
+    archiveFailed: "[patreon] 封存檔處理失敗：{name}（{errorName}：{error}）",
+    failedProbe: "[patreon]       失敗時落地內容：{kind} | {hex}",
+    unsupportedArchive: "[patreon] 跳過不支援的封存格式：{name}",
+    postSummary: "[patreon]   → {post}：{archives} 個壓縮檔，{images} 張正文圖",
+    postFinished: "[patreon]   ← {post}：成功 {ok}，失敗 {failed}",
+    postImageFailed: "[patreon] 正文圖下載失敗：{url}（{error}）",
+    watermarkReadFailed: "[patreon] 讀取上次爬取紀錄失敗，本次按全量處理：{error}",
+    watermarkSaved: "[patreon]   · 已記錄本次爬取水位線：{value}",
+    watermarkWriteFailed: "[patreon] 寫入爬取紀錄失敗（下次會重複抓取）：{error}",
+    timeMinLabel: "最舊時間",
+    timeMaxLabel: "最新時間",
+    boundaryInvalid: "{label}「{value}」無法解析為日期。請用日期選擇器，或填形如 2026-01-31 的格式。",
+    timeRangeInvalid: "時間範圍：最舊時間（{min}）不能晚於最新時間（{max}）",
+    direction: "[patreon] ▶ 方向：{direction}",
+    directionAsc: "從舊到新",
+    directionDesc: "從新到舊",
+    timeWindow: "[patreon] ▶ 時間窗：{min}{fromWatermark} ~ {max}",
+    oldestReachable: "能抓得到的最舊",
+    newestReachable: "能抓得到的最新",
+    fromWatermark: "（來自上次爬取紀錄）",
+    collectionOrderNote: "[patreon] ▶ 合集按合集內順序排列，不按時間——方向與時間窗設定對它不生效",
+    pageHeader: "[patreon]   ┌ 第 {page} 頁：{count} 個貼文 · {span}",
+    noTimeInfo: "無時間資訊",
+    pastNewest: "[patreon]   · 已越過最新時間（本篇 {time}），停止翻頁",
+    caughtWatermark: "[patreon]   · 已追上上次進度（本篇 {time}），停止翻頁",
+    pastOldest: "[patreon]   · 已越過最舊時間（本篇 {time}），停止翻頁",
+    skippedNoAccess: "[patreon]   · 無權查看，跳過 {post}",
+    pageAllOutside: "[patreon]   └ 本頁 {skipped} 篇都在時間窗外，尚未到達 {goal}，繼續翻頁…",
+    pagePartlyOutside: "[patreon]   └ 本頁處理 {handled} 篇，{skipped} 篇在時間窗外",
+    goalAfter: "{time} 之後",
+    goalBefore: "{time} 之前",
+    goalEarliest: "最早的貼文",
+    goalLatest: "最新的貼文",
+    lastPage: "[patreon]   · 已翻到最後一頁（共 {page} 頁）",
+    crawlFinished: "[patreon] ◀ 結束：共翻 {page} 頁，成功 {ok}，失敗 {failed}",
+    noFilesWindowed: "[patreon] 沒有下載到任何檔案。先確認時間窗是否設得太窄{watermark}；其次才是該創作者沒有壓縮檔附件、目前帳號未訂閱、或擷取規則把壓縮檔內檔案全濾掉了。",
+    noFilesWatermark: "（下界來自上次爬取紀錄，可能已經追平）",
+    noFilesGeneral: "[patreon] 沒有下載到任何檔案。可能原因：該創作者的貼文沒有壓縮檔附件、目前帳號未訂閱、或擷取規則把壓縮檔內檔案全濾掉了。",
+    targetType: "[patreon] ▶ 目標類型：{label}（{value}）",
+    targetCreator: "創作者主頁",
+    targetCollection: "合集頁",
+    targetCampaign: "站內頁",
+    openPage: "[patreon] ▶ 開啟 {url}",
+    challengePassing: "[patreon]   · 正在通過 Cloudflare 驗證…",
+    campaignParseFailed: "未能解析出 campaign id。若頁面停在 Cloudflare challenge，請在彈出的視窗裡手動完成驗證；若 Patreon 前端已改版，可在瀏覽器裡找到 campaign id 後填成 id:<campaign_id>。",
+    campaignLog: "[patreon] ▶ campaign {id}",
+    collectionPageFailed: "合集頁未能載入完成（可能卡在 Cloudflare challenge）。請在彈出的視窗裡手動完成驗證後重試。",
+    collectionThumbMissing: "[patreon]   · 合集縮圖裡沒有 campaign id，改從頁面解析",
+    collectionApiFailed: "[patreon]   · /api/collection 讀取失敗（{error}），改從頁面解析",
+    collectionCampaignFailed: "未能解析出合集 {id} 所屬的 campaign id。Patreon 的合集介面缺 campaign_id 會直接 400，所以這一步是必需的。可以改用「創作者」形式抓取，或填 id:<campaign_id>。",
+    collectionLog: "[patreon] ▶ 合集 {id}{title}，campaign {campaignId}",
+    collectionTitle: "「{title}」",
+    campaignDirect: "[patreon] ▶ 直接使用 campaign {id}",
+    homePageFailed: "關注流頁面未能載入完成（可能卡在 Cloudflare challenge）。請在彈出的視窗裡手動完成驗證後重試。",
+    homeLog: "[patreon] ▶ 關注流（你訂閱的全部創作者）",
+    postPageFailed: "未能從貼文頁解析出內容。若停在 Cloudflare challenge 請手動完成驗證；若該貼文需要訂閱才能查看，請確認目前帳號有權限。",
+    postNoAccess: "[patreon] 無權查看該貼文 {post}（需要訂閱對應等級）",
+    singlePostLog: "[patreon] ▶ 單篇貼文 {post}",
+    singlePostFinished: "[patreon] ◀ 結束：成功 {ok}，失敗 {failed}",
+    postEmpty: "[patreon] 該貼文沒有可下載的壓縮檔或圖片。",
+    stageEnded: "[patreon] 階段={phase}，結束",
+    pluginFailed: "[patreon] 外掛執行失敗：{error}"
+  }
+};
+
+const LANG = Kabegame.getLang?.() ?? "zh";
+const t = (key, params = {}) => {
+  const table = MESSAGES[LANG] || MESSAGES.zh;
+  const tpl = table[key] ?? MESSAGES.zh[key] ?? key;
+  return tpl.replace(/\{(\w+)\}/g, (m, name) =>
+    params[name] != null ? String(params[name]) : m
+  );
+};
 
 // ---------------------------------------------------------------- campaign id
 
@@ -97,18 +636,18 @@ function extractCampaignIdFromPage() {
 //（必须落在 patreon.com 上，后续同源 fetch 才过得了 Cloudflare）。
 function parseTarget(raw) {
   const value = coerceStr(raw);
-  if (!value) throw new Error("请填写创作者或合集");
+  if (!value) throw new Error(t("parseTargetRequired"));
 
   if (value.startsWith("id:")) {
     const id = value.slice(3).trim();
-    if (!id) throw new Error("id: 后面要跟 campaign id");
+    if (!id) throw new Error(t("parseCampaignIdRequired"));
     // 没有具体页面可去，落到创作者根域即可，只为拿到同源上下文。
     return { kind: "campaign", value: id, pageUrl: `${BASE_URL}/home` };
   }
 
   if (value.startsWith("collection:")) {
     const id = value.slice("collection:".length).trim();
-    if (!/^\d+$/.test(id)) throw new Error(`合集 id 必须是数字，收到「${id}」`);
+    if (!/^\d+$/.test(id)) throw new Error(t("parseCollectionIdNumeric", { value: id }));
     return { kind: "collection", value: id, pageUrl: `${BASE_URL}/collection/${id}` };
   }
 
@@ -122,13 +661,13 @@ function parseTarget(raw) {
     try {
       parsed = new URL(value);
     } catch {
-      throw new Error(`无法解析链接：${value}`);
+      throw new Error(t("parseUrlInvalid", { value }));
     }
     const parts = parsed.pathname.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
 
     if (parts[0] === "collection") {
       const id = coerceStr(parts[1]);
-      if (!/^\d+$/.test(id)) throw new Error(`无法从「${value}」解析出合集 id`);
+      if (!/^\d+$/.test(id)) throw new Error(t("parseCollectionFromUrl", { value }));
       // 丢掉 ?view=expanded 之类的展示参数，它们与抓取无关。
       return { kind: "collection", value: id, pageUrl: `${BASE_URL}/collection/${id}` };
     }
@@ -149,7 +688,7 @@ function parseTarget(raw) {
 
     // /c/<name>、/cw/<name>、/<name>、/<name>/posts 都取到 name。
     const name = parts[0] === "c" || parts[0] === "cw" ? parts[1] : parts[0];
-    if (!name) throw new Error(`无法从「${value}」解析出创作者名`);
+    if (!name) throw new Error(t("parseCreatorFromUrl", { value }));
     return {
       kind: "creator",
       value: name,
@@ -212,7 +751,7 @@ async function fetchApi(url) {
     headers: { "Content-Type": "application/vnd.api+json" },
   });
   if (!response.ok) {
-    throw new Error(`接口请求失败(${response.status}): ${url.slice(0, 120)}`);
+    throw new Error(t("apiFailed", { status: response.status, url: url.slice(0, 120) }));
   }
   return response.json();
 }
@@ -367,7 +906,10 @@ function postPageUrl(post) {
 }
 
 function postLabel(post) {
-  return `「${coerceStr(post?.title) || coerceStr(post?.id)}」(${coerceStr(post?.id)})`;
+  return t("postLabel", {
+    title: coerceStr(post?.title) || coerceStr(post?.id),
+    id: coerceStr(post?.id),
+  });
 }
 
 // ------------------------------------------------------------------ 归档入库
@@ -381,67 +923,69 @@ function postLabel(post) {
 //   - 两种模式都抛错                          → DNS/网络/证书层
 //   - redirected=true 且 origin 变了          → 302 到了 CDN，跨源由此产生
 async function diagnoseFetchFailure(url, error) {
-  await warn(`  ┏━ 下载失败诊断 ━━━━━━━━━━━━━━`);
-  await warn(`  ┃ URL: ${url}`);
-  await warn(`  ┃ 页面 origin: ${location.origin}`);
+  await warn(t("diagHeader"));
+  await warn(t("diagUrl", { url }));
+  await warn(t("diagPageOrigin", { origin: location.origin }));
   try {
     const target = new URL(url, location.href);
-    await warn(
-      `  ┃ 目标 origin: ${target.origin}` +
-        `（${target.origin === location.origin ? "同源" : "**跨源**"}）`,
-    );
+    await warn(t("diagTargetOrigin", {
+      origin: target.origin,
+      scope: target.origin === location.origin ? t("sameOrigin") : t("crossOrigin"),
+    }));
   } catch {
-    await warn(`  ┃ 目标 origin: (URL 解析失败)`);
+    await warn(t("diagTargetOriginFailed"));
   }
-  await warn(
-    `  ┃ 原始错误: ${error?.name || "?"} / ${error?.constructor?.name || "?"}：` +
-      `${error?.message || String(error)}`,
-  );
+  await warn(t("diagRawError", {
+    name: error?.name || "?",
+    ctor: error?.constructor?.name || "?",
+    message: error?.message || String(error),
+  }));
 
   // 探针顺序即排查顺序：先试实际用的 same-origin，再用 omit / include 的差异
   // 判断是不是"通配 ACAO 撞上 credentials"这一类（omit 成而 include 败即是）。
   const probes = [
-    { label: "same-origin(实际用法)", init: { mode: "cors", credentials: "same-origin" } },
-    { label: "cors 无凭据", init: { mode: "cors", credentials: "omit" } },
-    { label: "cors + credentials", init: { mode: "cors", credentials: "include" } },
-    { label: "no-cors", init: { mode: "no-cors" } },
+    { label: t("probeSameOrigin"), init: { mode: "cors", credentials: "same-origin" } },
+    { label: t("probeCorsAnon"), init: { mode: "cors", credentials: "omit" } },
+    { label: t("probeCorsCred"), init: { mode: "cors", credentials: "include" } },
+    { label: t("probeNoCors"), init: { mode: "no-cors" } },
   ];
   for (const probe of probes) {
     try {
       const response = await fetch(url, probe.init);
       const ct = response.headers.get("content-type") || "-";
       const cl = response.headers.get("content-length") || "-";
-      const acao = response.headers.get("access-control-allow-origin") || "无";
-      await warn(
-        `  ┃ [${probe.label}] status=${response.status} type=${response.type} ` +
-          `redirected=${response.redirected} bodyNull=${response.body === null}`,
-      );
-      await warn(`  ┃     最终 URL: ${response.url || "(不可见)"}`);
-      await warn(
-        `  ┃     content-type=${ct} content-length=${cl} ` +
-          `Access-Control-Allow-Origin=${acao}`,
-      );
+      const acao = response.headers.get("access-control-allow-origin") || t("none");
+      await warn(t("diagProbeResult", {
+        label: probe.label,
+        status: response.status,
+        type: response.type,
+        redirected: response.redirected,
+        bodyNull: response.body === null,
+      }));
+      await warn(t("diagFinalUrl", { url: response.url || t("notVisible") }));
+      await warn(t("diagHeaders", { ct, cl, acao }));
     } catch (probeError) {
-      await warn(
-        `  ┃ [${probe.label}] 抛错: ${probeError?.name || "?"}：` +
-          `${probeError?.message || String(probeError)}`,
-      );
+      await warn(t("diagProbeError", {
+        label: probe.label,
+        name: probeError?.name || "?",
+        message: probeError?.message || String(probeError),
+      }));
     }
   }
-  await warn(`  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
+  await warn(t("diagFooter"));
 }
 
 // 归档魔数表。落盘内容不是真归档时（最常见的是被写进了一张 HTML 错误页 /
 // Cloudflare 挑战页 / 登录跳转），解压会报一个和真因无关的错，这里提前点破。
 const MAGIC_SIGNATURES = [
   { bytes: [0x50, 0x4b, 0x03, 0x04], label: "zip" },
-  { bytes: [0x50, 0x4b, 0x05, 0x06], label: "zip(空)" },
-  { bytes: [0x50, 0x4b, 0x07, 0x08], label: "zip(分卷)" },
+  { bytes: [0x50, 0x4b, 0x05, 0x06], label: "zip (empty)" },
+  { bytes: [0x50, 0x4b, 0x07, 0x08], label: "zip (spanned)" },
   { bytes: [0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c], label: "7z" },
   { bytes: [0x1f, 0x8b], label: "gzip" },
   { bytes: [0x42, 0x5a, 0x68], label: "bzip2" },
   { bytes: [0xfd, 0x37, 0x7a, 0x58, 0x5a], label: "xz" },
-  { bytes: [0x52, 0x61, 0x72, 0x21], label: "rar(不支持)" },
+  { bytes: [0x52, 0x61, 0x72, 0x21], label: "rar (unsupported)" },
 ];
 
 function identifyMagic(head) {
@@ -489,8 +1033,8 @@ async function ingestArchive(attachment, kind, ctx) {
   let ok = 0;
   let failed = 0;
   try {
-    await log(`    ↓ 开始下载 ${attachment.name}`);
-    await log(`      URL: ${attachment.url}`);
+    await log(t("downloadStart", { name: attachment.name }));
+    await log(t("attachmentUrl", { url: attachment.url }));
 
     let head;
     try {
@@ -512,7 +1056,7 @@ async function ingestArchive(attachment, kind, ctx) {
     }
 
     if (head.status >= 400) {
-      await warn(`附件下载失败(${head.status})：${attachment.name}`);
+      await warn(t("attachmentHttpFailed", { status: head.status, name: attachment.name }));
       await diagnoseFetchFailure(
         attachment.url,
         new Error(`HTTP ${head.status} ${head.statusText}`),
@@ -522,31 +1066,28 @@ async function ingestArchive(attachment, kind, ctx) {
 
     // 落盘 0 字节说明 body 是空的或不可读（比如 opaque 响应），不是正常成功。
     if (!head.bytesWritten) {
-      await warn(`附件落盘 0 字节：${attachment.name}（status=${head.status}）`);
+      await warn(t("attachmentEmpty", { name: attachment.name, status: head.status }));
       await diagnoseFetchFailure(
         attachment.url,
         new Error(`bytesWritten=0, status=${head.status}`),
       );
       return { ok: 0, failed: 1 };
     }
-    await log(`    ↓ ${attachment.name}（${head.bytesWritten} 字节，最终 URL: ${head.url}）`);
+    await log(t("downloadFinished", { name: attachment.name, bytes: head.bytesWritten, url: head.url }));
 
     // 落盘内容自检：确认拿到的确实是归档，而不是一张 HTML 错误页。
     const probe = await inspectDownloadedFile(archivePath);
     if (probe.error) {
-      await warn(`      落盘文件无法读取：${probe.error}`);
+      await warn(t("inspectFailed", { error: probe.error }));
     } else {
-      await log(`      魔数: ${probe.hex}`);
-      await log(`      ASCII: ${probe.ascii}`);
+      await log(t("magicBytes", { hex: probe.hex }));
+      await log(t("attachmentAscii", { ascii: probe.ascii }));
       if (probe.kind === "HTML(!!)" || probe.kind === "JSON(!!)") {
-        await warn(
-          `      ✗ 下载到的不是归档而是 ${probe.kind}——` +
-            `多半是被重定向到了登录页 / 错误页 / Cloudflare 挑战页。`,
-        );
+        await warn(t("notArchive", { kind: probe.kind }));
       } else if (probe.kind) {
-        await log(`      判定格式: ${probe.kind}（声明为 ${kind}）`);
+        await log(t("archiveKindDetected", { kind: probe.kind, declared: kind }));
       } else {
-        await log(`      判定格式: 未识别（tar 的 ustar 标记在偏移 257，属正常）`);
+        await log(t("archiveKindUnknown"));
       }
     }
 
@@ -561,7 +1102,11 @@ async function ingestArchive(attachment, kind, ctx) {
       overwrite: true,
     });
     await log(
-      `    ⇲ 解出 ${result.entries.length} 个文件（跳过 ${result.skipped}，共 ${result.totalBytes} 字节）`,
+      t("archiveExtracted", {
+        count: result.entries.length,
+        skipped: result.skipped,
+        bytes: result.totalBytes,
+      }),
     );
 
     for (const entry of result.entries) {
@@ -575,20 +1120,21 @@ async function ingestArchive(attachment, kind, ctx) {
         ok += 1;
       } catch (error) {
         failed += 1;
-        await warn(`入库失败：${leaf}（${errorMessage(error)}）`);
+        await warn(t("ingestFailed", { file: leaf, error: errorMessage(error) }));
       }
     }
   } catch (error) {
     failed += 1;
-    await warn(
-      `归档处理失败：${attachment.name}` +
-        `（${error?.name || "Error"}：${errorMessage(error)}）`,
-    );
+    await warn(t("archiveFailed", {
+      name: attachment.name,
+      errorName: error?.name || "Error",
+      error: errorMessage(error),
+    }));
     // 解压阶段炸的话，落盘文件还在，把它的实际内容打出来定位真因。
     const probe = await inspectDownloadedFile(archivePath);
     if (!probe.error) {
-      await warn(`      失败时落盘内容：${probe.kind || "未识别"} | ${probe.hex}`);
-      await warn(`      ASCII: ${probe.ascii}`);
+      await warn(t("failedProbe", { kind: probe.kind || t("unrecognized"), hex: probe.hex }));
+      await warn(t("attachmentAscii", { ascii: probe.ascii }));
     }
   } finally {
     // 只删归档包本身。**不要删解压产物**——downloadImage() 是入队即返回，
@@ -613,7 +1159,7 @@ async function downloadPost(post, ctx) {
     if (kind) {
       archives.push({ attachment, kind });
     } else if (isUnsupportedArchive(attachment.name)) {
-      await warn(`跳过不支持的归档格式：${attachment.name}`);
+      await warn(t("unsupportedArchive", { name: attachment.name }));
     }
     // 非归档的普通附件（pdf/psd/txt）不进图库，静默跳过。
   }
@@ -626,7 +1172,7 @@ async function downloadPost(post, ctx) {
   // 一个压缩包和一张正文图各算一个下载单元。
   ctx.progress?.beginPost(archives.length + images.length);
 
-  await log(`  → ${postLabel(post)}：${archives.length} 个压缩包，${images.length} 张正文图`);
+  await log(t("postSummary", { post: postLabel(post), archives: archives.length, images: images.length }));
 
   // 每帖只建一行 metadata，所有图片复用同一个 metadata_id。
   // 若改成逐图传内联 metadata，宿主会每张图插一行内容完全相同的记录——
@@ -665,11 +1211,11 @@ async function downloadPost(post, ctx) {
       ok += 1;
     } catch (error) {
       failed += 1;
-      await warn(`正文图下载失败：${image.url}（${errorMessage(error)}）`);
+      await warn(t("postImageFailed", { url: image.url, error: errorMessage(error) }));
     }
     await ctx.progress?.tick();
   }
-  await log(`  ← ${postLabel(post)}：成功 ${ok}，失败 ${failed}`);
+  await log(t("postFinished", { post: postLabel(post), ok, failed }));
   return { ok, failed };
 }
 
@@ -735,9 +1281,7 @@ function parseBoundary(value, label, endOfDay) {
 
   let ms = toEpoch(normalized);
   if (Number.isNaN(ms)) {
-    throw new Error(
-      `${label}「${raw}」无法解析为日期。请用日期选择器，或填形如 2026-01-31 的格式。`,
-    );
+    throw new Error(t("boundaryInvalid", { label, value: raw }));
   }
   // 上界顺延到当天末尾（本地时区的 23:59:59.999），使「填 6/30」包含 6/30 全天。
   if (endOfDay && (dateOnly || compact)) {
@@ -758,7 +1302,7 @@ async function readWatermark(key) {
     const data = (await Kabegame.pluginData()) || {};
     return coerceStr(data?.[WATERMARK_ROOT]?.[key]);
   } catch (error) {
-    await warn(`读取上次爬取记录失败，本次按全量处理：${errorMessage(error)}`);
+    await warn(t("watermarkReadFailed", { error: errorMessage(error) }));
     return "";
   }
 }
@@ -770,9 +1314,9 @@ async function writeWatermark(key, value) {
     const next = { ...data };
     next[WATERMARK_ROOT] = { ...(data[WATERMARK_ROOT] || {}), [key]: value };
     await Kabegame.setPluginData(next);
-    await log(`  · 已记录本次爬取水位线：${value}`);
+    await log(t("watermarkSaved", { value }));
   } catch (error) {
-    await warn(`写入爬取记录失败（下次会重复抓取）：${errorMessage(error)}`);
+    await warn(t("watermarkWriteFailed", { error: errorMessage(error) }));
   }
 }
 
@@ -852,8 +1396,8 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
   const watermark = await readWatermark(wmKey);
 
   // 上界按当天末尾算（见 parseBoundary 注释），下界按当天 00:00 —— 两端都含当天。
-  const maxBound = timeAware ? parseBoundary(vars.time_max, "最新时间", true) : null;
-  let minBound = timeAware ? parseBoundary(vars.time_min, "最旧时间", false) : null;
+  const maxBound = timeAware ? parseBoundary(vars.time_max, t("timeMaxLabel"), true) : null;
+  let minBound = timeAware ? parseBoundary(vars.time_min, t("timeMinLabel"), false) : null;
   // 最旧时间留空时回落到上次爬取记录；没有记录就不设下界（一直翻到能扒到的最旧）。
   let minFromWatermark = false;
   if (timeAware && !minBound && watermark) {
@@ -864,9 +1408,7 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
     }
   }
   if (minBound && maxBound && minBound.ms > maxBound.ms) {
-    throw new Error(
-      `时间范围：最旧时间（${minBound.text}）不能晚于最新时间（${maxBound.text}）`,
-    );
+    throw new Error(t("timeRangeInvalid", { min: minBound.text, max: maxBound.text }));
   }
 
   // 进度按时间窗位置估算。上界缺省用"现在"，下界缺省留 NaN（首帖到手后再定）。
@@ -891,14 +1433,16 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
   let newestSeen = "";
 
   if (timeAware) {
-    await log(`▶ 方向：${ascending ? "从旧到新" : "从新到旧"}`);
+    await log(t("direction", { direction: ascending ? t("directionAsc") : t("directionDesc") }));
     await log(
-      `▶ 时间窗：${minBound ? fmtTime(minBound.ms) : "能扒到的最旧"}` +
-        `${minFromWatermark ? "（来自上次爬取记录）" : ""}` +
-        ` ~ ${maxBound ? fmtTime(maxBound.ms) : "能扒到的最新"}`,
+      t("timeWindow", {
+        min: minBound ? fmtTime(minBound.ms) : t("oldestReachable"),
+        fromWatermark: minFromWatermark ? t("fromWatermark") : "",
+        max: maxBound ? fmtTime(maxBound.ms) : t("newestReachable"),
+      }),
     );
   } else {
-    await log("▶ 合集按合集内顺序排列，不按时间——方向与时间窗设置对它不生效");
+    await log(t("collectionOrderNote"));
   }
   while (url) {
     page += 1;
@@ -916,8 +1460,8 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
         .filter((ms) => !Number.isNaN(ms));
       const pageSpan = stamps.length
         ? `${fmtTime(Math.max(...stamps))} ~ ${fmtTime(Math.min(...stamps))}`
-        : "无时间信息";
-      await log(`  ┌ 第 ${page} 页：${rows.length} 个帖子 · ${pageSpan}`);
+        : t("noTimeInfo");
+      await log(t("pageHeader", { page, count: rows.length, span: pageSpan }));
       progress.beginPage(rows.length);
 
       let hitBoundary = false;
@@ -933,7 +1477,7 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
           // 另一个边界只能逐帖跳过（还没进入窗口）。
           if (ascending) {
             if (maxBound && ms > maxBound.ms) {
-              await log(`  · 已越过最新时间（本篇 ${fmtTime(ms)}），停止翻页`);
+              await log(t("pastNewest", { time: fmtTime(ms) }));
               hitBoundary = true;
               break;
             }
@@ -949,9 +1493,7 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
             // 同上：水位线排除边界本身，用户手填的下界包含它。
             if (minBound && (minFromWatermark ? ms <= minBound.ms : ms < minBound.ms)) {
               await log(
-                minFromWatermark
-                  ? `  · 已追上上次进度（本篇 ${fmtTime(ms)}），停止翻页`
-                  : `  · 已越过最旧时间（本篇 ${fmtTime(ms)}），停止翻页`,
+                t(minFromWatermark ? "caughtWatermark" : "pastOldest", { time: fmtTime(ms) }),
               );
               hitBoundary = true;
               break;
@@ -973,7 +1515,7 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
 
         // 未订阅的帖子拿不到附件直链，提前跳过，免得刷一串 403。
         if (post.current_user_can_view === false) {
-          await log(`  · 无权查看，跳过 ${postLabel(post)}`);
+          await log(t("skippedNoAccess", { post: postLabel(post) }));
           await progress.skipPost();
           continue;
         }
@@ -989,20 +1531,20 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
         // 否则用户只看到一页页滚过、没有任何下载，会以为任务卡住了。
         const goal = ascending
           ? minBound
-            ? `${fmtTime(minBound.ms)} 之后`
-            : "最早的帖子"
+            ? t("goalAfter", { time: fmtTime(minBound.ms) })
+            : t("goalEarliest")
           : maxBound
-            ? `${fmtTime(maxBound.ms)} 之前`
-            : "最新的帖子";
-        await log(`  └ 本页 ${pageSkipped} 篇都在时间窗外，尚未到达 ${goal}，继续翻页…`);
+            ? t("goalBefore", { time: fmtTime(maxBound.ms) })
+            : t("goalLatest");
+        await log(t("pageAllOutside", { skipped: pageSkipped, goal }));
       } else if (pageSkipped > 0) {
-        await log(`  └ 本页处理 ${pageHandled} 篇，${pageSkipped} 篇在时间窗外`);
+        await log(t("pagePartlyOutside", { handled: pageHandled, skipped: pageSkipped }));
       }
     }
 
     url = coerceStr(payload?.links?.next);
     if (!url) {
-      await log(`  · 已翻到最后一页（共 ${page} 页）`);
+      await log(t("lastPage", { page }));
       break;
     }
   }
@@ -1015,31 +1557,28 @@ async function crawlFromCreatorPage(campaignId, collectionId, target) {
     await writeWatermark(wmKey, newestSeen);
   }
 
-  await log(
-    `◀ 结束：共翻 ${page} 页，成功 ${totalOk}，失败 ${totalFailed}`,
-  );
+  await log(t("crawlFinished", { page, ok: totalOk, failed: totalFailed }));
   if (totalOk === 0 && totalFailed === 0) {
     // 时间窗设得太窄是最常见的"什么都没下到"，单独点出来，
     // 免得用户去查附件规则或订阅状态那些不相干的方向。
     const windowed = minBound || maxBound;
     await warn(
       windowed
-        ? "没有下载到任何文件。先确认时间窗是否设得太窄" +
-            (minFromWatermark ? "（下界来自上次爬取记录，可能已经追平）" : "") +
-            "；其次才是该创作者没有压缩包附件、当前账号未订阅、或提取规则把包内文件全滤掉了。"
-        : "没有下载到任何文件。可能原因：该创作者的帖子没有压缩包附件、当前账号未订阅、" +
-            "或提取规则把包内文件全滤掉了。",
+        ? t("noFilesWindowed", {
+            watermark: minFromWatermark ? t("noFilesWatermark") : "",
+          })
+        : t("noFilesGeneral"),
     );
   }
 }
 
 async function handleInitial() {
   const target = parseTarget(Kabegame.vars?.creator);
-  const labels = { creator: "创作者主页", collection: "合集页", campaign: "站内页" };
-  await log(`▶ 目标类型：${labels[target.kind]}（${target.value}）`);
+  const labels = { creator: t("targetCreator"), collection: t("targetCollection"), campaign: t("targetCampaign") };
+  await log(t("targetType", { label: labels[target.kind], value: target.value }));
   // 必须先导航到 patreon.com 上：只有真浏览器能过 Cloudflare 挑战，
   // 而后续的同源 fetch 也要有这个页面上下文才不被拦。
-  await log(`▶ 打开 ${target.pageUrl}`);
+  await log(t("openPage", { url: target.pageUrl }));
   await Kabegame.to(target.pageUrl, { pageLabel: target.kind });
 }
 
@@ -1050,7 +1589,7 @@ async function waitPastChallenge(readyCheck) {
     if (await readyCheck()) return true;
     if (/just a moment|checking your browser/i.test(document.title || "")) {
       if (attempt === 0) {
-        await log("  · 正在过 Cloudflare 挑战…");
+        await log(t("challengePassing"));
         await Kabegame.requestShowWebview();
       }
     }
@@ -1067,13 +1606,10 @@ async function handleCreatorPage() {
   });
 
   if (!ok || !campaignId) {
-    throw new Error(
-      "未能解析出 campaign id。若页面停在 Cloudflare challenge，请在弹出的窗口里手动完成验证；" +
-        "若 Patreon 前端已改版，可在浏览器里找到 campaign id 后填成 id:<campaign_id>。",
-    );
+    throw new Error(t("campaignParseFailed"));
   }
 
-  await log(`▶ campaign ${campaignId}`);
+  await log(t("campaignLog", { id: campaignId }));
   await crawlFromCreatorPage(campaignId, "", { kind: "creator" });
 }
 
@@ -1087,9 +1623,7 @@ async function handleCollectionPage() {
     return document.readyState === "complete";
   });
   if (!ok) {
-    throw new Error(
-      "合集页未能加载完成（可能卡在 Cloudflare challenge）。请在弹出的窗口里手动完成验证后重试。",
-    );
+    throw new Error(t("collectionPageFailed"));
   }
 
   // campaign_id 的主路径：/api/collection/<id> 的缩略图 URL 里含 /campaign/<id>/。
@@ -1104,30 +1638,26 @@ async function handleCollectionPage() {
     const matched = thumbUrl.match(/\/campaign\/(\d+)\//);
     if (matched) campaignId = matched[1];
     if (!campaignId) {
-      await log("  · 合集缩略图里没有 campaign id，改从页面解析");
+      await log(t("collectionThumbMissing"));
     }
   } catch (error) {
-    await log(`  · /api/collection 读取失败（${errorMessage(error)}），改从页面解析`);
+    await log(t("collectionApiFailed", { error: errorMessage(error) }));
   }
 
   // 回退：合集页本身也带 __NEXT_DATA__，里面同样有 campaign。
   if (!campaignId) campaignId = extractCampaignIdFromPage();
 
   if (!campaignId) {
-    throw new Error(
-      `未能解析出合集 ${collectionId} 所属的 campaign id。` +
-        `Patreon 的合集接口缺 campaign_id 会直接 400，所以这一步是必需的。` +
-        `可以改用「创作者」形式抓取，或填 id:<campaign_id>。`,
-    );
+    throw new Error(t("collectionCampaignFailed", { id: collectionId }));
   }
 
-  await log(`▶ 合集 ${collectionId}${title ? `「${title}」` : ""}，campaign ${campaignId}`);
+  await log(t("collectionLog", { id: collectionId, title: title ? t("collectionTitle", { title }) : "", campaignId }));
   await crawlFromCreatorPage(campaignId, collectionId, { kind: "collection" });
 }
 
 async function handleCampaignDirect() {
   const campaignId = parseTarget(Kabegame.vars?.creator).value;
-  await log(`▶ 直接使用 campaign ${campaignId}`);
+  await log(t("campaignDirect", { id: campaignId }));
   await crawlFromCreatorPage(campaignId, "", { kind: "creator" });
 }
 
@@ -1138,11 +1668,9 @@ async function handleHomePage() {
     return document.readyState === "complete";
   });
   if (!ok) {
-    throw new Error(
-      "关注流页面未能加载完成（可能卡在 Cloudflare challenge）。请在弹出的窗口里手动完成验证后重试。",
-    );
+    throw new Error(t("homePageFailed"));
   }
-  await log("▶ 关注流（你订阅的全部创作者）");
+  await log(t("homeLog"));
   await crawlFromCreatorPage("", "", { kind: "home" });
 }
 
@@ -1173,14 +1701,11 @@ async function handlePostPage() {
     return !!post;
   });
   if (!ok || !post) {
-    throw new Error(
-      "未能从帖子页解析出内容。若停在 Cloudflare challenge 请手动完成验证；" +
-        "若该帖需要订阅才能查看，请确认当前账号有权限。",
-    );
+    throw new Error(t("postPageFailed"));
   }
 
   if (post.current_user_can_view === false) {
-    await warn(`无权查看该帖 ${postLabel(post)}（需要订阅对应档位）`);
+    await warn(t("postNoAccess", { post: postLabel(post) }));
     return;
   }
 
@@ -1189,7 +1714,7 @@ async function handlePostPage() {
   const progress = makeProgress(1);
   progress.beginPage(1);
 
-  await log(`▶ 单帖 ${postLabel(post)}`);
+  await log(t("singlePostLog", { post: postLabel(post) }));
   const ctx = {
     root,
     vars: Kabegame.vars || {},
@@ -1198,9 +1723,9 @@ async function handlePostPage() {
     progress,
   };
   const stat = await downloadPost(post, ctx);
-  await log(`◀ 结束：成功 ${stat.ok}，失败 ${stat.failed}`);
+  await log(t("singlePostFinished", { ok: stat.ok, failed: stat.failed }));
   if (stat.ok === 0 && stat.failed === 0) {
-    await warn("该帖没有可下载的压缩包或图片。");
+    await warn(t("postEmpty"));
   }
 }
 
@@ -1232,12 +1757,12 @@ async function main() {
         await Kabegame.exit();
         return;
       default:
-        await log(`阶段=${pageLabel}，结束`);
+        await log(t("stageEnded", { phase: pageLabel }));
         await Kabegame.exit();
         return;
     }
   } catch (error) {
-    await warn(`插件运行失败：${errorMessage(error)}`);
+    await warn(t("pluginFailed", { error: errorMessage(error) }));
     await Kabegame.exit();
   }
 }

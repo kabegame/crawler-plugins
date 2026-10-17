@@ -1,0 +1,12 @@
+{
+  "invalidWallpaperType": "[anihonet] Error: wallpaper_type must be one of all/sp/image/imgpc/pc",
+  "unknownMode": "[anihonet] Error: crawl_mode must be one of ranking, single_work or search",
+  "searchQueryEmpty": "[anihonet] The search keyword is empty, so no site search was started",
+  "searchStart": "[anihonet] Site search: keyword={query} direction={order} sort={orderBy} requested pages={requestedRange}, detected pages={actualRange}",
+  "rangeNotCovered": "[anihonet] The detected page range {actualRange} does not cover the requested range {requestedRange}; pages outside it will not be crawled",
+  "searchPageOpen": "[anihonet] Search results page {page}/{total}: {count} detail pages: {url}",
+  "detailOpen": "[anihonet]   Opening detail page {index}/{total}: {url}",
+  "seriesListOpen": "[anihonet] Opening series list page row={rowId} category {index}/{total}: {url}",
+  "allPages": "all",
+  "seriesRangeInfo": "[anihonet] Requested page range={requestedRange}, detected page range={actualRange}"
+}

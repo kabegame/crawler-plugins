@@ -1,0 +1,18 @@
+{
+  "searchUrlRequired": "Enter a search URL",
+  "invalidUrl": "Not a valid URL: {url}",
+  "searchUrlInvalid": "Enter an e-shuushuu search page URL (https://e-shuushuu.net/search?…); got: {url}",
+  "listHttpError": "The listing API returned HTTP {status}",
+  "noImageUrl": "[e-shuushuu] Image #{id} has no original image URL; skipping",
+  "topPageCapped": "[e-shuushuu] The ranking has at most {max} pages; using {max} for end page {endPage}",
+  "startPageOutOfRange": "[e-shuushuu] Start page {startPage} is out of range; stopping",
+  "openTop": "[e-shuushuu] Top rated ({period}): pages {startPage}–{endPage}",
+  "openSearch": "[e-shuushuu] Search ({query}): pages {startPage}–{endPage}",
+  "openHome": "[e-shuushuu] Homepage: pages {startPage}–{endPage}",
+  "all": "all",
+  "totalSummary": "[e-shuushuu] {total} images in {pages} pages",
+  "pageReadFailed": "[e-shuushuu] Failed to load page {page}: {error}",
+  "pageStart": "[e-shuushuu] ┌ Page {page}: {total} entries, {visible} visible on the site",
+  "downloadFailed": "[e-shuushuu] Failed to download image #{id}: {error}",
+  "pageDone": "[e-shuushuu] └ Page {page} done"
+}

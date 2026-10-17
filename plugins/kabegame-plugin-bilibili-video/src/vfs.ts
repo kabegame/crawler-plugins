@@ -6,6 +6,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { CHUNK_SIZE } from "./consts";
+import { t } from "./i18n";
 import { coerceStr } from "./util";
 
 const { fs, warn } = Kabegame;
@@ -19,12 +20,12 @@ function rangeFetch(url, start, end) {
 async function probeTotalSize(url) {
   const response = await rangeFetch(url, 0, 0);
   if (response.status !== 206) {
-    throw new Error(`探测文件大小失败（HTTP ${response.status}）`);
+    throw new Error(t("probeSizeFailed", { status: response.status }));
   }
   const contentRange = coerceStr(response.headers.get("content-range"));
   const total = Number(contentRange.split("/")[1]);
   if (!Number.isFinite(total) || total <= 0) {
-    throw new Error(`无法解析 Content-Range: ${contentRange || "(空)"}`);
+    throw new Error(t("contentRangeUnparsable", { value: contentRange || t("emptyValue") }));
   }
   return total;
 }
@@ -46,7 +47,7 @@ export async function downloadStreamToVfs(urls, targetPath, sizeHint, label, onC
           const response = await rangeFetch(url, offset, end);
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const bytes = await response.bytes();
-          if (bytes.length === 0) throw new Error(`第 ${offset} 字节起返回空响应`);
+          if (bytes.length === 0) throw new Error(t("emptyChunk", { offset }));
           let written = 0;
           while (written < bytes.length) {
             written += await file.write(bytes.subarray(written));
@@ -60,11 +61,11 @@ export async function downloadStreamToVfs(urls, targetPath, sizeHint, label, onC
       return total;
     } catch (error) {
       lastError = error;
-      warn(`${label} 下载失败（${coerceStr(error?.message ?? error)}），尝试备用地址`);
+      warn(t("chunkDownloadRetry", { label, error: coerceStr(error?.message ?? error) }));
       await sleep(500);
     }
   }
-  throw new Error(`${label} 全部地址均下载失败：${coerceStr(lastError?.message ?? lastError)}`);
+  throw new Error(t("allUrlsFailed", { label, error: coerceStr(lastError?.message ?? lastError) }));
 }
 
 export async function removeQuietly(path) {

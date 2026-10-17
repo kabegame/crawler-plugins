@@ -1,0 +1,8 @@
+{
+  "endPageBeforeStart": "終了ページは開始ページ以降にしてください",
+  "crawlStarted": "[wallpapers-craft] クロールを開始します",
+  "startPageBeyondMax": "開始ページ {startPage} がサイトの最大ページ {maxPage} を超えています",
+  "turningPage": "ページを移動します: {page}/{endPage} -> {url}",
+  "pageImages": "{page} ページ: サムネイル {count} 件、ダウンロード処理を開始します",
+  "crawlFinished": "[wallpapers-craft] クロールを終了しました"
+}

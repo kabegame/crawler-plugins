@@ -4,6 +4,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { OPUS_FEED_FAV_API, OPUS_FEED_SPACE_API } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
 
 /** UP 主图文列表（gallery-dl user_articles）：opus_id 游标翻页直到 has_more 为假。 */
@@ -15,7 +16,7 @@ export async function collectSpaceOpusIds(mid, maxArticles) {
     const json = await fetchJson(url);
     if (json?.code !== 0) {
       checkBilibiliRisk(json?.code);
-      throw new Error(`UP 主图文接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+      throw new Error(t("spaceApiFailed", { code: json?.code, message: coerceStr(json?.message) }));
     }
     const data = json?.data || {};
     const items = Array.isArray(data.items) ? data.items : [];
@@ -40,7 +41,7 @@ export async function collectFavOpusIds(maxArticles) {
     if (json?.code !== 0) {
       // -101 会在这里硬失败并提示登录：收藏夹只属于登录用户，没有匿名可看的形态。
       checkBilibiliRisk(json?.code);
-      throw new Error(`图文收藏接口失败（${json?.code}）: ${coerceStr(json?.message)}`);
+      throw new Error(t("favApiFailed", { code: json?.code, message: coerceStr(json?.message) }));
     }
     const data = json?.data || {};
     const items = Array.isArray(data.items) ? data.items : [];

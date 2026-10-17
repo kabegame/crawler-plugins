@@ -1,0 +1,15 @@
+{
+  "rateLimited": "[nekos-moe] 触发限流，{seconds} 秒后重试（{attempt}/{max}）",
+  "searchHttpError": "搜索接口 HTTP {status}",
+  "searchHttpErrorWithMessage": "搜索接口 HTTP {status}：{message}",
+  "startPageOutOfRange": "[nekos-moe] 每页 {pageSize} 张时最多翻到第 {maxPage} 页（站点限制 skip ≤ {maxSkip}），起始页 {startPage} 超出范围",
+  "endPageClamped": "[nekos-moe] 每页 {pageSize} 张时最多翻到第 {maxPage} 页，结束页 {endPage} 按 {maxPage} 处理",
+  "crawlSummary": "[nekos-moe] 排序 {sort}，NSFW {nsfw}，每页 {pageSize} 张，第 {startPage}~{endPage} 页",
+  "pageFailed": "[nekos-moe] 第 {page} 页读取失败：{error}",
+  "noResults": "[nekos-moe] 第 {page} 页没有结果，已到最后一页",
+  "pageStart": "[nekos-moe] ┌ 第 {page} 页：{count} 张",
+  "recordMissingId": "记录缺少 id",
+  "imageFailed": "[nekos-moe] 图片 {id} 下载失败：{error}",
+  "pageDone": "[nekos-moe] └ 第 {page} 页完成",
+  "pageShort": "[nekos-moe] 第 {page} 页不足 {pageSize} 张，已到最后一页"
+}

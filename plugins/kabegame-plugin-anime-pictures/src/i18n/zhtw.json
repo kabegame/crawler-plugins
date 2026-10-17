@@ -1,0 +1,22 @@
+{
+  "userAgentFromCef": "[anime-pictures] User-Agent 來源：暢遊 CEF（{ua}）",
+  "userAgentBuiltin": "[anime-pictures] User-Agent 來源：內建備援",
+  "cookieMissing": "[anime-pictures] 未取得暢遊 Cookie，改用內建 Cookie；若 403 請先在暢遊開啟 anime-pictures 通過驗證",
+  "challengePage": "[anime-pictures] 偵測到驗證頁，V8 後端無法處理瀏覽器驗證，請稍後重試或切換網路。",
+  "pickNameResolved": "[anime-pictures] pickName: title/author 作品={work} 角色={character} 作家={artist} => {name}",
+  "pickNameNoLinks": "[anime-pictures] pickName: ul.tags 內找不到 copyright/character/artist 連結",
+  "pickNameNoTags": "[anime-pictures] pickName: 找不到 ul.tags，改走備援",
+  "pickNameFallbackH1": "[anime-pictures] pickName: 改用 h1.copyright -> {name}",
+  "pickNameFallbackTitleLine": "[anime-pictures] pickName: 改用 title 換行第 2 段 -> {name}",
+  "pickNameFallbackTitleWord": "[anime-pictures] pickName: 改用 title 分詞第 2 個詞 -> {name}",
+  "pickNameEmpty": "[anime-pictures] pickName: 仍為空 title={title}",
+  "displayName": "[anime-pictures] downloadImage 顯示名稱 name: {name}",
+  "metadata": "[anime-pictures] metadata: {metadata}",
+  "emptyValue": "(空)",
+  "downloadLinkMissing": "[anime-pictures] 找不到下載連結: {url}",
+  "pageRangeTooLarge": "一次不允許爬取超過100頁，請友善使用站台資源",
+  "endPageBeforeStart": "結束頁面需要比開始頁面大",
+  "crawlStart": "[anime-pictures] 開始：第 {startPage}～{endPage} 頁，標籤={tag}",
+  "pageImages": "[anime-pictures] 第 {page} 頁圖片數量: {count}",
+  "crawlDone": "[anime-pictures] 任務結束"
+}

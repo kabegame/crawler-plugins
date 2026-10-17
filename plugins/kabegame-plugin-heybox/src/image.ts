@@ -1,6 +1,7 @@
 // @ts-nocheck
 // 缩略图 -> 原图：走 /bbs/app/api/original/image 换链，换不到时回退成去掉 query 的原输入。
 import { API_HOST, PATH_ORIGINAL } from "./consts";
+import { t } from "./i18n";
 import { signedUrl } from "./sign";
 import {
   challengeError,
@@ -34,7 +35,7 @@ export async function resolveOriginalUrl(inputUrl, commonParams, where) {
   const orig = await fetchJson(origUrl);
   if (isChallenge(orig?.status)) challengeError(where, orig?.status);
   if (orig?.status !== "ok") {
-    log(`${where} 失败 status=${coerceStr(orig?.status)}`, "warn");
+    log(t("originalRequestFailed", { where, status: coerceStr(orig?.status) }), "warn");
     return "";
   }
   return firstOriginalUrl(orig, inputUrl);

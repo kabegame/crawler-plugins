@@ -5,6 +5,7 @@
 // 中间这层 getTack 结果按 id / codeName 双索引缓存进 plugin_data，避免每轮重查。
 import { GET_TACK_QUERY, OPERATION_GET_TACK, TAG_CACHE_BY_CODE_NAME, TAG_CACHE_BY_ID } from "./consts";
 import { fetchGraphql } from "./api";
+import { t } from "./i18n";
 import { coerceStr, log } from "./util";
 
 const { pluginData, setPluginData } = Kabegame;
@@ -69,7 +70,7 @@ export async function fetchTackByCodeName(codeName) {
     if (tack) writeCachedTack(coerceStr(tack.id) || codeNameStr, tack);
     return tack;
   } catch {
-    log(`[PixAI] 标签详情获取失败，codeName=${codeNameStr}`, "warn");
+    log(t("tackDetailFailed", { codeName: codeNameStr }), "warn");
     return null;
   }
 }
@@ -80,12 +81,12 @@ export async function resolveTackId(codeName) {
 
   const tack = await fetchTackByCodeName(codeNameStr);
   if (!tack) {
-    log(`[PixAI] codeName=${codeNameStr} 未解析到 tack`);
+    log(t("tackNotFound", { codeName: codeNameStr }));
     return "";
   }
   const tackId = coerceStr(tack.id);
   if (!tackId) {
-    log(`[PixAI] codeName=${codeNameStr} 的 getTack 响应缺少 tack.id`);
+    log(t("tackIdMissing", { codeName: codeNameStr }));
     return "";
   }
   return tackId;

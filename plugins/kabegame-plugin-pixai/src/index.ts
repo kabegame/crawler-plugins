@@ -14,6 +14,7 @@
 //   ranking  排行榜（作品榜 / 模型榜）
 //   streams  全站、标签、作者三种流的配置解析与调度
 import { setRequestHeaders } from "./api";
+import { t } from "./i18n";
 import { runModel } from "./models";
 import { runRanking } from "./ranking";
 import { runAuthor, runGlobal, runTag } from "./streams";
@@ -36,5 +37,5 @@ export async function crawl(_common, custom) {
     await runModel(vars);
   }
 
-  log("[PixAI] 任务结束");
+  log(t("taskFinished"));
 }

@@ -2,6 +2,7 @@
 // 传统专栏（cv）：view 接口取正文、正则抠图、评论入 metadata、逐图入库。
 // buildArticleMetadata 同时被 opus 复用（opus 关联到 cv 时共享同一套元数据结构）。
 import { VIEW_API } from "./consts";
+import { t } from "./i18n";
 import { labelsFromMetadata, searchTextsFromMetadata } from "./metadata-derived";
 import { fetchArticleReplies } from "./replies";
 import {
@@ -61,7 +62,7 @@ export async function processOneCv(cvId, img, sub, perCv, searchDesc) {
   );
   if (view?.code !== 0) {
     checkBilibiliRisk(view?.code);
-    warn(`cv ${cvId} view 失败: ${coerceStr(view?.message)}`);
+    warn(t("cvViewFailed", { cvId, message: coerceStr(view?.message) }));
     addProgress(perCv);
     return;
   }

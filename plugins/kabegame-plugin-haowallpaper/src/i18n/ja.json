@@ -1,0 +1,17 @@
+{
+  "pageParseFailed": "ページの解析に失敗しました: {url}",
+  "missingJsonLd": "[haowallpaper] 詳細ページに JSON-LD がないためスキップします: {url}",
+  "missingContentUrl": "[haowallpaper] 詳細ページに contentUrl がないためスキップします: {url}",
+  "endPageBeforeStart": "終了ページは開始ページ以降にしてください",
+  "pageRangeTooLarge": "1回の実行で100ページを超えて取得することはできません。節度を守って利用してください",
+  "formatsRequired": "フォーマットが1つも選択されていません",
+  "defaultWpType": "既定",
+  "crawlStarted": "[haowallpaper] クロールを開始します: 種類={wallpaperType}、ページ={startPage}-{endPage}、検索=[{tags}]、wpType={wpType}",
+  "startPageBeyondTotal": "[haowallpaper] 開始ページ {startPage} がサイトの総ページ数 {totalPages} を超えています",
+  "totalPages": "[haowallpaper] サイトの総ページ数は {totalPages}、実際に取得するのは {startPage}-{endPage} です",
+  "pageItems": "[haowallpaper] {page}/{endPage} ページ: {count} 件",
+  "pageEmpty": "[haowallpaper] {page} ページに項目がありません (a={anchors}, card={cards}, cardMobile={mobileCards})",
+  "detailFailed": "[haowallpaper] 詳細ページの処理に失敗したためスキップします: {url} ({error})",
+  "pageDone": "[haowallpaper] {page}/{endPage} ページ完了: {downloaded}/{total} 件をダウンロード",
+  "crawlFinished": "[haowallpaper] クロールを終了しました"
+}

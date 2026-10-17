@@ -3,6 +3,8 @@
 // 这里全程走站点的 JSON API：列表接口用 only= 把上传者、AI 生成参数、作者评论、评论一次带回来，
 // 每页一个请求就拿齐详情页上的全部信息，不再逐帖打开详情页。（2026-10 实测）
 
+import { t } from "./i18n";
+
 const { addProgress, downloadImage, warn } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://aibooru.online";
@@ -76,7 +78,7 @@ async function fetchJson(url, label) {
       try {
         data = JSON.parse(text);
       } catch {
-        throw new Error(`HTTP ${response.status}，返回的不是 JSON：${text.slice(0, 120)}`);
+        throw new Error(t("httpNotJson", { status: response.status, preview: text.slice(0, 120) }));
       }
       // 站点错误统一是 { success: false, error, message }，如 TagLimitError，不重试
       if (data && !Array.isArray(data) && data.success === false) {
@@ -85,12 +87,12 @@ async function fetchJson(url, label) {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return data;
     } catch (error) {
-      if (error?.fatal) throw new Error(`[aibooru] ${label} 失败：${error.message}`);
+      if (error?.fatal) throw new Error(t("requestFailed", { label, error: error.message }));
       lastError = error;
-      console.warn(`[aibooru] ${label} 第 ${attempt} 次请求失败：${error?.message ?? error}`);
+      console.warn(t("requestAttemptFailed", { label, attempt, error: error?.message ?? error }));
     }
   }
-  throw new Error(`[aibooru] ${label} 失败：${lastError?.message ?? lastError}`);
+  throw new Error(t("requestFailed", { label, error: lastError?.message ?? lastError }));
 }
 
 // ---- 标签帖数 ----
@@ -120,10 +122,10 @@ async function fetchTagCounts(baseUrl, names) {
   for (const chunk of chunks) {
     const url = `${baseUrl}/tags.json?${chunk.join("")}only=name,post_count&limit=1000`;
     try {
-      const rows = await fetchJson(url, "查询标签帖数");
+      const rows = await fetchJson(url, t("tagCountsLabel"));
       for (const row of rows || []) tagCountCache.set(row.name, Number(row.post_count) || 0);
     } catch (error) {
-      warn(`${error?.message ?? error}，本批 ${chunk.length} 个标签不显示帖数`);
+      warn(t("tagCountsUnavailable", { error: error?.message ?? error, count: chunk.length }));
     }
   }
   // 查过但站点没返回的（极少见）也记下，免得每页重查
@@ -337,7 +339,7 @@ async function downloadPost(post, baseUrl, quality) {
   const mediaUrl = pickMediaUrl(post, quality);
   if (!mediaUrl) {
     // 被 ban 的作品（和极少数受限作品）接口不给文件地址
-    console.warn(`[aibooru] #${post.id} 没有可下载的文件地址（${postStatus(post)}），跳过`);
+    console.warn(t("noMediaUrl", { id: post.id, status: postStatus(post) }));
     return;
   }
   const metadata = buildMetadata(post, baseUrl);
@@ -365,9 +367,9 @@ async function downloadPage(posts, baseUrl, quality, pageProgress, label) {
     try {
       await downloadPost(post, baseUrl, quality);
     } catch (error) {
-      warn(`[aibooru][${label}] #${post.id} 处理失败：${error?.message ?? error}`);
+      warn(t("postFailed", { label, id: post.id, error: error?.message ?? error }));
     }
-    if ((index + 1) % 20 === 0) console.log(`[aibooru][${label}]   已入队 ${index + 1}/${posts.length}`);
+    if ((index + 1) % 20 === 0) console.log(t("enqueued", { label, done: index + 1, total: posts.length }));
     addProgress(pageProgress / posts.length);
   }
 }
@@ -405,9 +407,9 @@ function normalizePerPage(value) {
 function parsePageRange(vars) {
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
-  if (!Number.isSafeInteger(startPage) || startPage < 1) throw new Error("起始页面需要是正整数");
-  if (!Number.isSafeInteger(endPage) || endPage < startPage) throw new Error("结束页面需要不小于起始页面");
-  if (endPage >= startPage + 100) throw new Error("在一次之内不允许爬取超过100页，咱二次元人要保持文明礼仪");
+  if (!Number.isSafeInteger(startPage) || startPage < 1) throw new Error(t("startPagePositive"));
+  if (!Number.isSafeInteger(endPage) || endPage < startPage) throw new Error(t("endPageBeforeStart"));
+  if (endPage >= startPage + 100) throw new Error(t("pageRangeTooLarge"));
   return { startPage, endPage };
 }
 
@@ -426,15 +428,15 @@ async function crawlSearch(baseUrl, quality, vars, tags, label) {
   const pageProgress = 95 / (endPage - startPage + 1);
   for (let page = startPage; page <= endPage; page += 1) {
     const url = postsUrl(baseUrl, tags, perPage, page);
-    console.log(`[aibooru][${label}] 第 ${page}/${endPage} 页：tags=「${tags.join(" ")}」`);
-    const raw = await fetchJson(url, `第 ${page} 页列表`);
+    console.log(t("searchPage", { label, page, total: endPage, tags: tags.join(" ") }));
+    const raw = await fetchJson(url, t("pageListLabel", { page }));
     if (!Array.isArray(raw) || raw.length === 0) {
-      console.log(`[aibooru][${label}] 第 ${page} 页没有作品，结束`);
+      console.log(t("emptyPageStop", { label, page }));
       addProgress(pageProgress);
       break;
     }
     const posts = visiblePosts(raw);
-    console.log(`[aibooru][${label}] 第 ${page} 页 ${raw.length} 个作品，可见 ${posts.length} 个`);
+    console.log(t("pageSummary", { label, page, raw: raw.length, visible: posts.length }));
     if (posts.length === 0) {
       addProgress(pageProgress);
       continue;
@@ -447,11 +449,11 @@ const MAX_SEARCH_TAGS = 4;
 
 async function crawlByTags(baseUrl, quality, vars) {
   const tags = parseTagList(vars.mode_tag_value);
-  if (tags.length === 0) throw new Error("标签模式需要至少填写一个标签");
+  if (tags.length === 0) throw new Error(t("tagsRequired"));
   // 站点对未登录访问限制每次最多 4 个标签（rating:/status:/id: 不占名额，order: 占），超了直接返回 TagLimitError
   const counted = tags.filter((tag) => !/^-?(rating|status|id):/i.test(tag));
   if (counted.length > MAX_SEARCH_TAGS) {
-    throw new Error(`一次最多检索 ${MAX_SEARCH_TAGS} 个标签（rating:、status:、id: 不计入），当前 ${counted.length} 个：${counted.join(" ")}`);
+    throw new Error(t("tooManyTags", { max: MAX_SEARCH_TAGS, count: counted.length, tags: counted.join(" ") }));
   }
   await crawlSearch(baseUrl, quality, vars, withRatingToken(tags, vars), "tags");
 }
@@ -468,11 +470,11 @@ async function crawlAll(baseUrl, quality, vars) {
 async function previousSiteDate(baseUrl) {
   let offsetMinutes = -4 * 60;
   try {
-    const latest = await fetchJson(`${baseUrl}/posts.json?limit=1&only=created_at`, "读取站点时区");
+    const latest = await fetchJson(`${baseUrl}/posts.json?limit=1&only=created_at`, t("siteTimezoneLabel"));
     const matched = /([+-])(\d{2}):(\d{2})$/.exec(coerceStr(latest?.[0]?.created_at));
     if (matched) offsetMinutes = (matched[1] === "-" ? -1 : 1) * (Number(matched[2]) * 60 + Number(matched[3]));
   } catch (error) {
-    console.warn(`${error?.message ?? error}，按 UTC-4 计算站点日期`);
+    console.warn(t("timezoneFallback", { error: error?.message ?? error }));
   }
   return new Date(Date.now() + offsetMinutes * 60e3 - 86400e3).toISOString().slice(0, 10);
 }
@@ -487,20 +489,22 @@ async function crawlPopular(baseUrl, quality, vars) {
   for (let page = startPage; page <= endPage; page += 1) {
     const makeUrl = () =>
       `${baseUrl}/explore/posts/popular.json?scale=${scale}${date ? `&date=${date}` : ""}&limit=${perPage}&page=${page}&only=${POST_FIELDS}`;
-    console.log(`[aibooru][popular-${scale}] 第 ${page}/${endPage} 页${date ? `（${date}）` : ""}`);
-    let raw = await fetchJson(makeUrl(), `人气榜第 ${page} 页`);
+    console.log(date
+      ? t("popularPageWithDate", { label: `popular-${scale}`, page, total: endPage, date })
+      : t("popularPage", { label: `popular-${scale}`, page, total: endPage }));
+    let raw = await fetchJson(makeUrl(), t("popularPageLabel", { page }));
     if ((!Array.isArray(raw) || raw.length === 0) && scale === "day" && page === startPage && !date) {
       date = await previousSiteDate(baseUrl);
-      console.log(`[aibooru][popular-day] 今天的日榜还没有作品，改抓 ${date} 的日榜`);
-      raw = await fetchJson(makeUrl(), `人气榜第 ${page} 页（${date}）`);
+      console.log(t("popularDayFallback", { date }));
+      raw = await fetchJson(makeUrl(), t("popularPageDateLabel", { page, date }));
     }
     if (!Array.isArray(raw) || raw.length === 0) {
-      console.log(`[aibooru][popular-${scale}] 第 ${page} 页没有作品，结束`);
+      console.log(t("emptyPageStop", { label: `popular-${scale}`, page }));
       addProgress(pageProgress);
       break;
     }
     const posts = visiblePosts(raw, ratingLetter);
-    console.log(`[aibooru][popular-${scale}] 第 ${page} 页 ${raw.length} 个作品，符合条件 ${posts.length} 个`);
+    console.log(t("popularPageSummary", { label: `popular-${scale}`, page, raw: raw.length, visible: posts.length }));
     if (posts.length === 0) {
       // 这一页都被分级筛掉了，后面的页仍可能有符合的
       addProgress(pageProgress);
@@ -516,13 +520,13 @@ const MAX_ID_SPAN = 5000;
 function parsePostId(value, label) {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
-  if (!Number.isSafeInteger(id) || id < 1) throw new Error(`${label}需要是正整数，当前为「${text}」`);
+  if (!Number.isSafeInteger(id) || id < 1) throw new Error(t("positiveIntegerRequired", { label, value: text }));
   return id;
 }
 
 async function countPosts(baseUrl, tags) {
   try {
-    const data = await fetchJson(`${baseUrl}/counts/posts.json?tags=${encodeURIComponent(tags.join(" "))}`, "统计作品数");
+    const data = await fetchJson(`${baseUrl}/counts/posts.json?tags=${encodeURIComponent(tags.join(" "))}`, t("countPostsLabel"));
     const count = data?.counts?.posts;
     return Number.isSafeInteger(count) ? count : null;
   } catch {
@@ -531,16 +535,16 @@ async function countPosts(baseUrl, tags) {
 }
 
 async function crawlByIdRange(baseUrl, quality, vars) {
-  const startId = parsePostId(vars.id_start, "起始 id");
-  const endId = parsePostId(vars.id_end, "结束 id");
-  if (endId < startId) throw new Error(`结束 id（${endId}）需要不小于起始 id（${startId}）`);
+  const startId = parsePostId(vars.id_start, t("startIdLabel"));
+  const endId = parsePostId(vars.id_end, t("endIdLabel"));
+  if (endId < startId) throw new Error(t("endIdBeforeStart", { endId, startId }));
   if (endId - startId > MAX_ID_SPAN) {
-    throw new Error(`id 范围最多相差 ${MAX_ID_SPAN}，当前 ${startId}..${endId} 相差 ${endId - startId}`);
+    throw new Error(t("idRangeTooLarge", { max: MAX_ID_SPAN, startId, endId, span: endId - startId }));
   }
   const tags = withRatingToken([`id:${startId}..${endId}`, "order:id", "-status:deleted"], vars);
   const perPage = normalizePerPage(vars.per_page);
   const total = await countPosts(baseUrl, tags);
-  console.log(`[aibooru][id] id ${startId}..${endId}，共 ${total ?? "未知"} 个作品`);
+  console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
   if (total === 0) return;
   const estimatedPages = Math.max(1, Math.ceil((total ?? endId - startId + 1) / perPage));
   const pageProgress = 95 / estimatedPages;
@@ -549,8 +553,8 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   let previousFirst = null;
   let seen = 0;
   for (let page = 1; page <= maxPages; page += 1) {
-    console.log(`[aibooru][id] 第 ${page}/${total == null ? "?" : estimatedPages} 页`);
-    const raw = await fetchJson(postsUrl(baseUrl, tags, perPage, page), `id 范围第 ${page} 页`);
+    console.log(t("idPage", { page, total: total == null ? "?" : estimatedPages }));
+    const raw = await fetchJson(postsUrl(baseUrl, tags, perPage, page), t("idPageLabel", { page }));
     if (!Array.isArray(raw) || raw.length === 0 || raw[0].id === previousFirst) break;
     previousFirst = raw[0].id;
     await downloadPage(visiblePosts(raw), baseUrl, quality, pageProgress, "id");
@@ -564,11 +568,11 @@ export async function crawl(common, custom) {
   const baseUrl = coerceStr(common?.baseUrl || common?.base_url || DEFAULT_BASE_URL).replace(/\/+$/, "");
   const quality = coerceStr(vars.quality || "high");
   const mode = coerceStr(vars.crawl_mode || "tags");
-  console.log(`[aibooru] 模式 ${mode}，分级 ${ratingLetterOf(vars) || "不限"}，质量 ${quality}`);
+  console.log(t("runSummary", { mode, rating: ratingLetterOf(vars) || t("anyRating"), quality }));
 
   if (mode === "all") await crawlAll(baseUrl, quality, vars);
   else if (mode === "tags") await crawlByTags(baseUrl, quality, vars);
   else if (mode === "popular") await crawlPopular(baseUrl, quality, vars);
   else if (mode === "id_range") await crawlByIdRange(baseUrl, quality, vars);
-  else throw new Error(`未知的爬取模式: ${mode}`);
+  else throw new Error(t("unknownMode", { mode }));
 }

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
 const { setHeader, warn } = Kabegame;
@@ -24,16 +25,16 @@ export async function runRanking(vars) {
     (vars.ranking_mode === "monthly" || vars.ranking_mode === "rookie") &&
     effectiveContent === "ugoira"
   ) {
-    throw new Error("月榜与新生榜不支持动图（うごイラ）内容类型");
+    throw new Error(t("ugoiraUnsupported"));
   }
 
   const apiMode = rankingPixivMode(vars.ranking_mode, vars.age_mode);
   if (vars.age_mode === "r18") {
     if (!coerceStr(vars.user_id)) {
-      throw new Error("R18 排行榜请在「用户 UID」填写登录账号 UID");
+      throw new Error(t("r18UserRequired"));
     }
     setHeader("x-user-id", coerceStr(vars.user_id));
-    ensurePixivCookie("R18 排行榜");
+    ensurePixivCookie(t("labelR18Ranking"));
   }
 
   let done = 0;
@@ -50,7 +51,7 @@ export async function runRanking(vars) {
     try {
       json = await fetchJson(`${refBase}&p=${page}&format=json`);
     } catch (e) {
-      rethrowIfLoginFailed(e, "R18 排行榜", vars.age_mode === "r18");
+      rethrowIfLoginFailed(e, t("labelR18Ranking"), vars.age_mode === "r18");
       break;
     }
     const contents = Array.isArray(json?.contents) ? json.contents : [];
@@ -67,9 +68,7 @@ export async function runRanking(vars) {
     if (!Number.isFinite(page) || page < 1) break;
   }
   if (done < target) {
-    warn(
-      `排行榜实际只获取到 ${done} 个作品，少于请求的 ${target} 个（可能已到底或无更多页）`,
-    );
+    warn(t("rankingShort", { done, target }));
   }
 }
 

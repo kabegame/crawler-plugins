@@ -1,0 +1,18 @@
+{
+  "searchUrlRequired": "請填寫搜尋 URL",
+  "invalidUrl": "不是合法的 URL：{url}",
+  "searchUrlInvalid": "請填寫 e-shuushuu 搜尋頁網址（https://e-shuushuu.net/search?…），收到：{url}",
+  "listHttpError": "列表介面回傳 HTTP {status}",
+  "noImageUrl": "[e-shuushuu] 圖片 #{id} 沒有原圖網址，跳過",
+  "topPageCapped": "[e-shuushuu] 排行榜最多 {max} 頁，結束頁 {endPage} 以 {max} 處理",
+  "startPageOutOfRange": "[e-shuushuu] 起始頁 {startPage} 超出範圍，任務結束",
+  "openTop": "[e-shuushuu] 排行榜（{period}）：第 {startPage}~{endPage} 頁",
+  "openSearch": "[e-shuushuu] 搜尋（{query}）：第 {startPage}~{endPage} 頁",
+  "openHome": "[e-shuushuu] 主頁翻頁：第 {startPage}~{endPage} 頁",
+  "all": "全部",
+  "totalSummary": "[e-shuushuu] 共 {total} 張，{pages} 頁",
+  "pageReadFailed": "[e-shuushuu] 第 {page} 頁讀取失敗：{error}",
+  "pageStart": "[e-shuushuu] ┌ 第 {page} 頁：{total} 筆，站點可見 {visible} 筆",
+  "downloadFailed": "[e-shuushuu] 圖片 #{id} 下載失敗：{error}",
+  "pageDone": "[e-shuushuu] └ 第 {page} 頁完成"
+}

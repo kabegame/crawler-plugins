@@ -13,6 +13,7 @@
 //   space   UP 主投稿列表      bangumi 番剧 PGC 链路（season→playurl→ingest）
 import { sleep } from "@kabegame/plugin-sdk";
 
+import { t } from "./i18n";
 import { crawlBangumi, parseBangumiId } from "./bangumi";
 import { UA, WEB_BASE } from "./consts";
 import { collectListEntries } from "./list";
@@ -34,20 +35,22 @@ async function runBatch(entries, keys, vars, intervalMs, retries) {
     const entry = entries[index];
     // 视频之间固定间隔，避免连续 playurl + 大流量下载触发风控。
     if (index > 0) await sleep(intervalMs);
-    const title = entry.title ? ` 「${entry.title}」` : "";
-    console.log(`[bilibili-video] (${index + 1}/${entries.length}) ${entry.bvid}${title}`);
+    const title = entry.title ? t("batchItemTitle", { title: entry.title }) : "";
+    console.log(t("batchItem", {
+      index: index + 1, total: entries.length, bvid: entry.bvid, title,
+    }));
     try {
       // 批量模式固定只取 P1：一个 23P 的稿件会炸出 23 个文件。
       await downloadWithRetry(entry, keys, vars, budget, 1, intervalMs, retries);
     } catch (error) {
       failed += 1;
-      warn(`${entry.bvid} 最终失败：${coerceStr(error?.message ?? error)}`);
+      warn(t("itemFailedFinal", { bvid: entry.bvid, error: coerceStr(error?.message ?? error) }));
       addProgress(budget);
     }
   }
 
-  if (failed === entries.length) throw new Error("所有视频均下载失败");
-  if (failed > 0) warn(`共 ${entries.length} 个视频，其中 ${failed} 个失败。`);
+  if (failed === entries.length) throw new Error(t("allVideosFailed"));
+  if (failed > 0) warn(t("someVideosFailed", { total: entries.length, failed }));
 }
 
 export async function crawl(_common, custom) {
@@ -58,7 +61,7 @@ export async function crawl(_common, custom) {
 
   // 机会注入：拿不到 Cookie 也能跑，只是高档位受限。
   if (!requireCookie()) {
-    warn("未从畅游获取到 B 站 Cookie，将以未登录状态抓取，画质会被限制。如需高画质请先在畅游登录 bilibili。");
+    warn(t("cookieMissing"));
   }
 
   await cleanupStaleTmp(fs.getRoot());
@@ -68,7 +71,7 @@ export async function crawl(_common, custom) {
 
   const { keys: wbiKeys, isLoggedIn } = await getWbiKeys();
   // 未登录靠 try_look（试看）通常仍能拿到 1080P，但 4K / HDR / 杜比等档位必然缺席。
-  if (!isLoggedIn) warn("当前为未登录状态，4K / HDR / 杜比等档位不可用。");
+  if (!isLoggedIn) warn(t("notLoggedIn"));
   const keys = { ...wbiKeys, isLoggedIn };
 
   if (vars.mode === "space") {
@@ -97,9 +100,9 @@ export async function crawl(_common, custom) {
   if (!bvid && !aid) {
     // 常见误用：把番剧链接贴进「单个视频」。给出可行动的提示而不是笼统报错。
     if (parseBangumiId(vars.video).kind) {
-      throw new Error("这是番剧 / 剧集链接，请把「模式」切换为「番剧」再试");
+      throw new Error(t("bangumiLinkInVideoMode"));
     }
-    throw new Error("请填写 BV 号（BV13x41117TL）、av 号（av1074402）或视频链接");
+    throw new Error(t("videoIdRequired"));
   }
   await downloadWithRetry(
     { bvid, aid }, keys, vars, 100.0, Number(vars.page_index ?? 1), intervalMs, retries,

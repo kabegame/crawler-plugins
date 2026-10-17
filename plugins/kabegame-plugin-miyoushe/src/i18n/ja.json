@@ -1,0 +1,20 @@
+{
+  "emoticonSetFailed": "[米游社] emoticon_set のリクエストに失敗しました retcode={retcode}",
+  "emoticonSetNetworkError": "[米游社] emoticon_set のネットワークエラーです。絵文字はテキスト表示に切り替わります",
+  "repliesNetworkError": "[米游社] getPostReplies のネットワークエラーです post_id={postId}",
+  "repliesFailed": "[米游社] getPostReplies に失敗しました：post_id={postId} retcode={retcode}",
+  "singlePostUrlRequired": "[米游社] 単一投稿モード：投稿 URL を入力してください",
+  "postIdExtractFailed": "[米游社] URL から投稿 ID を抽出できません。https://www.miyoushe.com/<ゲーム>/article/<投稿ID> の形式か確認してください",
+  "postFullFailed": "[米游社] getPostFull に失敗しました：post_id={postId} retcode={retcode} {message}",
+  "postFullNoPost": "[米游社] getPostFull の応答に data.post.post がありません：post_id={postId}",
+  "postNoImages": "[米游社] 投稿に画像がありません：post_id={postId}",
+  "userUidRequired": "[米游社] 投稿者リストモード：投稿者 UID を入力してください",
+  "endPageBeforeStart": "[米游社] 終了ページは開始ページ以上にしてください",
+  "userPostsFailed": "[米游社] userPostList に失敗しました：uid={uid} retcode={retcode} {message}",
+  "pageNoResults": "[米游社] {page} ページに結果がないため停止します",
+  "userPostsDone": "[米游社] 投稿者リストのタスクが終了しました。合計 {count} 件の投稿を処理しました",
+  "searchFailed": "[米游社] 検索に失敗しました：page={page} retcode={retcode} {message}",
+  "emoticonLoading": "[米游社] 絵文字セットを取得しています...",
+  "emoticonLoaded": "[米游社] 絵文字セットの読み込みが完了しました",
+  "taskFinished": "[米游社] タスクが終了しました"
+}

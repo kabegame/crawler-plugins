@@ -7,6 +7,7 @@
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { FAV_IDS_API, FAV_LIST_API, LIST_PAGE_SIZE, SEASON_API, SERIES_API, SPACE_BASE } from "./consts";
+import { t } from "./i18n";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle } from "./util";
 
 const { warn } = Kabegame;
@@ -56,9 +57,11 @@ async function fetchArchivesPage(target, pageNo, referer) {
   const json = await fetchJson(url, { Referer: referer });
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
-    throw new Error(
-      `${isSeason ? "合集" : "系列"}接口失败（${json?.code}）: ${coerceStr(json?.message)}`,
-    );
+    throw new Error(t("archivesFailed", {
+      label: isSeason ? t("seasonLabel") : t("seriesLabel"),
+      code: json?.code,
+      message: coerceStr(json?.message),
+    }));
   }
 
   const data = json.data;
@@ -73,7 +76,7 @@ async function fetchArchivesPage(target, pageNo, referer) {
 
 async function collectArchives(target, vars, intervalMs, referer) {
   if (!target.mid) {
-    throw new Error("合集 / 系列需要 UP 主 UID，请粘贴完整的 space.bilibili.com 链接");
+    throw new Error(t("archivesMidRequired"));
   }
 
   const startPage = Math.max(1, Number(vars.start_page ?? 1));
@@ -111,12 +114,18 @@ async function collectArchives(target, vars, intervalMs, referer) {
     if (pageNo >= pageCount) break;
   }
 
-  if (dead > 0) warn(`列表里有 ${dead} 个已失效稿件，已跳过。`);
-  const label = target.kind === "season" ? "合集" : "系列";
-  console.log(
-    `[bilibili-video] ${label}「${name || target.sid}」共 ${total} 个视频 / ${pageCount} 页，`
-    + `本次取第 ${startPage}~${Math.min(endPage, pageCount || endPage)} 页，命中 ${entries.length} 个（上限 ${maxVideos}）`,
-  );
+  if (dead > 0) warn(t("listDeadSkipped", { count: dead }));
+  const label = target.kind === "season" ? t("seasonLabel") : t("seriesLabel");
+  console.log(t("archivesSummary", {
+    label,
+    name: name || target.sid,
+    total,
+    pages: pageCount,
+    start: startPage,
+    end: Math.min(endPage, pageCount || endPage),
+    count: entries.length,
+    max: maxVideos,
+  }));
   return entries;
 }
 
@@ -127,23 +136,23 @@ async function collectArchives(target, vars, intervalMs, referer) {
 async function collectFavlist(target, vars, referer) {
   const info = await fetchJson(`${FAV_LIST_API}?media_id=${target.sid}&pn=1&ps=20`, { Referer: referer });
   if (info?.code === -403) {
-    throw new Error("这是私密收藏夹：需要以收藏夹所有者的身份登录，请先在畅游登录对应账号。");
+    throw new Error(t("privateFavlist"));
   }
   if (info?.code !== 0) {
     checkBilibiliRisk(info?.code);
-    throw new Error(`收藏夹信息接口失败（${info?.code}）: ${coerceStr(info?.message)}`);
+    throw new Error(t("favInfoFailed", { code: info?.code, message: coerceStr(info?.message) }));
   }
   const name = coerceStr(info?.data?.info?.title);
 
   const ids = await fetchJson(`${FAV_IDS_API}?media_id=${target.sid}`, { Referer: referer });
   if (ids?.code !== 0) {
     checkBilibiliRisk(ids?.code);
-    throw new Error(`收藏夹条目接口失败（${ids?.code}）: ${coerceStr(ids?.message)}`);
+    throw new Error(t("favIdsFailed", { code: ids?.code, message: coerceStr(ids?.message) }));
   }
 
   const all = Array.isArray(ids?.data) ? ids.data : [];
   if (all.length === 0) {
-    throw new Error(`收藏夹「${name || target.sid}」是空的（接口返回 0 个条目）。`);
+    throw new Error(t("favEmpty", { name: name || target.sid }));
   }
 
   const startPage = Math.max(1, Number(vars.start_page ?? 1));
@@ -160,12 +169,15 @@ async function collectFavlist(target, vars, referer) {
   }
 
   const skipped = all.length - all.filter((item) => Number(item?.type ?? 2) === 2).length;
-  if (skipped > 0) warn(`收藏夹里有 ${skipped} 个非视频条目（音频 / 专栏等）已跳过。`);
+  if (skipped > 0) warn(t("favNonVideoSkipped", { count: skipped }));
 
-  console.log(
-    `[bilibili-video] 收藏夹「${name || target.sid}」共 ${all.length} 个条目，`
-    + `从第 ${offset + 1} 个起取，命中 ${entries.length} 个（上限 ${maxVideos}）`,
-  );
+  console.log(t("favSummary", {
+    name: name || target.sid,
+    total: all.length,
+    offset: offset + 1,
+    count: entries.length,
+    max: maxVideos,
+  }));
   return entries;
 }
 
@@ -173,10 +185,7 @@ async function collectFavlist(target, vars, referer) {
 export async function collectListEntries(vars, intervalMs) {
   const target = parseListUrl(vars.list_url);
   if (!target.kind) {
-    throw new Error(
-      "无法识别列表链接。支持合集（/lists/<id> 或 /channel/collectiondetail?sid=）、"
-      + "系列（?type=series 或 /channel/seriesdetail?sid=）、收藏夹（?fid= 或 /medialist/detail/ml<id>）",
-    );
+    throw new Error(t("listUrlUnrecognized"));
   }
 
   const referer = coerceStr(vars.list_url).startsWith("http")
@@ -187,6 +196,6 @@ export async function collectListEntries(vars, intervalMs) {
     ? await collectFavlist(target, vars, referer)
     : await collectArchives(target, vars, intervalMs, referer);
 
-  if (entries.length === 0) throw new Error("未取到任何视频，请检查链接与页码范围");
+  if (entries.length === 0) throw new Error(t("listEmpty"));
   return entries;
 }

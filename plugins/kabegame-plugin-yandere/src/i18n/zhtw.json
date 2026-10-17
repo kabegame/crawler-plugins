@@ -1,0 +1,21 @@
+{
+  "pageRangeTooLarge": "在一次之內不允許爬取超過100頁，咱二次元人要保持文明禮儀",
+  "endPageBeforeStart": "結束頁面需要比開始頁面大",
+  "openPage": "[yandere][{label}] 開啟頁面 {page}/{total}: {url}",
+  "emptyPageStop": "[yandere][{label}] 第 {page} 頁沒有作品，結束",
+  "imageMissing": "[yandere] 詳情頁沒解析出圖片位址，跳過：{url}",
+  "tagsRequired": "標籤模式需要至少填寫一個標籤",
+  "startIdLabel": "起始 id",
+  "endIdLabel": "結束 id",
+  "positiveIntegerRequired": "{label}需要是正整數，目前為「{value}」",
+  "endIdBeforeStart": "結束 id（{endId}）需要不小於起始 id（{startId}）",
+  "idRangeTooLarge": "id 範圍最多相差 {max}，目前 {startId}..{endId} 相差 {span}",
+  "unknownCount": "未知",
+  "idRangeSummary": "[yandere][id] id {startId}..{endId}，共 {total} 張",
+  "unknownRanking": "未知的排行榜類型: {scale}",
+  "openPopular": "[yandere][popular] 開啟排行榜 {period}/{total}: {url}",
+  "ratingInfoMissing": "[yandere][popular] 頁面裡沒找到作品分級資訊，本期不做分級過濾：{url}",
+  "ratingFiltered": "[yandere][popular] 分級過濾 {rating}：{before} → {after}",
+  "popularEmpty": "[yandere][popular] 本期沒有符合條件的作品：{url}",
+  "unknownMode": "未知的爬取模式: {mode}"
+}

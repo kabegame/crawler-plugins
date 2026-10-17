@@ -1,0 +1,22 @@
+{
+  "userAgentFromCef": "[anime-pictures] User-Agent source: Surf CEF ({ua})",
+  "userAgentBuiltin": "[anime-pictures] User-Agent source: built-in fallback",
+  "cookieMissing": "[anime-pictures] No Cookie from Surf; falling back to the built-in Cookie. If requests return 403, open anime-pictures in Surf and pass the check first",
+  "challengePage": "[anime-pictures] Challenge page detected. The V8 backend cannot handle browser verification; try again later or switch networks.",
+  "pickNameResolved": "[anime-pictures] pickName: title/author work={work} character={character} artist={artist} => {name}",
+  "pickNameNoLinks": "[anime-pictures] pickName: no copyright/character/artist link found in ul.tags",
+  "pickNameNoTags": "[anime-pictures] pickName: ul.tags not found, falling back",
+  "pickNameFallbackH1": "[anime-pictures] pickName: fallback to h1.copyright -> {name}",
+  "pickNameFallbackTitleLine": "[anime-pictures] pickName: fallback to the second line of the title -> {name}",
+  "pickNameFallbackTitleWord": "[anime-pictures] pickName: fallback to the second word of the title -> {name}",
+  "pickNameEmpty": "[anime-pictures] pickName: still empty, title={title}",
+  "displayName": "[anime-pictures] downloadImage display name: {name}",
+  "metadata": "[anime-pictures] metadata: {metadata}",
+  "emptyValue": "(empty)",
+  "downloadLinkMissing": "[anime-pictures] No download link found: {url}",
+  "pageRangeTooLarge": "A single run cannot crawl more than 100 pages. Please crawl responsibly",
+  "endPageBeforeStart": "The end page must be after the start page",
+  "crawlStart": "[anime-pictures] Starting: pages {startPage}-{endPage}, tag={tag}",
+  "pageImages": "[anime-pictures] Page {page}: {count} image(s)",
+  "crawlDone": "[anime-pictures] Task finished"
+}

@@ -1,0 +1,11 @@
+{
+  "endPageBeforeStart": "结束页数需要大于或等于起始页数",
+  "crawlStarted": "[wallspic] 开始爬取",
+  "openStartPage": "打开起始页: {url}",
+  "startPageBeyondMax": "起始页 {startPage} 超出网站最大页 {maxPage}",
+  "paginationSummary": "站点分页上限: {maxPage}，实际结束页: {endPage}，本任务共 {totalPages} 页",
+  "turningPage": "翻页: {page}/{endPage} -> {url}",
+  "processStartPage": "处理第 {page}/{endPage} 页（已在起始页）",
+  "pageImages": "第 {page} 页: 解析到 {count} 个图片地址，开始下载",
+  "crawlFinished": "[wallspic] 爬取结束"
+}

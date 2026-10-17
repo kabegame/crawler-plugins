@@ -48,10 +48,399 @@ XMLHttpRequest.prototype.open = function (_method, url) {
 // ── 通用工具 ───────────────────────────────────────────────────────────
 
 const PLUGIN_ID = "x-webview";
-const log = (m) => Kabegame.log(`[x] ${m}`);
-const warn = (m) => Kabegame.warn(`[x] ${m}`);
+const log = (m) => Kabegame.log(m);
+const warn = (m) => Kabegame.warn(m);
 const errorMessage = (e) => e?.message ?? String(e);
 const str = (v) => (v === null || v === undefined ? "" : String(v));
+
+// 用户可见文案跟随界面语言。zh 是基准表，其余语言必须覆盖全部 key。
+// WebView 插件不经过打包，无法 import JSON，因此把五语言表内联在这里。
+const MESSAGES = {
+  zh: {
+    yes: "是",
+    no: "否",
+    kindPhoto: "图片",
+    kindVideo: "视频",
+    unlimited: "不限",
+    commentsOff: "不抓",
+    none: "无",
+    withCommentImages: "（含配图）",
+    timeMinSuffix: " · 最旧={date}",
+    commonLog: "类型={types} · 上限={limit} · 增量={incremental} · 评论={comments}{images}{timeMin}",
+    pageLoaded: "[x] ▶ 页面加载 · 阶段={phase} · {url}",
+    searchLog: "[x] 搜索「{query}」· 排序={sort} · {common}",
+    tweetLog: "[x] 单条推文 {id} · 类型={types} · 评论={comments}",
+    collectionLog: "[x] {label} · {common}",
+    artistLog: "[x] 画师 @{name} · {common}",
+    artistInfoLog: "[x] 画师信息：{name} · id={id} · 媒体推文 {count}",
+    sortTop: "热门",
+    sortLatest: "最新",
+    photoTimeline: "{kind}时间线",
+    searchTopLabel: "搜索（热门）",
+    searchLatestLabel: "搜索（最新）",
+    bookmarksLabel: "书签",
+    likesLabel: "点赞",
+    bookmarksName: "X 书签",
+    likesName: "X 点赞",
+    searchNoIncremental: "[x] 热门排序的结果不按时间排列，不使用增量记录",
+    dateInvalid: "最旧时间「{value}」无法解析，请用形如 2026-01-31 的日期",
+    watermarkReadFailed: "[x] 读取上次爬取记录失败，本次按全量处理：{error}",
+    watermarkWriteFailed: "[x] 写入爬取记录失败（下次会重复翻页）：{error}",
+    watermarkSaved: "[x] 已记录水位线 {key} = {value}",
+    notLoggedIn: "[x] 未登录 X。请在弹出的爬虫窗口中登录（或先在「畅游」里登录 x.com），登录后会自动继续。",
+    loginTimeout: "[x] 等待 3 分钟仍未登录，任务结束",
+    mediaSwitched: "[x] 页面加载了 {op}，切换到{kind}",
+    timelineMissing: "[x] 没有等到{kind}时间线（{op}）响应，跳过 · {url} · {title}",
+    collectDone: "[x] 收集完成 · 共 {count} 条推文",
+    collectDoneComments: " · 有回复的会打开详情页保存最多 {count} 条",
+    allDone: "[x] 全部完成 · 共处理 {count} 条推文",
+    searchRetry: "[x] 没有等到搜索结果，5 秒后重载页面再试一次",
+    searchMissing: "[x] 没有等到搜索结果（{op}）响应 · 页面请求={ops} · 页面显示「{text}」",
+    usernameMissing: "[x] 取不到当前账号的用户名，无法打开点赞列表 · 页面={path} · 宽度={width}",
+    accountOpened: "[x] 当前账号 @{name}，打开点赞列表",
+    collectionMissing: "[x] 没有等到{label}列表（{op}）响应 · {url} · {title}",
+    tweetMissing: "[x] 推文 {id} 没取到：{reason}",
+    tweetRateLimited: "被限流（429），稍后再试",
+    tweetUnavailable: "推文不存在、已删除或当前账号看不到",
+    noWantedMedia: "[x] 这条推文没有所选类型的图片 / 视频，没有可下载的媒体",
+    commentsSaved: "[x] 评论：保存 {count} 条回复",
+    incrementalMarkSet: "[x] 增量：遇到上次最前面的 {count} 条之一就停",
+    incrementalWatermark: "[x] 增量：只抓 {id} 之后的推文",
+    rateLimited: "[x] X 返回 429（请求过于频繁），停止翻页；稍后再试",
+    responseAbnormal: "[x] {op} 响应异常：HTTP {status} {errors}",
+    timelineAdded: "[x] {label} +{count} 条推文（累计 {total}）",
+    reasonEnd: "已到时间线末尾",
+    reasonWatermark: "遇到上次抓过的推文",
+    reasonTimeMin: "早于最旧时间",
+    reasonMax: "达到推文数上限",
+    reasonRateLimit: "被限流",
+    reasonIdle: "连续 3 次滚动都没有新响应",
+    timelineDone: "[x] {label}收集结束（{reason}）· {count} 条推文",
+    commentsRateLimited: "[x] 打开推文详情被限流（429），后面的推文不再保存评论，只下载媒体",
+    commentsFetchFailed: "[x] 推文 {id} 的回复没取到：{error}",
+    progressLog: "[x] 已处理 {done}/{total} 条推文",
+    commentSummary: "[x] 评论：打开 {opened} 条推文详情，共保存 {saved} 条回复",
+    detailWaitingMissing: "没有等到 TweetDetail · 期间请求={ops} · 页面={path}",
+    detailNotJson: "TweetDetail 不是 JSON（HTTP {status}）",
+    parseTweetFailed: "[x] 解析推文 {id} 失败：{error}",
+    metadataFailed: "[x] 创建 metadata 失败（{id}）：{error}",
+    downloadFailed: "[x] 下载失败 {url}{suffix}：{error}",
+    commentImageFailed: "[x] 评论配图下载失败 {url}{suffix}：{error}",
+    searchQueryRequired: "[x] 搜索模式需要填写搜索词",
+    tweetInputInvalid: "[x] 无法识别推文「{value}」：请粘贴推文链接（https://x.com/<用户>/status/<数字>）或推文 id",
+    artistInputInvalid: "[x] 无法识别画师「{value}」：请填 @用户名、用户名或主页链接",
+    pluginFailed: "[x] 插件运行失败：{error}"
+  },
+  en: {
+    yes: "yes",
+    no: "no",
+    kindPhoto: "photo",
+    kindVideo: "video",
+    unlimited: "unlimited",
+    commentsOff: "off",
+    none: "none",
+    withCommentImages: " (with images)",
+    timeMinSuffix: " · oldest={date}",
+    commonLog: "type={types} · limit={limit} · incremental={incremental} · comments={comments}{images}{timeMin}",
+    pageLoaded: "[x] ▶ Page load · phase={phase} · {url}",
+    searchLog: "[x] Search “{query}” · sort={sort} · {common}",
+    tweetLog: "[x] Single post {id} · type={types} · comments={comments}",
+    collectionLog: "[x] {label} · {common}",
+    artistLog: "[x] Artist @{name} · {common}",
+    artistInfoLog: "[x] Artist info: {name} · id={id} · media posts {count}",
+    sortTop: "top",
+    sortLatest: "latest",
+    photoTimeline: "{kind} timeline",
+    searchTopLabel: "Search (top)",
+    searchLatestLabel: "Search (latest)",
+    bookmarksLabel: "Bookmarks",
+    likesLabel: "Likes",
+    bookmarksName: "X bookmarks",
+    likesName: "X likes",
+    searchNoIncremental: "[x] Top results are not time-ordered, so incremental tracking is not used",
+    dateInvalid: "The oldest time “{value}” could not be parsed; use a date like 2026-01-31",
+    watermarkReadFailed: "[x] Failed to read the previous crawl record; doing a full crawl this time: {error}",
+    watermarkWriteFailed: "[x] Failed to save the crawl record (pages will repeat next time): {error}",
+    watermarkSaved: "[x] Saved watermark {key} = {value}",
+    notLoggedIn: "[x] Not signed in to X. Sign in in the crawler window that just opened (or sign in to x.com in Surf first); the task will continue automatically.",
+    loginTimeout: "[x] Still not signed in after 3 minutes; ending the task",
+    mediaSwitched: "[x] The page loaded {op}; switching to the {kind} timeline",
+    timelineMissing: "[x] No {kind} timeline ({op}) response arrived; skipping · {url} · {title}",
+    collectDone: "[x] Collection finished · {count} posts",
+    collectDoneComments: " · posts with replies will open their detail page to save up to {count} replies",
+    allDone: "[x] All done · {count} posts processed",
+    searchRetry: "[x] No search results arrived; reloading the page in 5 seconds and trying again",
+    searchMissing: "[x] No search results ({op}) response arrived · page requests={ops} · page shows “{text}”",
+    usernameMissing: "[x] Could not get the current account's username, so the likes list cannot be opened · page={path} · width={width}",
+    accountOpened: "[x] Current account @{name}; opening the likes list",
+    collectionMissing: "[x] No {label} list ({op}) response arrived · {url} · {title}",
+    tweetMissing: "[x] Could not fetch post {id}: {reason}",
+    tweetRateLimited: "rate limited (429); try again later",
+    tweetUnavailable: "the post does not exist, was deleted, or is not visible to this account",
+    noWantedMedia: "[x] This post has no media of the selected type; nothing to download",
+    commentsSaved: "[x] Comments: saved {count} replies",
+    incrementalMarkSet: "[x] Incremental: stopping at any of the {count} posts that were first last time",
+    incrementalWatermark: "[x] Incremental: only posts after {id}",
+    rateLimited: "[x] X returned 429 (too many requests); stopping pagination. Try again later",
+    responseAbnormal: "[x] {op} response error: HTTP {status} {errors}",
+    timelineAdded: "[x] {label} +{count} posts ({total} total)",
+    reasonEnd: "reached the end of the timeline",
+    reasonWatermark: "hit a post from the previous crawl",
+    reasonTimeMin: "older than the oldest allowed time",
+    reasonMax: "reached the post limit",
+    reasonRateLimit: "rate limited",
+    reasonIdle: "three scrolls in a row produced no new response",
+    timelineDone: "[x] {label} collection finished ({reason}) · {count} posts",
+    commentsRateLimited: "[x] Opening post details was rate limited (429); no more replies will be saved, media only",
+    commentsFetchFailed: "[x] Could not fetch replies for post {id}: {error}",
+    progressLog: "[x] Processed {done}/{total} posts",
+    commentSummary: "[x] Comments: opened {opened} post detail pages and saved {saved} replies",
+    detailWaitingMissing: "TweetDetail never arrived · requests during that time={ops} · page={path}",
+    detailNotJson: "TweetDetail was not JSON (HTTP {status})",
+    parseTweetFailed: "[x] Failed to parse post {id}: {error}",
+    metadataFailed: "[x] Failed to create metadata ({id}): {error}",
+    downloadFailed: "[x] Download failed {url}{suffix}: {error}",
+    commentImageFailed: "[x] Comment image download failed {url}{suffix}: {error}",
+    searchQueryRequired: "[x] Search mode requires a search query",
+    tweetInputInvalid: "[x] Unrecognized post “{value}”: paste a post link (https://x.com/<user>/status/<number>) or a post id",
+    artistInputInvalid: "[x] Unrecognized artist “{value}”: enter an @username, a username, or a profile link",
+    pluginFailed: "[x] Plugin run failed: {error}"
+  },
+  ja: {
+    yes: "はい",
+    no: "いいえ",
+    kindPhoto: "画像",
+    kindVideo: "動画",
+    unlimited: "無制限",
+    commentsOff: "取得しない",
+    none: "なし",
+    withCommentImages: "（画像付き）",
+    timeMinSuffix: " · 最古={date}",
+    commonLog: "種類={types} · 上限={limit} · 増分={incremental} · コメント={comments}{images}{timeMin}",
+    pageLoaded: "[x] ▶ ページ読み込み · フェーズ={phase} · {url}",
+    searchLog: "[x] 「{query}」を検索 · 並び順={sort} · {common}",
+    tweetLog: "[x] 単一ポスト {id} · 種類={types} · コメント={comments}",
+    collectionLog: "[x] {label} · {common}",
+    artistLog: "[x] 絵師 @{name} · {common}",
+    artistInfoLog: "[x] 絵師情報：{name} · id={id} · メディア投稿 {count}",
+    sortTop: "人気",
+    sortLatest: "最新",
+    photoTimeline: "{kind}タイムライン",
+    searchTopLabel: "検索（人気）",
+    searchLatestLabel: "検索（最新）",
+    bookmarksLabel: "ブックマーク",
+    likesLabel: "いいね",
+    bookmarksName: "X ブックマーク",
+    likesName: "X いいね",
+    searchNoIncremental: "[x] 人気順の結果は時系列ではないため、増分記録は使用しません",
+    dateInvalid: "最古時間「{value}」を解析できません。2026-01-31 のような日付を指定してください",
+    watermarkReadFailed: "[x] 前回のクロール記録を読み込めませんでした。今回は全件取得します：{error}",
+    watermarkWriteFailed: "[x] クロール記録を保存できませんでした（次回同じページを再度取得します）：{error}",
+    watermarkSaved: "[x] ウォーターマーク {key} = {value} を記録しました",
+    notLoggedIn: "[x] X にログインしていません。開いたクローラーウィンドウでログインしてください（先に「サーフ」で x.com にログインしてもかまいません）。ログイン後は自動で続行します。",
+    loginTimeout: "[x] 3 分待ってもログインされないため、タスクを終了します",
+    mediaSwitched: "[x] ページが {op} を読み込みました。{kind}タイムラインに切り替えます",
+    timelineMissing: "[x] {kind}タイムライン（{op}）の応答が来なかったためスキップします · {url} · {title}",
+    collectDone: "[x] 収集完了 · ポスト {count} 件",
+    collectDoneComments: " · 返信があるポストは詳細ページを開いて最大 {count} 件保存します",
+    allDone: "[x] すべて完了 · ポスト {count} 件を処理",
+    searchRetry: "[x] 検索結果が来なかったため、5 秒後にページを再読み込みしてもう一度試します",
+    searchMissing: "[x] 検索結果（{op}）の応答が来ませんでした · ページのリクエスト={ops} · ページ表示「{text}」",
+    usernameMissing: "[x] 現在のアカウントのユーザー名を取得できないため、いいね一覧を開けません · ページ={path} · 幅={width}",
+    accountOpened: "[x] 現在のアカウント @{name} のいいね一覧を開きます",
+    collectionMissing: "[x] {label}一覧（{op}）の応答が来ませんでした · {url} · {title}",
+    tweetMissing: "[x] ポスト {id} を取得できませんでした：{reason}",
+    tweetRateLimited: "レート制限（429）です。しばらくしてから再試行してください",
+    tweetUnavailable: "ポストが存在しない、削除された、または現在のアカウントからは見られません",
+    noWantedMedia: "[x] このポストには選択した種類の画像・動画がないため、ダウンロードできません",
+    commentsSaved: "[x] コメント：返信 {count} 件を保存",
+    incrementalMarkSet: "[x] 増分：前回先頭だった {count} 件のいずれかに到達したら停止",
+    incrementalWatermark: "[x] 増分：{id} より後のポストのみ取得",
+    rateLimited: "[x] X が 429（リクエスト過多）を返しました。ページ送りを停止します。しばらくしてから再試行してください",
+    responseAbnormal: "[x] {op} の応答が異常です：HTTP {status} {errors}",
+    timelineAdded: "[x] {label} +{count} 件（累計 {total} 件）",
+    reasonEnd: "タイムラインの最後に到達",
+    reasonWatermark: "前回取得したポストに到達",
+    reasonTimeMin: "最古時間より前",
+    reasonMax: "ポスト数の上限に到達",
+    reasonRateLimit: "レート制限",
+    reasonIdle: "3 回連続スクロールしても新しい応答なし",
+    timelineDone: "[x] {label}の収集終了（{reason}）· ポスト {count} 件",
+    commentsRateLimited: "[x] ポスト詳細を開く際にレート制限（429）を受けました。以降のポストは返信を保存せず、メディアのみダウンロードします",
+    commentsFetchFailed: "[x] ポスト {id} の返信を取得できませんでした：{error}",
+    progressLog: "[x] {done}/{total} 件のポストを処理済み",
+    commentSummary: "[x] コメント：{opened} 件のポスト詳細を開き、返信 {saved} 件を保存",
+    detailWaitingMissing: "TweetDetail の応答が来ません · 期間中のリクエスト={ops} · ページ={path}",
+    detailNotJson: "TweetDetail が JSON ではありません（HTTP {status}）",
+    parseTweetFailed: "[x] ポスト {id} の解析に失敗しました：{error}",
+    metadataFailed: "[x] metadata の作成に失敗しました（{id}）：{error}",
+    downloadFailed: "[x] ダウンロード失敗 {url}{suffix}：{error}",
+    commentImageFailed: "[x] コメント画像のダウンロード失敗 {url}{suffix}：{error}",
+    searchQueryRequired: "[x] 検索モードでは検索語の入力が必要です",
+    tweetInputInvalid: "[x] ポスト「{value}」を認識できません。ポストリンク（https://x.com/<ユーザー>/status/<数字>）またはポスト id を貼り付けてください",
+    artistInputInvalid: "[x] 絵師「{value}」を認識できません。@ユーザー名、ユーザー名、またはプロフィールリンクを入力してください",
+    pluginFailed: "[x] プラグインの実行に失敗しました：{error}"
+  },
+  ko: {
+    yes: "예",
+    no: "아니요",
+    kindPhoto: "사진",
+    kindVideo: "동영상",
+    unlimited: "무제한",
+    commentsOff: "수집 안 함",
+    none: "없음",
+    withCommentImages: " (이미지 포함)",
+    timeMinSuffix: " · 가장 오래된={date}",
+    commonLog: "유형={types} · 상한={limit} · 증분={incremental} · 댓글={comments}{images}{timeMin}",
+    pageLoaded: "[x] ▶ 페이지 로드 · 단계={phase} · {url}",
+    searchLog: "[x] “{query}” 검색 · 정렬={sort} · {common}",
+    tweetLog: "[x] 단일 게시물 {id} · 유형={types} · 댓글={comments}",
+    collectionLog: "[x] {label} · {common}",
+    artistLog: "[x] 작가 @{name} · {common}",
+    artistInfoLog: "[x] 작가 정보: {name} · id={id} · 미디어 게시물 {count}",
+    sortTop: "인기",
+    sortLatest: "최신",
+    photoTimeline: "{kind} 타임라인",
+    searchTopLabel: "검색(인기)",
+    searchLatestLabel: "검색(최신)",
+    bookmarksLabel: "북마크",
+    likesLabel: "좋아요",
+    bookmarksName: "X 북마크",
+    likesName: "X 좋아요",
+    searchNoIncremental: "[x] 인기순 결과는 시간순이 아니므로 증분 기록을 사용하지 않습니다",
+    dateInvalid: "가장 오래된 시간 “{value}”을(를) 해석할 수 없습니다. 2026-01-31 같은 날짜를 입력해 주세요",
+    watermarkReadFailed: "[x] 이전 크롤 기록을 읽지 못했습니다. 이번에는 전체를 수집합니다: {error}",
+    watermarkWriteFailed: "[x] 크롤 기록을 저장하지 못했습니다(다음에 같은 페이지를 다시 수집합니다): {error}",
+    watermarkSaved: "[x] 워터마크 {key} = {value} 기록됨",
+    notLoggedIn: "[x] X에 로그인되어 있지 않습니다. 열린 크롤러 창에서 로그인해 주세요(먼저 '서핑'에서 x.com에 로그인해도 됩니다). 로그인하면 자동으로 계속합니다.",
+    loginTimeout: "[x] 3분이 지나도 로그인하지 않아 작업을 종료합니다",
+    mediaSwitched: "[x] 페이지가 {op}을(를) 불러왔습니다. {kind} 타임라인으로 전환합니다",
+    timelineMissing: "[x] {kind} 타임라인({op}) 응답이 오지 않아 건너뜁니다 · {url} · {title}",
+    collectDone: "[x] 수집 완료 · 게시물 {count}개",
+    collectDoneComments: " · 답글이 있는 게시물은 상세 페이지를 열어 최대 {count}개까지 저장합니다",
+    allDone: "[x] 모두 완료 · 게시물 {count}개 처리",
+    searchRetry: "[x] 검색 결과가 오지 않아 5초 후 페이지를 다시 불러와 재시도합니다",
+    searchMissing: "[x] 검색 결과({op}) 응답이 오지 않았습니다 · 페이지 요청={ops} · 페이지 표시 “{text}”",
+    usernameMissing: "[x] 현재 계정의 사용자 이름을 가져올 수 없어 좋아요 목록을 열 수 없습니다 · 페이지={path} · 너비={width}",
+    accountOpened: "[x] 현재 계정 @{name}의 좋아요 목록을 엽니다",
+    collectionMissing: "[x] {label} 목록({op}) 응답이 오지 않았습니다 · {url} · {title}",
+    tweetMissing: "[x] 게시물 {id}을(를) 가져오지 못했습니다: {reason}",
+    tweetRateLimited: "속도 제한(429)에 걸렸습니다. 잠시 후 다시 시도해 주세요",
+    tweetUnavailable: "게시물이 없거나 삭제되었거나 현재 계정에서 볼 수 없습니다",
+    noWantedMedia: "[x] 이 게시물에는 선택한 유형의 사진/동영상이 없어 다운로드할 것이 없습니다",
+    commentsSaved: "[x] 댓글: 답글 {count}개 저장",
+    incrementalMarkSet: "[x] 증분: 지난번 맨 앞 {count}개 중 하나를 만나면 중지",
+    incrementalWatermark: "[x] 증분: {id} 이후 게시물만 수집",
+    rateLimited: "[x] X가 429(요청 과다)를 반환했습니다. 페이지 넘김을 중지합니다. 잠시 후 다시 시도해 주세요",
+    responseAbnormal: "[x] {op} 응답 이상: HTTP {status} {errors}",
+    timelineAdded: "[x] {label} +{count}개(누적 {total}개)",
+    reasonEnd: "타임라인 끝에 도달",
+    reasonWatermark: "지난번에 수집한 게시물을 만남",
+    reasonTimeMin: "가장 오래된 시간보다 이름",
+    reasonMax: "게시물 수 상한 도달",
+    reasonRateLimit: "속도 제한",
+    reasonIdle: "3회 연속 스크롤에도 새 응답 없음",
+    timelineDone: "[x] {label} 수집 종료({reason}) · 게시물 {count}개",
+    commentsRateLimited: "[x] 게시물 상세를 여는 중 속도 제한(429)에 걸렸습니다. 이후 게시물은 답글을 저장하지 않고 미디어만 다운로드합니다",
+    commentsFetchFailed: "[x] 게시물 {id}의 답글을 가져오지 못했습니다: {error}",
+    progressLog: "[x] 게시물 {done}/{total}개 처리",
+    commentSummary: "[x] 댓글: 게시물 상세 {opened}개를 열어 답글 {saved}개 저장",
+    detailWaitingMissing: "TweetDetail 응답이 오지 않았습니다 · 기간 중 요청={ops} · 페이지={path}",
+    detailNotJson: "TweetDetail이 JSON이 아닙니다(HTTP {status})",
+    parseTweetFailed: "[x] 게시물 {id} 파싱 실패: {error}",
+    metadataFailed: "[x] metadata 생성 실패({id}): {error}",
+    downloadFailed: "[x] 다운로드 실패 {url}{suffix}: {error}",
+    commentImageFailed: "[x] 댓글 이미지 다운로드 실패 {url}{suffix}: {error}",
+    searchQueryRequired: "[x] 검색 모드에서는 검색어를 입력해야 합니다",
+    tweetInputInvalid: "[x] 게시물 “{value}”을(를) 인식할 수 없습니다. 게시물 링크(https://x.com/<사용자>/status/<숫자>) 또는 게시물 id를 붙여 넣어 주세요",
+    artistInputInvalid: "[x] 작가 “{value}”을(를) 인식할 수 없습니다. @사용자 이름, 사용자 이름 또는 프로필 링크를 입력해 주세요",
+    pluginFailed: "[x] 플러그인 실행 실패: {error}"
+  },
+  zhtw: {
+    yes: "是",
+    no: "否",
+    kindPhoto: "圖片",
+    kindVideo: "影片",
+    unlimited: "不限",
+    commentsOff: "不抓取",
+    none: "無",
+    withCommentImages: "（含配圖）",
+    timeMinSuffix: " · 最舊={date}",
+    commonLog: "類型={types} · 上限={limit} · 增量={incremental} · 留言={comments}{images}{timeMin}",
+    pageLoaded: "[x] ▶ 頁面載入 · 階段={phase} · {url}",
+    searchLog: "[x] 搜尋「{query}」· 排序={sort} · {common}",
+    tweetLog: "[x] 單則推文 {id} · 類型={types} · 留言={comments}",
+    collectionLog: "[x] {label} · {common}",
+    artistLog: "[x] 繪師 @{name} · {common}",
+    artistInfoLog: "[x] 繪師資訊：{name} · id={id} · 媒體推文 {count}",
+    sortTop: "熱門",
+    sortLatest: "最新",
+    photoTimeline: "{kind}時間軸",
+    searchTopLabel: "搜尋（熱門）",
+    searchLatestLabel: "搜尋（最新）",
+    bookmarksLabel: "書籤",
+    likesLabel: "按讚",
+    bookmarksName: "X 書籤",
+    likesName: "X 按讚",
+    searchNoIncremental: "[x] 熱門排序的結果不按時間排列，不使用增量紀錄",
+    dateInvalid: "最舊時間「{value}」無法解析，請用形如 2026-01-31 的日期",
+    watermarkReadFailed: "[x] 讀取上次爬取紀錄失敗，本次按全量處理：{error}",
+    watermarkWriteFailed: "[x] 寫入爬取紀錄失敗（下次會重複翻頁）：{error}",
+    watermarkSaved: "[x] 已記錄水位線 {key} = {value}",
+    notLoggedIn: "[x] 未登入 X。請在彈出的爬蟲視窗中登入（或先在「暢遊」裡登入 x.com），登入後會自動繼續。",
+    loginTimeout: "[x] 等待 3 分鐘仍未登入，任務結束",
+    mediaSwitched: "[x] 頁面載入了 {op}，切換到{kind}",
+    timelineMissing: "[x] 沒有等到{kind}時間軸（{op}）回應，跳過 · {url} · {title}",
+    collectDone: "[x] 收集完成 · 共 {count} 則推文",
+    collectDoneComments: " · 有回覆的會開啟詳情頁儲存最多 {count} 則",
+    allDone: "[x] 全部完成 · 共處理 {count} 則推文",
+    searchRetry: "[x] 沒有等到搜尋結果，5 秒後重新載入頁面再試一次",
+    searchMissing: "[x] 沒有等到搜尋結果（{op}）回應 · 頁面請求={ops} · 頁面顯示「{text}」",
+    usernameMissing: "[x] 取不到目前帳號的使用者名稱，無法開啟按讚列表 · 頁面={path} · 寬度={width}",
+    accountOpened: "[x] 目前帳號 @{name}，開啟按讚列表",
+    collectionMissing: "[x] 沒有等到{label}列表（{op}）回應 · {url} · {title}",
+    tweetMissing: "[x] 推文 {id} 沒取到：{reason}",
+    tweetRateLimited: "被限流（429），請稍後再試",
+    tweetUnavailable: "推文不存在、已刪除或目前帳號看不到",
+    noWantedMedia: "[x] 這則推文沒有所選類型的圖片／影片，沒有可下載的媒體",
+    commentsSaved: "[x] 留言：儲存 {count} 則回覆",
+    incrementalMarkSet: "[x] 增量：遇到上次最前面的 {count} 則之一就停",
+    incrementalWatermark: "[x] 增量：只抓 {id} 之後的推文",
+    rateLimited: "[x] X 傳回 429（請求過於頻繁），停止翻頁；請稍後再試",
+    responseAbnormal: "[x] {op} 回應異常：HTTP {status} {errors}",
+    timelineAdded: "[x] {label} +{count} 則推文（累計 {total}）",
+    reasonEnd: "已到時間軸末尾",
+    reasonWatermark: "遇到上次抓過的推文",
+    reasonTimeMin: "早於最舊時間",
+    reasonMax: "達到推文數上限",
+    reasonRateLimit: "被限流",
+    reasonIdle: "連續 3 次滾動都沒有新回應",
+    timelineDone: "[x] {label}收集結束（{reason}）· {count} 則推文",
+    commentsRateLimited: "[x] 開啟推文詳情被限流（429），後面的推文不再儲存留言，只下載媒體",
+    commentsFetchFailed: "[x] 推文 {id} 的回覆沒取到：{error}",
+    progressLog: "[x] 已處理 {done}/{total} 則推文",
+    commentSummary: "[x] 留言：開啟 {opened} 則推文詳情，共儲存 {saved} 則回覆",
+    detailWaitingMissing: "沒有等到 TweetDetail · 期間請求={ops} · 頁面={path}",
+    detailNotJson: "TweetDetail 不是 JSON（HTTP {status}）",
+    parseTweetFailed: "[x] 解析推文 {id} 失敗：{error}",
+    metadataFailed: "[x] 建立 metadata 失敗（{id}）：{error}",
+    downloadFailed: "[x] 下載失敗 {url}{suffix}：{error}",
+    commentImageFailed: "[x] 留言配圖下載失敗 {url}{suffix}：{error}",
+    searchQueryRequired: "[x] 搜尋模式需要填寫搜尋詞",
+    tweetInputInvalid: "[x] 無法辨識推文「{value}」：請貼上推文連結（https://x.com/<使用者>/status/<數字>）或推文 id",
+    artistInputInvalid: "[x] 無法辨識繪師「{value}」：請填 @使用者名稱、使用者名稱或主頁連結",
+    pluginFailed: "[x] 外掛執行失敗：{error}"
+  }
+};
+
+const LANG = Kabegame.getLang?.() ?? "zh";
+const t = (key, params = {}) => {
+  const table = MESSAGES[LANG] || MESSAGES.zh;
+  const tpl = table[key] ?? MESSAGES.zh[key] ?? key;
+  return tpl.replace(/\{(\w+)\}/g, (m, name) =>
+    params[name] != null ? String(params[name]) : m
+  );
+};
 
 // 按字形截断。不能用 String#slice：它按 UTF-16 码元切，会把 emoji 劈成孤立代理项，
 // 带孤立代理项的字符串经 IPC 传给宿主时 invoke 既不返回也不报错，任务会永远挂住（实测）。
@@ -109,7 +498,7 @@ function parseDateFloor(value) {
   const raw = str(value).trim();
   if (!raw) return null;
   const ms = Date.parse(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T00:00:00` : raw);
-  if (Number.isNaN(ms)) throw new Error(`最旧时间「${raw}」无法解析，请用形如 2026-01-31 的日期`);
+  if (Number.isNaN(ms)) throw new Error(t("dateInvalid", { value: raw }));
   return ms;
 }
 
@@ -179,10 +568,10 @@ function tweetHashtags(tweet) {
   const seen = new Set();
   const tags = [];
   for (const h of list) {
-    const t = str(h?.text).trim();
-    if (t && !seen.has(t.toLowerCase())) {
-      seen.add(t.toLowerCase());
-      tags.push(t);
+    const tag = str(h?.text).trim();
+    if (tag && !seen.has(tag.toLowerCase())) {
+      seen.add(tag.toLowerCase());
+      tags.push(tag);
     }
   }
   return tags;
@@ -314,8 +703,8 @@ function extractConversation(json, focalId) {
   const replies = [];
   const pushItem = (it) => {
     if (!str(it?.entryId).includes("-tweet-")) return;
-    const t = unwrapTweet(it.item?.itemContent?.tweet_results?.result);
-    if (t) replies.push(t);
+    const reply = unwrapTweet(it.item?.itemContent?.tweet_results?.result);
+    if (reply) replies.push(reply);
   };
   for (const ins of instructions) {
     if (ins.type === "TimelineAddEntries") {
@@ -399,7 +788,7 @@ function buildSearchTexts(meta) {
   for (const tag of meta.tweet.hashtags) texts.push(`#${tag}`, tag);
   for (const m of meta.media) if (m.alt) texts.push(m.alt);
   for (const c of meta.comments) texts.push(c.author.name, `@${c.author.screenName}`, c.text);
-  return [...new Set(texts.map((t) => str(t).trim()).filter(Boolean))];
+  return [...new Set(texts.map((text) => str(text).trim()).filter(Boolean))];
 }
 
 // ── 增量水位线 ──
@@ -410,7 +799,7 @@ async function readWatermark(key) {
     const data = (await Kabegame.pluginData()) || {};
     return str(data?.watermarks?.[key]);
   } catch (e) {
-    await warn(`读取上次爬取记录失败，本次按全量处理：${errorMessage(e)}`);
+    await warn(t("watermarkReadFailed", { error: errorMessage(e) }));
     return "";
   }
 }
@@ -420,9 +809,9 @@ async function writeWatermark(key, value) {
   try {
     const data = (await Kabegame.pluginData()) || {};
     await Kabegame.setPluginData({ ...data, watermarks: { ...(data.watermarks || {}), [key]: value } });
-    await log(`已记录水位线 ${key} = ${value}`);
+    await log(t("watermarkSaved", { key, value }));
   } catch (e) {
-    await warn(`写入爬取记录失败（下次会重复翻页）：${errorMessage(e)}`);
+    await warn(t("watermarkWriteFailed", { error: errorMessage(e) }));
   }
 }
 
@@ -449,11 +838,11 @@ const isLoggedIn = () => /(?:^|; )twid=/.test(document.cookie);
 // 未登录：显示爬虫窗口等用户登录，登录后重新打开 retryUrl。返回 false 表示本页已交棒（重进或结束）。
 async function ensureLoggedIn(retryUrl, pageLabel) {
   if (isLoggedIn()) return true;
-  await warn("未登录 X。请在弹出的爬虫窗口中登录（或先在「畅游」里登录 x.com），登录后会自动继续。");
+  await warn(t("notLoggedIn"));
   await Kabegame.requestShowWebview();
   for (let i = 0; i < 180 && !isLoggedIn(); i++) await Kabegame.sleep(1000);
   if (!isLoggedIn()) {
-    await warn("等待 3 分钟仍未登录，任务结束");
+    await warn(t("loginTimeout"));
     await Kabegame.exit();
     return false;
   }
@@ -518,7 +907,7 @@ async function handleTimeline() {
       // 首屏：等目标时间线；来的是另一种（下拉记住了上次选择）就手动切换。
       first = await nextResponse(reader, Object.values(TIMELINE_OPS), 25000);
       if (first && first.name !== TIMELINE_OPS[kind]) {
-        await log(`页面加载了 ${first.name}，切换到${kindName(kind)}`);
+        await log(t("mediaSwitched", { op: first.name, kind: kindName(kind) }));
         first = (await switchMediaFilter(kind)) ? await nextResponse(reader, [TIMELINE_OPS[kind]], 15000) : null;
       }
     } else {
@@ -528,14 +917,14 @@ async function handleTimeline() {
       first = (await switchMediaFilter(kind)) ? await nextResponse(reader, [TIMELINE_OPS[kind]], 15000) : null;
     }
     if (!first) {
-      await warn(`没有等到${kindName(kind)}时间线（${TIMELINE_OPS[kind]}）响应，跳过 · ${location.href} · ${document.title}`);
+      await warn(t("timelineMissing", { kind: kindName(kind), op: TIMELINE_OPS[kind], url: location.href, title: document.title }));
       continue;
     }
     st = await resolveUser(st);
     const limit = st.maxTweets > 0 ? st.maxTweets - queue.size : 0;
     const spec = {
       op: TIMELINE_OPS[kind],
-      label: `${kindName(kind)}时间线`,
+      label: t("photoTimeline", { kind: kindName(kind) }),
       watermarkKey: st.userId ? `${st.userId}:${kind}` : "",
       ordered: true,
     };
@@ -554,11 +943,14 @@ async function handleTimeline() {
 
 // 收集结束后的共同收尾：逐条抓评论并下载，全部处理完才推进水位线。
 async function finish(st, items, watermarks) {
-  await log(`收集完成 · 共 ${items.length} 条推文` + (st.maxComments > 0 ? ` · 有回复的会打开详情页保存最多 ${st.maxComments} 条` : ""));
+  await log(
+    t("collectDone", { count: items.length }) +
+      (st.maxComments > 0 ? t("collectDoneComments", { count: st.maxComments }) : ""),
+  );
   await processQueue(st, items);
   // 只有收集一路翻到「旧水位 / 末尾 / 时间下界」且全部处理完，才推进水位线；中途取消不会走到这里。
   for (const w of watermarks) await writeWatermark(w.key, w.value);
-  await log(`全部完成 · 共处理 ${items.length} 条推文`);
+  await log(t("allDone", { count: items.length }));
   await Kabegame.exit();
 }
 
@@ -572,23 +964,23 @@ async function handleSearch() {
   const first = await nextResponse(reader, [SEARCH_OP], 25000);
   if (!first && !st.searchRetried) {
     // 实测连续搜索后偶尔整页加载完也不发 SearchTimeline，隔一会儿重载就恢复。此时还没有下载在途，可以整页导航。
-    await log("没有等到搜索结果，5 秒后重载页面再试一次");
+    await log(t("searchRetry"));
     await Kabegame.updateState({ searchRetried: true });
     await Kabegame.sleep(5000);
     return Kabegame.to(searchUrl(st.query, st.sort), { pageLabel: "search" });
   }
   if (!first) {
-    const ops = [...new Set(responses.map((r) => r.name))].join(",") || "无";
+    const ops = [...new Set(responses.map((r) => r.name))].join(",") || t("none");
     const text = (document.querySelector('[data-testid="primaryColumn"]')?.innerText ?? "").replace(/\s+/g, " ").slice(0, 160);
-    await warn(`没有等到搜索结果（${SEARCH_OP}）响应 · 页面请求=${ops} · 页面显示「${text}」`);
+    await warn(t("searchMissing", { op: SEARCH_OP, ops, text }));
     return Kabegame.exit();
   }
   const spec = {
     op: SEARCH_OP,
-    label: st.sort === "top" ? "搜索（热门）" : "搜索（最新）",
+    label: st.sort === "top" ? t("searchTopLabel") : t("searchLatestLabel"),
     watermarkKey: st.sort === "top" ? "" : `search:${st.kinds.join("+")}:${hashKey(st.query.toLowerCase())}`,
     ordered: st.sort !== "top",
-    noIncrementalNote: st.sort === "top" ? "热门排序的结果不按时间排列，不使用增量记录" : "",
+    noIncrementalNote: st.sort === "top" ? t("searchNoIncremental") : "",
   };
   const result = await collectTimeline(st, spec, first, reader, st.maxTweets);
   const kinds = new Set(st.kinds);
@@ -596,11 +988,11 @@ async function handleSearch() {
   await finish(st, items, result.watermark ? [result.watermark] : []);
 }
 
-const kindName = (kind) => (kind === "photo" ? "图片" : "视频");
+const kindName = (kind) => (kind === "photo" ? t("kindPhoto") : t("kindVideo"));
 
 const COLLECTIONS = {
-  bookmarks: { op: BOOKMARKS_OP, label: "书签", labelName: "X 书签" },
-  likes: { op: LIKES_OP, label: "点赞", labelName: "X 点赞" },
+  bookmarks: { op: BOOKMARKS_OP, label: t("bookmarksLabel"), labelName: t("bookmarksName") },
+  likes: { op: LIKES_OP, label: t("likesLabel"), labelName: t("likesName") },
 };
 
 // 书签 / 点赞：都只能看当前登录账号自己的。书签直接打开 /i/bookmarks；点赞的地址要用户名，
@@ -617,16 +1009,16 @@ async function handleCollection() {
   if (st.mode === "likes") {
     const me = await resolveOwnScreenName(userId);
     if (!me) {
-      await warn(`取不到当前账号的用户名，无法打开点赞列表 · 页面=${location.pathname} · 宽度=${innerWidth}`);
+      await warn(t("usernameMissing", { path: location.pathname, width: innerWidth }));
       return Kabegame.exit();
     }
-    await log(`当前账号 @${me}，打开点赞列表`);
+    await log(t("accountOpened", { name: me }));
     reader.index = responses.length;
     spaNavigate(`/${me}/likes`);
   }
   const first = await nextResponse(reader, [conf.op], 25000);
   if (!first) {
-    await warn(`没有等到${conf.label}列表（${conf.op}）响应 · ${location.href} · ${document.title}`);
+    await warn(t("collectionMissing", { label: conf.label, op: conf.op, url: location.href, title: document.title }));
     return Kabegame.exit();
   }
   const spec = {
@@ -668,13 +1060,13 @@ async function handleTweet() {
   if (!(await ensureLoggedIn(`https://x.com/i/web/status/${st.tweetId}`, "tweet"))) return;
   const r = await fetchConversation(st.tweetId, st, { navigate: false });
   if (r.rateLimited || r.error || !r.focal) {
-    const why = r.rateLimited ? "被限流（429），稍后再试" : r.error || "推文不存在、已删除或当前账号看不到";
-    await warn(`推文 ${st.tweetId} 没取到：${why}`);
+    const why = r.rateLimited ? t("tweetRateLimited") : r.error || t("tweetUnavailable");
+    await warn(t("tweetMissing", { id: st.tweetId, reason: why }));
     return Kabegame.exit();
   }
   const kinds = new Set(st.kinds);
-  if (!hasWantedMedia(r.focal, st.kinds)) await warn("这条推文没有所选类型的图片 / 视频，没有可下载的媒体");
-  if (st.maxComments > 0) await log(`评论：保存 ${r.comments.length} 条回复`);
+  if (!hasWantedMedia(r.focal, st.kinds)) await warn(t("noWantedMedia"));
+  if (st.maxComments > 0) await log(t("commentsSaved", { count: r.comments.length }));
   await downloadTweet(r.focal, kinds, r.comments, st);
   await Kabegame.addProgress(99);
   await Kabegame.exit();
@@ -694,7 +1086,7 @@ async function collectTimeline(st, spec, first, reader, limit) {
   const watermark = st.incremental && watermarkKey ? await readWatermark(watermarkKey) : "";
   const marks = markSet ? new Set(watermark.split(",").filter(Boolean)) : null;
   const isOld = (id) => Boolean(watermark) && (marks ? marks.has(id) : !idGreater(id, watermark));
-  if (watermark) await log(markSet ? `增量：遇到上次最前面的 ${marks.size} 条之一就停` : `增量：只抓 ${watermark} 之后的推文`);
+  if (watermark) await log(markSet ? t("incrementalMarkSet", { count: marks.size }) : t("incrementalWatermark", { id: watermark }));
   if (st.incremental && spec.noIncrementalNote) await log(spec.noIncrementalNote);
 
   const seen = new Set();
@@ -707,7 +1099,7 @@ async function collectTimeline(st, spec, first, reader, limit) {
   while (response || idleRounds < 3) {
     if (response) {
       if (response.status === 429) {
-        await warn("X 返回 429（请求过于频繁），停止翻页；稍后再试");
+        await warn(t("rateLimited"));
         stopReason = "ratelimit";
         break;
       }
@@ -717,7 +1109,7 @@ async function collectTimeline(st, spec, first, reader, limit) {
       } catch {}
       const tweets = json ? extractTweets(json) : [];
       if (!json || json.errors?.length) {
-        await warn(`${op} 响应异常：HTTP ${response.status} ${JSON.stringify(json?.errors ?? null).slice(0, 200)}`);
+        await warn(t("responseAbnormal", { op, status: response.status, errors: JSON.stringify(json?.errors ?? null).slice(0, 200) }));
       }
       if (tweets.length === 0) {
         stopReason = "end";
@@ -729,7 +1121,7 @@ async function collectTimeline(st, spec, first, reader, limit) {
         seen.add(id);
         return true;
       });
-      await log(`${label} +${fresh.length} 条推文（累计 ${seen.size}）`);
+      await log(t("timelineAdded", { label, count: fresh.length, total: seen.size }));
       for (const tweet of fresh) {
         const id = str(tweet.rest_id);
         if (isOld(id)) {
@@ -768,14 +1160,14 @@ async function collectTimeline(st, spec, first, reader, limit) {
   if (!stopReason) stopReason = "idle";
 
   const reasonText = {
-    end: "已到时间线末尾",
-    watermark: "遇到上次抓过的推文",
-    timeMin: "早于最旧时间",
-    max: "达到推文数上限",
-    ratelimit: "被限流",
-    idle: "连续 3 次滚动都没有新响应",
+    end: t("reasonEnd"),
+    watermark: t("reasonWatermark"),
+    timeMin: t("reasonTimeMin"),
+    max: t("reasonMax"),
+    ratelimit: t("reasonRateLimit"),
+    idle: t("reasonIdle"),
   }[stopReason];
-  await log(`${label}收集结束（${reasonText}）· ${collected.length} 条推文`);
+  await log(t("timelineDone", { label, reason: reasonText, count: collected.length }));
   // 因上限、限流或无响应提前停时不推进水位线，免得漏抓。
   const ok = st.incremental && watermarkKey && newestId && ["end", "watermark", "timeMin"].includes(stopReason);
   // markSet：本次没有新收藏就沿用旧记录；否则新的前几条不够数时用旧记录补齐。
@@ -798,9 +1190,9 @@ async function processQueue(st, items) {
       const r = await fetchConversation(str(tweet.rest_id), st, { tweet });
       if (r.rateLimited) {
         commentsDisabled = true;
-        await warn("打开推文详情被限流（429），后面的推文不再保存评论，只下载媒体");
+        await warn(t("commentsRateLimited"));
       } else if (r.error) {
-        await warn(`推文 ${tweet.rest_id} 的回复没取到：${r.error}`);
+        await warn(t("commentsFetchFailed", { id: tweet.rest_id, error: r.error }));
       } else {
         if (r.focal) current = r.focal; // 详情页里的计数更新
         comments = r.comments;
@@ -811,9 +1203,9 @@ async function processQueue(st, items) {
     }
     await downloadTweet(current, kinds, comments, st);
     await Kabegame.addProgress(perItem);
-    if ((i + 1) % 20 === 0) await log(`已处理 ${i + 1}/${items.length} 条推文`);
+    if ((i + 1) % 20 === 0) await log(t("progressLog", { done: i + 1, total: items.length }));
   }
-  if (st.maxComments > 0) await log(`评论：打开 ${opened} 条推文详情，共保存 ${saved} 条回复`);
+  if (st.maxComments > 0) await log(t("commentSummary", { opened, saved }));
 }
 
 // SPA 路由跳转：文档不重载，在途下载不受影响。
@@ -839,8 +1231,8 @@ async function fetchConversation(id, st, { tweet = null, navigate = true } = {})
     response = await nextDetail(reader, id, 6000);
   }
   if (!response) {
-    const seenOps = responses.slice(reader.start).map((r) => r.name).join(",") || "无";
-    return { error: `没有等到 TweetDetail · 期间请求=${seenOps} · 页面=${location.pathname}` };
+    const seenOps = responses.slice(reader.start).map((r) => r.name).join(",") || t("none");
+    return { error: t("detailWaitingMissing", { ops: seenOps, path: location.pathname }) };
   }
   let idle = 0;
   while (response || idle < 1) {
@@ -850,13 +1242,13 @@ async function fetchConversation(id, st, { tweet = null, navigate = true } = {})
       try {
         json = JSON.parse(response.text);
       } catch {}
-      if (!json) return { error: `TweetDetail 不是 JSON（HTTP ${response.status}）` };
+      if (!json) return { error: t("detailNotJson", { status: response.status }) };
       const conv = extractConversation(json, id);
       if (conv.focal) focal = conv.focal;
       const focalAuthorId = tweetAuthor(focal ?? tweet ?? {}).id;
-      for (const t of conv.replies) {
-        const rid = str(t.rest_id);
-        if (rid && rid !== id && !byId.has(rid) && byId.size < st.maxComments) byId.set(rid, buildComment(t, focalAuthorId));
+      for (const reply of conv.replies) {
+        const rid = str(reply.rest_id);
+        if (rid && rid !== id && !byId.has(rid) && byId.size < st.maxComments) byId.set(rid, buildComment(reply, focalAuthorId));
       }
       if (!conv.hasBottom || byId.size >= st.maxComments) break;
       idle = 0;
@@ -889,7 +1281,7 @@ async function downloadTweet(tweet, kinds, comments, st) {
   try {
     meta = buildMetadata(tweet);
   } catch (e) {
-    await warn(`解析推文 ${tweet?.rest_id} 失败：${errorMessage(e)}`);
+    await warn(t("parseTweetFailed", { id: tweet?.rest_id, error: errorMessage(e) }));
     return;
   }
   meta.comments = comments;
@@ -905,7 +1297,7 @@ async function downloadTweet(tweet, kinds, comments, st) {
   try {
     metadataId = await Kabegame.createImageMetadata(meta, { searchTexts: buildSearchTexts(meta) });
   } catch (e) {
-    await warn(`创建 metadata 失败（${meta.tweet.id}）：${errorMessage(e)}`);
+    await warn(t("metadataFailed", { id: meta.tweet.id, error: errorMessage(e) }));
   }
   const labels = buildLabels(meta);
   if (st.extraLabel) labels.push(st.extraLabel);
@@ -916,7 +1308,7 @@ async function downloadTweet(tweet, kinds, comments, st) {
     try {
       await Kabegame.downloadImage(m.url, { name: `${snippet}${suffix}`, url: meta.tweet.url, ...withMeta, labels });
     } catch (e) {
-      await warn(`下载失败 ${meta.tweet.url}${suffix}：${errorMessage(e)}`);
+      await warn(t("downloadFailed", { url: meta.tweet.url, suffix, error: errorMessage(e) }));
     }
   }
 
@@ -929,7 +1321,7 @@ async function downloadTweet(tweet, kinds, comments, st) {
       try {
         await Kabegame.downloadImage(m.url, { name: `${snippet} [@${c.author.screenName} 的回复]${suffix}`, url: c.url, ...withMeta });
       } catch (e) {
-        await warn(`评论配图下载失败 ${c.url}${suffix}：${errorMessage(e)}`);
+        await warn(t("commentImageFailed", { url: c.url, suffix, error: errorMessage(e) }));
       }
     }
   }
@@ -948,22 +1340,28 @@ async function handleInitial() {
   const maxComments = clampInt(vars.max_comments, 50, 0, 1000);
   const fetchCommentImages = vars.fetch_comment_images === true;
   const common = { kinds, maxTweets, timeMin, incremental, maxComments, fetchCommentImages };
-  const commonLog =
-    `类型=${kinds.join("+")} · 上限=${maxTweets || "不限"} · 增量=${incremental}` +
-    ` · 评论=${maxComments || "不抓"}${maxComments && fetchCommentImages ? "（含配图）" : ""}` +
-    (timeMin !== null ? ` · 最旧=${new Date(timeMin).toLocaleDateString()}` : "");
+  const commonLog = t("commonLog", {
+    types: kinds.map(kindName).join("+"),
+    limit: maxTweets || t("unlimited"),
+    incremental: incremental ? t("yes") : t("no"),
+    comments: maxComments || t("commentsOff"),
+    images: maxComments && fetchCommentImages ? t("withCommentImages") : "",
+    timeMin: timeMin !== null
+      ? t("timeMinSuffix", { date: new Date(timeMin).toLocaleDateString() })
+      : "",
+  });
 
   if (mode === "search") {
     const raw = str(vars.query).replace(/\s+/g, " ").trim();
     if (!raw) {
-      await warn("搜索模式需要填写搜索词");
+      await warn(t("searchQueryRequired"));
       return Kabegame.exit();
     }
     const query = searchQuery(raw, mediaType);
     const sort = vars.search_sort === "top" ? "top" : "latest";
     // 搜索结果挂一个标签，key 用搜索词哈希（原文含冒号、空格等不能当 key）。
     const extraLabel = { key: `q-${hashKey(raw.toLowerCase())}`, category: `${PLUGIN_ID}/search`, name: raw };
-    await log(`搜索「${query}」· 排序=${sort === "top" ? "热门" : "最新"} · ${commonLog}`);
+    await log(t("searchLog", { query, sort: sort === "top" ? t("sortTop") : t("sortLatest"), common: commonLog }));
     await Kabegame.updateState({ mode, query, sort, extraLabel, ...common });
     await Kabegame.to(searchUrl(query, sort), { pageLabel: "search" });
     return;
@@ -972,10 +1370,10 @@ async function handleInitial() {
   if (mode === "tweet") {
     const tweetId = parseTweetId(vars.tweet);
     if (!tweetId) {
-      await warn(`无法识别推文「${str(vars.tweet)}」：请粘贴推文链接（https://x.com/<用户>/status/<数字>）或推文 id`);
+      await warn(t("tweetInputInvalid", { value: str(vars.tweet) }));
       return Kabegame.exit();
     }
-    await log(`单条推文 ${tweetId} · 类型=${kinds.join("+")} · 评论=${maxComments || "不抓"}`);
+    await log(t("tweetLog", { id: tweetId, types: kinds.map(kindName).join("+"), comments: maxComments || t("commentsOff") }));
     await Kabegame.updateState({ mode, tweetId, ...common, maxTweets: 1, timeMin: null, incremental: false });
     await Kabegame.to(`https://x.com/i/web/status/${tweetId}`, { pageLabel: "tweet" });
     return;
@@ -984,7 +1382,7 @@ async function handleInitial() {
   if (mode === "bookmarks" || mode === "likes") {
     const conf = COLLECTIONS[mode];
     const extraLabel = { key: mode, category: `${PLUGIN_ID}/collection`, name: conf.labelName };
-    await log(`${conf.label} · ${commonLog}`);
+    await log(t("collectionLog", { label: conf.label, common: commonLog }));
     await Kabegame.updateState({ mode, extraLabel, ...common });
     await Kabegame.to(mode === "bookmarks" ? "https://x.com/i/bookmarks" : "https://x.com/home", { pageLabel: "collection" });
     return;
@@ -992,10 +1390,10 @@ async function handleInitial() {
 
   const screenName = parseScreenName(vars.user);
   if (!screenName) {
-    await warn(`无法识别画师「${str(vars.user)}」：请填 @用户名、用户名或主页链接`);
+    await warn(t("artistInputInvalid", { value: str(vars.user) }));
     return Kabegame.exit();
   }
-  await log(`画师 @${screenName} · ${commonLog}`);
+  await log(t("artistLog", { name: screenName, common: commonLog }));
   // userId 要等时间线页截获 UserByScreenName 后补齐（初始页是首页，拿不到）。
   await Kabegame.updateState({ mode, screenName, userId: "", ...common });
   await Kabegame.to(timelineUrl(screenName, kinds[0]), { pageLabel: "timeline" });
@@ -1012,7 +1410,7 @@ async function resolveUser(st) {
   // 2026-07 起 user.legacy 被拿掉，计数迁到 tweet_counts；旧字段留作兜底。
   const mediaCount = Number(user?.tweet_counts?.media_tweets ?? user?.legacy?.media_count ?? 0);
   const patch = { userId: str(user?.rest_id) };
-  await log(`画师信息：${user?.core?.name ?? "?"} · id=${patch.userId || "?"} · 媒体推文 ${mediaCount || "?"}`);
+  await log(t("artistInfoLog", { name: user?.core?.name ?? "?", id: patch.userId || "?", count: mediaCount || "?" }));
   await Kabegame.updateState(patch);
   return { ...st, ...patch };
 }
@@ -1020,7 +1418,7 @@ async function resolveUser(st) {
 async function main() {
   try {
     const label = await Kabegame.pageLabel();
-    await log(`▶ 页面加载 · 阶段=${label} · ${location.href}`);
+    await log(t("pageLoaded", { phase: label, url: location.href }));
     if (label === "initial") return await handleInitial();
     if (label === "timeline") return await handleTimeline();
     if (label === "search") return await handleSearch();
@@ -1028,7 +1426,7 @@ async function main() {
     if (label === "tweet") return await handleTweet();
     await Kabegame.exit();
   } catch (e) {
-    await warn(`插件运行失败：${errorMessage(e)}`);
+    await warn(t("pluginFailed", { error: errorMessage(e) }));
     await Kabegame.exit();
   }
 }

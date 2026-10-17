@@ -8,6 +8,7 @@
 
 import TinyPinyin from "tiny-pinyin";
 import { sleep } from "@kabegame/plugin-sdk";
+import { t } from "./i18n";
 
 const { addProgress, createImageMetadata, downloadImage, warn } = Kabegame;
 
@@ -49,10 +50,6 @@ const LABEL_CHARACTER = "bluedafeiyu/character";
 const LABEL_TAG = "bluedafeiyu/tag";
 const KEY_ALLOWED = /^[a-z0-9_\-() ]+$/;
 
-function log(message) {
-  console.log(`[bluedafeiyu] ${message}`);
-}
-
 function str(value) {
   return value == null ? "" : String(value).trim();
 }
@@ -84,14 +81,20 @@ async function fetchJson(url, label) {
     } catch (error) {
       lastError = error;
       if (attempt < REQUEST_ATTEMPTS) {
-        log(
-          `${label}读取失败，${attempt * 700}ms 后重试 ${attempt + 1}/${REQUEST_ATTEMPTS}：${error?.message ?? error}`,
+        console.log(
+          t("requestRetry", {
+            label,
+            delay: attempt * 700,
+            attempt: attempt + 1,
+            max: REQUEST_ATTEMPTS,
+            error: error?.message ?? error,
+          }),
         );
         await sleep(attempt * 700);
       }
     }
   }
-  throw new Error(`${label}请求失败：${lastError?.message ?? lastError}`);
+  throw new Error(t("requestFailed", { label, error: lastError?.message ?? lastError }));
 }
 
 function toPinyin(text) {
@@ -277,7 +280,7 @@ function filterAndSort(works, character, type, sort, statsSnapshot) {
           (Number(statsSnapshot?.works?.[b.id]?.[metric]) || 0) - (Number(statsSnapshot?.works?.[a.id]?.[metric]) || 0),
       );
     } else {
-      warn(`[bluedafeiyu] 公开统计不可用，${sort === "popular" ? "热度" : "下载量"}排序回退为最新顺序`);
+      warn(t("statsUnavailable", { sort: sort === "popular" ? t("sortPopular") : t("sortDownloads") }));
     }
   } else if (sort === "random") {
     shuffle(filtered);
@@ -292,23 +295,29 @@ export async function crawl(common, custom) {
   const type = VALID_TYPES.has(str(vars.type)) ? str(vars.type) : "";
   const sort = VALID_SORTS.has(str(vars.sort)) ? str(vars.sort) : "latest";
 
-  log(`读取完整归档：${baseUrl}${ARCHIVE_PATH}`);
-  const archive = await fetchJson(`${baseUrl}${ARCHIVE_PATH}`, "归档数据");
+  console.log(t("readingArchive", { url: `${baseUrl}${ARCHIVE_PATH}` }));
+  const archive = await fetchJson(`${baseUrl}${ARCHIVE_PATH}`, t("archiveLabel"));
   const works = Array.isArray(archive?.works) ? archive.works : [];
-  if (works.length === 0) throw new Error("archive-data.json 中没有作品，源站数据结构可能已变化");
+  if (works.length === 0) throw new Error(t("archiveEmpty"));
   addProgress(3);
 
   let statsSnapshot = null;
   try {
-    statsSnapshot = await fetchJson(`${baseUrl}${ANALYTICS_PATH}`, "公开统计");
+    statsSnapshot = await fetchJson(`${baseUrl}${ANALYTICS_PATH}`, t("statsLabel"));
   } catch (error) {
-    warn(`[bluedafeiyu] 公开统计读取失败：${error?.message ?? error}`);
+    warn(t("statsReadFailed", { error: error?.message ?? error }));
   }
   addProgress(2);
 
   const selected = filterAndSort(works, character, type, sort, statsSnapshot);
-  log(
-    `归档 ${works.length} 条，筛选后 ${selected.length} 条（角色=${character || "全部"}，类型=${type || "全部"}，排序=${sort}）`,
+  console.log(
+    t("filterSummary", {
+      total: works.length,
+      selected: selected.length,
+      character: character || t("all"),
+      type: type || t("all"),
+      sort,
+    }),
   );
   if (selected.length === 0) {
     addProgress(95);
@@ -320,7 +329,7 @@ export async function crawl(common, custom) {
     try {
       const metadata = buildMetadata(work, baseUrl, statsSnapshot);
       const originalUrl = metadata.media.original_url;
-      if (!originalUrl) throw new Error("缺少原图 URL");
+      if (!originalUrl) throw new Error(t("missingOriginalUrl"));
       const metadataId = Number(createImageMetadata(metadata, { searchTexts: buildSearchTexts(metadata) }));
       await downloadImage(originalUrl, {
         name: metadata.title || `${metadata.characters[0]?.name || "蓝色大肥鱼"} #${metadata.slug}`,
@@ -328,9 +337,9 @@ export async function crawl(common, custom) {
         metadata_id: metadataId,
         labels: buildLabels(work),
       });
-      log(`  ${index + 1}/${selected.length} ${metadata.title || metadata.slug}`);
+      console.log(`[bluedafeiyu]   ${index + 1}/${selected.length} ${metadata.title || metadata.slug}`);
     } catch (error) {
-      warn(`[bluedafeiyu] 作品 ${work?.slug || work?.id || index + 1} 失败：${error?.message ?? error}`);
+      warn(t("workFailed", { work: work?.slug || work?.id || index + 1, error: error?.message ?? error }));
     }
     addProgress(eachProgress);
   }

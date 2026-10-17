@@ -1,0 +1,18 @@
+{
+  "searchUrlRequired": "请填写搜索 URL",
+  "invalidUrl": "不是合法的 URL：{url}",
+  "searchUrlInvalid": "请填写 e-shuushuu 搜索页地址（https://e-shuushuu.net/search?…），收到：{url}",
+  "listHttpError": "列表接口返回 HTTP {status}",
+  "noImageUrl": "[e-shuushuu] 图片 #{id} 没有原图地址，跳过",
+  "topPageCapped": "[e-shuushuu] 排行榜最多 {max} 页，结束页 {endPage} 按 {max} 处理",
+  "startPageOutOfRange": "[e-shuushuu] 起始页 {startPage} 超出范围，任务结束",
+  "openTop": "[e-shuushuu] 排行榜（{period}）：第 {startPage}~{endPage} 页",
+  "openSearch": "[e-shuushuu] 搜索（{query}）：第 {startPage}~{endPage} 页",
+  "openHome": "[e-shuushuu] 主页翻页：第 {startPage}~{endPage} 页",
+  "all": "全部",
+  "totalSummary": "[e-shuushuu] 共 {total} 张，{pages} 页",
+  "pageReadFailed": "[e-shuushuu] 第 {page} 页读取失败：{error}",
+  "pageStart": "[e-shuushuu] ┌ 第 {page} 页：{total} 条，源站可见 {visible} 条",
+  "downloadFailed": "[e-shuushuu] 图片 #{id} 下载失败：{error}",
+  "pageDone": "[e-shuushuu] └ 第 {page} 页完成"
+}
