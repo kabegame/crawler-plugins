@@ -1,6 +1,6 @@
 {
-  "name": "kabegame-plugin-konachan",
-  "version": "1.7.3",
+  "name": "konachan",
+  "version": "1.7.4",
   "private": true,
   "name.zh": "konachan动漫壁纸",
   "name.en": "Konachan anime wallpapers",
