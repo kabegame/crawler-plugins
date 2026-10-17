@@ -6,7 +6,7 @@
 // 服务器 4.5.1 起画廊续接段改名（`_kb_fc` / `_kb_desc` / `_kb_x<N>x`），旧写法不再识别；
 // 运行前先探测服务器方言，路径一律按探测结果拼。
 // 图片字节、元数据、标签、帖子地址都从服务器原样搬过来：
-//   - 媒体：Web 版的 local_path 已是 CDN 直链；桌面 Web 服务器返回本地路径，经同端口 `/file?path=` 读取；
+//   - 媒体：Web 版的 local_path 已是 CDN 直链；桌面 Web 服务器返回本地路径，经同端口 `/file/{*path}` 读取；
 //   - 元数据：`get_image_metadata_full`，按服务器 metadata 行共用一行本地 metadata（多图帖子不重复存）；
 //   - 标签：`albums://of_image_<id>/album_kind/label` 的 label_path 原样拆成 category + key；
 //   - 帖子地址：服务器的 post_url，没有就留空，不填服务器自己的地址。
@@ -137,7 +137,10 @@ async function runPool(items, limit, worker) {
 function mediaUrl(server, image) {
   const p = String(image.local_path ?? "").trim();
   if (/^https?:\/\//i.test(p)) return p;
-  if (p) return `${server}/file?path=${encodeURIComponent(p)}`;
+  if (p) {
+    const encoded = p.split("/").map(encodeURIComponent).join("/").replace(/^\/+/, "");
+    return `${server}/file/${encoded}`;
+  }
   // 服务器没有本地文件（理论上不会出现）时退回原始下载地址
   return String(image.url ?? "").trim();
 }

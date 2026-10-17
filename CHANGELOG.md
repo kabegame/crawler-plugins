@@ -13,6 +13,7 @@
 - aibooru（1.0.0）：aibooru.online（Danbooru 分支的 AI 生成图图库），走 JSON API 一页一次请求拿齐标签、AI 生成参数、作者评论与评论区；支持标签 / 人气榜 / 全部 / id 范围四种模式，分级默认只抓全年龄，标签新增 `model` 分类。
 
 ### Changed
+- kabegame-server（0.2.3）：桌面服务器媒体地址改用 `/file/{*path}`，适配不再接受 `?path=` 的 Kabegame 4.5.2 服务端。
 - 全部插件目录与 `package.json` 的 `name` 改为 `kabegame-plugin-<id>`（如 `plugins/kabegame-plugin-pixiv/`），应用加载时剥离前缀，插件 id、`.kgpg` 文件名与已有图片数据均不变；`engines.kabegame` 统一提到 `>=4.5.2`（旧版应用不剥离前缀，会把完整包名当成新插件）。
 - `package-plugin.ts` / `generate-index.ts` / repack、run driver 按剥离后的 id 
 
