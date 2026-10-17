@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-anime-pictures",
-  "version": "0.6.4",
+  "version": "0.7.0",
   "private": true,
   "name.zh": "anime-pictures动漫图库",
   "name.en": "anime-pictures anime gallery",
@@ -23,7 +23,9 @@
   },
   "kbBaseUrl": "https://anime-pictures.net",
   "kbLabels": [
-    { "id": "auth.needProxy" }
+    {
+      "id": "auth.needProxy"
+    }
   ],
   "kbConfig": [
     {
@@ -41,6 +43,93 @@
       "descripts.zhtw": "要拉取的標籤（預設無標籤爬全站）"
     },
     {
+      "key": "postsPerPage",
+      "type": "int",
+      "name": "每页大小",
+      "name.en": "Posts per page",
+      "name.ja": "1ページの件数",
+      "name.ko": "페이지당 항목 수",
+      "name.zhtw": "每頁大小",
+      "descripts": "每页拉取的图片数（1～100）",
+      "descripts.en": "Number of images fetched per page (1–100)",
+      "descripts.ja": "1ページあたりに取得する画像数（1～100）",
+      "descripts.ko": "페이지당 가져올 이미지 수 (1~100)",
+      "descripts.zhtw": "每頁拉取的圖片數（1～100）",
+      "default": 80,
+      "min": 1,
+      "max": 100,
+      "width": 2
+    },
+    {
+      "key": "orderBy",
+      "type": "options",
+      "name": "排序方法",
+      "name.en": "Sort order",
+      "name.ja": "並び順",
+      "name.ko": "정렬 방식",
+      "name.zhtw": "排序方法",
+      "default": "date",
+      "width": 2,
+      "options": [
+        {
+          "name": "日期（新到旧）",
+          "name.en": "Date (newest first)",
+          "name.ja": "日付（新しい順）",
+          "name.ko": "날짜 (최신순)",
+          "name.zhtw": "日期（新到舊）",
+          "variable": "date"
+        },
+        {
+          "name": "日期（旧到新）",
+          "name.en": "Date (oldest first)",
+          "name.ja": "日付（古い順）",
+          "name.ko": "날짜 (오래된순)",
+          "name.zhtw": "日期（舊到新）",
+          "variable": "date_r"
+        },
+        {
+          "name": "评分",
+          "name.en": "Rating",
+          "name.ja": "評価",
+          "name.ko": "평점",
+          "name.zhtw": "評分",
+          "variable": "rating"
+        },
+        {
+          "name": "浏览数",
+          "name.en": "Views",
+          "name.ja": "閲覧数",
+          "name.ko": "조회수",
+          "name.zhtw": "瀏覽數",
+          "variable": "views"
+        },
+        {
+          "name": "文件大小",
+          "name.en": "File size",
+          "name.ja": "ファイルサイズ",
+          "name.ko": "파일 크기",
+          "name.zhtw": "檔案大小",
+          "variable": "size"
+        },
+        {
+          "name": "标签数",
+          "name.en": "Tag count",
+          "name.ja": "タグ数",
+          "name.ko": "태그 수",
+          "name.zhtw": "標籤數",
+          "variable": "tag_num"
+        },
+        {
+          "name": "收藏日期",
+          "name.en": "Favorite date",
+          "name.ja": "お気に入り登録日",
+          "name.ko": "즐겨찾기 날짜",
+          "name.zhtw": "收藏日期",
+          "variable": "stars_date"
+        }
+      ]
+    },
+    {
       "key": "startPage",
       "type": "int",
       "name": "起始页面",
@@ -55,7 +144,7 @@
       "descripts.zhtw": "要拉取的起始頁面",
       "default": 0,
       "min": 0,
-      "width": 1
+      "width": 2
     },
     {
       "key": "endPage",
@@ -72,7 +161,7 @@
       "descripts.zhtw": "要拉取的結束頁面",
       "default": 5,
       "min": 0,
-      "width": 1
+      "width": 2
     }
   ],
   "kbIcon": "icon.png",
@@ -97,7 +186,8 @@
     "configs/every-day-pictures.json",
     "configs/girls.json",
     "configs/oli+o+o.json",
-    "configs/pink-eye.json"
+    "configs/pink-eye.json",
+    "configs/test.json"
   ],
   "kbPathQLProviders": [
     "providers/color_provider.json5",

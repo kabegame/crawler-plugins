@@ -14,6 +14,8 @@ Download wallpapers from [anime-pictures.net](https://anime-pictures.net) by tag
    | **Start page** | First page to crawl (0-based). |
    | **End page**   | Last page to crawl (inclusive). Keep under 100 pages per task. |
    | **Tag**        | Site search tag; only images with this tag are downloaded. Leave empty to crawl the current list without a tag filter. |
+   | **Posts per page** | Number of images fetched per page, from 1 to 100. Defaults to 80. |
+   | **Sort order** | List sort field. Defaults to date (`date`). |
 
 3. **Finding tag names**  
    On [anime-pictures.net](https://anime-pictures.net), open an image you like.

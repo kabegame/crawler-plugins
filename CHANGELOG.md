@@ -14,6 +14,7 @@
 
 ### Changed
 - kabegame-server（0.2.3）：桌面服务器媒体地址改用 `/file/{*path}`，适配不再接受 `?path=` 的 Kabegame 4.5.2 服务端。
+- anime-pictures（0.7.0）：列表与详情改走站点 JSON API，原图改从 oimages 直接下载，不再需要在畅游里通过 Cloudflare 验证；新增每页大小（1～100，默认 80）与排序方法配置（默认 `date`）；元数据结构不变，并修复改版后部分新图作者与详情为空。
 - 全部插件目录与 `package.json` 的 `name` 改为 `kabegame-plugin-<id>`（如 `plugins/kabegame-plugin-pixiv/`），应用加载时剥离前缀，插件 id、`.kgpg` 文件名与已有图片数据均不变；`engines.kabegame` 统一提到 `>=4.5.2`（旧版应用不剥离前缀，会把完整包名当成新插件）。
 - `package-plugin.ts` / `generate-index.ts` / repack、run driver 按剥离后的 id 
 
