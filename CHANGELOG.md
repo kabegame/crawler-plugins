@@ -4,7 +4,7 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 [SemVer](https://semver.org/lang/zh-CN/)。
 
-## 【4.5.1.4】
+## 【4.6.0】
 ### Added
 - 新增 `check` 命令（`pnpm run check` / `deno task check`），使用仓库根目录的 `tsconfig.check.json` 对 `plugins/*/src` 下的 TypeScript 源码做统一类型检查（WebView 插件的 `crawl.js` 除外）。
 - xhs-webview（0.1.4）：新增仿小红书详情页的插件详情模板，展示作者、正文话题、互动统计与 SSR 首屏评论；元数据补充头像、地区、话题 id 与评论快照，并挂载话题标签画册。
