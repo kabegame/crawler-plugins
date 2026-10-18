@@ -1,0 +1,164 @@
+<%#
+  数据来源：crawl.js noteMetadata 写入的 schema 1 metadata。
+  版式与配色取自 2026-10 Android WebView 中的小红书详情页：
+  主文字 #333、话题链接 #13386c、品牌红 #ff2e4d、次要文字 rgba(51,51,51,.6)。
+%>
+<%
+  const m = metadata || {};
+  const obj = (value) => value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const arr = (value) => Array.isArray(value) ? value : [];
+  const user = obj(m.user);
+  const interact = obj(m.interactInfo);
+  const related = obj(m.relatedSearch);
+  const comments = arr(obj(m.comments).list);
+  const tags = arr(m.tagList);
+  const noteHref = m.noteId ? "https://www.xiaohongshu.com/explore/" + encodeURIComponent(m.noteId) : "";
+  const userHref = user.userId ? "https://www.xiaohongshu.com/user/profile/" + encodeURIComponent(user.userId) : "";
+
+  function httpsUrl(value) {
+    return String(value || "").replace(/^http:\/\//i, "https://");
+  }
+  function pad(value) {
+    return String(value).padStart(2, "0");
+  }
+  function dateText(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number) || number <= 0) return "";
+    const date = new Date(number < 1e12 ? number * 1000 : number);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+  }
+  function countText(value) {
+    if (value === null || value === undefined || value === "") return "0";
+    const source = String(value);
+    if (/[^0-9.]/.test(source)) return source;
+    const number = Number(source);
+    if (!Number.isFinite(number)) return source;
+    if (number >= 10000) return (number / 10000).toFixed(1).replace(/\.0$/, "") + "万";
+    return source;
+  }
+  function descParts(value) {
+    const text = String(value || "");
+    const out = [];
+    const pattern = /#([^#\n]+?)\[话题\]#/g;
+    let offset = 0;
+    let match;
+    while ((match = pattern.exec(text))) {
+      if (match.index > offset) out.push({ text: text.slice(offset, match.index) });
+      out.push({ text: "#" + match[1], tag: match[1] });
+      offset = pattern.lastIndex;
+    }
+    if (offset < text.length) out.push({ text: text.slice(offset) });
+    return out;
+  }
+  const description = descParts(m.desc);
+%>
+<style>
+  .xhs-detail, .xhs-detail * { box-sizing: border-box; }
+  .xhs-detail {
+    color: #333;
+    font: 14px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  .xhs-detail a { color: inherit; text-decoration: none; }
+  .xhs-card { overflow: hidden; border: 1px solid #eee; border-radius: 16px; background: #fff; }
+  .xhs-author { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid #f2f2f2; }
+  .xhs-avatar { width: 40px; height: 40px; flex: none; border-radius: 50%; object-fit: cover; background: #f5f5f5; }
+  .xhs-author-name { min-width: 0; flex: 1; overflow: hidden; color: rgba(51, 51, 51, .8); font-size: 16px; white-space: nowrap; text-overflow: ellipsis; }
+  .xhs-profile { flex: none; padding: 5px 14px; border: 1px solid #ff2e4d; border-radius: 999px; color: #ff2e4d !important; font-weight: 600; }
+  .xhs-content { padding: 16px; }
+  .xhs-warning { display: inline-flex; margin-bottom: 10px; padding: 3px 8px; border-radius: 6px; background: #f5f5f5; color: rgba(51, 51, 51, .6); font-size: 12px; }
+  .xhs-title { margin: 0 0 8px; font-size: 18px; font-weight: 600; line-height: 1.4; word-break: break-word; }
+  .xhs-desc { margin: 0; font-size: 16px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .xhs-tag { color: #13386c !important; }
+  .xhs-related { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: #f7f7f7; }
+  .xhs-related-title { font-weight: 500; }
+  .xhs-related-divider { width: 1px; height: 14px; background: #ddd; }
+  .xhs-related-keyword { min-width: 0; overflow: hidden; color: rgba(51, 51, 51, .7); white-space: nowrap; text-overflow: ellipsis; }
+  .xhs-date { margin-top: 12px; color: rgba(51, 51, 51, .6); font-size: 12px; }
+  .xhs-stats { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 12px 16px; border-top: 1px solid #eee; color: rgba(51, 51, 51, .75); }
+  .xhs-stat b { margin-left: 4px; color: #333; font-weight: 500; }
+  .xhs-comments { margin-top: 12px; overflow: hidden; border: 1px solid #eee; border-radius: 16px; background: #fff; }
+  .xhs-comments-title { padding: 14px 16px 8px; color: rgba(51, 51, 51, .6); }
+  .xhs-comment { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 10px 16px; border-top: 1px solid #f5f5f5; }
+  .xhs-comment:first-of-type { border-top: 0; }
+  .xhs-comment .xhs-avatar { width: 36px; height: 36px; }
+  .xhs-comment-body { min-width: 0; }
+  .xhs-comment-name { color: rgba(51, 51, 51, .6) !important; font-size: 13px; }
+  .xhs-author-badge { margin-left: 5px; padding: 1px 4px; border-radius: 4px; background: #f5f5f5; color: #ff2e4d; font-size: 10px; }
+  .xhs-comment-text { margin-top: 3px; font-size: 14px; white-space: pre-wrap; word-break: break-word; }
+  .xhs-comment-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-top: 5px; color: rgba(51, 51, 51, .6); font-size: 12px; }
+  .xhs-comment-pics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 7px; }
+  .xhs-comment-pics img { width: 100%; aspect-ratio: 1; border-radius: 6px; object-fit: cover; background: #f5f5f5; }
+  .xhs-replies { margin-top: 8px; padding: 8px 10px; border-radius: 8px; background: #f7f7f7; }
+  .xhs-reply + .xhs-reply { margin-top: 9px; }
+  .xhs-reply-name { color: rgba(51, 51, 51, .65); font-size: 12px; }
+  .xhs-reply-target { color: #13386c; }
+  .xhs-more { margin-top: 6px; color: #13386c; font-size: 12px; }
+  .xhs-open { display: block; margin-top: 12px; padding: 10px 14px; border: 1px solid #ff2e4d; border-radius: 999px; color: #ff2e4d !important; text-align: center; font-weight: 600; }
+</style>
+<div class="xhs-detail">
+  <section class="xhs-card">
+    <div class="xhs-author">
+      <% if (user.avatar) { %>
+        <a target="_blank" href="<%= userHref %>"><img class="xhs-avatar" src="<%= httpsUrl(user.avatar) %>" referrerpolicy="no-referrer" alt="" /></a>
+      <% } else { %>
+        <span class="xhs-avatar"></span>
+      <% } %>
+      <a class="xhs-author-name" target="_blank" href="<%= userHref %>"><%= user.nickname || user.userId || "小红书用户" %></a>
+      <% if (userHref) { %><a class="xhs-profile" target="_blank" href="<%= userHref %>">查看主页</a><% } %>
+    </div>
+    <div class="xhs-content">
+      <% if (m.illegalInfo && m.illegalInfo.desc) { %><div class="xhs-warning"><%= m.illegalInfo.desc %></div><% } %>
+      <% if (m.title) { %><h1 class="xhs-title"><%= m.title %></h1><% } %>
+      <% if (description.length) { %>
+        <p class="xhs-desc"><% description.forEach(function (part) { %><% if (part.tag) { %><a class="xhs-tag" target="_blank" href="https://www.xiaohongshu.com/search_result?keyword=<%= encodeURIComponent(part.tag) %>&type=54"><%= part.text %></a><% } else { %><%= part.text %><% } %><% }) %></p>
+      <% } else if (tags.length) { %>
+        <p class="xhs-desc"><% tags.forEach(function (tag) { %><a class="xhs-tag" target="_blank" href="https://www.xiaohongshu.com/search_result?keyword=<%= encodeURIComponent(tag.name || "") %>&type=54">#<%= tag.name %></a> <% }) %></p>
+      <% } %>
+      <% if (related.keyword) { %>
+        <a class="xhs-related" target="_blank" href="https://www.xiaohongshu.com/search_result?keyword=<%= encodeURIComponent(related.keyword) %>">
+          <span class="xhs-related-title"><%= related.title || "猜你想搜" %></span><span class="xhs-related-divider"></span><span class="xhs-related-keyword"><%= related.keyword %></span>
+        </a>
+      <% } %>
+      <% if (m.time || m.ipLocation) { %><div class="xhs-date"><%= dateText(m.time) %><% if (m.time && m.ipLocation) { %> · <% } %><%= m.ipLocation || "" %></div><% } %>
+    </div>
+    <div class="xhs-stats">
+      <span class="xhs-stat">♡<b><%= countText(interact.likedCount) %></b></span>
+      <span class="xhs-stat">☆<b><%= countText(interact.collectedCount) %></b></span>
+      <span class="xhs-stat">评论<b><%= countText(interact.commentCount) %></b></span>
+      <span class="xhs-stat">分享<b><%= countText(interact.shareCount) %></b></span>
+      <% if (m.imageCount) { %><span class="xhs-stat">图片<b><%= m.imageCount %></b></span><% } %>
+    </div>
+  </section>
+
+  <% if (comments.length) { %>
+    <section class="xhs-comments">
+      <div class="xhs-comments-title">共 <%= countText(obj(m.comments).total || interact.commentCount) %> 条评论<% if (obj(m.comments).hasMore) { %> · 首屏快照<% } %></div>
+      <% comments.forEach(function (comment) { const cu = obj(comment.user); const replies = arr(comment.subComments); const pictures = arr(comment.pictures); %>
+        <article class="xhs-comment">
+          <% if (cu.avatar) { %><a target="_blank" href="https://www.xiaohongshu.com/user/profile/<%= encodeURIComponent(cu.userId || "") %>"><img class="xhs-avatar" src="<%= httpsUrl(cu.avatar) %>" referrerpolicy="no-referrer" alt="" /></a><% } else { %><span class="xhs-avatar"></span><% } %>
+          <div class="xhs-comment-body">
+            <div><a class="xhs-comment-name" target="_blank" href="https://www.xiaohongshu.com/user/profile/<%= encodeURIComponent(cu.userId || "") %>"><%= cu.nickname || "小红书用户" %></a><% if (comment.isAuthor) { %><span class="xhs-author-badge">作者</span><% } %></div>
+            <div class="xhs-comment-text"><%= comment.content || "" %></div>
+            <% if (pictures.length) { %><div class="xhs-comment-pics"><% pictures.forEach(function (picture) { %><a target="_blank" href="<%= httpsUrl(picture.url) %>"><img src="<%= httpsUrl(picture.url) %>" referrerpolicy="no-referrer" alt="" /></a><% }) %></div><% } %>
+            <div class="xhs-comment-meta"><span><%= dateText(comment.createTime) %><% if (comment.ipLocation) { %> · <%= comment.ipLocation %><% } %></span><% if (comment.likeCount) { %><span>赞 <%= countText(comment.likeCount) %></span><% } %><% if (comment.subCommentCount) { %><span>回复 <%= countText(comment.subCommentCount) %></span><% } %></div>
+            <% if (replies.length) { %>
+              <div class="xhs-replies">
+                <% replies.forEach(function (reply) { const ru = obj(reply.user); const target = obj(reply.targetUser); %>
+                  <div class="xhs-reply">
+                    <div><a class="xhs-reply-name" target="_blank" href="https://www.xiaohongshu.com/user/profile/<%= encodeURIComponent(ru.userId || "") %>"><%= ru.nickname || "小红书用户" %></a><% if (reply.isAuthor) { %><span class="xhs-author-badge">作者</span><% } %><% if (target.nickname && target.userId !== cu.userId) { %><span> 回复 </span><span class="xhs-reply-target">@<%= target.nickname %></span><% } %></div>
+                    <div class="xhs-comment-text"><%= reply.content || "" %></div>
+                    <div class="xhs-comment-meta"><span><%= dateText(reply.createTime) %><% if (reply.ipLocation) { %> · <%= reply.ipLocation %><% } %></span><% if (reply.likeCount && reply.likeCount !== "0") { %><span>赞 <%= countText(reply.likeCount) %></span><% } %></div>
+                  </div>
+                <% }) %>
+                <% if (Number(comment.subCommentCount) > replies.length) { %><div class="xhs-more">展开其余 <%= Number(comment.subCommentCount) - replies.length %> 条回复</div><% } %>
+              </div>
+            <% } %>
+          </div>
+        </article>
+      <% }) %>
+    </section>
+  <% } %>
+
+  <% if (noteHref) { %><a class="xhs-open" target="_blank" href="<%= noteHref %>">在小红书中查看</a><% } %>
+</div>

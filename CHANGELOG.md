@@ -7,11 +7,15 @@
 ## 【4.5.1.4】
 ### Added
 - 新增 `check` 命令（`pnpm run check` / `deno task check`），使用仓库根目录的 `tsconfig.check.json` 对 `plugins/*/src` 下的 TypeScript 源码做统一类型检查（WebView 插件的 `crawl.js` 除外）。
+- xhs-webview（0.1.4）：新增仿小红书详情页的插件详情模板，展示作者、正文话题、互动统计与 SSR 首屏评论；元数据补充头像、地区、话题 id 与评论快照，并挂载话题标签画册。
 - pixiv 新增第三方api模式，目前支持lolicon api。
 - konachan（1.7.4）：任务日志与参数校验错误新增简中、英文、日文、韩文、繁中本地化。
 - 其余插件（aibooru、anihonet-wallpaper、anime-pictures、bilibili、bilibili-video、bluedafeiyu、danbooru、e-shuushuu、gelbooru、haowallpaper、heybox、kabegame-server、kemono、manyacg、miyoushe、nekos-moe、patreon-webview、pixai、pixiv、safebooru、wallhaven、wallpapers-craft、wallspic、weibo、x-webview、xhs、xhs-webview、yandere、zerochan、ziworld）：任务日志与参数校验错误同样跟随界面语言显示，支持简中、英文、日文、韩文、繁中。
 - safebooru（1.0.0）：safebooru.org 全年龄图库，走站点官方 dapi，一页一次请求拿到带分类的全量标签；支持标签 / 全部 / 标签列表三种模式与评论元数据。
 - aibooru（1.0.0）：aibooru.online（Danbooru 分支的 AI 生成图图库），走 JSON API 一页一次请求拿齐标签、AI 生成参数、作者评论与评论区；支持标签 / 人气榜 / 全部 / id 范围四种模式，分级默认只抓全年龄，标签新增 `model` 分类。
+
+### Fixed
+- xhs、xhs-webview（0.1.3）：小红书详情页的 `__INITIAL_STATE__` 里出现 `new Map([...])`，原先按 JSON 解析失败，每条作品都报「未解析到作品数据」；现在先展开 Map / Set 再解析。
 
 ### Changed
 - kabegame-server（0.2.3）：桌面服务器媒体地址改用 `/file/{*path}`，适配不再接受 `?path=` 的 Kabegame 4.5.2 服务端。

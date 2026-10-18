@@ -84,11 +84,69 @@ function parseInitialState(html: string): any | null {
   let raw = m[1].trim().replace(/;$/, "");
   raw = raw.replace(/\bundefined\b/g, "null");
   try {
-    return JSON.parse(raw);
+    return JSON.parse(rewriteCollectionLiterals(raw), reviveCollections);
   } catch (err: any) {
     warn(t("parseStateFailed", { error: err?.message ?? err }));
     return null;
   }
+}
+
+const MAP_ENTRIES_KEY = "__kbMapEntries__";
+
+/**
+ * 展开字符串之外的 new Map( / new Set(（详情页的 noteDetailMap 现在是 new Map([...])）：
+ * Map 改写成 {"__kbMapEntries__": [...]}，解析时由 reviveCollections 还原成按 key 索引的普通对象；
+ * Set 直接变成数组。JSON 在字符串之外没有括号，遇到的 ")" 必定是最近一个调用的收尾。
+ */
+function rewriteCollectionLiterals(text: string): string {
+  let out = "";
+  const closers: string[] = [];
+  let inString = false;
+  for (let i = 0; i < text.length; i += 1) {
+    const ch = text[i];
+    if (inString) {
+      out += ch;
+      if (ch === "\\") {
+        out += text[i + 1] ?? "";
+        i += 1;
+      } else if (ch === '"') {
+        inString = false;
+      }
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      out += ch;
+    } else if (text.startsWith("new Map()", i)) {
+      out += "{}";
+      i += "new Map()".length - 1;
+    } else if (text.startsWith("new Set()", i)) {
+      out += "[]";
+      i += "new Set()".length - 1;
+    } else if (text.startsWith("new Map(", i)) {
+      out += `{"${MAP_ENTRIES_KEY}":`;
+      closers.push("}");
+      i += "new Map(".length - 1;
+    } else if (text.startsWith("new Set(", i)) {
+      closers.push("");
+      i += "new Set(".length - 1;
+    } else if (ch === ")" && closers.length > 0) {
+      out += closers.pop();
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+function reviveCollections(_key: string, value: any): any {
+  if (
+    value && typeof value === "object" && !Array.isArray(value) &&
+    Array.isArray(value[MAP_ENTRIES_KEY])
+  ) {
+    return Object.fromEntries(value[MAP_ENTRIES_KEY]);
+  }
+  return value;
 }
 
 /** SSR 里是直接值，客户端 hydrate 后是 Vue ref 包一层 _rawValue —— 两种都兼容 */

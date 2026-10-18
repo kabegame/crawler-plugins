@@ -186,8 +186,7 @@
     "configs/every-day-pictures.json",
     "configs/girls.json",
     "configs/oli+o+o.json",
-    "configs/pink-eye.json",
-    "configs/test.json"
+    "configs/pink-eye.json"
   ],
   "kbPathQLProviders": [
     "providers/color_provider.json5",

@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-xhs-webview",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "private": true,
   "name.zh": "小红书（WebView）",
   "name.en": "Xiaohongshu (WebView)",
@@ -363,6 +363,7 @@
     }
   ],
   "kbIcon": "icon.png",
+  "kbDescriptionTemplate": "templates/description.ejs",
   "kbDoc": {
     "default": "README.md"
   }
