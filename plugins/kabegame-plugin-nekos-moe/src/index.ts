@@ -1,4 +1,3 @@
-// @ts-nocheck
 // nekos.moe V8 爬虫：按排序 + NSFW 过滤翻页抓取搜索结果。
 //
 // 数据来自开源后端（github.com/Nekos-moe/api）的 POST /api/v1/images/search：
@@ -22,14 +21,87 @@ const SEARCH_INTERVAL_MS = 2100;
 const MAX_RETRIES = 3;
 const SORTS = new Set(["newest", "likes", "oldest"]);
 
+// ---- 类型 ----
+// 站点 JSON 记录：字段可能缺失，只在真正依赖处收窄。
+// 输出侧（metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface。
+type NekosUser = {
+  id?: string | null;
+  username?: string | null;
+};
+
+type NekosImage = {
+  id: string | null;
+  nsfw?: boolean | null;
+  artist?: string | null;
+  tags?: string[] | null;
+  uploader?: NekosUser | null;
+  approver?: NekosUser | null;
+  createdAt?: string | null;
+  likes?: number | null;
+  favorites?: number | null;
+};
+
+type NekosSearchBody = {
+  limit: number;
+  skip: number;
+  sort: string;
+  nsfw?: boolean;
+};
+
+// 搜索接口的响应：429 时带 retryAfter，出错时带 message，正常时带 images
+type NekosSearchResponse = {
+  retryAfter?: unknown;
+  message?: unknown;
+  images?: unknown;
+};
+
+type NekosMetadataUser = {
+  id: string;
+  username: string;
+};
+
+type NekosMetadata = {
+  schema: number;
+  id: string | null;
+  page_url: string;
+  image_url: string;
+  thumbnail_url: string;
+  nsfw: boolean;
+  artist: string;
+  uploader: NekosMetadataUser | null;
+  approver: NekosMetadataUser | null;
+  created_at: string;
+  likes: number;
+  favorites: number;
+  tags: string[];
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type NekosVars = {
+  sort?: unknown;
+  nsfw?: unknown;
+  page_size?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
 // [nekos-moe] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
-function log(message) {
+function log(message: string): void {
   console.log(message);
+}
+
+// 保持原来 `e?.message ?? e` 的字符串回退语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null) return String(message);
+  }
+  return String(error);
 }
 
 let lastSearchAt = 0;
 
-async function searchPage(baseUrl, body) {
+async function searchPage(baseUrl: string, body: NekosSearchBody): Promise<NekosImage[]> {
   for (let attempt = 0; ; attempt += 1) {
     const wait = lastSearchAt + SEARCH_INTERVAL_MS - Date.now();
     if (wait > 0) await sleep(wait);
@@ -39,9 +111,10 @@ async function searchPage(baseUrl, body) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const data = await res.json().catch(() => ({}));
+    const data: unknown = await res.json().catch(() => ({}));
+    const payload = (data && typeof data === "object" ? data : {}) as NekosSearchResponse;
     if (res.status === 429 && attempt < MAX_RETRIES) {
-      const retryAfter = Number(data?.retryAfter) > 0 ? Number(data.retryAfter) : 10000;
+      const retryAfter = Number(payload.retryAfter) > 0 ? Number(payload.retryAfter) : 10000;
       log(
         t("rateLimited", {
           seconds: Math.ceil(retryAfter / 1000),
@@ -54,12 +127,12 @@ async function searchPage(baseUrl, body) {
     }
     if (!res.ok) {
       throw new Error(
-        data?.message
-          ? t("searchHttpErrorWithMessage", { status: res.status, message: data.message })
+        payload.message
+          ? t("searchHttpErrorWithMessage", { status: res.status, message: payload.message })
           : t("searchHttpError", { status: res.status }),
       );
     }
-    return Array.isArray(data?.images) ? data.images : [];
+    return Array.isArray(payload.images) ? (payload.images as NekosImage[]) : [];
   }
 }
 
@@ -67,7 +140,7 @@ async function searchPage(baseUrl, body) {
 // 先丢弃字符集之外的字符（`emilia (re:zero)` → `emilia (rezero)`）；
 // 派生为空但原文含非 ASCII 文字的（日文画师名），按码点编码成 `u-xxxx-…` 作稳定 key；
 // 纯符号（`:t`、`^ ^` 这类表情）派生为空，跳过。
-function labelKey(value) {
+function labelKey(value: unknown): string {
   const raw = String(value || "").trim();
   const key = raw
     .toLowerCase()
@@ -76,12 +149,12 @@ function labelKey(value) {
     .trim();
   if (key) return key.length <= 64 ? key : "";
   if (!/[^\x00-\x7f]/.test(raw)) return "";
-  const encoded = `u-${Array.from(raw, (ch) => ch.codePointAt(0).toString(16)).join("-")}`;
+  const encoded = `u-${Array.from(raw, (ch) => (ch.codePointAt(0) ?? 0).toString(16)).join("-")}`;
   return encoded.length <= 64 ? encoded : "";
 }
 
-function buildLabels(image) {
-  const labels = [];
+function buildLabels(image: NekosImage): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   const artistKey = labelKey(image.artist);
   if (artistKey) labels.push({ key: artistKey, category: "nekos-moe/artist", name: String(image.artist).trim() });
   for (const tag of image.tags || []) {
@@ -91,14 +164,14 @@ function buildLabels(image) {
   return labels;
 }
 
-function pickUser(user) {
+function pickUser(user: NekosUser | null | undefined): NekosMetadataUser | null {
   if (!user || !user.username) return null;
   return { id: user.id || "", username: user.username };
 }
 
 // metadata 存足以还原源站详情页（/post/<id>）的字段：Post Info（上传者、审核者、上传时间、画师）、
 // 点赞与收藏、标签（保持站点顺序）以及 NSFW 标记。templates/description.ejs 消费。
-function buildMetadata(image, baseUrl) {
+function buildMetadata(image: NekosImage, baseUrl: string): NekosMetadata {
   return {
     schema: 1,
     id: image.id,
@@ -117,20 +190,25 @@ function buildMetadata(image, baseUrl) {
 }
 
 // 元数据搜索片段覆盖详情面板里的文字：画师、上传者、审核者、标签与 ID。
-function searchTextsFromMetadata(meta) {
+function searchTextsFromMetadata(meta: NekosMetadata): string[] {
   const values = ["nekos.moe", meta.id, meta.artist, meta.uploader?.username, meta.approver?.username, ...meta.tags];
   return [...new Set(values.map((v) => String(v ?? "").trim()).filter(Boolean))];
 }
 
-function displayName(image) {
+function displayName(image: NekosImage): string {
   return `${String(image.artist || "").trim() || "nekos.moe"} #${image.id}`;
 }
 
-export async function crawl(common, custom) {
-  const baseUrl = String(common?.base_url || DEFAULT_BASE_URL).replace(/\/+$/, "");
-  const vars = custom || {};
-  const sort = SORTS.has(vars.sort) ? vars.sort : "newest";
-  const nsfw = ["sfw", "nsfw", "all"].includes(vars.nsfw) ? vars.nsfw : "sfw";
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const baseUrl = String(cfg.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
+  const vars = (custom || {}) as NekosVars;
+  const sort = typeof vars.sort === "string" && SORTS.has(vars.sort) ? vars.sort : "newest";
+  const nsfwInput = typeof vars.nsfw === "string" ? vars.nsfw : "";
+  const nsfw = ["sfw", "nsfw", "all"].includes(nsfwInput) ? nsfwInput : "sfw";
   const pageSize = Math.min(MAX_LIMIT, Math.max(1, Number(vars.page_size ?? MAX_LIMIT) || MAX_LIMIT));
   const startPage = Math.max(1, Number(vars.start_page ?? 1) || 1);
   let endPage = Math.max(startPage, Number(vars.end_page ?? startPage) || startPage);
@@ -158,13 +236,13 @@ export async function crawl(common, custom) {
   log(t("crawlSummary", { sort, nsfw, pageSize, startPage, endPage }));
 
   for (let page = startPage; page <= endPage; page += 1) {
-    const body = { limit: pageSize, skip: (page - 1) * pageSize, sort };
+    const body: NekosSearchBody = { limit: pageSize, skip: (page - 1) * pageSize, sort };
     if (nsfw !== "all") body.nsfw = nsfw === "nsfw";
-    let images;
+    let images: NekosImage[];
     try {
       images = await searchPage(baseUrl, body);
     } catch (e) {
-      warn(t("pageFailed", { page, error: e?.message ?? e }));
+      warn(t("pageFailed", { page, error: errorMessage(e) }));
       addProgress(pctPerPage);
       continue;
     }
@@ -180,7 +258,7 @@ export async function crawl(common, custom) {
       try {
         if (!image?.id) throw new Error(t("recordMissingId"));
         const metadata = buildMetadata(image, baseUrl);
-        const opts = {
+        const opts: KabegameDownloadImageOptions = {
           name: displayName(image),
           url: metadata.page_url,
           metadata,
@@ -190,7 +268,7 @@ export async function crawl(common, custom) {
         if (labels.length > 0) opts.labels = labels;
         await downloadImage(metadata.image_url, opts);
       } catch (e) {
-        warn(t("imageFailed", { id: image?.id, error: e?.message ?? e }));
+        warn(t("imageFailed", { id: image?.id, error: errorMessage(e) }));
       }
       addProgress(pctPerImage);
     }

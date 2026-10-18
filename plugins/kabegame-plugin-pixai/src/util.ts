@@ -1,12 +1,12 @@
-// @ts-nocheck
 // 取值归一、日志与分页窗口解析。
 
 import { DEFAULT_END_PAGE, DEFAULT_START_PAGE } from "./consts";
+import type { PixaiVars } from "./types";
 import { t } from "./i18n";
 
 const { warn } = Kabegame;
 
-export function log(message, level) {
+export function log(message: unknown, level?: string): void {
   if (level === "warn") {
     warn(String(message ?? ""));
     return;
@@ -14,26 +14,27 @@ export function log(message, level) {
   console.log(String(message ?? ""));
 }
 
-export function coerceStr(value) {
+export function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-export function toInt(value, fallback) {
+export function toInt(value: unknown, fallback: number): number {
   // 清空的数字字段收到 null；Number(null) === 0 会被当成有效值，这里先按未填写回落
   if (value == null || value === "") return fallback;
   const n = Number(value);
   return Number.isFinite(n) ? Math.trunc(n) : fallback;
 }
 
-export function arrayValue(value) {
-  return Array.isArray(value) ? value : [];
+/** 站点 JSON 里的数组字段：不是数组就按空数组处理。断言只发生在这层 JSON 边界上。 */
+export function arrayValue<T = unknown>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
 }
 
 /**
  * 起始页（1 基）→ 内部跳过页数。
  * 分页游标必须从第一页顺次取，所以「从第 N 页开始」= 前 N-1 页只翻页不下载。
  */
-export function skipPagesOf(vars) {
+export function skipPagesOf(vars: PixaiVars): number {
   const startPage = toInt(vars.start_page, DEFAULT_START_PAGE);
   return startPage > 1 ? startPage - 1 : 0;
 }
@@ -42,7 +43,7 @@ export function skipPagesOf(vars) {
  * 全站流的页码窗口：起始页 + 结束页（含）→ { skipPages, maxPages }。
  * 结束页早于起始页时按「只爬起始页」处理，避免整轮空跑。
  */
-export function globalPageWindow(vars) {
+export function globalPageWindow(vars: PixaiVars): { skipPages: number; maxPages: number } {
   const skipPages = skipPagesOf(vars);
   const endPage = toInt(vars.end_page, DEFAULT_END_PAGE);
   if (endPage < skipPages + 1) {

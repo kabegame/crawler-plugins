@@ -1,4 +1,3 @@
-// @ts-nocheck
 // metadata 派生：标签与元数据搜索词。规则以后若被 metadata migration 复用，两边保持一致。
 import TinyPinyin from "tiny-pinyin";
 
@@ -8,7 +7,7 @@ import { record, str } from "./util";
  * 中文标签 → 合法 key：tiny-pinyin 逐字转无声调拼音，其余字符收敛到 [a-z0-9_()-]。
  * 与 bilibili 插件同一规则；同音标签会落到同一个 key。
  */
-export function pinyinLabelKey(value) {
+export function pinyinLabelKey(value: unknown): string {
   const source = str(value).trim();
   if (!source) return "";
   let converted = source;
@@ -35,11 +34,11 @@ export function pinyinLabelKey(value) {
   return key && key.length <= 64 ? key : "";
 }
 
-export function labelsFromMetadata(metadata) {
+export function labelsFromMetadata(metadata: unknown): KabegameLabelInput[] {
   const m = record(metadata);
-  const labels = [];
-  const seen = new Set();
-  const push = (key, category, name) => {
+  const labels: KabegameLabelInput[] = [];
+  const seen = new Set<string>();
+  const push = (key: string, category: string, name: string) => {
     if (!key || !name) return;
     const identity = `${category}/${key}`.toLowerCase();
     if (seen.has(identity)) return;
@@ -60,7 +59,7 @@ export function labelsFromMetadata(metadata) {
   return labels;
 }
 
-function chinaDate(iso) {
+function chinaDate(iso: unknown): string {
   const date = new Date(str(iso));
   if (Number.isNaN(date.getTime())) return "";
   const cn = new Date(date.getTime() + 8 * 3600 * 1000);
@@ -68,11 +67,11 @@ function chinaDate(iso) {
 }
 
 /** 详情面板上看得到的文字：话题、超话、正文、作者、IP 属地、日期、评论者与评论。 */
-export function searchTextsFromMetadata(metadata) {
+export function searchTextsFromMetadata(metadata: unknown): string[] {
   const m = record(metadata);
-  const out = [];
-  const seen = new Set();
-  const push = (value) => {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const push = (value: unknown) => {
     const item = str(value).trim();
     if (!item || seen.has(item)) return;
     seen.add(item);

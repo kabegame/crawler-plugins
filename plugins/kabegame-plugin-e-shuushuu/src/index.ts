@@ -1,4 +1,3 @@
-// @ts-nocheck
 // e-shuushuu V8 爬虫：主页翻页 / 排行榜（全时段、年、月、周）/ 搜索 URL 三种模式。
 //
 // 主页 `/?page=N` 与 JSON API `/api/v1/images?page=N` 是同一份列表（每页 20 条、最新在前），
@@ -13,14 +12,164 @@ const DEFAULT_BASE_URL = "https://e-shuushuu.net";
 // 站点标签只有四类，映射到 `e-shuushuu/<分类>` 目录；未知类型归入 theme，保证不会多出目录。
 const LABEL_CATEGORIES = new Set(["artist", "source", "character", "theme"]);
 
-function labelCategory(typeName) {
+// 站点 JSON 与 metadata 都用 type 建模（不用 interface：interface 没有隐式索引签名，
+// 不能直接赋给 KabegameJsonValue 作为 metadata）。
+type EshuushuuTag = {
+  tag_id?: number | null;
+  title?: string | null;
+  type_name?: string | null;
+};
+
+type EshuushuuUser = {
+  user_id?: number | null;
+  username?: string | null;
+  avatar_url?: string | null;
+  user_title?: string | null;
+  groups?: string[] | null;
+};
+
+type EshuushuuComment = {
+  post_id?: number | null;
+  parent_comment_id?: number | null;
+  deleted?: boolean | null;
+  date?: string | null;
+  last_updated?: string | null;
+  post_text?: string | null;
+  user?: EshuushuuUser | null;
+};
+
+type EshuushuuImage = {
+  image_id: number;
+  filename?: string | null;
+  ext?: string | null;
+  url?: string | null;
+  large?: boolean | null;
+  large_url?: string | null;
+  medium?: boolean | null;
+  medium_url?: string | null;
+  thumbnail_url?: string | null;
+  width?: number | null;
+  height?: number | null;
+  filesize?: number | null;
+  md5_hash?: string | null;
+  caption?: string | null;
+  original_filename?: string | null;
+  source_url?: string | null;
+  date_added?: string | null;
+  rating?: number | null;
+  num_ratings?: number | null;
+  bayesian_rating?: number | null;
+  favorites?: number | null;
+  user?: EshuushuuUser | null;
+  tags?: EshuushuuTag[] | null;
+  posts?: number | null;
+  status?: number | null;
+};
+
+type EshuushuuListResponse = {
+  images?: EshuushuuImage[] | null;
+  comments?: Record<string, EshuushuuComment[]> | null;
+  total?: number | null;
+  per_page?: number | null;
+};
+
+type EshuushuuPage = {
+  images: EshuushuuImage[];
+  comments: Record<string, EshuushuuComment[]>;
+  total: number;
+  lastPage: number;
+};
+
+// metadata 侧类型（写进 downloadImage 的 metadata，description.ejs 消费）
+type EshuushuuMetadataUser = {
+  user_id?: number | null;
+  username: string;
+  avatar_url: string;
+  user_title: string;
+  groups: string[];
+};
+
+type EshuushuuMetadataComment = {
+  post_id?: number | null;
+  parent_comment_id: number | null;
+  deleted: boolean;
+  date: string;
+  last_updated: string | null;
+  post_text: string;
+  user: EshuushuuMetadataUser | null;
+};
+
+type EshuushuuMetadataTag = {
+  tag_id?: number | null;
+  title?: string | null;
+  type_name?: string | null;
+};
+
+type EshuushuuMetadata = {
+  schema: number;
+  image_id: number;
+  page_url: string;
+  filename: string;
+  ext: string;
+  url: string;
+  large_url: string;
+  medium_url: string;
+  thumbnail_url: string;
+  width?: number | null;
+  height?: number | null;
+  filesize?: number | null;
+  md5: string;
+  caption: string;
+  original_filename: string;
+  source_url: string;
+  date_added: string;
+  rating: number | null;
+  num_ratings: number;
+  bayesian_rating: number | null;
+  favorites: number;
+  uploader: EshuushuuMetadataUser | null;
+  tags: EshuushuuMetadataTag[];
+  comment_count: number;
+  comments: EshuushuuMetadataComment[];
+};
+
+type EshuushuuMode = "home" | "top" | "search";
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type EshuushuuVars = {
+  mode?: unknown;
+  top_period?: unknown;
+  search_url?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+type EshuushuuTopPeriod = {
+  minNumRatings: number;
+  days: number;
+};
+
+function coerceStr(value: unknown): string {
+  return value == null ? "" : String(value);
+}
+
+// catch 变量在 strict 下是 unknown；保持原来 `e?.message ?? e` 的字符串回退语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null) return String(message);
+  }
+  return String(error);
+}
+
+function labelCategory(typeName: unknown): string {
   const value = String(typeName || "").trim().toLowerCase();
   return `e-shuushuu/${LABEL_CATEGORIES.has(value) ? value : "theme"}`;
 }
 
 // label key 只允许 [a-zA-Z0-9_-]、英文括号与空格（不在首尾、不连续），≤ 64 字节；
 // 丢弃字符集之外的字符，派生为空或超长的跳过（如 `^_^`），原标题仍作为显示名。
-function labelKey(title) {
+function labelKey(title: unknown): string {
   const key = String(title || "")
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -29,8 +178,8 @@ function labelKey(title) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromTags(tags) {
-  const labels = [];
+function labelsFromTags(tags: EshuushuuTag[] | null | undefined): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   for (const tag of tags || []) {
     const key = labelKey(tag?.title);
     if (!key) continue;
@@ -39,11 +188,11 @@ function labelsFromTags(tags) {
   return labels;
 }
 
-function tagTitles(tags, typeName) {
+function tagTitles(tags: EshuushuuTag[] | null | undefined, typeName: string): string[] {
   return (tags || []).filter((t) => t?.type_name === typeName).map((t) => String(t.title || "").trim()).filter(Boolean);
 }
 
-function pickUser(user) {
+function pickUser(user: EshuushuuUser | null | undefined): EshuushuuMetadataUser | null {
   if (!user) return null;
   return {
     user_id: user.user_id,
@@ -55,7 +204,7 @@ function pickUser(user) {
 }
 
 // 列表接口带 include_comments=true 时，评论按 image_id 分组随列表一并返回，不用逐图再请求。
-function pickComments(list) {
+function pickComments(list: EshuushuuComment[] | null | undefined): EshuushuuMetadataComment[] {
   return (Array.isArray(list) ? list : []).map((c) => ({
     post_id: c.post_id,
     parent_comment_id: c.parent_comment_id ?? null,
@@ -70,7 +219,11 @@ function pickComments(list) {
 // metadata 存足以还原源站详情页的稳定字段（templates/description.ejs 消费）：
 // 上传者卡片、分类标签、Image Information、评论。只与当前访客有关的字段
 // （is_favorited / user_rating / has_open_report 等）不存。
-function buildMetadata(image, pageUrl, comments) {
+function buildMetadata(
+  image: EshuushuuImage,
+  pageUrl: string,
+  comments: EshuushuuMetadataComment[],
+): EshuushuuMetadata {
   return {
     schema: 1,
     image_id: image.image_id,
@@ -106,14 +259,14 @@ function buildMetadata(image, pageUrl, comments) {
 // （逐值加前缀会让含 "e-shuushuu" 的词条膨胀到几十万行映射，搜索变慢）。
 // metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，改这里要同步改那里。
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-function searchTextsFromMetadata(meta) {
-  const out = ["e-shuushuu"];
-  const field = (key, values) => {
+function searchTextsFromMetadata(meta: EshuushuuMetadata): string[] {
+  const out: string[] = ["e-shuushuu"];
+  const field = (key: string, values: unknown[]) => {
     const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
     if (list.length) out.push(key, ...list);
   };
-  const up = meta.uploader || {};
-  field("uploader", [up.username, up.user_title]);
+  const up = meta.uploader;
+  field("uploader", [up?.username, up?.user_title]);
   // 日期拆成年、月（英文全名）、日三个词，与详情页显示的 "September 17, 2026" 对应；取 date_added 的 UTC 日期串
   const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(meta.date_added || ""));
   if (ymd) field("date", [ymd[1], MONTHS[Number(ymd[2]) - 1], String(Number(ymd[3]))]);
@@ -127,7 +280,7 @@ function searchTextsFromMetadata(meta) {
 }
 
 // 展示名：角色优先，其次作品；都没有就退回图片编号。
-function displayName(image) {
+function displayName(image: EshuushuuImage): string {
   const tags = image.tags || [];
   const head = tagTitles(tags, "Character").slice(0, 3).join(", ") || tagTitles(tags, "Source")[0] || "e-shuushuu";
   return `${head} #${image.image_id}`;
@@ -136,7 +289,7 @@ function displayName(image) {
 // 排行榜四个范围与源站 /images/top?period=… 逐项一致（实测四个范围前两页顺序完全相同）：
 // 按 bayesian_rating 降序，最少评分人数随范围放宽，非全时段用 date_from 截取最近 N 天。
 // 源站排行榜最多 20 页。
-const TOP_PERIODS = {
+const TOP_PERIODS: Record<string, EshuushuuTopPeriod> = {
   all: { minNumRatings: 5, days: 0 },
   year: { minNumRatings: 3, days: 365 },
   month: { minNumRatings: 2, days: 30 },
@@ -144,16 +297,16 @@ const TOP_PERIODS = {
 };
 const TOP_MAX_PAGES = 20;
 
-function isoDateDaysAgo(days) {
+function isoDateDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
 }
 
 // 搜索页 /search?… 的查询参数与 /api/v1/images 同名，页面把它们原样转给接口（实测结果逐项一致），
 // 所以直接搬过来，只去掉 page（由起止页控制）。接受完整 URL，也接受只粘贴了 `?tags=…` 的查询串。
-function parseSearchUrl(input) {
+function parseSearchUrl(input: unknown): URLSearchParams {
   const raw = String(input || "").trim();
   if (!raw) throw new Error(t("searchUrlRequired"));
-  let url;
+  let url: URL;
   try {
     url = new URL(raw.startsWith("?") ? `${DEFAULT_BASE_URL}/search${raw}` : raw);
   } catch {
@@ -173,7 +326,11 @@ function parseSearchUrl(input) {
 //   搜索 URL 自带 status 参数时照样转给接口，但网页仍只显示 status 1（实测 status=2 时页面一张不显示），
 //   本地同样只留 1；
 // - 排行榜在服务端过滤，传 status=1 后四个范围与源站逐项一致。
-function buildListQuery(mode, period, searchParams) {
+function buildListQuery(
+  mode: EshuushuuMode,
+  period: string,
+  searchParams: URLSearchParams | undefined,
+): URLSearchParams {
   const params = new URLSearchParams(mode === "search" ? searchParams : undefined);
   params.set("include_comments", "true");
   if (mode === "top") {
@@ -187,12 +344,13 @@ function buildListQuery(mode, period, searchParams) {
   return params;
 }
 
-async function fetchPage(baseUrl, query, page) {
+async function fetchPage(baseUrl: string, query: URLSearchParams, page: number): Promise<EshuushuuPage> {
   const params = new URLSearchParams(query);
   params.set("page", String(page));
   const res = await fetch(`${baseUrl}/api/v1/images?${params}`);
   if (!res.ok) throw new Error(t("listHttpError", { status: res.status }));
-  const data = await res.json();
+  // 外部 JSON 边界：只在这里断言响应形状，后续字段都按类型读取
+  const data = (await res.json()) as EshuushuuListResponse;
   return {
     images: Array.isArray(data?.images) ? data.images : [],
     comments: data?.comments && typeof data.comments === "object" ? data.comments : {},
@@ -201,36 +359,44 @@ async function fetchPage(baseUrl, query, page) {
   };
 }
 
-async function downloadOne(baseUrl, image, rawComments) {
+async function downloadOne(
+  baseUrl: string,
+  image: EshuushuuImage,
+  rawComments: EshuushuuComment[] | null | undefined,
+): Promise<void> {
   if (!image?.url) {
     warn(t("noImageUrl", { id: image?.image_id }));
     return;
   }
   const pageUrl = `${baseUrl}/images/${image.image_id}`;
-  const opts = { name: displayName(image), url: pageUrl, metadata: buildMetadata(image, pageUrl, pickComments(rawComments)) };
-  opts.searchTexts = searchTextsFromMetadata(opts.metadata);
+  const metadata = buildMetadata(image, pageUrl, pickComments(rawComments));
+  const opts: KabegameDownloadImageOptions = { name: displayName(image), url: pageUrl, metadata };
+  opts.searchTexts = searchTextsFromMetadata(metadata);
   const labels = labelsFromTags(image.tags);
   if (labels.length > 0) opts.labels = labels;
   await downloadImage(image.url, opts);
 }
 
-export async function crawl(common, custom) {
-  const baseUrl = String(common?.base_url || DEFAULT_BASE_URL).replace(/\/+$/, "");
-  const vars = custom || {};
-  const mode = ["top", "search"].includes(vars.mode) ? vars.mode : "home";
-  let searchParams = null;
+export async function crawl(common: unknown, custom: unknown): Promise<void> {
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const baseUrl = String(cfg.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
+  const vars = (custom || {}) as EshuushuuVars;
+  const requestedMode = coerceStr(vars.mode);
+  const mode: EshuushuuMode = requestedMode === "top" || requestedMode === "search" ? requestedMode : "home";
+  let searchParams: URLSearchParams | undefined;
   if (mode === "search") {
     try {
       searchParams = parseSearchUrl(vars.search_url);
     } catch (e) {
-      warn(`[e-shuushuu] ${e?.message ?? e}`);
+      warn(`[e-shuushuu] ${errorMessage(e)}`);
       addProgress(100);
       return;
     }
   }
   // 本地只留 status 1，与源站列表显示一致；排行榜已在服务端过滤
   const filterVisible = mode !== "top";
-  const period = TOP_PERIODS[vars.top_period] ? vars.top_period : "all";
+  const requestedPeriod = coerceStr(vars.top_period);
+  const period = TOP_PERIODS[requestedPeriod] ? requestedPeriod : "all";
   const startPage = Math.max(1, Number(vars.start_page ?? 1) || 1);
   let endPage = Math.max(startPage, Number(vars.end_page ?? startPage) || startPage);
   if (mode === "top" && endPage > TOP_MAX_PAGES) {
@@ -255,7 +421,7 @@ export async function crawl(common, custom) {
     }),
   );
   for (let page = startPage; page <= endPage; page += 1) {
-    let result;
+    let result: EshuushuuPage;
     try {
       result = await fetchPage(baseUrl, query, page);
       if (page === startPage) {
@@ -263,7 +429,7 @@ export async function crawl(common, custom) {
         if (endPage > result.lastPage) endPage = result.lastPage;
       }
     } catch (e) {
-      warn(t("pageReadFailed", { page, error: e?.message ?? e }));
+      warn(t("pageReadFailed", { page, error: errorMessage(e) }));
       addProgress(pctPerPage);
       continue;
     }
@@ -285,7 +451,7 @@ export async function crawl(common, custom) {
       try {
         await downloadOne(baseUrl, image, comments[String(image.image_id)]);
       } catch (e) {
-        warn(t("downloadFailed", { id: image.image_id, error: e?.message ?? e }));
+        warn(t("downloadFailed", { id: image.image_id, error: errorMessage(e) }));
       }
       addProgress(pctPerImage);
     }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { t } from "./i18n";
 
 const {
@@ -45,18 +44,145 @@ const IMAGE_EXTENSIONS = new Set([
   "pjpeg", "pjp", "png", "svg", "tif", "tiff", "webp", "jpe",
 ]);
 
-function coerceStr(value) {
+// 站点 JSON 的最小结构：字段都可能缺失，只在确实依赖处收窄。
+// 输出侧（createImageMetadata / downloadImage 的选项）必须保持 JSON 可序列化，
+// 所以全部用 type 而非 interface（interface 不满足 KabegameJsonValue 的索引签名）。
+type KemonoFile = {
+  name?: string | null;
+  path?: string | null;
+};
+
+type KemonoPost = {
+  id?: string | number | null;
+  user?: string | number | null;
+  service?: string | null;
+  title?: string | null;
+  added?: string | null;
+  published?: string | null;
+  edited?: string | null;
+  tags?: string[] | null;
+  shared_file?: boolean | null;
+  file?: KemonoFile | null;
+  attachments?: KemonoFile[] | null;
+};
+
+type KemonoCreator = {
+  id?: string | number | null;
+  name?: string | null;
+  service?: string | null;
+  indexed?: number | string | null;
+  updated?: number | string | null;
+  public_id?: string | null;
+  post_count?: number | string | null;
+};
+
+// 收藏接口的两种条目：type=user 只有 service/id，type=post 还有 user。
+type KemonoFavoriteCreator = {
+  service?: string | null;
+  id?: string | number | null;
+};
+
+type KemonoFavoritePost = {
+  service?: string | null;
+  user?: string | number | null;
+  id?: string | number | null;
+};
+
+type KemonoTagPageBody = {
+  count?: number | string | null;
+  true_count?: number | string | null;
+  posts?: KemonoPost[] | null;
+};
+
+type KemonoSinglePostBody = {
+  post?: KemonoPost | null;
+  attachments?: KemonoFile[] | null;
+};
+
+type KemonoTarget = {
+  service: string;
+  creatorId: string;
+  postIds: Set<string> | null;
+};
+
+type KemonoResolveResult = {
+  targets: KemonoTarget[];
+  loginRequired: boolean;
+};
+
+type KemonoPageRange = {
+  start: number;
+  end: number;
+};
+
+type KemonoProgress = {
+  beginTarget(batchCount: number): void;
+  beginBatch(imageCount: number): void;
+  tick(): void;
+};
+
+// metadata 只存白名单字段。属性保持可选，缺字段时维持原来的 undefined（序列化时被丢弃），
+// 不补 null，避免改变写入库里的字段集合。
+type KemonoCreatorMetadata = {
+  id?: string | number | null;
+  name?: string | null;
+  service?: string | null;
+  indexed?: number | string | null;
+  updated?: number | string | null;
+  public_id?: string | null;
+  post_count?: number | string | null;
+};
+
+type KemonoPostMetadata = {
+  id?: string | number | null;
+  title?: string | null;
+  service?: string | null;
+  user?: string | number | null;
+  added?: string | null;
+  published?: string | null;
+  edited?: string | null;
+  tags?: string[] | null;
+  shared_file?: boolean | null;
+};
+
+type KemonoDownloadResult = {
+  images: number;
+  ok: number;
+  failed: number;
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type KemonoVars = {
+  source?: unknown;
+  link?: unknown;
+  service?: unknown;
+  creator_id?: unknown;
+  tag?: unknown;
+  banner?: unknown;
+  image_source?: unknown;
+  fav_creator_page_start?: unknown;
+  fav_creator_page_end?: unknown;
+  list_page_start?: unknown;
+  list_page_end?: unknown;
+  creator_page_start?: unknown;
+  creator_page_end?: unknown;
+};
+
+// i18n 消息键（defineI18n 返回的键联合），用于把动态 reasonKey 收窄到合法键
+type MessageKey = Parameters<typeof t>[0];
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value).trim();
 }
 
 // 走 console.log → op_kabegame_log，进任务日志。warn 留给真正的异常，
 // 正常的流程边界（进入/离开作者、页面、帖子）用 log，免得任务日志全是黄色。
 // [kemono] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
-function log(message) {
+function log(message: string): void {
   console.log(message);
 }
 
-function setSiteHeaders() {
+function setSiteHeaders(): void {
   setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36");
   setHeader("Referer", `${BASE_URL}/`);
   setHeader("Origin", BASE_URL);
@@ -67,24 +193,44 @@ function setSiteHeaders() {
   setHeader("Accept", "text/css");
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) {
-    const error = new Error(`HTTP ${response.status}: ${url}`);
-    error.status = response.status;
-    throw error;
+// 请求失败时把 HTTP 状态码挂在 Error 上，供上层区分 401/403/404/400
+function httpStatusOf(error: unknown): number | null {
+  if (error && typeof error === "object" && "status" in error) {
+    const status = (error as { status?: unknown }).status;
+    if (typeof status === "number") return status;
   }
-  return response.json();
+  return null;
 }
 
-function rethrowIfLoginFailed(error, reasonKey) {
-  if (error?.status === 401 || error?.status === 403) {
-    throw new Error(t(reasonKey, { host: HOST, status: error.status }));
+// catch 变量统一收窄，保持原来 `error?.message || error` 的字符串回退语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message) return String(message);
+  }
+  return String(error);
+}
+
+async function fetchJson<T = unknown>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    const error = Object.assign(new Error(`HTTP ${response.status}: ${url}`), {
+      status: response.status,
+    });
+    throw error;
+  }
+  return (await response.json()) as T;
+}
+
+function rethrowIfLoginFailed(error: unknown, reasonKey: MessageKey): never {
+  const status = httpStatusOf(error);
+  if (status === 401 || status === 403) {
+    throw new Error(t(reasonKey, { host: HOST, status }));
   }
   throw error;
 }
 
-function ensureFavoriteCookie() {
+function ensureFavoriteCookie(): void {
   if (!requireCookie(HOST)) {
     throw new Error(t("favoriteCookieMissing", { host: HOST }));
   }
@@ -93,13 +239,19 @@ function ensureFavoriteCookie() {
 // 上游 Go 用 /api/v1/creators 拉全站作者列表再按 id 查找（fetch.go:16-38），
 // 但那是 3.4 MB 的全量响应，只为拿一个显示名。现站点有单作者 profile 接口，改用它。
 // 2026-07 实测：/api/v1/<service>/user/<id>/profile → 200，约 200 字节。
-async function fetchCreatorProfile(service, creatorId, loginRequired) {
+async function fetchCreatorProfile(
+  service: string,
+  creatorId: string,
+  loginRequired: boolean,
+): Promise<KemonoCreator | null> {
   setSiteHeaders();
   try {
-    const body = await fetchJson(`${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/profile`);
+    const body = await fetchJson<KemonoCreator>(
+      `${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/profile`,
+    );
     return body && typeof body === "object" ? body : null;
   } catch (error) {
-    if (error?.status === 404) return null;
+    if (httpStatusOf(error) === 404) return null;
     if (loginRequired) rethrowIfLoginFailed(error, "loginFailedCreatorProfile");
     throw error;
   }
@@ -108,13 +260,20 @@ async function fetchCreatorProfile(service, creatorId, loginRequired) {
 // 单帖接口，上游 Go 时代还没有，故它只能拉全量列表再过滤（kemono.go:252-259）。
 // 2026-07 实测：/api/v1/<service>/user/<id>/post/<pid> → 200，返回 { post, attachments, ... }，
 // 其中 post 与列表项同构（同样带 file / attachments）。
-async function fetchSinglePost(service, creatorId, postId, loginRequired) {
+async function fetchSinglePost(
+  service: string,
+  creatorId: string,
+  postId: string,
+  loginRequired: boolean,
+): Promise<KemonoPost | null> {
   setSiteHeaders();
   try {
-    const body = await fetchJson(`${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/post/${encodeURIComponent(postId)}`);
+    const body = await fetchJson<KemonoSinglePostBody>(
+      `${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/post/${encodeURIComponent(postId)}`,
+    );
     return body?.post && typeof body.post === "object" ? body.post : null;
   } catch (error) {
-    if (error?.status === 404) return null;
+    if (httpStatusOf(error) === 404) return null;
     if (loginRequired) rethrowIfLoginFailed(error, "loginFailedPost");
     throw error;
   }
@@ -124,28 +283,33 @@ async function fetchSinglePost(service, creatorId, postId, loginRequired) {
 // 但路径变了：上游的 /api/v1/<service>/user/<id> 现在 404，必须带 /posts 后缀。
 // 取单页帖子列表。page 从 1 开始，对应 ?o=(page-1)*50。
 // 返回 null 表示偏移越过了该作者的帖子总数（接口返回 400 而非空数组，2026-07 实测）。
-async function fetchPostPage(service, creatorId, page, loginRequired) {
+async function fetchPostPage(
+  service: string,
+  creatorId: string,
+  page: number,
+  loginRequired: boolean,
+): Promise<KemonoPost[] | null> {
   setSiteHeaders();
   const offset = (page - 1) * PAGE_SIZE;
   const url = `${BASE_URL}/api/v1/${encodeURIComponent(service)}/user/${encodeURIComponent(creatorId)}/posts?o=${offset}`;
   try {
-    const body = await fetchJson(url);
+    const body = await fetchJson<KemonoPost[]>(url);
     if (!Array.isArray(body)) {
       throw new Error(t("postListInvalid", { service, creatorId }));
     }
     return body;
   } catch (error) {
-    if (error?.status === 400) return null;
+    if (httpStatusOf(error) === 400) return null;
     if (loginRequired) rethrowIfLoginFailed(error, "loginFailedPostList");
     throw error;
   }
 }
 
 // 依据 ignore/kemono-scraper/main/main.go:674-746 的两个收藏接口。
-async function fetchFavorites(type) {
+async function fetchFavorites<T>(type: "user" | "post"): Promise<T[]> {
   setSiteHeaders();
   try {
-    const body = await fetchJson(`${BASE_URL}/api/v1/account/favorites?type=${type}`);
+    const body = await fetchJson<T[]>(`${BASE_URL}/api/v1/account/favorites?type=${type}`);
     if (!Array.isArray(body)) throw new Error(t("favoritesInvalid", { host: HOST }));
     return body;
   } catch (error) {
@@ -153,7 +317,7 @@ async function fetchFavorites(type) {
   }
 }
 
-function decodePathComponent(value) {
+function decodePathComponent(value: string): string {
   try {
     return decodeURIComponent(value);
   } catch {
@@ -162,8 +326,8 @@ function decodePathComponent(value) {
 }
 
 // 依据 ignore/kemono-scraper/main/main.go:496-527：4 段为作者，6 段为单帖。
-function parseLink(rawLink) {
-  let url;
+function parseLink(rawLink: string): KemonoTarget {
+  let url: URL;
   try {
     url = new URL(rawLink);
   } catch {
@@ -196,11 +360,15 @@ function parseLink(rawLink) {
   return { service, creatorId, postIds: postId ? new Set([postId]) : null };
 }
 
-function targetKey(target) {
+function targetKey(target: KemonoTarget): string {
   return `${target.service}:${target.creatorId}`;
 }
 
-function addTarget(targets, targetByKey, target) {
+function addTarget(
+  targets: KemonoTarget[],
+  targetByKey: Map<string, KemonoTarget>,
+  target: KemonoTarget,
+): void {
   const key = targetKey(target);
   const existing = targetByKey.get(key);
   if (!existing) {
@@ -214,9 +382,9 @@ function addTarget(targets, targetByKey, target) {
   }
 }
 
-async function resolveTargets(vars) {
-  const targets = [];
-  const targetByKey = new Map();
+async function resolveTargets(vars: KemonoVars): Promise<KemonoResolveResult> {
+  const targets: KemonoTarget[] = [];
+  const targetByKey = new Map<string, KemonoTarget>();
   const source = coerceStr(vars.source) || "link";
   if (source === "link") {
     const link = coerceStr(vars.link);
@@ -243,12 +411,11 @@ async function resolveTargets(vars) {
   ensureFavoriteCookie();
   if (source === "fav_creator") {
     const range = pageRange(
-      vars,
-      "fav_creator_page_start",
-      "fav_creator_page_end",
+      vars.fav_creator_page_start,
+      vars.fav_creator_page_end,
       t("favCreatorPageRangeLabel"),
     );
-    const creators = slicePages(await fetchFavorites("user"), range);
+    const creators = slicePages(await fetchFavorites<KemonoFavoriteCreator>("user"), range);
     for (const creator of creators) {
       const service = coerceStr(creator?.service);
       const creatorId = coerceStr(creator?.id);
@@ -259,8 +426,8 @@ async function resolveTargets(vars) {
   } else {
     // Go 实现把收藏接口结果只作为 service/user/post id，再回作者列表按 id 过滤（main.go:140-145）。
     // 与标签模式共用同一组「页数范围」变量：两者都是在一条扁平的帖子列表上翻页。
-    const range = pageRange(vars, "list_page_start", "list_page_end", t("pageRangeLabel"));
-    const posts = slicePages(await fetchFavorites("post"), range);
+    const range = pageRange(vars.list_page_start, vars.list_page_end, t("pageRangeLabel"));
+    const posts = slicePages(await fetchFavorites<KemonoFavoritePost>("post"), range);
     for (const post of posts) {
       const service = coerceStr(post?.service);
       const creatorId = coerceStr(post?.user);
@@ -275,11 +442,11 @@ async function resolveTargets(vars) {
 // 标签帖子列表。与作者帖子列表不同，这里返回 { count, true_count, posts }，
 // 且每个 post 自带 file / attachments，无需再逐帖请求单帖接口（2026-07 实测）。
 // 该接口不需要登录。
-async function fetchTagPage(tag, page) {
+async function fetchTagPage(tag: string, page: number): Promise<{ posts: KemonoPost[]; count: number }> {
   setSiteHeaders();
   const offset = (page - 1) * PAGE_SIZE;
   const url = `${BASE_URL}/api/v1/posts?tag=${encodeURIComponent(tag)}&o=${offset}`;
-  const body = await fetchJson(url);
+  const body = await fetchJson<KemonoTagPageBody>(url);
   const posts = Array.isArray(body?.posts) ? body.posts : null;
   if (!posts) throw new Error(t("tagPostListInvalid", { tag }));
   return { posts, count: positiveInteger(body?.count, 0) };
@@ -287,10 +454,10 @@ async function fetchTagPage(tag, page) {
 
 // 标签模式：帖子横跨多个作者，按需拉取并缓存作者 profile
 // （实测一页 50 帖只有约 10 个唯一作者，缓存命中率高）。
-async function crawlTag(vars) {
+async function crawlTag(vars: KemonoVars): Promise<void> {
   const tag = coerceStr(vars.tag);
   if (!tag) throw new Error(t("tagRequired"));
-  const { start, end } = pageRange(vars, "list_page_start", "list_page_end", t("pageRangeLabel"));
+  const { start, end } = pageRange(vars.list_page_start, vars.list_page_end, t("pageRangeLabel"));
 
   const first = await fetchTagPage(tag, start);
   if (first.posts.length === 0) {
@@ -308,11 +475,14 @@ async function crawlTag(vars) {
   progress.beginTarget(Math.max(1, lastPage - start + 1));
   log(t("tagStart", { tag, start, end: lastPage }));
 
-  const profiles = new Map();
-  const profileFor = async (service, creatorId) => {
+  const profiles = new Map<string, KemonoCreator | null>();
+  const profileFor = async (service: string, creatorId: string): Promise<KemonoCreator | null> => {
     const key = `${service}:${creatorId}`;
-    if (!profiles.has(key)) profiles.set(key, await fetchCreatorProfile(service, creatorId, false));
-    return profiles.get(key);
+    if (!profiles.has(key)) {
+      const profile = await fetchCreatorProfile(service, creatorId, false);
+      profiles.set(key, profile);
+    }
+    return profiles.get(key) ?? null;
   };
 
   let page = start;
@@ -349,7 +519,7 @@ async function crawlTag(vars) {
 
 // 收藏接口一次返回完整列表（上游 Go 也是一次性拉取，没有 ?o= 分页），
 // 所以“页”是在客户端按 PAGE_SIZE 切出来的，语义与帖子列表的页保持一致。
-function slicePages(list, range) {
+function slicePages<T>(list: T[] | null | undefined, range: KemonoPageRange): T[] {
   if (!Array.isArray(list)) return [];
   const from = (range.start - 1) * PAGE_SIZE;
   if (from >= list.length) {
@@ -361,7 +531,7 @@ function slicePages(list, range) {
   return list.slice(from, to);
 }
 
-function positiveInteger(value, fallback) {
+function positiveInteger(value: unknown, fallback: number): number {
   // 清空的数字字段收到 null；Number(null) === 0 会被误当成「填了 0」，先按未填写回落
   if (value == null || value === "") return fallback;
   const number = Number(value);
@@ -369,10 +539,10 @@ function positiveInteger(value, fallback) {
 }
 
 // 起止页，1 基，每页 PAGE_SIZE 条。结束页填 0 表示一直翻到最后一页。
-function pageRange(vars, startKey, endKey, label) {
-  const start = Math.max(1, positiveInteger(vars[startKey], 1));
+function pageRange(startValue: unknown, endValue: unknown, label: string): KemonoPageRange {
+  const start = Math.max(1, positiveInteger(startValue, 1));
   // 结束页留空（null）不等同于填 0（翻到最后一页），按只爬起始页处理
-  const rawEnd = positiveInteger(vars[endKey], start);
+  const rawEnd = positiveInteger(endValue, start);
   const end = rawEnd <= 0 ? Number.MAX_SAFE_INTEGER : rawEnd;
   if (end < start) {
     throw new Error(t("pageRangeReversed", { label, end: rawEnd, start }));
@@ -381,11 +551,11 @@ function pageRange(vars, startKey, endKey, label) {
 }
 
 // 作者帖子列表的页范围。单作者、链接、收藏的作者三种模式共用这一组。
-function creatorPageRange(vars) {
-  return pageRange(vars, "creator_page_start", "creator_page_end", t("creatorPageRangeLabel"));
+function creatorPageRange(vars: KemonoVars): KemonoPageRange {
+  return pageRange(vars.creator_page_start, vars.creator_page_end, t("creatorPageRangeLabel"));
 }
 
-function creatorLabel(creator, target) {
+function creatorLabel(creator: KemonoCreator | null | undefined, target: KemonoTarget): string {
   const name = coerceStr(creator?.name);
   return name
     ? t("creatorLabel", { name, service: target.service, creatorId: target.creatorId })
@@ -394,7 +564,12 @@ function creatorLabel(creator, target) {
 
 // 流式：每翻一页就把该页的帖子下完，不再攒完整列表。
 // 进度：整个任务的 99% 先按「批次」平分（一页 = 一批），再按该批实际图片数平分。
-async function crawlTarget(target, vars, loginRequired, progress) {
+async function crawlTarget(
+  target: KemonoTarget,
+  vars: KemonoVars,
+  loginRequired: boolean,
+  progress: KemonoProgress,
+): Promise<void> {
   const creator = await fetchCreatorProfile(target.service, target.creatorId, loginRequired);
   if (!creator) {
     warn(t("creatorMissing", { service: target.service, creatorId: target.creatorId, host: HOST }));
@@ -406,7 +581,7 @@ async function crawlTarget(target, vars, loginRequired, progress) {
   if (target.postIds) {
     log(t("enterCreatorPosts", { who, count: target.postIds.size }));
     progress.beginTarget(1);
-    const posts = [];
+    const posts: KemonoPost[] = [];
     for (const postId of target.postIds) {
       const post = await fetchSinglePost(target.service, target.creatorId, postId, loginRequired);
       if (post) posts.push(post);
@@ -473,7 +648,7 @@ async function crawlTarget(target, vars, loginRequired, progress) {
 // 关键约束：单次 delta 绝不能超过所属批次的额度。之前的实现用接口返回的 count
 // 估算总数，count 异常（缺失或偏小）时 estimated 会退化成 1，一次就加满 99.9。
 // 现在批数只来自页范围这类确定值，且额度在 beginBatch 时才细分，不会再放大。
-function makeProgress(targetCount) {
+function makeProgress(targetCount: number): KemonoProgress {
   const perTarget = targetCount > 0 ? 99.0 / targetCount : 0;
   let perBatch = 0;
   let step = 0;
@@ -487,28 +662,28 @@ function makeProgress(targetCount) {
 }
 
 // 一批帖子里实际会下载的图片总数，用于把该批额度按图片平分。
-function countImages(posts, vars) {
+function countImages(posts: KemonoPost[], vars: KemonoVars): number {
   let total = 0;
   for (const post of posts) total += collectAttachments(post, vars).length;
   return total;
 }
 
-function fileExtension(file) {
+function fileExtension(file: KemonoFile | null | undefined): string {
   const raw = coerceStr(file?.name) || coerceStr(file?.path).split(/[?#]/, 1)[0].split("/").pop() || "";
   const dot = raw.lastIndexOf(".");
   return dot >= 0 && dot < raw.length - 1 ? raw.slice(dot + 1).toLowerCase() : "";
 }
 
-function fileName(file) {
+function fileName(file: KemonoFile | null | undefined): string {
   return coerceStr(file?.name) || coerceStr(file?.path).split(/[?#]/, 1)[0].split("/").pop() || "attachment";
 }
 
-function isImageFile(file) {
+function isImageFile(file: KemonoFile | null | undefined): boolean {
   return IMAGE_EXTENSIONS.has(fileExtension(file));
 }
 
-function collectAttachments(post, vars) {
-  const attachments = Array.isArray(post?.attachments) ? [...post.attachments] : [];
+function collectAttachments(post: KemonoPost | null | undefined, vars: KemonoVars): KemonoFile[] {
+  const attachments: KemonoFile[] = Array.isArray(post?.attachments) ? [...post.attachments] : [];
   const primary = post?.file;
   // 依据 kemono/kemono.go:261-270：开启 banner 或主文件不是图片时把 post.file 前置。
   if (primary?.path && (vars.banner === true || !isImageFile(primary))) {
@@ -519,17 +694,17 @@ function collectAttachments(post, vars) {
   return useThumbnail(vars) ? usable.filter((file) => isImageFile(file)) : usable;
 }
 
-function goQueryEscape(value) {
+function goQueryEscape(value: string): string {
   return encodeURIComponent(value)
     .replace(/[!'()*]/g, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`)
     .replace(/%20/g, "+");
 }
 
-function useThumbnail(vars) {
+function useThumbnail(vars: KemonoVars): boolean {
   return coerceStr(vars.image_source || "thumbnail") !== "original";
 }
 
-function attachmentUrl(file, vars) {
+function attachmentUrl(file: KemonoFile, vars: KemonoVars): string {
   const path = coerceStr(file?.path);
   if (!path) throw new Error(t("attachmentPathMissing"));
   // 缩略图走 img 主机的独立路径，不带 ?f=（实测不需要），也不经 kemono.cr 302 中转。
@@ -545,7 +720,7 @@ function attachmentUrl(file, vars) {
   return `${BASE_URL}/data${path}?f=${goQueryEscape(name)}${extension}`;
 }
 
-function trimCreator(creator) {
+function trimCreator(creator: KemonoCreator | null | undefined): KemonoCreatorMetadata {
   return {
     id: creator?.id,
     name: creator?.name,
@@ -558,7 +733,7 @@ function trimCreator(creator) {
   };
 }
 
-function trimPost(post) {
+function trimPost(post: KemonoPost | null | undefined): KemonoPostMetadata {
   return {
     id: post?.id,
     title: post?.title,
@@ -572,16 +747,16 @@ function trimPost(post) {
   };
 }
 
-function postPageUrl(post) {
+function postPageUrl(post: KemonoPost | null | undefined): string {
   return `${BASE_URL}/${encodeURIComponent(coerceStr(post?.service))}/user/${encodeURIComponent(coerceStr(post?.user))}/post/${encodeURIComponent(coerceStr(post?.id))}`;
 }
 
-function rawAttachmentCount(post) {
+function rawAttachmentCount(post: KemonoPost | null | undefined): number {
   return (Array.isArray(post?.attachments) ? post.attachments.length : 0)
     + (post?.file?.path ? 1 : 0);
 }
 
-function postLabel(post) {
+function postLabel(post: KemonoPost | null | undefined): string {
   const title = coerceStr(post?.title) || coerceStr(post?.id);
   return t("postLabel", {
     title,
@@ -592,7 +767,11 @@ function postLabel(post) {
 }
 
 // onImage 在每张图片下载结束后调用（无论成败），用于按图片推进进度条。
-async function downloadPost(item, vars, onImage) {
+async function downloadPost(
+  item: { creator: KemonoCreator | null; post: KemonoPost },
+  vars: KemonoVars,
+  onImage?: (() => void) | null,
+): Promise<KemonoDownloadResult> {
   const { creator, post } = item;
   const files = collectAttachments(post, vars);
   if (files.length === 0) {
@@ -633,17 +812,18 @@ async function downloadPost(item, vars, onImage) {
     let url = "";
     try {
       url = attachmentUrl(entry.file, vars);
-      await downloadImage(url, {
+      const opts: KabegameDownloadImageOptions = {
         name: displayName,
         metadata_id: metadataId,
         url: pageUrl,
-      });
+      };
+      await downloadImage(url, opts);
       ok += 1;
     } catch (error) {
       failed += 1;
       warn(t("attachmentDownloadFailed", {
         url: url || coerceStr(entry.file?.path),
-        error: error?.message || error,
+        error: errorMessage(error),
       }));
     }
     if (onImage) onImage();
@@ -652,8 +832,8 @@ async function downloadPost(item, vars, onImage) {
   return { images: files.length, ok, failed };
 }
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+export async function crawl(_common: unknown, custom: Record<string, unknown> | null | undefined): Promise<void> {
+  const vars = (custom || {}) as KemonoVars;
   // 标签模式的列表是全站扁平的，不落到「作者 + 帖子」这套 target 结构上，单独走一条路径。
   if (coerceStr(vars.source) === "tag") {
     await crawlTag(vars);

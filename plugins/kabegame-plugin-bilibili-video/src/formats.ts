@@ -1,11 +1,11 @@
-// @ts-nocheck
 // DASH 流的挑选。对应 yt-dlp `BilibiliBaseIE.extract_formats` 的选择部分——
 // 区别是 yt-dlp 把所有 format 交给用户的 -f 表达式，这里必须当场定一个。
+import type { Dash, DashStream, PlayDataWithFormats } from "./types";
 import { coerceStr } from "./util";
 
 /** 主地址 + 备用地址，供下载时逐个尝试。 */
-export function streamUrls(stream) {
-  const urls = [];
+export function streamUrls(stream: DashStream | null | undefined): string[] {
+  const urls: string[] = [];
   const primary = stream?.baseUrl || stream?.base_url;
   if (primary) urls.push(primary);
   for (const backup of stream?.backupUrl || stream?.backup_url || []) {
@@ -14,8 +14,12 @@ export function streamUrls(stream) {
   return urls;
 }
 
-export function pickVideo(dash, maxQuality, preferAvc) {
-  const all = Array.isArray(dash?.video) ? dash.video : [];
+export function pickVideo(
+  dash: Dash | null | undefined,
+  maxQuality: number,
+  preferAvc: boolean,
+): DashStream | null {
+  const all: DashStream[] = Array.isArray(dash?.video) ? dash.video : [];
   if (all.length === 0) return null;
 
   let pool = maxQuality > 0 ? all.filter((v) => Number(v?.id ?? 0) <= maxQuality) : all;
@@ -33,9 +37,9 @@ export function pickVideo(dash, maxQuality, preferAvc) {
       || (Number(b?.bandwidth ?? 0) - Number(a?.bandwidth ?? 0)))[0];
 }
 
-export function pickAudio(dash) {
+export function pickAudio(dash: Dash | null | undefined): DashStream | null {
   // 只取普通音轨：flac / dolby 的编码 stream-copy 进 mp4 兼容性差，第一版不碰。
-  const all = Array.isArray(dash?.audio) ? dash.audio : [];
+  const all: DashStream[] = Array.isArray(dash?.audio) ? dash.audio : [];
   if (all.length === 0) return null;
   return all
     .slice()
@@ -43,8 +47,10 @@ export function pickAudio(dash) {
 }
 
 /** support_formats → { 质量 id: 可读名 }，仅用于日志和 metadata。 */
-export function qualityLabels(playData) {
-  const names = {};
+export function qualityLabels(
+  playData: PlayDataWithFormats | null | undefined,
+): Record<number, string> {
+  const names: Record<number, string> = {};
   for (const format of playData?.support_formats || []) {
     names[Number(format?.quality ?? 0)] = coerceStr(format?.new_description || format?.display_desc);
   }

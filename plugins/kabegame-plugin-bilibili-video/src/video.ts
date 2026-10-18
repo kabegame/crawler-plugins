@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 单个视频的完整下载链路：view → playurl → 分块下载 → 合流 → 入库。
 // 对应 yt-dlp `BiliBiliIE._real_extract` + 它交给 ffmpeg 的 merge 步骤。
 import { sleep } from "@kabegame/plugin-sdk";
@@ -6,12 +5,123 @@ import { sleep } from "@kabegame/plugin-sdk";
 import { FNVAL_DASH, PLAYURL_API, VIEW_API, WEB_BASE } from "./consts";
 import { t } from "./i18n";
 import { ingestDash } from "./ingest";
-import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds } from "./util";
+import type {
+  BilibiliVars,
+  Dash,
+  DashStream,
+  FormatMetadata,
+  PlayDataWithFormats,
+  TaggedError,
+  VideoRef,
+  WbiKeysState,
+} from "./types";
+import {
+  checkBilibiliRisk,
+  coerceStr,
+  errorMessage,
+  fetchJson,
+  hasNoRetry,
+  isUnavailableTitle,
+  nowSeconds,
+} from "./util";
 import { buildDmParams, signQuery } from "./wbi";
 
 const { warn } = Kabegame;
 
-function buildMetadata(view, page, video, audio, qualityLabel) {
+/** view 接口（x/web-interface/view）的最小结构。 */
+type BiliOwner = {
+  mid?: number | null;
+  name?: string | null;
+  face?: string | null;
+};
+
+type BiliStat = {
+  view?: number | null;
+  danmaku?: number | null;
+  reply?: number | null;
+  favorite?: number | null;
+  coin?: number | null;
+  share?: number | null;
+  like?: number | null;
+};
+
+type BiliPage = {
+  cid?: number | null;
+  page?: number | null;
+  part?: string | null;
+  duration?: number | null;
+};
+
+type BiliView = {
+  bvid?: string | null;
+  aid?: number | null;
+  cid?: number | null;
+  title?: string | null;
+  desc?: string | null;
+  duration?: number | null;
+  pubdate?: number | null;
+  owner?: BiliOwner | null;
+  stat?: BiliStat | null;
+  pages?: BiliPage[] | null;
+};
+
+type ViewResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: BiliView | null;
+};
+
+type PlayurlData = PlayDataWithFormats & {
+  dash?: Dash | null;
+};
+
+type PlayurlResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: PlayurlData | null;
+};
+
+/** metadata 的 owner / stat 段。字段可能缺失，保持 undefined 而非补 null。 */
+type VideoMetadataOwner = {
+  mid?: number | null;
+  name: string;
+  face: string;
+};
+
+type VideoMetadataStat = {
+  view?: number | null;
+  danmaku?: number | null;
+  reply?: number | null;
+  favorite?: number | null;
+  coin?: number | null;
+  share?: number | null;
+  like?: number | null;
+};
+
+type VideoMetadata = {
+  schema: number;
+  source: string;
+  bvid: string;
+  aid?: number | null;
+  cid: string;
+  page: number;
+  title: string;
+  part: string;
+  desc: string;
+  duration: number;
+  pubdate: number;
+  owner: VideoMetadataOwner;
+  stat: VideoMetadataStat;
+  format: FormatMetadata;
+};
+
+function buildMetadata(
+  view: BiliView | null | undefined,
+  page: BiliPage | null | undefined,
+  video: DashStream,
+  audio: DashStream,
+  qualityLabel: string,
+): VideoMetadata {
   return {
     schema: 1,
     source: "bilibili_video",
@@ -51,7 +161,13 @@ function buildMetadata(view, page, video, audio, qualityLabel) {
 }
 
 /** 下载一个分 P。budget 是本 P 可用的进度额度。 */
-async function processPart(view, page, keys, vars, budget) {
+async function processPart(
+  view: BiliView | null | undefined,
+  page: BiliPage | null | undefined,
+  keys: WbiKeysState,
+  vars: BilibiliVars,
+  budget: number,
+): Promise<void> {
   const bvid = coerceStr(view?.bvid);
   const cid = coerceStr(page?.cid);
   const partIndex = Number(page?.page ?? 1);
@@ -62,7 +178,7 @@ async function processPart(view, page, keys, vars, budget) {
     ? `${title} - P${partIndex}${partName && partName !== title ? ` ${partName}` : ""}`
     : title;
 
-  const playParams = {
+  const playParams: Record<string, string> = {
     bvid,
     cid,
     fnval: String(FNVAL_DASH),
@@ -73,7 +189,9 @@ async function processPart(view, page, keys, vars, budget) {
   // yt-dlp: 已登录时去掉 try_look（试看参数），未登录靠它拿到更高档位。
   if (!keys.isLoggedIn) playParams.try_look = "1";
 
-  const play = await fetchJson(signQuery(PLAYURL_API, playParams, keys.img, keys.sub));
+  const play = await fetchJson<PlayurlResponse>(
+    signQuery(PLAYURL_API, playParams, keys.img, keys.sub),
+  );
   if (play?.code !== 0) {
     checkBilibiliRisk(play?.code);
     throw new Error(t("playurlFailed", { code: play?.code, message: coerceStr(play?.message) }));
@@ -100,9 +218,15 @@ async function processPart(view, page, keys, vars, budget) {
 }
 
 /** partIndex：1 起的分 P 序号，0 表示全部分 P。 */
-async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
+async function downloadOneVideo(
+  videoRef: VideoRef,
+  keys: WbiKeysState,
+  vars: BilibiliVars,
+  budget: number,
+  partIndex: number,
+): Promise<void> {
   const query = videoRef.bvid ? `bvid=${videoRef.bvid}` : `aid=${videoRef.aid}`;
-  const view = await fetchJson(`${VIEW_API}?${query}`);
+  const view = await fetchJson<ViewResponse>(`${VIEW_API}?${query}`);
   if (view?.code !== 0) {
     checkBilibiliRisk(view?.code);
     throw new Error(t("viewFailed", { code: view?.code, message: coerceStr(view?.message) }));
@@ -111,16 +235,17 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
   const data = view.data;
   // 失效稿件会返回一段占位视频，下下来毫无意义；重试也不会变好，所以标记 noRetry。
   if (isUnavailableTitle(data?.title)) {
-    const dead = new Error(t("videoUnavailable", { title: coerceStr(data?.title) }));
+    const dead: TaggedError = new Error(t("videoUnavailable", { title: coerceStr(data?.title) }));
     dead.noRetry = true;
     throw dead;
   }
 
-  const allPages = Array.isArray(data?.pages) && data.pages.length > 0
-    ? data.pages
+  const pageList = data?.pages;
+  const allPages: BiliPage[] = Array.isArray(pageList) && pageList.length > 0
+    ? pageList
     : [{ cid: data?.cid, page: 1, part: coerceStr(data?.title), duration: data?.duration }];
 
-  let pages;
+  let pages: BiliPage[];
   if (partIndex === 0) {
     pages = allPages;
   } else {
@@ -143,7 +268,7 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
       await processPart(data, page, keys, vars, perPart);
     } catch (error) {
       failed += 1;
-      warn(t("partFailed", { part: Number(page?.page ?? 0), error: coerceStr(error?.message ?? error) }));
+      warn(t("partFailed", { part: Number(page?.page ?? 0), error: errorMessage(error) }));
       if (pages.length === 1) throw error;
     }
   }
@@ -151,18 +276,26 @@ async function downloadOneVideo(videoRef, keys, vars, budget, partIndex) {
 }
 
 /** 单个视频失败后等 intervalMs 再重试，最多 retries 次。 */
-export async function downloadWithRetry(videoRef, keys, vars, budget, partIndex, intervalMs, retries) {
+export async function downloadWithRetry(
+  videoRef: VideoRef,
+  keys: WbiKeysState,
+  vars: BilibiliVars,
+  budget: number,
+  partIndex: number,
+  intervalMs: number,
+  retries: number,
+): Promise<void> {
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
       await downloadOneVideo(videoRef, keys, vars, budget, partIndex);
       return;
     } catch (error) {
       // noRetry：失效稿件之类重试也不会变好的情形，直接上抛。
-      if (attempt >= retries || error?.noRetry) throw error;
+      if (attempt >= retries || hasNoRetry(error)) throw error;
       const label = videoRef.bvid || `av${videoRef.aid}`;
       warn(t("retryLater", {
         label,
-        error: coerceStr(error?.message ?? error),
+        error: errorMessage(error),
         seconds: Math.round(intervalMs / 1000),
         attempt: attempt + 1,
         total: retries,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // anihonet V8 爬虫入口。
 //
 // 模块分工：
@@ -16,7 +15,30 @@ import { crawlAnimeSeries } from "./series";
 
 const { addProgress } = Kabegame;
 
-export async function crawl(common, custom) {
+// 宿主 common 提供 baseUrl（见 @kabegame/types 的 KbCommonCfg）。
+type AnihonetCommon = { baseUrl?: string | null } | null | undefined;
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄。
+type AnihonetVars = {
+  crawl_mode?: unknown;
+  wallpaper_type?: unknown;
+  selected_work?: unknown;
+  work_start_page?: unknown;
+  work_end_page?: unknown;
+  search_query?: unknown;
+  search_order?: unknown;
+  search_orderby?: unknown;
+  search_start_page?: unknown;
+  search_end_page?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+  ranking_period?: unknown;
+};
+
+export async function crawl(
+  common: AnihonetCommon,
+  custom: AnihonetVars | null | undefined,
+): Promise<void> {
   const vars = custom || {};
   // 模式下拉被清空时（null）按默认的排行榜模式处理
   const mode = vars.crawl_mode ?? "ranking";

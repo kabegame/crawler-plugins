@@ -1,44 +1,61 @@
-// @ts-nocheck
 // WBI 签名核心。与 bilibili-video 插件同源（同一套 nav mixin key）；
 // 各业务模块自己拼参数，这里只提供 signUrl 与密钥获取。
 import { md5 } from "@kabegame/plugin-sdk";
 
 import { MIXIN_TAB, NAV_URL } from "./consts";
 import { t } from "./i18n";
-import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
+import {
+  checkBilibiliRisk, coerceStr, fetchJson, type BilibiliResponse,
+} from "./util";
 
 const { delHeader, setHeader } = Kabegame;
 
-function wbiFilterValue(value) {
+/** WBI 签名参数对，按数组顺序签名（调用方负责排序约定）。 */
+export type WbiPair = readonly [string, string];
+
+/** 签名所需的两段密钥（nav 接口下发）。 */
+export type WbiKeys = {
+  img: string;
+  sub: string;
+};
+
+type WbiImage = {
+  img_url?: string | null;
+  sub_url?: string | null;
+};
+
+type NavResponse = BilibiliResponse<{ wbi_img?: WbiImage | null } | null>;
+
+function wbiFilterValue(value: unknown): string {
   return coerceStr(value).replace(/[!'()*]/g, "");
 }
 
-function getMixinKey(orig) {
+function getMixinKey(orig: string): string {
   return MIXIN_TAB.map((idx) => orig[idx] || "").join("").slice(0, 32);
 }
 
-function stemFromWbiUrl(url) {
+function stemFromWbiUrl(url: unknown): string {
   const name = coerceStr(url).split("/").pop() || "";
   return name.split(".", 1)[0] || "";
 }
 
 /** pairs 是 [key, value] 数组，按传入顺序签名（调用方负责排序约定）。 */
-export function signUrl(baseUrl, pairs, img, sub) {
+export function signUrl(baseUrl: string, pairs: readonly WbiPair[], img: string, sub: string): string {
   const mix = getMixinKey(`${img}${sub}`);
   const q = pairs.map(([key, value]) => `${key}=${encodeURIComponent(wbiFilterValue(value))}`).join("&");
   return `${baseUrl}?${q}&w_rid=${md5(q + mix)}`;
 }
 
-export async function getWbiKeys() {
+export async function getWbiKeys(): Promise<WbiKeys> {
   delHeader("Referer");
   setHeader("Referer", "https://www.bilibili.com/");
-  const nav = await fetchJson(NAV_URL);
+  const nav = await fetchJson<NavResponse>(NAV_URL);
   delHeader("Referer");
   if (nav?.code !== 0) {
     checkBilibiliRisk(nav?.code);
     throw new Error(t("navApiError", { message: coerceStr(nav?.message) }));
   }
-  const wbi = nav?.data?.wbi_img || {};
+  const wbi: WbiImage = nav?.data?.wbi_img || {};
   const keys = { img: stemFromWbiUrl(wbi.img_url), sub: stemFromWbiUrl(wbi.sub_url) };
   if (!keys.img || !keys.sub) throw new Error(t("wbiKeysMissing"));
   return keys;

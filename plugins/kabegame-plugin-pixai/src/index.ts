@@ -1,4 +1,3 @@
-// @ts-nocheck
 // PixAI V8 crawler. This mirrors the previous Rhai implementation but uses the
 // Kabegame V8 host bridge and standard fetch.
 //
@@ -18,10 +17,11 @@ import { t } from "./i18n";
 import { runModel } from "./models";
 import { runRanking } from "./ranking";
 import { runAuthor, runGlobal, runTag } from "./streams";
+import type { PixaiVars } from "./types";
 import { coerceStr, log } from "./util";
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+export async function crawl(_common: unknown, custom?: PixaiVars | null): Promise<void> {
+  const vars: PixaiVars = custom || {};
   setRequestHeaders();
 
   const crawlType = coerceStr(vars.crawl_type) || "global";

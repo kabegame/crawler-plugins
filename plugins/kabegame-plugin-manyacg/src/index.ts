@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ManyACG V8 爬虫：筛选 / 语义搜索 / 相似作品 / 随机 四种互斥模式。
 //
 // 站点是 Nuxt 单页应用，数据全部来自 https://api.manyacg.top/v1 的 JSON 接口（无需登录、图片无防盗链），
@@ -26,12 +25,114 @@ const REQUEST_ATTEMPTS = 3;
 const LABEL_TAG = "manyacg/tag";
 const LABEL_ARTIST = "manyacg/artist";
 
+// 站点 JSON 的最小结构：字段都可能缺失，只在确实依赖处收窄。全部用 type 而非 interface，
+// 因为输出侧（metadata）最终要赋给 KabegameJsonValue，interface 没有隐式索引签名。
+type ManyAcgArtist = {
+  id?: string | null;
+  name?: string | null;
+  type?: string | null;
+  uid?: string | null;
+  username?: string | null;
+};
+
+type ManyAcgPicture = {
+  id?: string | null;
+  index?: number | string | null;
+  width?: number | string | null;
+  height?: number | string | null;
+  file_name?: string | null;
+  hash?: string | null;
+  regular?: string | null;
+  thumbnail?: string | null;
+};
+
+type ManyAcgArtwork = {
+  id: string;
+  title?: string | null;
+  description?: string | null;
+  source_url?: string | null;
+  source_type?: string | null;
+  r18?: boolean | number | null;
+  like_count?: number | string | null;
+  created_at?: string | null;
+  tags?: string[] | null;
+  artist?: ManyAcgArtist | null;
+  pictures?: ManyAcgPicture[] | null;
+};
+
+type ManyAcgApiEnvelope<T> = {
+  status?: number | string | null;
+  message?: string | null;
+  data?: T[] | null;
+};
+
+// metadata 是对外输出结构（templates/description.ejs 消费），字段全部为 JSON 可序列化值。
+type ManyAcgMetadataArtist = {
+  id: string;
+  name: string;
+  type: string;
+  uid: string;
+  username: string;
+};
+
+type ManyAcgMetadataPicture = {
+  id: string;
+  index: number;
+  width: number;
+  height: number;
+  file_name: string;
+  hash: string;
+  regular: string;
+  thumbnail: string;
+};
+
+type ManyAcgMetadata = {
+  schema: number;
+  artwork_id: string;
+  page_url: string;
+  title: string;
+  description: string;
+  source_url: string;
+  source_type: string;
+  r18: boolean;
+  like_count: number;
+  created_at: string;
+  tags: string[];
+  artist: ManyAcgMetadataArtist;
+  pictures: ManyAcgMetadataPicture[];
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type ManyAcgVars = {
+  mode?: unknown;
+  r18?: unknown;
+  tag?: unknown;
+  artist?: unknown;
+  keyword?: unknown;
+  artwork?: unknown;
+  count?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null) return String(message);
+  }
+  return String(error);
+}
+
+function isFatalError(error: unknown): error is Error & { fatal?: true } {
+  return Boolean(error && typeof error === "object" && (error as { fatal?: unknown }).fatal);
+}
+
 // [manyacg] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
-function log(message) {
+function log(message: unknown): void {
   console.log(message);
 }
 
-function str(value) {
+function str(value: unknown): string {
   return value == null ? "" : String(value).trim();
 }
 
@@ -39,28 +140,33 @@ function str(value) {
 
 // 返回 { status, data }：404 表示「没有结果 / 越过最后一页」，由调用方当作正常结束；
 // 400 等参数错误直接抛出（带服务端 message），其余失败重试几次后抛出。
-async function apiGet(path, query) {
+async function apiGet<T = unknown>(
+  path: string,
+  query: Record<string, string>,
+): Promise<{ status: number; data: T[] | null }> {
   const url = `${API_BASE}${path}?${new URLSearchParams(query)}`;
-  let lastError = null;
+  let lastError: unknown = null;
   for (let attempt = 1; attempt <= REQUEST_ATTEMPTS; attempt += 1) {
     try {
       const res = await fetch(url);
       if (res.status === 404) return { status: 404, data: null };
-      let body = null;
+      let body: ManyAcgApiEnvelope<T> | null = null;
       try {
-        body = await res.json();
+        // 外部 JSON 边界：响应体按接口形状断言
+        body = (await res.json()) as ManyAcgApiEnvelope<T>;
       } catch {
         // 非 JSON 响应交给下面的状态码处理
       }
       if (res.status === 400) throw Object.assign(new Error(body?.message || t("badRequest")), { fatal: true });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return { status: res.status, data: Array.isArray(body?.data) ? body.data : [] };
+      const rows = body && Array.isArray(body.data) ? body.data : [];
+      return { status: res.status, data: rows };
     } catch (e) {
-      if (e?.fatal) throw e;
+      if (isFatalError(e)) throw e;
       lastError = e;
     }
   }
-  throw new Error(t("requestFailed", { error: lastError?.message ?? lastError }));
+  throw new Error(t("requestFailed", { error: errorMessage(lastError) }));
 }
 
 // ---------------------------------------------------------- label 与 key ----
@@ -75,7 +181,7 @@ async function apiGet(path, query) {
 const KEY_ALLOWED = /^[a-z0-9_\-() ]+$/;
 
 // 汉字转拼音、其余原样保留；没有汉字时 hasHan 为 false，调用方据此决定是否走拼音路径。
-function toPinyin(text) {
+function toPinyin(text: string): { converted: string; hasHan: boolean } {
   let converted = "";
   let hasHan = false;
   try {
@@ -97,18 +203,18 @@ function toPinyin(text) {
   return { converted: text, hasHan: false };
 }
 
-function hashKey(text) {
+function hashKey(text: string): string {
   let hashA = 0x811c9dc5;
   let hashB = 0x9e3779b9;
   for (const char of text) {
-    const codePoint = char.codePointAt(0);
+    const codePoint = char.codePointAt(0) ?? 0;
     hashA = Math.imul(hashA ^ codePoint, 0x01000193);
     hashB = Math.imul(hashB ^ codePoint, 0x85ebca6b);
   }
   return `u-${(hashA >>> 0).toString(36)}-${(hashB >>> 0).toString(36)}`;
 }
 
-function tagKey(value) {
+function tagKey(value: unknown): string {
   const text = str(value).normalize("NFKC").replace(/\s+/g, " ");
   if (!text) return "";
   const lower = text.toLowerCase();
@@ -122,22 +228,22 @@ function tagKey(value) {
       .replace(/^-|-$/g, "");
     if (pinyin && pinyin.length <= 64) return pinyin;
   }
-  const encoded = `u-${Array.from(text, (ch) => ch.codePointAt(0).toString(36)).join("-")}`;
+  const encoded = `u-${Array.from(text, (ch) => (ch.codePointAt(0) ?? 0).toString(36)).join("-")}`;
   return encoded.length <= 64 ? encoded : hashKey(text);
 }
 
 // 作者以平台 + UID 作 key（不随改名变化）；缺 UID 时退回站内 ObjectID。
-function artistKey(artist) {
+function artistKey(artist: ManyAcgArtist | null | undefined): string {
   const platform = str(artist?.type).toLowerCase().replace(/[^a-z0-9_-]/g, "");
   const uid = str(artist?.uid).toLowerCase().replace(/[^a-z0-9_-]/g, "");
   const key = platform && uid ? `${platform}-${uid}` : str(artist?.id).toLowerCase();
   return key && key.length <= 64 ? key : "";
 }
 
-function buildLabels(art) {
-  const labels = [];
-  const seen = new Set();
-  const push = (category, key, name) => {
+function buildLabels(art: ManyAcgArtwork): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
+  const seen = new Set<string>();
+  const push = (category: string, key: string, name: string): void => {
     if (!key) return;
     const id = `${category}\n${key}`;
     if (seen.has(id)) return;
@@ -153,7 +259,7 @@ function buildLabels(art) {
 
 // metadata 存足以还原源站详情页的稳定字段（templates/description.ejs 消费）：
 // 标题、作者与来源、简介、标签、各图尺寸。like_count 站点现在恒为 0，但仍是详情页的数据，照存。
-function buildMetadata(art, pageUrl) {
+function buildMetadata(art: ManyAcgArtwork, pageUrl: string): ManyAcgMetadata {
   const artist = art.artist || {};
   return {
     schema: 1,
@@ -189,8 +295,8 @@ function buildMetadata(art, pageUrl) {
 
 // 元数据搜索片段：manyacg、全部标签、作品名、作者名、平台名（pixiv / twitter 等）、平台作者名（去掉 @）、入库日期。
 // metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，改这里要同步改那里。
-function searchTextsFromMetadata(meta) {
-  const artist = meta.artist || {};
+function searchTextsFromMetadata(meta: ManyAcgMetadata): string[] {
+  const artist: Partial<ManyAcgMetadataArtist> = meta.artist || {};
   const texts = [
     "manyacg",
     ...(meta.tags || []).map(str),
@@ -204,16 +310,16 @@ function searchTextsFromMetadata(meta) {
   return [...new Set(texts.filter(Boolean))];
 }
 
-function displayName(art, index, total) {
+function displayName(art: ManyAcgArtwork, index: number, total: number): string {
   const base = str(art.title) || `${str(art.artist?.name) || "ManyACG"} #${str(art.id).slice(-6)}`;
   return total > 1 ? `${base} (${index + 1}/${total})` : base;
 }
 
 // ---------------------------------------------------------------- 下载 ----
 
-async function downloadArtwork(art, siteBase) {
+async function downloadArtwork(art: ManyAcgArtwork, siteBase: string): Promise<number> {
   const pictures = (art.pictures || [])
-    .filter((p) => p?.regular)
+    .filter((p): p is ManyAcgPicture & { regular: string } => !!p?.regular)
     .sort((a, b) => (Number(a.index) || 0) - (Number(b.index) || 0));
   if (pictures.length === 0) {
     warn(t("artworkNoImages", { id: art?.id }));
@@ -225,7 +331,11 @@ async function downloadArtwork(art, siteBase) {
   const metadataId = Number(createImageMetadata(metadata, { searchTexts: searchTextsFromMetadata(metadata) }));
   const labels = buildLabels(art);
   for (const [index, picture] of pictures.entries()) {
-    const opts = { name: displayName(art, index, pictures.length), url: pageUrl, metadata_id: metadataId };
+    const opts: KabegameDownloadImageOptions = {
+      name: displayName(art, index, pictures.length),
+      url: pageUrl,
+      metadata_id: metadataId,
+    };
     if (labels.length > 0) opts.labels = labels;
     await downloadImage(picture.regular, opts);
   }
@@ -233,7 +343,13 @@ async function downloadArtwork(art, siteBase) {
 }
 
 // 逐个处理一批作品，按作品数摊分 pct 进度；单个作品失败只 warn，不中断任务。
-async function processArtworks(list, seen, siteBase, pct, bump) {
+async function processArtworks(
+  list: ManyAcgArtwork[],
+  seen: Set<string>,
+  siteBase: string,
+  pct: number,
+  bump: (pct: number) => void,
+): Promise<void> {
   const fresh = list.filter((art) => art?.id && !seen.has(art.id));
   const skipped = list.length - fresh.length;
   if (skipped > 0) log(t("duplicatesSkipped", { count: skipped }));
@@ -255,7 +371,7 @@ async function processArtworks(list, seen, siteBase, pct, bump) {
         }),
       );
     } catch (e) {
-      warn(t("artworkFailed", { id: art.id, error: e?.message ?? e }));
+      warn(t("artworkFailed", { id: art.id, error: errorMessage(e) }));
     }
     bump(each);
   }
@@ -264,43 +380,48 @@ async function processArtworks(list, seen, siteBase, pct, bump) {
 // ---------------------------------------------------------------- 入口 ----
 
 // 粘贴链接或直接填 ID 都行：取第一个 24 位十六进制串。
-function parseObjectId(input) {
+function parseObjectId(input: unknown): string {
   const match = str(input).match(/[0-9a-f]{24}/i);
   return match ? match[0].toLowerCase() : "";
 }
 
-export async function crawl(common, custom) {
-  const siteBase = str(common?.base_url || DEFAULT_SITE).replace(/\/+$/, "");
-  const vars = custom || {};
-  const mode = ["semantic", "similar", "random"].includes(vars.mode) ? vars.mode : "filter";
-  const r18 = ["0", "1", "2"].includes(str(vars.r18)) ? str(vars.r18) : "0";
+export async function crawl(common: unknown, custom: Record<string, any> | null | undefined): Promise<void> {
+  const cfg = (common || {}) as { baseUrl?: string | null };
+  const siteBase = str(cfg.baseUrl || DEFAULT_SITE).replace(/\/+$/, "");
+  const vars = (custom || {}) as ManyAcgVars;
+  const rawMode = vars.mode;
+  const mode: string = typeof rawMode === "string" && ["semantic", "similar", "random"].includes(rawMode)
+    ? rawMode
+    : "filter";
+  const r18Text = str(vars.r18);
+  const r18 = ["0", "1", "2"].includes(r18Text) ? r18Text : "0";
 
   // 进度累计：提前结束时补满到 100。
   let progressed = 0;
-  const bump = (pct) => {
+  const bump = (pct: number): void => {
     progressed += pct;
     addProgress(pct);
   };
-  const finish = () => {
+  const finish = (): void => {
     if (progressed < 100) addProgress(100 - progressed);
   };
-  const seen = new Set();
+  const seen = new Set<string>();
 
   if (mode === "random") {
     const limit = Math.min(RANDOM_MAX, Math.max(1, Number(vars.count ?? 30) || 30));
     log(t("randomMode", { limit, r18 }));
     try {
-      const { data } = await apiGet("/artwork/random", { limit: String(limit), r18 });
+      const { data } = await apiGet<ManyAcgArtwork>("/artwork/random", { limit: String(limit), r18 });
       await processArtworks(data || [], seen, siteBase, 100, bump);
     } catch (e) {
-      warn(t("randomFailed", { error: e?.message ?? e }));
+      warn(t("randomFailed", { error: errorMessage(e) }));
     }
     finish();
     return;
   }
 
   // 列表类三种模式：只把该模式认的参数放进 query，其余一律不传（实测其它参数要么被忽略、要么破坏结果）。
-  const query = { r18, page_size: String(PAGE_SIZE) };
+  const query: Record<string, string> = { r18, page_size: String(PAGE_SIZE) };
   let title = "";
   if (mode === "semantic") {
     const keyword = str(vars.keyword);
@@ -322,7 +443,7 @@ export async function crawl(common, custom) {
     query.similar_target = id;
     title = t("titleSimilar", { id });
   } else {
-    const parts = [];
+    const parts: string[] = [];
     const tag = str(vars.tag);
     const keyword = str(vars.keyword);
     if (tag) {
@@ -353,11 +474,11 @@ export async function crawl(common, custom) {
   log(t("crawlSummary", { title, r18, startPage, endPage, pageSize: PAGE_SIZE }));
 
   for (let page = startPage; page <= endPage; page += 1) {
-    let list;
+    let list: ManyAcgArtwork[] | null = null;
     try {
-      ({ data: list } = await apiGet("/artwork/list", { ...query, page: String(page) }));
+      ({ data: list } = await apiGet<ManyAcgArtwork>("/artwork/list", { ...query, page: String(page) }));
     } catch (e) {
-      warn(t("pageFailed", { page, error: e?.message ?? e }));
+      warn(t("pageFailed", { page, error: errorMessage(e) }));
       bump(pctPerPage);
       continue;
     }

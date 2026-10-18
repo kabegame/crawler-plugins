@@ -1,9 +1,8 @@
-// @ts-nocheck
 // lolicon（https://docs.api.lolicon.app/#/setu）：随机返回库中的 pixiv 作品，没有分页，一次请求即结束。
 // 只取 pid，图片规格与地址不用（原图由 downloadIllust 从 pixiv 取），因此不传 size / proxy。
 // 实测结论（请求头 403、限流形态、r18 分类偏差、图库范围）见 docs/lolicon-api.md。
 import { sleep } from "@kabegame/plugin-sdk";
-import { coerceStr, ensurePixivCookie } from "../../common";
+import { coerceStr, ensurePixivCookie, type PixivVars } from "../../common";
 import { t } from "../../i18n";
 
 const { warn } = Kabegame;
@@ -17,19 +16,29 @@ const RETRY_LIMIT = 3;
 const RETRY_DELAY_MS = 15000;
 // lolicon 的 r18 是库内分类：r18=0 时仍会返回 pixiv 标为 R-18 的作品，全年龄在本地按标签再筛一次。
 const R18_TAGS = new Set(["R-18", "R-18G"]);
-const R18_PARAM = { safe: 0, r18: 1, all: 2 };
-const ASPECT_PARAM = { landscape: "gt1", portrait: "lt1" };
+const R18_PARAM: Record<string, number> = { safe: 0, r18: 1, all: 2 };
+const ASPECT_PARAM: Record<string, string> = { landscape: "gt1", portrait: "lt1" };
 // 日期按 pixiv 所在的日本时区（UTC+9）取整日，与排行榜日期、元数据搜索日期一致。
 const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function listOf(value) {
+type LoliconSetuItem = {
+  pid?: string | number | null;
+  tags?: string[] | null;
+};
+
+type LoliconResponse = {
+  error?: unknown;
+  data?: LoliconSetuItem[] | null;
+};
+
+function listOf(value: unknown): string[] {
   return (Array.isArray(value) ? value : []).map((v) => coerceStr(v).trim())
     .filter(Boolean);
 }
 
 // YYYY-MM-DD → 该日 JST 0 点的毫秒时间戳；空值返回 null。
-function jstDayStart(value, label) {
+function jstDayStart(value: unknown, label: string): number | null {
   const text = coerceStr(value).trim();
   if (!text) return null;
   const m = text.match(/^(\d{4})-?(\d{2})-?(\d{2})$/);
@@ -38,14 +47,14 @@ function jstDayStart(value, label) {
     JST_OFFSET_MS;
 }
 
-function buildQuery(vars) {
-  const params = [];
-  const add = (key, value) =>
+function buildQuery(vars: PixivVars): { url: string; num: number } {
+  const params: string[] = [];
+  const add = (key: string, value: unknown) =>
     params.push(`${key}=${encodeURIComponent(String(value))}`);
 
   const num = Math.min(MAX_NUM, Math.max(1, Number(vars.lolicon_count) || MAX_NUM));
   add("num", num);
-  add("r18", R18_PARAM[vars.lolicon_r18] ?? 0);
+  add("r18", R18_PARAM[coerceStr(vars.lolicon_r18)] ?? 0);
 
   const tags = listOf(vars.lolicon_tags);
   if (tags.length > MAX_TAG_GROUPS) {
@@ -68,7 +77,7 @@ function buildQuery(vars) {
     add("uid", uid);
   }
 
-  const aspect = ASPECT_PARAM[vars.lolicon_orientation];
+  const aspect = ASPECT_PARAM[coerceStr(vars.lolicon_orientation)];
   if (aspect) add("aspectRatio", aspect);
   if (vars.lolicon_exclude_ai) add("excludeAI", "true");
 
@@ -86,13 +95,13 @@ function buildQuery(vars) {
 }
 
 // 限流有两种形态：HTTP 429，或 HTTP 200 且 error 非空（「请求的太快啦，休息一会吧」）。
-async function requestSetu(url) {
+async function requestSetu(url: string): Promise<LoliconSetuItem[]> {
   for (let attempt = 0;; attempt += 1) {
     const response = await fetch(url);
-    let json = null;
-    if (response.ok) json = await response.json();
+    let json: LoliconResponse | null = null;
+    if (response.ok) json = (await response.json()) as LoliconResponse;
     const limited = response.status === 429 ||
-      (json && coerceStr(json.error).includes("太快"));
+      Boolean(json && coerceStr(json.error).includes("太快"));
     if (limited && attempt < RETRY_LIMIT) {
       warn(t("loliconRateLimited", { seconds: RETRY_DELAY_MS / 1000 }));
       await sleep(RETRY_DELAY_MS);
@@ -107,27 +116,27 @@ async function requestSetu(url) {
 export const lolicon = {
   id: "lolicon",
 
-  prepare(vars) {
+  prepare(vars: PixivVars): void {
     // R18 作品的 pixiv 详情与分页接口需要登录态。
     if ((vars.lolicon_r18 ?? "safe") !== "safe") {
       ensurePixivCookie(t("labelLoliconR18"));
     }
   },
 
-  async fetchPage(vars) {
+  async fetchPage(vars: PixivVars): Promise<{ ids: string[]; next: null }> {
     const { url, num } = buildQuery(vars);
     console.log(t("loliconRequest", { url }));
     const data = await requestSetu(url);
 
     const safeOnly = (vars.lolicon_r18 ?? "safe") === "safe";
-    const ids = [];
+    const ids: string[] = [];
     let r18Skipped = 0;
     for (const item of data) {
       const pid = coerceStr(item?.pid);
       if (!pid) continue;
       if (
         safeOnly &&
-        (Array.isArray(item?.tags) ? item.tags : []).some((t) => R18_TAGS.has(t))
+        (Array.isArray(item?.tags) ? item.tags : []).some((tag) => R18_TAGS.has(tag))
       ) {
         r18Skipped += 1;
         continue;

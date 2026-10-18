@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 关键词搜索。端点与 bilibili 专栏插件相同，只是 search_type 从 article 换成 video。
 //
 // 注意 yt-dlp `BiliBiliSearchIE` 走的是**非 WBI** 的 x/web-interface/search/type，
@@ -7,13 +6,32 @@ import { sleep } from "@kabegame/plugin-sdk";
 
 import { SEARCH_API, SEARCH_PAGE_SIZE, WEB_BASE } from "./consts";
 import { t } from "./i18n";
+import type { BilibiliVars, ListEntry, WbiKeysState } from "./types";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle, nowSeconds } from "./util";
 import { buildDmParams, signQuery } from "./wbi";
 
 const { warn } = Kabegame;
 
+type SearchItem = {
+  type?: string | null;
+  bvid?: string | null;
+  title?: string | null;
+};
+
+type SearchData = {
+  numResults?: number | null;
+  numPages?: number | null;
+  result?: SearchItem[] | null;
+};
+
+type SearchResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: SearchData | null;
+};
+
 /** 搜索结果的 title 带 `<em class="keyword">` 高亮标签，入库前要洗掉。 */
-function stripHighlight(html) {
+function stripHighlight(html: unknown): string {
   return coerceStr(html)
     .replace(/<[^>]+>/g, "")
     .replace(/&quot;/g, "\"")
@@ -23,8 +41,12 @@ function stripHighlight(html) {
     .replace(/&amp;/g, "&");
 }
 
-async function fetchSearchPage(vars, pageNo, keys) {
-  const params = {
+async function fetchSearchPage(
+  vars: BilibiliVars,
+  pageNo: number,
+  keys: WbiKeysState,
+): Promise<SearchData | null | undefined> {
+  const params: Record<string, string> = {
     search_type: "video",
     keyword: coerceStr(vars.keyword),
     page: String(pageNo),
@@ -36,7 +58,7 @@ async function fetchSearchPage(vars, pageNo, keys) {
     ...buildDmParams(),
   };
 
-  const json = await fetchJson(signQuery(SEARCH_API, params, keys.img, keys.sub), {
+  const json = await fetchJson<SearchResponse>(signQuery(SEARCH_API, params, keys.img, keys.sub), {
     Referer: `${WEB_BASE}/`,
   });
   if (json?.code !== 0) {
@@ -50,7 +72,11 @@ async function fetchSearchPage(vars, pageNo, keys) {
  * 返回 [{ bvid, title }]。搜索结果里混有直播间、番剧等非投稿条目，
  * 只保留 type === "video" 且有 bvid 的。
  */
-export async function collectSearchEntries(vars, keys, intervalMs) {
+export async function collectSearchEntries(
+  vars: BilibiliVars,
+  keys: WbiKeysState,
+  intervalMs: number,
+): Promise<ListEntry[]> {
   const keyword = coerceStr(vars.keyword).trim();
   if (!keyword) throw new Error(t("keywordRequired"));
 
@@ -58,8 +84,8 @@ export async function collectSearchEntries(vars, keys, intervalMs) {
   const endPage = Math.max(startPage, Number(vars.end_page ?? startPage));
   const maxVideos = Math.max(1, Number(vars.max_videos ?? 5));
 
-  const entries = [];
-  const seen = new Set();
+  const entries: ListEntry[] = [];
+  const seen = new Set<string>();
   let totalResults = 0;
   let totalPages = 0;
   let dead = 0;
@@ -72,7 +98,8 @@ export async function collectSearchEntries(vars, keys, intervalMs) {
     totalResults = Number(data?.numResults ?? totalResults);
     totalPages = Number(data?.numPages ?? totalPages);
 
-    const result = Array.isArray(data?.result) ? data.result : [];
+    const resultValue = data?.result;
+    const result: SearchItem[] = Array.isArray(resultValue) ? resultValue : [];
     if (result.length === 0) break;
 
     for (const item of result) {

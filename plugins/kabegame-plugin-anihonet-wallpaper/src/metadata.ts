@@ -1,8 +1,22 @@
-// @ts-nocheck
 // 详情页 metadata 解析与原站 taxonomy 分类。
 import { coerceStr, resolveUrl, textOf } from "./runtime";
 
-function sourcePostId(detailUrl) {
+// metadata 要能赋给 KabegameJsonValue，所以用 type 而非 interface（interface 没有隐式索引签名）。
+type AnihonetTagCopy = {
+  name: string;
+  href: string;
+  rel: string;
+};
+
+export type AnihonetMetadata = {
+  schema: number;
+  post_id: string;
+  date: string;
+  categories: AnihonetTagCopy[];
+  tags: AnihonetTagCopy[];
+};
+
+function sourcePostId(detailUrl: unknown): string {
   const parts = coerceStr(detailUrl).split(/[?#]/, 1)[0].split("/").filter(
     Boolean,
   );
@@ -10,7 +24,7 @@ function sourcePostId(detailUrl) {
   return /^\d+$/.test(last) ? last : "";
 }
 
-function tagCopy(anchor, baseUrl) {
+function tagCopy(anchor: Element, baseUrl: string): AnihonetTagCopy {
   const rel = coerceStr(anchor.getAttribute("rel"))
     .split(/\s+/)
     .filter(Boolean)
@@ -22,15 +36,15 @@ function tagCopy(anchor, baseUrl) {
   };
 }
 
-function relTokens(anchor) {
+function relTokens(anchor: Element): string[] {
   return coerceStr(anchor.getAttribute("rel"))
     .split(/\s+/)
     .filter(Boolean);
 }
 
-export function parseMetadata(document, detailUrl) {
-  const categories = [];
-  const tags = [];
+export function parseMetadata(document: Document, detailUrl: string): AnihonetMetadata {
+  const categories: AnihonetTagCopy[] = [];
+  const tags: AnihonetTagCopy[] = [];
   for (const anchor of document.querySelectorAll("span.tagst a[href]")) {
     const rel = relTokens(anchor);
     if (rel.includes("category")) categories.push(tagCopy(anchor, detailUrl));

@@ -1,24 +1,37 @@
-// @ts-nocheck
 // 图文流（opus feed）列表：UP 主图文与登录用户的图文收藏，只产出 opus_id 列表。
 // 对应 gallery-dl BilibiliUserArticlesExtractor / BilibiliUserArticlesFavoriteExtractor。
 import { sleep } from "@kabegame/plugin-sdk";
 
 import { OPUS_FEED_FAV_API, OPUS_FEED_SPACE_API } from "./consts";
 import { t } from "./i18n";
-import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
+import {
+  checkBilibiliRisk, coerceStr, fetchJson, type BilibiliResponse,
+} from "./util";
+
+type OpusFeedItem = {
+  opus_id?: string | number | null;
+};
+
+type OpusFeedData = {
+  items?: OpusFeedItem[] | null;
+  has_more?: boolean | null;
+  offset?: string | null;
+};
+
+type OpusFeedResponse = BilibiliResponse<OpusFeedData>;
 
 /** UP 主图文列表（gallery-dl user_articles）：opus_id 游标翻页直到 has_more 为假。 */
-export async function collectSpaceOpusIds(mid, maxArticles) {
-  const ids = [];
+export async function collectSpaceOpusIds(mid: string, maxArticles: number): Promise<string[]> {
+  const ids: string[] = [];
   let offset = "";
   while (ids.length < maxArticles) {
     const url = `${OPUS_FEED_SPACE_API}?host_mid=${mid}${offset ? `&offset=${offset}` : ""}`;
-    const json = await fetchJson(url);
+    const json = await fetchJson<OpusFeedResponse>(url);
     if (json?.code !== 0) {
       checkBilibiliRisk(json?.code);
       throw new Error(t("spaceApiFailed", { code: json?.code, message: coerceStr(json?.message) }));
     }
-    const data = json?.data || {};
+    const data: OpusFeedData = json?.data || {};
     const items = Array.isArray(data.items) ? data.items : [];
     if (items.length === 0) break;
     for (const item of items) {
@@ -33,17 +46,17 @@ export async function collectSpaceOpusIds(mid, maxArticles) {
 }
 
 /** 登录用户自己的图文收藏（gallery-dl user_favlist）：page 翻页，需要登录态。 */
-export async function collectFavOpusIds(maxArticles) {
-  const ids = [];
+export async function collectFavOpusIds(maxArticles: number): Promise<string[]> {
+  const ids: string[] = [];
   let page = 1;
   while (ids.length < maxArticles) {
-    const json = await fetchJson(`${OPUS_FEED_FAV_API}?page=${page}&page_size=20`);
+    const json = await fetchJson<OpusFeedResponse>(`${OPUS_FEED_FAV_API}?page=${page}&page_size=20`);
     if (json?.code !== 0) {
       // -101 会在这里硬失败并提示登录：收藏夹只属于登录用户，没有匿名可看的形态。
       checkBilibiliRisk(json?.code);
       throw new Error(t("favApiFailed", { code: json?.code, message: coerceStr(json?.message) }));
     }
-    const data = json?.data || {};
+    const data: OpusFeedData = json?.data || {};
     const items = Array.isArray(data.items) ? data.items : [];
     if (items.length === 0) break;
     for (const item of items) {

@@ -1,11 +1,10 @@
-// @ts-nocheck
 // 表情表：小黑盒会陆续上新表情，详情模板里写死的静态表会过期（新表情只能显示成 [cube_xxx] 文本）。
 // 这里把官方表情列表存进 plugin_data，按需更新：帖子里出现 plugin_data 表中没有的表情时，
 // 本次任务拉一次官方列表并合并写回。详情模板在 iframe 里经 __bridge.getPluginData() 读取补全。
 import { API_HOST, PATH_EMOJI_LIST } from "./consts";
 import { t } from "./i18n";
 import { signedUrl } from "./sign";
-import { coerceStr, fetchJson, isChallenge, log } from "./util";
+import { coerceStr, errorMessage, fetchJson, isChallenge, log } from "./util";
 
 const { pluginData, setPluginData } = Kabegame;
 
@@ -18,11 +17,30 @@ const EMOJI_UPDATED_AT_KEY = "heybox_emoji_updated_at";
 const BRACKET_RE = /\[([a-z]+_[^\[\]]+)\]/g;
 const SPAN_RE = /data-emoji=\\?"([^"\\]+)\\?"/g;
 
-let emojiMap = null;
+/** 官方表情列表接口的最小响应结构（外部 JSON，字段都可能缺失）。 */
+type XhhEmoji = {
+  code?: unknown;
+  img?: unknown;
+};
+
+type XhhEmojiGroup = {
+  group_code?: unknown;
+  emojis?: XhhEmoji[] | null;
+};
+
+type XhhEmojiResponse = {
+  status?: unknown;
+  result?: {
+    emoji_groups?: XhhEmojiGroup[] | null;
+    emoji_version?: unknown;
+  } | null;
+};
+
+let emojiMap: Record<string, string> | null = null;
 // 一次任务最多拉一次：官方列表里本来就没有的表情不该让每篇帖子都重拉。
 let refreshedThisRun = false;
 
-function readPluginData() {
+function readPluginData(): Record<string, KabegameJsonValue> {
   try {
     const data = pluginData();
     return data && typeof data === "object" && !Array.isArray(data) ? data : {};
@@ -31,29 +49,35 @@ function readPluginData() {
   }
 }
 
-function currentEmojiMap() {
+function currentEmojiMap(): Record<string, string> {
   if (!emojiMap) {
     const cached = readPluginData()[EMOJI_MAP_KEY];
-    emojiMap = cached && typeof cached === "object" && !Array.isArray(cached) ? cached : {};
+    // plugin_data 是外部持久化 JSON：只在边界上声明表情表的形状，值仍是站点的图片 URL。
+    emojiMap =
+      cached && typeof cached === "object" && !Array.isArray(cached)
+        ? (cached as Record<string, string>)
+        : {};
   }
   return emojiMap;
 }
 
 /** 从任意可序列化值（metadata）里收集出现过的表情 key。 */
-export function collectEmojiKeys(value) {
-  const text = JSON.stringify(value ?? "");
-  const keys = new Set();
+export function collectEmojiKeys(value: unknown): Set<string> {
+  const text = JSON.stringify(value ?? "") ?? "";
+  const keys = new Set<string>();
   for (const match of text.matchAll(BRACKET_RE)) keys.add(match[1].trim());
   for (const match of text.matchAll(SPAN_RE)) keys.add(match[1].trim());
   return keys;
 }
 
-function flattenEmojiGroups(result) {
-  const map = {};
-  const groups = Array.isArray(result?.emoji_groups) ? result.emoji_groups : [];
+function flattenEmojiGroups(result: XhhEmojiResponse["result"]): Record<string, string> {
+  const map: Record<string, string> = {};
+  const rawGroups = result?.emoji_groups;
+  const groups = Array.isArray(rawGroups) ? rawGroups : [];
   for (const group of groups) {
     const groupCode = coerceStr(group?.group_code);
-    const emojis = Array.isArray(group?.emojis) ? group.emojis : [];
+    const rawEmojis = group?.emojis;
+    const emojis = Array.isArray(rawEmojis) ? rawEmojis : [];
     if (!groupCode) continue;
     for (const emoji of emojis) {
       const code = coerceStr(emoji?.code);
@@ -68,7 +92,7 @@ function flattenEmojiGroups(result) {
  * 帖子里出现本地表情表没有的 key 时，拉官方列表并合并写入 plugin_data。
  * 合并而非覆盖：官方下架的旧表情仍可能出现在历史评论里。失败只告警，不影响下载。
  */
-export async function ensureEmojis(keys, commonParams) {
+export async function ensureEmojis(keys: Set<string>, commonParams: string): Promise<void> {
   if (refreshedThisRun || keys.size === 0) return;
   const known = currentEmojiMap();
   const missing = [...keys].filter((key) => !known[key]);
@@ -76,7 +100,9 @@ export async function ensureEmojis(keys, commonParams) {
   refreshedThisRun = true;
 
   try {
-    const response = await fetchJson(signedUrl(API_HOST, PATH_EMOJI_LIST, commonParams));
+    const response = await fetchJson<XhhEmojiResponse>(
+      signedUrl(API_HOST, PATH_EMOJI_LIST, commonParams),
+    );
     if (isChallenge(response?.status) || response?.status !== "ok") {
       log(t("emojiListFailed", { status: coerceStr(response?.status) }), "warn");
       return;
@@ -84,15 +110,16 @@ export async function ensureEmojis(keys, commonParams) {
     const fetched = flattenEmojiGroups(response.result);
     if (Object.keys(fetched).length === 0) return;
 
-    emojiMap = { ...known, ...fetched };
+    const merged = { ...known, ...fetched };
+    emojiMap = merged;
     const data = readPluginData();
-    data[EMOJI_MAP_KEY] = emojiMap;
+    data[EMOJI_MAP_KEY] = merged;
     data[EMOJI_VERSION_KEY] = coerceStr(response.result?.emoji_version);
     data[EMOJI_UPDATED_AT_KEY] = Date.now();
     setPluginData(data);
 
-    const stillMissing = missing.filter((key) => !emojiMap[key]);
-    const emojiCount = Object.keys(emojiMap).length;
+    const stillMissing = missing.filter((key) => !merged[key]);
+    const emojiCount = Object.keys(merged).length;
     log(
       stillMissing.length
         ? t("emojiUpdatedWithMissing", {
@@ -103,6 +130,6 @@ export async function ensureEmojis(keys, commonParams) {
         : t("emojiUpdated", { version: data[EMOJI_VERSION_KEY], count: emojiCount }),
     );
   } catch (error) {
-    log(t("emojiUpdateFailed", { error: error?.message ?? error }), "warn");
+    log(t("emojiUpdateFailed", { error: errorMessage(error) }), "warn");
   }
 }

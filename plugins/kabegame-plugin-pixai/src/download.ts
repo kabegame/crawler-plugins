@@ -1,60 +1,76 @@
-// @ts-nocheck
 // 一页作品 edges → 落库。含下载地址挑选（media API vs 列表里的 PUBLIC url）、
 // 详情补齐与进度分摊。
 import { MEDIA_API_BASE } from "./consts";
 import { fetchPixaiArtworkDetail, fetchPixaiComments } from "./api";
 import { labelsFromArtworkDetail } from "./labels";
 import { searchTextsFromDetail } from "./search-texts";
+import type { PixaiArtworkDetail, PixaiArtworkEdge, PixaiArtworkNode, PixaiMetadataV2, PixaiUrlVariant } from "./types";
 import { arrayValue, coerceStr, log } from "./util";
 import { t } from "./i18n";
 
 const { addProgress, createImageMetadata: createImageMetadataRow, downloadImage } = Kabegame;
 
-function countPublicUrls(urls) {
+function countPublicUrls(urls: unknown): number {
   let count = 0;
-  for (const item of arrayValue(urls)) {
+  for (const item of arrayValue<PixaiUrlVariant>(urls)) {
     if (item?.variant === "PUBLIC" && item?.url) count += 1;
   }
   return count;
 }
 
 /** 列表节点的下载媒体 id：动图优先取 videoMediaId，否则退回静图 mediaId。 */
-function pickMediaIdForDownload(node) {
+function pickMediaIdForDownload(node: PixaiArtworkNode | null | undefined): string {
   const videoMediaId = coerceStr(node?.videoMediaId);
   if (videoMediaId) return videoMediaId;
   return coerceStr(node?.mediaId);
 }
 
-function pickVideoMediaIdForDownload(node, artworkDetail) {
+function pickVideoMediaIdForDownload(
+  node: PixaiArtworkNode | null | undefined,
+  artworkDetail: PixaiArtworkDetail | null | undefined,
+): string {
   const detailVideoMediaId = coerceStr(artworkDetail?.videoMediaId);
   if (detailVideoMediaId) return detailVideoMediaId;
   return coerceStr(node?.videoMediaId);
 }
 
 /** 详情里有 videoMediaId 就一律换成视频地址，否则用调用方给的默认 url。 */
-function pickArtworkDownloadUrl(defaultUrl, node, artworkDetail) {
+function pickArtworkDownloadUrl(
+  defaultUrl: unknown,
+  node: PixaiArtworkNode | null | undefined,
+  artworkDetail: PixaiArtworkDetail | null | undefined,
+): string {
   const videoMediaId = pickVideoMediaIdForDownload(node, artworkDetail);
   if (videoMediaId) return `${MEDIA_API_BASE}${videoMediaId}/image`;
   return coerceStr(defaultUrl);
 }
 
-function createImageMetadata(metadata) {
+function createImageMetadata(metadata: PixaiMetadataV2): number {
   return Number(createImageMetadataRow(metadata, { searchTexts: searchTextsFromDetail(metadata.v2) }));
 }
 
-async function downloadArtwork(finalDownloadUrl, artworkDetail, displayName, pixaiUrl) {
+async function downloadArtwork(
+  finalDownloadUrl: string,
+  artworkDetail: PixaiArtworkDetail,
+  displayName: string,
+  pixaiUrl: string,
+): Promise<void> {
   const metadataId = createImageMetadata({ v2: artworkDetail });
-  const labels = labelsFromArtworkDetail(artworkDetail);
-  await downloadImage(finalDownloadUrl, {
+  const labels: KabegameLabelInput[] = labelsFromArtworkDetail(artworkDetail);
+  const opts: KabegameDownloadImageOptions = {
     name: displayName,
     metadata_id: metadataId,
     url: pixaiUrl,
     labels,
-  });
+  };
+  await downloadImage(finalDownloadUrl, opts);
 }
 
 /** 列表节点只有标题和媒体 id，入库要的 tacks/author/prompts 都在详情里，故逐条补齐。 */
-async function enrichArtworkDetail(artworkId, fallbackTitle) {
+async function enrichArtworkDetail(
+  artworkId: unknown,
+  fallbackTitle: string,
+): Promise<PixaiArtworkDetail | null> {
   const detail = await fetchPixaiArtworkDetail(artworkId);
   if (!detail) {
     log(t("skipArtworkNoDetail", { artworkId }), "warn");
@@ -73,14 +89,14 @@ async function enrichArtworkDetail(artworkId, fallbackTitle) {
  * false 则取列表节点里的 PUBLIC url。
  */
 export async function processArtworksEdgesForDownload(
-  edges,
-  label,
-  contextId,
-  progressBudget,
-  useMediaApi,
-  downloadedOffset,
-) {
-  const artworkEdges = arrayValue(edges);
+  edges: unknown,
+  label: string,
+  contextId: string,
+  progressBudget: number,
+  useMediaApi: boolean,
+  downloadedOffset: number,
+): Promise<number> {
+  const artworkEdges = arrayValue<PixaiArtworkEdge>(edges);
   if (artworkEdges.length === 0) return 0;
 
   let downloaded = 0;
@@ -129,7 +145,7 @@ export async function processArtworksEdgesForDownload(
 
   for (let edgeIndex = 0; edgeIndex < artworkEdges.length; edgeIndex += 1) {
     const node = artworkEdges[edgeIndex]?.node;
-    const urls = arrayValue(node?.media?.urls);
+    const urls = arrayValue<PixaiUrlVariant>(node?.media?.urls);
     const publicUrl = urls.find((item) => item?.variant === "PUBLIC" && item?.url)?.url;
     if (!publicUrl) continue;
 

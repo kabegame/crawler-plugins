@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 端点、公共查询参数与固定请求头。改接口参数时只动这里。
 
 export const API_HOST = "https://api.xiaoheihe.cn";

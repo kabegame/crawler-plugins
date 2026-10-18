@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 小黑盒 (XHH) 综合搜索爬虫，V8 后端。
 //
 // 模块分工：
@@ -24,6 +23,7 @@ import {
   findPostRender,
   flattenComments,
   topicsToTags,
+  type XhhTreeResult,
 } from "./post";
 import { signedUrl, xhhFakeDeviceId } from "./sign";
 import {
@@ -40,14 +40,51 @@ import {
   stripEmojiBracketTokens,
   stripTags,
   validHttpUrl,
+  type XhhVars,
 } from "./util";
 
 const { addProgress, downloadImage, requireCookie, warn } = Kabegame;
 
-async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, autoCommentText) {
+/** tree 接口的最小响应结构（外部 JSON，字段都可能缺失）。 */
+type XhhTreeResponse = {
+  status?: unknown;
+  result?: XhhTreeResult | null;
+};
+
+/** 搜索接口 items 里的条目：只有 info 是帖子本体，其余是版块卡。 */
+type XhhSearchInfo = {
+  share_url?: unknown;
+  linkid?: unknown;
+};
+
+type XhhSearchItem = {
+  info?: XhhSearchInfo | null;
+};
+
+type XhhSearchResponse = {
+  status?: unknown;
+  result?: {
+    items?: XhhSearchItem[] | null;
+  } | null;
+};
+
+/** 正文 JSON（block 数组）里的一项。 */
+type XhhPostBlock = {
+  type?: unknown;
+  text?: unknown;
+  url?: unknown;
+};
+
+async function crawlPost(
+  linkId: string,
+  itemWeight: number,
+  commonParams: string,
+  fetchCommentImages: boolean,
+  autoCommentText: string,
+): Promise<void> {
   const treeExtra = `link_id=${encodeURIComponent(linkId)}&is_first=1&page=1&index=1&limit=20&owner_only=0`;
   const treeUrl = signedUrl(API_HOST, PATH_TREE, commonParams, treeExtra);
-  const tree = await fetchJson(treeUrl);
+  const tree = await fetchJson<XhhTreeResponse>(treeUrl);
 
   if (isChallenge(tree?.status)) challengeError(t("treeApiLabel"), tree?.status);
   if (tree?.status !== "ok") {
@@ -81,19 +118,21 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
     return;
   }
 
-  let blocks;
+  let parsed: unknown;
   try {
-    blocks = JSON.parse(textStr);
+    parsed = JSON.parse(textStr);
   } catch {
     log(t("postTextJsonInvalid", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
-  if (!Array.isArray(blocks)) {
+  if (!Array.isArray(parsed)) {
     log(t("postTextNotArray", { linkId }), "warn");
     addProgress(itemWeight);
     return;
   }
+  // 正文是帖子自带的 JSON 字符串：只在解析边界上声明 block 的静态形状。
+  const blocks = parsed as XhhPostBlock[];
 
   const titleHtml = coerceStr(linkObj.title);
   const titlePlain = stripTags(titleHtml).trim();
@@ -114,7 +153,7 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
   const postIp = coerceStr(linkObj.ip_location);
 
   let descriptionPlain = "";
-  const thumbUrls = [];
+  const thumbUrls: string[] = [];
   for (const block of blocks) {
     if (block?.type === "text" && !descriptionPlain) {
       descriptionPlain = stripEmojiBracketTokens(stripTags(block.text).trim());
@@ -159,11 +198,12 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
     const finalUrl = await resolveOriginalUrl(thumbUrls[index], commonParams, t("originalApiLabel"));
     if (finalUrl) {
       const imageDisplayName = imageTotal > 1 ? `${displayName}(${index + 1})` : displayName;
-      await downloadImage(finalUrl, {
+      const opts: KabegameDownloadImageOptions = {
         name: imageDisplayName,
         metadata_id: metadataId,
         url: shareUrl,
-      });
+      };
+      await downloadImage(finalUrl, opts);
     } else {
       log(t("originalUrlUnavailable", { linkId, index: index + 1 }), "warn");
     }
@@ -187,16 +227,17 @@ async function crawlPost(linkId, itemWeight, commonParams, fetchCommentImages, a
 
       const baseName = `${displayName}[comment_${comment.floor_num}]`;
       const name = commentImages.length > 1 ? `${baseName}(${index + 1})` : baseName;
-      await downloadImage(finalUrl, {
+      const opts: KabegameDownloadImageOptions = {
         name,
         metadata_id: metadataId,
         url: shareUrl,
-      });
+      };
+      await downloadImage(finalUrl, opts);
     }
   }
 }
 
-async function runSinglePost(commonParams, vars) {
+async function runSinglePost(commonParams: string, vars: XhhVars): Promise<void> {
   const inputUrl = coerceStr(vars?.post_share_url);
   if (!inputUrl) throw new Error(t("singlePostUrlRequired"));
 
@@ -213,7 +254,7 @@ async function runSinglePost(commonParams, vars) {
   );
 }
 
-async function runSearch(commonParams, vars) {
+async function runSearch(commonParams: string, vars: XhhVars): Promise<void> {
   const searchKeyword = coerceStr(vars?.search_keyword || "美图");
   const startPage = Number(vars?.start_page ?? 1);
   const endPage = Number(vars?.end_page ?? startPage);
@@ -234,7 +275,7 @@ async function runSearch(commonParams, vars) {
     const offset = (page - 1) * apiLimit;
     const extra = `q=${encodeURIComponent(searchKeyword)}&search_type=general&offset=${offset}&limit=${apiLimit}`;
     const searchUrl = signedUrl(API_HOST, PATH_SEARCH, commonParams, extra);
-    const response = await fetchJson(searchUrl);
+    const response = await fetchJson<XhhSearchResponse>(searchUrl);
 
     if (isChallenge(response?.status)) challengeError(t("searchApiLabel"), response?.status);
     if (response?.status !== "ok") {
@@ -268,7 +309,7 @@ async function runSearch(commonParams, vars) {
     const itemWeight = pageWeight / validItems.length;
     log(t("pageParseStart", { page, endPage, count: validItems.length }));
     for (const item of validItems) {
-      const info = item.info || {};
+      const info: XhhSearchInfo = item.info || {};
       const linkId = extractLinkId(info.share_url) || coerceStr(info.linkid);
       await crawlPost(
         linkId,
@@ -282,8 +323,8 @@ async function runSearch(commonParams, vars) {
   }
 }
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+export async function crawl(_common: unknown, custom: XhhVars | null | undefined): Promise<void> {
+  const vars: XhhVars = custom || {};
   setRequestHeaders();
   const commonParams = `${COMMON_PARAMS_BASE}&device_id=${xhhFakeDeviceId()}`;
 

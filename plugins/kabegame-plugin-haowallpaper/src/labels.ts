@@ -1,18 +1,21 @@
-// @ts-nocheck
 // 哲风壁纸标签：相关标签使用拼音 key，作者优先使用稳定的站内用户 ID。
 // metadata migration 与下载入口共用本文件，保证新旧图片生成完全一致的标签路径。
 
 import TinyPinyin from "tiny-pinyin";
 
-function text(value) {
+function text(value: unknown): string {
   return value == null ? "" : String(value).trim();
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 /**
  * tiny-pinyin 刻意选择体积优先，不保证多音字准确。输出继续收敛成标签 key 允许的 ASCII 字符集；
  * 汉字间、原有空白和标点都折叠成单个 `-`，便于搜索和复制。
  */
-export function pinyinLabelKey(value) {
+export function pinyinLabelKey(value: unknown): string {
   const source = text(value);
   if (!source) return "";
 
@@ -41,12 +44,13 @@ export function pinyinLabelKey(value) {
   return key && key.length <= 64 ? key : "";
 }
 
-export function labelsFromMetadata(metadata) {
-  const m = metadata && typeof metadata === "object" ? metadata : {};
-  const labels = [];
-  const seen = new Set();
+export function labelsFromMetadata(metadata: unknown): KabegameLabelInput[] {
+  const m = isRecord(metadata) ? metadata : {};
+  const labels: KabegameLabelInput[] = [];
+  const seen = new Set<string>();
 
-  for (const rawTag of Array.isArray(m.tags) ? m.tags : []) {
+  const rawTags: unknown[] = Array.isArray(m.tags) ? m.tags : [];
+  for (const rawTag of rawTags) {
     const name = text(rawTag);
     const key = pinyinLabelKey(name);
     if (!key) continue;
@@ -56,7 +60,7 @@ export function labelsFromMetadata(metadata) {
     labels.push({ key, category: "haowallpaper/tag", name });
   }
 
-  const publisher = m.publisher && typeof m.publisher === "object" && !Array.isArray(m.publisher) ? m.publisher : {};
+  const publisher = isRecord(m.publisher) ? m.publisher : {};
   const authorName = text(publisher.name || m.author);
   const authorKey = pinyinLabelKey(publisher.id || m.author_id || authorName);
   if (authorKey) {

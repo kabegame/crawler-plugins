@@ -333,6 +333,14 @@ node package-plugin.js anihonet-wallpaper
 node package-plugin.js --only single-file-import local-folder-import
 ```
 
+**Type-check all plugin sources**:
+
+```bash
+pnpm run check
+```
+
+Runs `tsconfig.check.json` over the TypeScript sources under `plugins/*/src` (WebView plugins' `crawl.js` are not included). Every plugin passes; the retired `twodwallpapers` keeps a file-level `// @ts-nocheck`. From the main project you can also run `deno task --cwd src-crawler-plugins check`.
+
 **Generate plugin index (index.json)**:
 
 ```bash
@@ -376,24 +384,10 @@ Output: `crawler-plugins/packed/<plugin-name>.kgpg`
 
 ## Developer docs
 
-### Plugin development guide
-
-- Plugin directory structure
-- Packaging
-- File format (manifest.json, config.json, crawl.rhai)
-- Variable types and config
-
-📖 [README_PLUGIN_DEV.md](README_PLUGIN_DEV.md)
-
-### Rhai API
-
-- Navigation and fetch (`to()`, `back()`, `fetch_json()`)
-- Page info (`current_url()`, `current_html()`)
-- DOM queries (`query()`, `get_attr()`, `query_by_text()`)
-- URL and image helpers (`resolve_url()`, `is_image_url()`, `download_image()`)
-- Examples and notes
-
-📖 [RHAI_API.md](RHAI_API.md)
+- [Plugin format](https://github.com/kabegame/kabegame/blob/main/docs/PLUGIN_FORMAT.md)
+- [Plugin development](https://kabegame.com/dev/overview/)
+- [V8 API](https://kabegame.com/dev/v8-api/)
+- [WebView API](https://kabegame.com/dev/webview-api/)
 
 ---
 
@@ -412,7 +406,7 @@ Contributions are welcome. Please:
 2. Provide a complete manifest.json
 3. Add a clear README.md and user doc (README.md)
 
-Before developing, read the main repo’s [Plugin development guide](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) and [Rhai API](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md).
+Before developing, read the [Plugin development guide](https://kabegame.com/dev/overview/) and [Plugin format](https://github.com/kabegame/kabegame/blob/main/docs/PLUGIN_FORMAT.md).
 
 ---
 

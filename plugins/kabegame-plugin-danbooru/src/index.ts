@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 import { t } from "./i18n";
 
@@ -8,7 +7,7 @@ const DEFAULT_BASE_URL = "https://donmai.moe";
 
 // 站点在 li/tr 上只给数字分类（tag-type-N / data-category）；这里翻成可读名，
 // 元数据、provider 分组和 description.ejs 三处都按这套名字对齐。
-const TAG_CATEGORY_NAMES = {
+const TAG_CATEGORY_NAMES: Record<string, string> = {
   "0": "general",
   "1": "artist",
   "3": "copyright",
@@ -17,31 +16,114 @@ const TAG_CATEGORY_NAMES = {
 };
 
 // 侧栏标签展示顺序（站点自身的 h3 分组顺序），全量 tag 串按这个顺序拼
-const TAG_CATEGORY_ORDER = ["artist", "copyright", "character", "general", "meta"];
+const TAG_CATEGORY_ORDER: string[] = ["artist", "copyright", "character", "general", "meta"];
+
+// 站点数据与 metadata 用 type 建模：它们最终要交给 KabegameJsonValue，
+// interface 没有隐式索引签名，赋值时会报 TS2322。
+type DanbooruSite = {
+  baseUrl: string;
+  host: string;
+  ua: string;
+  browserIdentity: boolean;
+};
+
+type DanbooruTag = {
+  name: string;
+  // 展示名带空格（站点自己就是这么渲染的），全量 tag 串仍用 name
+  display: string;
+  type: string;
+  count: string;
+  post_href: string;
+  wiki_href: string;
+  deprecated: boolean;
+};
+
+type DanbooruTagsByType = Record<string, string[]>;
+
+type DanbooruCommentary = {
+  title: string;
+  body: string;
+};
+
+type DanbooruMetadata = {
+  post_id: string;
+  tags_string: string;
+  tags: DanbooruTag[];
+  tags_by_type: DanbooruTagsByType;
+  rating: string;
+  score: string;
+  fav_count: string;
+  status: string;
+  file_size: string;
+  file_ext: string;
+  width: number;
+  height: number;
+  uploader_name: string;
+  uploader_href: string;
+  posted_date_text: string;
+  posted_date_iso: string;
+  posted_date_title: string;
+  posted_date_href: string;
+  source_text: string;
+  source_href: string;
+  original_href: string;
+  sample_href: string;
+  commentary: DanbooruCommentary | null;
+};
+
+type DanbooruSize = {
+  file_size: string;
+  file_ext: string;
+  width: number;
+  height: number;
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type DanbooruVars = {
+  source_site?: unknown;
+  quality?: unknown;
+  crawl_mode?: unknown;
+  rating?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+  per_page?: unknown;
+  mode_tag_value?: unknown;
+  popular_scale?: unknown;
+  id_start?: unknown;
+  id_end?: unknown;
+};
 
 // 根据源站选项解析基础 URL：moe = 只含 general 分级的安全站，danbooru = 全站。
 // safebooru 是 1.0.0 的旧选项值，已保存的运行配置仍会带着它，一并指向安全站。
-function resolveBaseUrl(source, fallback) {
+function resolveBaseUrl(source: unknown, fallback: unknown): string {
   const site = coerceStr(source).trim().toLowerCase();
   if (site === "moe" || site === "safebooru") return "https://donmai.moe";
   if (site === "danbooru") return "https://danbooru.donmai.us";
   return coerceStr(fallback) || DEFAULT_BASE_URL;
 }
 
-function coerceStr(value) {
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function trimText(value) {
+function trimText(value: unknown): string {
   return coerceStr(value).replace(/\s+/g, " ").trim();
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return trimText(el?.textContent || "");
 }
 
-function parseHtml(html) {
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
+}
+
+// catch 变量统一收窄，保持原来 String(error?.message ?? error) 的字符串回退语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error && error.message != null) {
+    return String(error.message);
+  }
+  return String(error);
 }
 
 // donmai 各域名的 Cloudflare 规则不一样（2026-09 实测，均未带 cf_clearance）：
@@ -52,21 +134,29 @@ function parseHtml(html) {
 // 那一刻快照任务请求头，所以下载前临时撤掉这两个头，下载后再恢复。
 const BROWSER_IDENTITY_HOSTS = new Set(["donmai.moe"]);
 
-let site = null; // { baseUrl, host, ua, browserIdentity }
+let site: DanbooruSite | null = null;
 
-function applySiteHeaders() {
-  if (!site.browserIdentity) return true;
-  if (site.ua) setHeader("User-Agent", site.ua);
-  return requireCookie(site.host);
+// site 只在 prepareSite 里建立一次，其余函数都在其后调用；这里显式收窄，避免非空断言
+function requireSite(): DanbooruSite {
+  if (!site) throw new Error("site is not prepared");
+  return site;
 }
 
-function clearSiteHeaders() {
-  if (!site.browserIdentity) return;
+function applySiteHeaders(): boolean {
+  const current = requireSite();
+  if (!current.browserIdentity) return true;
+  if (current.ua) setHeader("User-Agent", current.ua);
+  return requireCookie(current.host);
+}
+
+function clearSiteHeaders(): void {
+  const current = requireSite();
+  if (!current.browserIdentity) return;
   delHeader("User-Agent");
   delHeader("Cookie");
 }
 
-function prepareSite(baseUrl) {
+function prepareSite(baseUrl: string): void {
   const host = new URL(baseUrl).host;
   // 旧版应用没有 cefUserAgent 接口，此时不覆盖 UA
   site = {
@@ -80,25 +170,26 @@ function prepareSite(baseUrl) {
   }
 }
 
-function siteBlockedError(reason) {
-  const hint = site.browserIdentity
-    ? t("surfChallengeHint", { baseUrl: site.baseUrl })
+function siteBlockedError(reason: string): Error {
+  const current = requireSite();
+  const hint = current.browserIdentity
+    ? t("surfChallengeHint", { baseUrl: current.baseUrl })
     : t("networkRetryHint");
-  return new Error(t("cloudflareBlocked", { host: site.host, reason, hint }));
+  return new Error(t("cloudflareBlocked", { host: current.host, reason, hint }));
 }
 
-function isChallengePage(document) {
+function isChallengePage(document: Document): boolean {
   const title = trimText(document.title);
   return /just a moment|attention required|checking your browser/i.test(title);
 }
 
-async function openDocument(url) {
-  let finalUrl;
+async function openDocument(url: string): Promise<{ finalUrl: string; document: Document }> {
+  let finalUrl: string;
   try {
     finalUrl = await to(url);
   } catch (error) {
     // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
-    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) throw siteBlockedError(t("returned403"));
+    if (/HTTP error: 403\b/.test(errorMessage(error))) throw siteBlockedError(t("returned403"));
     throw error;
   }
   const document = parseHtml(await currentHtml());
@@ -106,20 +197,20 @@ async function openDocument(url) {
   return { finalUrl, document };
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function normalizeTagToken(text) {
+function normalizeTagToken(text: unknown): string {
   return trimText(text).replace(/\s+/g, "_");
 }
 
 // 标签组合按站点搜索语法用空格分隔（URL 里编码成 +）。
 // list 类型经 GUI 传进来是数组，但 kabegame-cli 的 --var 只能给字符串，
 // 所以字符串形态也要接：按逗号/空白/加号切开。
-function buildTagsValueFromList(tagList) {
-  const items = Array.isArray(tagList)
+function buildTagsValueFromList(tagList: unknown): string {
+  const items: unknown[] = Array.isArray(tagList)
     ? tagList
     : coerceStr(tagList).split(/[,+\s]+/);
   return items
@@ -130,13 +221,13 @@ function buildTagsValueFromList(tagList) {
 
 const TAG_TYPE_CLASS_RE = /(?:^|\s)tag-type-(\d+)(?:\s|$)/;
 
-function categoryNameOf(id) {
+function categoryNameOf(id: unknown): string {
   return TAG_CATEGORY_NAMES[coerceStr(id).trim()] || "general";
 }
 
 // 详情页侧栏 #tag-list：每个 li 带 data-tag-name（规范名，已含下划线），
 // class 上的 tag-type-N 是分类，a.search-tag 是站内检索链接，a.wiki-link 是 wiki/artist 页。
-function parseSidebarTags(document, pageUrl) {
+function parseSidebarTags(document: Document, pageUrl: string): DanbooruTag[] {
   return Array.from(document.querySelectorAll("#tag-list li[data-tag-name]"))
     .map((li) => {
       const searchAnchor = li.querySelector("a.search-tag");
@@ -169,12 +260,12 @@ function parseSidebarTags(document, pageUrl) {
 // 改这里要同步改那里。
 const LABEL_CATEGORIES = new Set(["artist", "character", "copyright", "meta", "general"]);
 
-function tagLabelType(type) {
+function tagLabelType(type: unknown): string {
   const value = String(type || "").trim().toLowerCase();
   return LABEL_CATEGORIES.has(value) ? value : "general";
 }
 
-function tagLabelKey(name) {
+function tagLabelKey(name: unknown): string {
   const key = String(name || "")
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -183,8 +274,8 @@ function tagLabelKey(name) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromTags(tags) {
-  const labels = [];
+function labelsFromTags(tags: DanbooruTag[] | null | undefined): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   for (const tag of tags || []) {
     const key = tagLabelKey(tag && tag.name);
     if (!key) continue;
@@ -203,9 +294,9 @@ function labelsFromTags(tags) {
 // 可配合「非」找没有标签的图），值本身不带前缀，原因同 konachan：逐值加前缀会让含 "danbooru" 的词条
 // 膨胀到几十万行映射，搜索变慢。metadata_migrations/migrate.js 的 provideSearchTextList 有一份同规则副本，
 // 改这里要同步改那里。
-function searchTextsFromMetadata(meta) {
-  const out = ["danbooru"];
-  const field = (key, values) => {
+function searchTextsFromMetadata(meta: DanbooruMetadata): string[] {
+  const out: string[] = ["danbooru"];
+  const field = (key: string, values: unknown[]): void => {
     const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
     if (list.length) out.push(key, ...list);
   };
@@ -224,8 +315,8 @@ function searchTextsFromMetadata(meta) {
   return [...new Set(out)];
 }
 
-function buildTagsString(tags) {
-  const ordered = [];
+function buildTagsString(tags: DanbooruTag[]): string {
+  const ordered: string[] = [];
   for (const category of TAG_CATEGORY_ORDER) {
     for (const tag of tags) {
       if (tag.type === category) ordered.push(tag.name);
@@ -237,8 +328,8 @@ function buildTagsString(tags) {
   return ordered.join(" ");
 }
 
-function groupTagsByType(tags) {
-  const grouped = {};
+function groupTagsByType(tags: DanbooruTag[]): DanbooruTagsByType {
+  const grouped: DanbooruTagsByType = {};
   for (const tag of tags) {
     (grouped[tag.type] || (grouped[tag.type] = [])).push(tag.name);
   }
@@ -246,13 +337,13 @@ function groupTagsByType(tags) {
 }
 
 // #post-info-* 每行形如 "Size: 585 KB .jpg (707x942) »"，统一剥掉前缀标签
-function infoText(document, key) {
+function infoText(document: Document, key: string): string {
   const el = document.querySelector(`#post-info-${key}`);
   if (!el) return "";
   return trimText(textOf(el).replace(new RegExp(`^${key}\\s*:\\s*`, "i"), "").replace(/\s*»\s*$/, ""));
 }
 
-function parseSizeLine(line) {
+function parseSizeLine(line: unknown): DanbooruSize {
   // "585 KB .jpg (707x942)"
   const matched = /^(.*?)\s*(\.[a-z0-9]+)?\s*\((\d+)x(\d+)\)\s*$/i.exec(coerceStr(line));
   if (!matched) return { file_size: trimText(line), file_ext: "", width: 0, height: 0 };
@@ -264,7 +355,7 @@ function parseSizeLine(line) {
   };
 }
 
-function parseCommentary(document) {
+function parseCommentary(document: Document): DanbooruCommentary | null {
   const section = document.querySelector("#original-artist-commentary");
   if (!section) return null;
   const title = textOf(section.querySelector("h3"));
@@ -273,7 +364,7 @@ function parseCommentary(document) {
   return { title, body };
 }
 
-function buildDanbooruMetadata(document, pageUrl) {
+function buildDanbooruMetadata(document: Document, pageUrl: string): DanbooruMetadata {
   const tags = parseSidebarTags(document, pageUrl);
   const uploaderAnchor = document.querySelector("#post-info-uploader a.user");
   const sourceAnchor = document.querySelector("#post-info-source a[href]");
@@ -315,7 +406,7 @@ function buildDanbooruMetadata(document, pageUrl) {
   };
 }
 
-function metadataNonEmpty(meta) {
+function metadataNonEmpty(meta: DanbooruMetadata): boolean {
   return !!(
     meta.post_id ||
     meta.tags.length ||
@@ -329,12 +420,12 @@ function metadataNonEmpty(meta) {
 
 // 质量分流：high = #post-info-size 上的原图直链（图片/视频通用），
 // medium = #image 的 sample；缺 sample（视频帖 #image 是 div）时回落原图。
-function pickImageUrl(meta, quality) {
+function pickImageUrl(meta: DanbooruMetadata, quality: string): string {
   if (quality === "high") return meta.original_href || meta.sample_href;
   return meta.sample_href || meta.original_href;
 }
 
-async function processDetailPage(href, baseUrl, quality) {
+async function processDetailPage(href: string, baseUrl: string, quality: string): Promise<void> {
   const fullUrl = resolveUrl(href, baseUrl);
   const { document, finalUrl } = await openDocument(fullUrl);
   const meta = buildDanbooruMetadata(document, finalUrl);
@@ -343,7 +434,7 @@ async function processDetailPage(href, baseUrl, quality) {
     console.warn(t("imageMissing", { url: finalUrl }));
     return;
   }
-  const opts = { url: finalUrl };
+  const opts: KabegameDownloadImageOptions = { url: finalUrl };
   if (metadataNonEmpty(meta)) {
     opts.metadata = meta;
     opts.searchTexts = searchTextsFromMetadata(meta);
@@ -359,7 +450,7 @@ async function processDetailPage(href, baseUrl, quality) {
 }
 
 // ratingLetter 非空时只留 data-rating 相同的作品（人气榜页不接受 tags 参数，分级只能在这里筛）
-function collectPostHrefs(document, pageUrl, ratingLetter = "") {
+function collectPostHrefs(document: Document, pageUrl: string, ratingLetter = ""): string[] {
   const articles = Array.from(document.querySelectorAll("article.post-preview"));
   const hrefs = articles
     .filter((article) => !ratingLetter || coerceStr(article.getAttribute("data-rating")) === ratingLetter)
@@ -374,21 +465,28 @@ function collectPostHrefs(document, pageUrl, ratingLetter = "") {
   return hrefs;
 }
 
-function validatePageRange(startPage, endPage) {
+function validatePageRange(startPage: number, endPage: number): void {
   if (endPage >= startPage + 100) {
     throw new Error(t("pageRangeTooLarge"));
   }
   if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
-function normalizePerPage(value) {
+function normalizePerPage(value: unknown): number {
   const parsed = Number(value ?? 20);
   if (!Number.isFinite(parsed) || parsed <= 0) return 20;
   return Math.min(200, Math.floor(parsed));
 }
 
 // 列表页统一入口：给 URL 生成器，按页取详情页并均摊进度
-async function crawlListPages(makePageUrl, quality, startPage, endPage, label, ratingLetter = "") {
+async function crawlListPages(
+  makePageUrl: (page: number) => string,
+  quality: string,
+  startPage: number,
+  endPage: number,
+  label: string,
+  ratingLetter = "",
+): Promise<void> {
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
@@ -419,25 +517,25 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label, r
 // 3 个普通标签返回 422）。donmai.moe 只有 General，所以 kbConfig 里只在全站时显示这一项。
 const RATING_LETTERS = new Set(["g", "s", "q", "e"]);
 
-function ratingLetterOf(vars) {
+function ratingLetterOf(vars: DanbooruVars): string {
   const letter = trimText(vars.rating).toLowerCase();
   return RATING_LETTERS.has(letter) ? letter : "";
 }
 
-function withRatingToken(tagsValue, vars) {
+function withRatingToken(tagsValue: string, vars: DanbooruVars): string {
   const letter = ratingLetterOf(vars);
   return [tagsValue, letter ? `rating:${letter}` : ""].filter(Boolean).join(" ");
 }
 
-function buildPostsUrl(baseUrl, tagsValue, perPage, page) {
-  const params = [];
+function buildPostsUrl(baseUrl: string, tagsValue: string, perPage: number, page: number): string {
+  const params: string[] = [];
   if (tagsValue) params.push(`tags=${encodeURIComponent(tagsValue)}`);
   if (perPage !== 20) params.push(`limit=${perPage}`);
   params.push(`page=${page}`);
   return `${baseUrl}/posts?${params.join("&")}`;
 }
 
-async function crawlAll(baseUrl, quality, vars) {
+async function crawlAll(baseUrl: string, quality: string, vars: DanbooruVars): Promise<void> {
   const perPage = normalizePerPage(vars.per_page);
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
@@ -450,7 +548,7 @@ async function crawlAll(baseUrl, quality, vars) {
   );
 }
 
-async function crawlByTags(baseUrl, quality, vars) {
+async function crawlByTags(baseUrl: string, quality: string, vars: DanbooruVars): Promise<void> {
   const tagsValue = buildTagsValueFromList(vars.mode_tag_value);
   if (!tagsValue) throw new Error(t("tagsRequired"));
   // 站点对匿名/普通账号限制每次检索最多 2 个标签，超了它会直接报错页
@@ -476,7 +574,7 @@ async function crawlByTags(baseUrl, quality, vars) {
 // 都不占普通账号「最多 2 个标签」的名额。
 const MAX_ID_SPAN = 5000;
 
-function parsePostId(value, label) {
+function parsePostId(value: unknown, label: string): number {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
   if (!Number.isSafeInteger(id) || id < 1) {
@@ -485,7 +583,7 @@ function parsePostId(value, label) {
   return id;
 }
 
-function parseIdRange(vars) {
+function parseIdRange(vars: DanbooruVars): { startId: number; endId: number } {
   const startId = parsePostId(vars.id_start, t("startIdLabel"));
   const endId = parsePostId(vars.id_end, t("endIdLabel"));
   if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
@@ -496,22 +594,24 @@ function parseIdRange(vars) {
 }
 
 // 总数只用来摊进度和判断抓满；取不到（如 donmai.moe 未过验证）就翻到空页为止
-async function countPosts(baseUrl, tagsValue) {
+async function countPosts(baseUrl: string, tagsValue: string): Promise<number | null> {
   try {
     const response = await fetch(`${baseUrl}/counts/posts.json?tags=${encodeURIComponent(tagsValue)}`);
     if (!response.ok) return null;
-    const count = (await response.json())?.counts?.posts;
-    return Number.isSafeInteger(count) ? count : null;
+    const payload: unknown = await response.json();
+    const counts = payload && typeof payload === "object" && "counts" in payload ? payload.counts : null;
+    const count = counts && typeof counts === "object" && "posts" in counts ? counts.posts : null;
+    return typeof count === "number" && Number.isSafeInteger(count) ? count : null;
   } catch {
     return null;
   }
 }
 
-async function crawlByIdRange(baseUrl, quality, vars) {
+async function crawlByIdRange(baseUrl: string, quality: string, vars: DanbooruVars): Promise<void> {
   const { startId, endId } = parseIdRange(vars);
   // donmai.moe 的列表页只渲染 General，但计数照算其他分级，同样要在搜索串里显式限定
   const idTags = `id:${startId}..${endId} order:id -status:deleted`;
-  const tagsValue = site.host === "donmai.moe" ? `${idTags} rating:g` : withRatingToken(idTags, vars);
+  const tagsValue = requireSite().host === "donmai.moe" ? `${idTags} rating:g` : withRatingToken(idTags, vars);
   const perPage = normalizePerPage(vars.per_page);
   const total = await countPosts(baseUrl, tagsValue);
   console.log(t("idRangeSummary", { startId, endId, total: total ?? t("unknownCount") }));
@@ -540,7 +640,7 @@ async function crawlByIdRange(baseUrl, quality, vars) {
   }
 }
 
-async function crawlPopular(baseUrl, quality, vars) {
+async function crawlPopular(baseUrl: string, quality: string, vars: DanbooruVars): Promise<void> {
   const scale = coerceStr(vars.popular_scale || "day");
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
@@ -554,9 +654,10 @@ async function crawlPopular(baseUrl, quality, vars) {
   );
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = resolveBaseUrl(vars.source_site, common?.baseUrl);
+export async function crawl(common: unknown, custom: unknown): Promise<void> {
+  const config = (common || {}) as { baseUrl?: unknown };
+  const vars = (custom || {}) as DanbooruVars;
+  const baseUrl = resolveBaseUrl(vars.source_site, config.baseUrl);
   prepareSite(baseUrl);
   const quality = coerceStr(vars.quality || "high");
   const mode = coerceStr(vars.crawl_mode);

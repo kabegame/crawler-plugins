@@ -1,11 +1,73 @@
-// @ts-nocheck
 // 单个作品：详情、评论、标签、metadata 与全部分页原图下载。各模式只负责产出作品 id。
 import { coerceStr, fetchJson } from "./common";
 import { t } from "./i18n";
 
 const { createImageMetadata, downloadImage, setHeader, warn } = Kabegame;
 
-function pixivTrimIllustBody(body) {
+// 站点 JSON 的最小结构：字段都可能缺失，只在确实依赖处收窄。metadata 要能赋给
+// KabegameJsonValue，所以全部用 type 而非 interface（interface 没有隐式索引签名）。
+type PixivTagTranslation = {
+  en?: string | null;
+};
+
+type PixivTag = {
+  tag?: string | null;
+  translation?: PixivTagTranslation | null;
+};
+
+type PixivTagList = {
+  tags?: PixivTag[] | null;
+  authorId?: string | null;
+};
+
+type PixivIllustBody = {
+  illustId?: string | null;
+  id?: string | null;
+  title?: string | null;
+  illustTitle?: string | null;
+  description?: string | null;
+  illustComment?: string | null;
+  userId?: string | null;
+  userName?: string | null;
+  uploadDate?: string | null;
+  createDate?: string | null;
+  bookmarkCount?: number | null;
+  likeCount?: number | null;
+  viewCount?: number | null;
+  tags?: PixivTagList | null;
+};
+
+type PixivComment = {
+  userName?: string | null;
+  comment?: string | null;
+};
+
+type PixivIllustResponse = {
+  body?: PixivIllustBody | null;
+};
+
+type PixivPage = {
+  urls?: { original?: string | null } | null;
+};
+
+// filter 收窄后的分页项：original 一定有值，后续不再重复判空。
+type PixivPageWithUrl = {
+  urls: { original: string };
+};
+
+type PixivPagesResponse = {
+  body?: PixivPage[] | null;
+};
+
+type PixivCommentsResponse = {
+  error?: boolean | null;
+  body?: { comments?: PixivComment[] | null } | null;
+};
+
+// downloadIllust 写入 metadata 的两种形态：有详情时带 body + 评论，没有详情时只记 id。
+type PixivMetadata = { body: PixivIllustBody; comments: PixivComment[] } | { illustId: string };
+
+function pixivTrimIllustBody(body: PixivIllustBody): PixivIllustBody {
   return {
     illustId: body?.illustId,
     id: body?.id,
@@ -30,7 +92,7 @@ function pixivTrimIllustBody(body) {
 // 回落双哈希）。name 保留原始名，缺失时依次回落英文翻译与 key。作者以不会随改名变化的 UID 作 key。
 // metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本（迁移运行在无 import 的裸 V8 里），
 // 改这里要同步改那里。
-const PIXIV_KANA_ROMAJI = {
+const PIXIV_KANA_ROMAJI: Record<string, string> = {
   ぁ: "a",
   あ: "a",
   ぃ: "i",
@@ -118,7 +180,7 @@ const PIXIV_KANA_ROMAJI = {
   ゖ: "ke",
 };
 
-const PIXIV_KANA_PAIR_ROMAJI = {
+const PIXIV_KANA_PAIR_ROMAJI: Record<string, string> = {
   きゃ: "kya",
   きゅ: "kyu",
   きょ: "kyo",
@@ -178,14 +240,14 @@ const PIXIV_KANA_PAIR_ROMAJI = {
   ふゅ: "fyu",
 };
 
-function pixivHiragana(char) {
+function pixivHiragana(char: string): string {
   const codePoint = char.codePointAt(0);
-  return codePoint >= 0x30a1 && codePoint <= 0x30f6
+  return codePoint !== undefined && codePoint >= 0x30a1 && codePoint <= 0x30f6
     ? String.fromCodePoint(codePoint - 0x60)
     : char;
 }
 
-function pixivKanaUnit(chars, index) {
+function pixivKanaUnit(chars: string[], index: number): { value: string; length: number } | null {
   if (!chars[index]) return null;
   const first = pixivHiragana(chars[index]);
   const second = index + 1 < chars.length
@@ -197,7 +259,11 @@ function pixivKanaUnit(chars, index) {
   return single ? { value: single, length: 1 } : null;
 }
 
-function pixivAppendKeyPart(state, value, kind) {
+function pixivAppendKeyPart(
+  state: { value: string; kind: string },
+  value: string,
+  kind: string,
+): void {
   if (!value) return;
   if (
     state.value && state.kind !== kind && /[a-z0-9]$/.test(state.value) &&
@@ -209,7 +275,7 @@ function pixivAppendKeyPart(state, value, kind) {
   state.kind = kind;
 }
 
-function pixivLabelKey(value) {
+function pixivLabelKey(value: unknown): string {
   const key = coerceStr(value)
     .replace(/[ー—―]/g, "-")
     .toLowerCase()
@@ -219,7 +285,7 @@ function pixivLabelKey(value) {
   return key && key.length <= 64 ? key : "";
 }
 
-function pixivOriginalTagKey(value) {
+function pixivOriginalTagKey(value: unknown): string {
   const normalized = coerceStr(value).normalize("NFKC").replace(/\s+/g, " ")
     .trim();
   if (!normalized) return "";
@@ -257,13 +323,13 @@ function pixivOriginalTagKey(value) {
       continue;
     }
 
-    const codePoints = [];
+    const codePoints: string[] = [];
     while (index < chars.length) {
       const pending = chars[index];
       if (/^[\x00-\x7fー—―]$/.test(pending) || pixivKanaUnit(chars, index)) {
         break;
       }
-      codePoints.push(pending.codePointAt(0).toString(36));
+      codePoints.push((pending.codePointAt(0) ?? 0).toString(36));
       index += 1;
     }
     pixivAppendKeyPart(state, `u-${codePoints.join("-")}`, "unicode");
@@ -275,15 +341,15 @@ function pixivOriginalTagKey(value) {
   let hashA = 0x811c9dc5;
   let hashB = 0x9e3779b9;
   for (const char of normalized) {
-    const codePoint = char.codePointAt(0);
+    const codePoint = char.codePointAt(0) ?? 0;
     hashA = Math.imul(hashA ^ codePoint, 0x01000193);
     hashB = Math.imul(hashB ^ codePoint, 0x85ebca6b);
   }
   return `u-${(hashA >>> 0).toString(36)}-${(hashB >>> 0).toString(36)}`;
 }
 
-function labelsFromIllustBody(body) {
-  const labels = [];
+function labelsFromIllustBody(body: PixivIllustBody | null): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   const tags = Array.isArray(body?.tags?.tags) ? body.tags.tags : [];
   for (const tag of tags) {
     const originalName = coerceStr(tag?.tag).trim();
@@ -314,20 +380,21 @@ function labelsFromIllustBody(body) {
 // 日期取 uploadDate（缺失回落 createDate，与详情模板一致），按 Pixiv 所在的日本时区（UTC+9，无夏令时）
 // 取日，结果不随运行设备的时区变化。
 // 规则在 src/illust.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
-function pixivDateText(value) {
+function pixivDateText(value: unknown): string {
   const ms = Date.parse(coerceStr(value));
   if (!Number.isFinite(ms)) return "";
   const jst = new Date(ms + 9 * 60 * 60 * 1000);
   return `${jst.getUTCFullYear()}年${jst.getUTCMonth() + 1}月${jst.getUTCDate()}日`;
 }
 
-function pixivSearchTexts(metadata) {
-  const body = metadata && typeof metadata.body === "object" &&
+function pixivSearchTexts(metadata: PixivMetadata): string[] {
+  const body: PixivIllustBody = "body" in metadata &&
+      typeof metadata.body === "object" &&
       !Array.isArray(metadata.body)
     ? metadata.body
     : {};
   const out = ["pixiv"];
-  const push = (value) => {
+  const push = (value: unknown) => {
     const text = coerceStr(value).trim();
     if (text) out.push(text);
   };
@@ -341,7 +408,8 @@ function pixivSearchTexts(metadata) {
     }
   }
   push(pixivDateText(body.uploadDate ?? body.createDate));
-  const comments = Array.isArray(metadata?.comments) ? metadata.comments : [];
+  const comments: PixivComment[] =
+    "comments" in metadata && Array.isArray(metadata.comments) ? metadata.comments : [];
   if (comments.length > 0) {
     out.push("comments");
     for (const comment of comments) {
@@ -352,14 +420,20 @@ function pixivSearchTexts(metadata) {
   return [...new Set(out)];
 }
 
-async function fetchPixivComments(illustId) {
+// 只保留带原图地址的分页项；filter 之后页项类型收窄，下载处不再重复判空。
+function isPageWithOriginal(page: PixivPage): page is PixivPageWithUrl {
+  return Boolean(page?.urls?.original);
+}
+
+async function fetchPixivComments(illustId: string): Promise<PixivComment[]> {
   try {
     setHeader("Referer", `https://www.pixiv.net/artworks/${illustId}`);
     const url =
       `https://www.pixiv.net/ajax/illusts/comments/roots?illust_id=${illustId}&offset=0&limit=20&lang=en`;
-    const json = await fetchJson(url);
-    if (json && json.error !== true && json.body?.comments) {
-      return json.body.comments;
+    const json = await fetchJson<PixivCommentsResponse>(url);
+    const comments = json?.body?.comments;
+    if (json && json.error !== true && comments) {
+      return comments;
     }
   } catch {
     warn(t("commentsFetchFailed", { illustId }));
@@ -367,29 +441,29 @@ async function fetchPixivComments(illustId) {
   return [];
 }
 
-export async function downloadIllust(illustId) {
+export async function downloadIllust(illustId: string): Promise<void> {
   setHeader("Referer", `https://www.pixiv.net/artworks/${illustId}`);
-  let illustBody = null;
+  let illustBody: PixivIllustBody | null = null;
   try {
     illustBody =
-      (await fetchJson(`https://www.pixiv.net/ajax/illust/${illustId}?lang=en`))
+      (await fetchJson<PixivIllustResponse>(`https://www.pixiv.net/ajax/illust/${illustId}?lang=en`))
         ?.body || null;
   } catch {
     // Deleted or restricted details still allow trying pages below.
   }
 
   try {
-    const json = await fetchJson(
+    const json = await fetchJson<PixivPagesResponse>(
       `https://www.pixiv.net/ajax/illust/${illustId}/pages`,
     );
     const body = Array.isArray(json?.body) ? json.body : [];
-    const pages = body.filter((page) => page?.urls?.original);
+    const pages = body.filter(isPageWithOriginal);
     if (pages.length === 0) return;
 
     const baseName = coerceStr(illustBody?.title) || illustId;
     const comments = await fetchPixivComments(illustId);
     const labels = labelsFromIllustBody(illustBody);
-    const metadata = illustBody
+    const metadata: PixivMetadata = illustBody
       ? { body: pixivTrimIllustBody(illustBody), comments }
       : { illustId };
     const metadataId = Number(
@@ -400,12 +474,13 @@ export async function downloadIllust(illustId) {
       const displayName = pages.length > 1
         ? `${baseName}(${index + 1})`
         : baseName;
-      await downloadImage(pages[index].urls.original, {
+      const opts: KabegameDownloadImageOptions = {
         name: displayName,
         metadata_id: metadataId,
         url: `https://www.pixiv.net/artworks/${illustId}`,
-        ...(labels.length > 0 ? { labels } : {}),
-      });
+      };
+      if (labels.length > 0) opts.labels = labels;
+      await downloadImage(pages[index].urls.original, opts);
     }
   } catch {
     // Works may be deleted/restricted. Skip quietly like the Rhai plugin.

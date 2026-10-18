@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 端点与常量。改接口参数时只动这里。所有端点均经畅游登录态 Cookie 实测可用。
 
 export const BASE = "https://weibo.com";
@@ -20,14 +19,14 @@ export const SEARCH_MAX_PAGE = 50;
 // 超话 id = 100808 + md5(超话名)
 export const SUPERTOPIC_PREFIX = "100808";
 // 超话频道：内置排序的后缀；标签频道（如「同人」）的 flowId 需从 channelInfo.channels 按标题查
-export const SUPERTOPIC_SORTS = {
+export const SUPERTOPIC_SORTS: Record<string, string> = {
   hot: "_-_recommend",
   latest: "_-_sort_time",
   reply: "_-_feed",
   soul: "_-_soul",
 };
 
-export const TIMELINE_FEATURES = { all: 0, original: 1, pic: 2 };
+export const TIMELINE_FEATURES: Record<string, number> = { all: 0, original: 1, pic: 2 };
 
 // 请求间隔（毫秒），登录态下连续请求过快可能触发 418
 export const PAGE_DELAY_MS = 800;

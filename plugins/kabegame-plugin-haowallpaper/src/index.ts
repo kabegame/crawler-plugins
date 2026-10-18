@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 哲风壁纸（haowallpaper.com）V8 爬虫。
 //
 // 站点是 Nuxt 3 SSR：列表页与详情页的标记都在首屏 HTML 里，直接解析即可，
@@ -22,12 +21,87 @@ const SORT_TYPE = "3";
 /** metadata 结构版本，改字段时递增，供后续 migration 脚本识别。 */
 const METADATA_SCHEMA = 2;
 
-function coerceStr(value) {
+/**
+ * 查询根：常规 Document，或 Nuxt 把 body 包进 <template> 后的 template.content。
+ * deno_dom 的最小 DOM 类型里没有 content，运行时的 DocumentFragment 只用到查询方法。
+ */
+type QueryRoot = Document | Element;
+
+/** 详情页 JSON-LD 的最小结构，只声明实际读取的字段。 */
+type HaowallpaperJsonLd = {
+  "@type"?: unknown;
+  contentUrl?: unknown;
+  caption?: unknown;
+  name?: unknown;
+  width?: unknown;
+  height?: unknown;
+  contentSize?: unknown;
+  encodingFormat?: unknown;
+  fileFormat?: unknown;
+  duration?: unknown;
+};
+
+/** 详情卡片底部的发布者信息。 */
+type HaowallpaperPublisher = {
+  id: string;
+  name: string;
+  profile_url: string;
+  avatar_url: string;
+  follower_count: string;
+  share_count: string;
+  download_count: string;
+  signature: string;
+};
+
+/**
+ * metadata 必须保持 JSON 可序列化，所以用 type 而非 interface
+ * （interface 不满足 KabegameJsonValue 的索引签名）。
+ */
+type HaowallpaperMetadata = {
+  schema: number;
+  title: string;
+  post_id: string;
+  file_id: string;
+  detail_url: string;
+  download_url: string;
+  is_video: boolean;
+  tags: string[];
+  category: string;
+  resolution: string;
+  width: number;
+  height: number;
+  color: string;
+  color_hex: string;
+  size: string;
+  format: string;
+  duration: string;
+  download_count: string;
+  favorite_count: string;
+  published_at: string;
+  author: string;
+  author_id: string;
+  publisher: HaowallpaperPublisher;
+};
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return (el?.textContent || "").replace(/\s+/g, " ").trim();
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+// catch 里的值是 unknown；保持原来 `error?.message ?? error` 的字符串回退语义。
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = error.message;
+    if (message != null) return String(message);
+  }
+  return String(error);
 }
 
 /**
@@ -36,23 +110,35 @@ function textOf(el) {
  * document.querySelectorAll 查不到任何卡片/信息行。deno_dom 遵循该语义，必须
  * 改用 template.content 作为查询根。（head 里的 JSON-LD 与 meta 仍在 document 上。）
  */
-function contentRoot(document) {
-  const frag = document.querySelector("template")?.content;
-  return frag && typeof frag.querySelectorAll === "function" ? frag : document;
+function contentRoot(document: Document): QueryRoot {
+  const template = document.querySelector("template");
+  // template.content 不在最小 DOM 类型里，按属性存在性读成 unknown 再收窄
+  const frag: unknown =
+    template && "content" in template ? template.content : null;
+  return isQueryRoot(frag) ? frag : document;
+}
+
+function isQueryRoot(value: unknown): value is QueryRoot {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    "querySelectorAll" in value &&
+    typeof value.querySelectorAll === "function"
+  );
 }
 
 /**
  * 必须走宿主的 currentDocument()：deno_dom 是 wasm 实现，直接 `new DOMParser()`
  * 会跳过 initParser() 初始化，解析出空文档且不报错（所有选择器静默返回 0 条）。
  */
-async function openDocument(url) {
+async function openDocument(url: string) {
   const finalUrl = await to(url);
   const document = await currentDocument();
   if (!document) throw new Error(t("pageParseFailed", { url: finalUrl }));
   return { finalUrl, document, root: contentRoot(document) };
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   if (!raw) return "";
   try {
@@ -67,20 +153,21 @@ function resolveUrl(url, base) {
  * 详情页的 JSON-LD。Nuxt 把它塞在 children 属性里而不是脚本正文，
  * 所以必须走 getAttribute 而非 textContent。
  */
-function parseJsonLd(document) {
+function parseJsonLd(document: Document): HaowallpaperJsonLd | null {
   const el = document.querySelector('script[type="application/ld+json"]');
   const raw = el?.getAttribute("children") || textOf(el);
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    // 外部 JSON 边界：站点结构不受类型约束
+    return JSON.parse(raw) as HaowallpaperJsonLd;
   } catch {
     return null;
   }
 }
 
 /** `.icon-all` 里是「分类：xxx」「大小：xxx」这类行，按标签前缀取值。 */
-function parseInfoRows(root) {
-  const rows = {};
+function parseInfoRows(root: QueryRoot): Record<string, string> {
+  const rows: Record<string, string> = {};
   for (const row of Array.from(root.querySelectorAll(".icon-all .col-son-ico"))) {
     const text = textOf(row);
     const match = text.match(/^(.+?)[:：]\s*(.*)$/);
@@ -90,7 +177,7 @@ function parseInfoRows(root) {
   return rows;
 }
 
-function parseTags(document, root) {
+function parseTags(document: Document, root: QueryRoot): string[] {
   // meta keywords 在 head（template 之外）。
   const keywords = document
     .querySelector('meta[name="keywords"]')
@@ -105,11 +192,11 @@ function parseTags(document, root) {
 }
 
 /** 详情卡片底部的发布者信息。只保存结构化字段，不冻结站点 HTML。 */
-function parsePublisher(root, pageUrl) {
+function parsePublisher(root: QueryRoot, pageUrl: string): HaowallpaperPublisher {
   const block = root.querySelector(".col-son-bottom");
   const profileLink = block?.querySelector('a[href*="/userProfile/"]');
   const profileUrl = resolveUrl(profileLink?.getAttribute("href"), pageUrl);
-  const counts = {};
+  const counts: Record<string, string> = {};
   for (const item of Array.from(block?.querySelectorAll(".col-count") || [])) {
     const label = textOf(item.querySelector("span:first-child"));
     const value = textOf(item.querySelector(".count"));
@@ -132,7 +219,7 @@ function parsePublisher(root, pageUrl) {
  * 分页条最大的数字即总页数。页码是 `<a>`，「...」省略号是 `<div>`，
  * 两者都扫，非数字项自然被跳过。
  */
-function parseTotalPages(root) {
+function parseTotalPages(root: QueryRoot): number {
   let maxPage = 1;
   for (const el of Array.from(root.querySelectorAll(".page-content a, .page-content div"))) {
     const num = Number(textOf(el));
@@ -146,7 +233,7 @@ function parseTotalPages(root) {
  * 桌面版是 .card 卡片里的「前往」按钮，手机版是瀑布流里的 a.cardMobile，
  * 两者标记不同，故按 href 模式兜底。
  */
-function parseDetailLinks(root, listUrl) {
+function parseDetailLinks(root: QueryRoot, listUrl: string): string[] {
   const selectors = [".card .card--button a[href]", "a.cardMobile[href]", 'a[href*="ViewLook/"]'];
   for (const selector of selectors) {
     const links = Array.from(root.querySelectorAll(selector))
@@ -158,12 +245,16 @@ function parseDetailLinks(root, listUrl) {
   return [];
 }
 
-function wantsFormat(formats, isVideo) {
+/** checkbox 变量的单项开关：非对象或缺失字段都按「未关闭」处理。 */
+function formatEnabled(formats: unknown, key: "image" | "video"): boolean {
+  if (formats === null || typeof formats !== "object") return true;
+  if (key === "image") return !("image" in formats) || formats.image !== false;
+  return !("video" in formats) || formats.video !== false;
+}
+
+function wantsFormat(formats: unknown, isVideo: boolean): boolean {
   // checkbox 类型的变量以 { image: true, video: false } 形式传入。
-  const map = formats && typeof formats === "object" ? formats : {};
-  const image = map.image !== false;
-  const video = map.video !== false;
-  return isVideo ? video : image;
+  return formatEnabled(formats, isVideo ? "video" : "image");
 }
 
 /** 站点「种类」下拉的取值：1 = 静态壁纸，2 = 动态壁纸。 */
@@ -177,7 +268,7 @@ const KIND_DYNAMIC = 2;
  * 即静态 + 动态都要。页面与 wpType 必须配对：homeView 配手机种类时，
  * 详情链接指向 homeViewLook 却拿不到 JSON-LD。
  */
-function wpTypeOf(routerName, kind) {
+function wpTypeOf(routerName: unknown, kind: unknown): string | null {
   if (kind == KIND_STATIC) {
     if (routerName == "homeView") return "1";
     if (routerName == "mobileView") return "2";
@@ -189,7 +280,7 @@ function wpTypeOf(routerName, kind) {
 }
 
 /** 壁纸格式 → 站点「种类」：只勾一种时定向，两种都勾则不限（null，走站点默认集合）。 */
-function kindOf(formats) {
+function kindOf(formats: unknown): number | null {
   const image = wantsFormat(formats, false);
   const video = wantsFormat(formats, true);
   if (image && !video) return KIND_STATIC;
@@ -202,7 +293,13 @@ function kindOf(formats) {
  * `/homeView?page=8&search=动漫、二次元&sortType=3&wpType=3,4`。
  * 标签走站点搜索：多个标签用「、」连接，站点按并集返回。
  */
-function buildListUrl(baseUrl, wallpaperType, page, tags, kind) {
+function buildListUrl(
+  baseUrl: string,
+  wallpaperType: string,
+  page: number,
+  tags: string[],
+  kind: number | null,
+): string {
   const params = new URLSearchParams();
   if (page > 1) params.set("page", String(page));
   if (tags.length > 0) params.set("search", tags.join("、"));
@@ -213,7 +310,7 @@ function buildListUrl(baseUrl, wallpaperType, page, tags, kind) {
   return `${baseUrl}/${wallpaperType}?${params.toString().replace(/%2C/gi, ",")}`;
 }
 
-async function processDetailPage(detailUrl, formats) {
+async function processDetailPage(detailUrl: string, formats: unknown): Promise<boolean> {
   const { document, finalUrl, root } = await openDocument(detailUrl);
   const jsonLd = parseJsonLd(document);
   if (!jsonLd) {
@@ -242,7 +339,7 @@ async function processDetailPage(detailUrl, formats) {
   const fileId = downloadUrl.match(/previewFileImg\/(\w+)/)?.[1] || "";
   const publisher = parsePublisher(detailPanel, finalUrl);
 
-  const metadata = {
+  const metadata: HaowallpaperMetadata = {
     schema: METADATA_SCHEMA,
     title,
     post_id: postId,
@@ -271,7 +368,7 @@ async function processDetailPage(detailUrl, formats) {
     publisher,
   };
 
-  const opts = { metadata, url: finalUrl };
+  const opts: KabegameDownloadImageOptions = { metadata, url: finalUrl };
   if (title) opts.name = title;
   const labels = labelsFromMetadata(metadata);
   if (labels.length > 0) opts.labels = labels;
@@ -279,17 +376,19 @@ async function processDetailPage(detailUrl, formats) {
   return true;
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = coerceStr(common?.baseUrl || DEFAULT_BASE_URL).replace(/\/$/, "");
+export async function crawl(common: unknown, custom: unknown): Promise<void> {
+  const cfg = isRecord(common) ? common : {};
+  const vars = isRecord(custom) ? custom : {};
+  const baseUrl = coerceStr(cfg.baseUrl || DEFAULT_BASE_URL).replace(/\/$/, "");
   const startPage = Number(vars.startPage ?? 1);
   const endPageConfig = Number(vars.endPage ?? startPage);
   const wallpaperType = coerceStr(vars.wallpaperType || "homeView").trim();
   const formats = vars.formats || {};
   // 站点用「、」分隔多个搜索词，标签自身里的「、」会被拆开，这里预先按同样规则拆分去重。
+  const rawTags: unknown[] = Array.isArray(vars.tags) ? vars.tags : [];
   const searchTags = Array.from(
     new Set(
-      (Array.isArray(vars.tags) ? vars.tags : [])
+      rawTags
         .flatMap((t) => coerceStr(t).split("、"))
         .map((t) => t.trim())
         .filter(Boolean),
@@ -356,7 +455,7 @@ export async function crawl(common, custom) {
       try {
         if (await processDetailPage(detailUrl, formats)) downloaded += 1;
       } catch (e) {
-        warn(t("detailFailed", { url: detailUrl, error: e?.message ?? e }));
+        warn(t("detailFailed", { url: detailUrl, error: errorMessage(e) }));
       }
       addProgress(pctPerItem);
     }

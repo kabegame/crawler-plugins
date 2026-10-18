@@ -1,17 +1,25 @@
-// @ts-nocheck
 // 按模型爬：先翻模型列表（自带独立的分页数 / 跳过页数），再对每个模型走一遍作品流。
 //
 // 模型页也用游标分页，所以 skip_model_pages 同样是「照样请求、只是不进作品流」。
 import { DEFAULT_ARTWORK_PAGES, DEFAULT_MODEL_PAGES, DEFAULT_SKIP_MODEL_PAGES, MODELS_QUERY, OPERATION_MODELS } from "./consts";
 import { fetchGraphql } from "./api";
 import { processArtworks } from "./artworks";
+import type {
+  ListGenerationModelsResponse,
+  PixaiModelEdge,
+  PixaiModelVariables,
+  PixaiVars,
+} from "./types";
 import { arrayValue, coerceStr, log, skipPagesOf, toInt } from "./util";
 import { t } from "./i18n";
 
 const { addProgress } = Kabegame;
 
 /** 把模型排序选项翻成 listGenerationModels 的 feed / orderBy / first / last。 */
-export function applyModelSortVariables(variables, modelSort) {
+export function applyModelSortVariables(
+  variables: PixaiModelVariables,
+  modelSort: string,
+): void {
   switch (modelSort) {
     case "trending":
       Object.assign(variables, { feed: "trending", last: 24 });
@@ -40,14 +48,14 @@ export function applyModelSortVariables(variables, modelSort) {
   }
 }
 
-export async function runModel(vars) {
+export async function runModel(vars: PixaiVars): Promise<void> {
   const modelSort = coerceStr(vars.model_sort) || "trending";
   const artworkSort = coerceStr(vars.artwork_sort) || "trending";
   const maxModelPages = toInt(vars.max_model_pages, DEFAULT_MODEL_PAGES);
   const skipModelPages = toInt(vars.skip_model_pages, DEFAULT_SKIP_MODEL_PAGES);
   const maxArtworkPages = toInt(vars.max_artwork_pages, DEFAULT_ARTWORK_PAGES);
   const skipArtworkPages = skipPagesOf(vars);
-  const seenModelIds = new Set();
+  const seenModelIds = new Set<string>();
   const useBeforePagination =
     modelSort === "trending" || modelSort === "latest_desc" || modelSort === "latest_asc";
   const effectiveModelPages = maxModelPages - skipModelPages;
@@ -71,18 +79,18 @@ export async function runModel(vars) {
       }));
     }
 
-    const variables = {};
+    const variables: PixaiModelVariables = {};
     applyModelSortVariables(variables, modelSort);
     if (modelCursor) variables[useBeforePagination ? "before" : "after"] = modelCursor;
 
-    const res = await fetchGraphql(OPERATION_MODELS, variables, MODELS_QUERY);
+    const res = await fetchGraphql<ListGenerationModelsResponse>(OPERATION_MODELS, variables, MODELS_QUERY);
     const generationModels = res?.data?.generationModels;
     if (!generationModels) {
       log(t("modelsMissing"));
       break;
     }
 
-    const edges = arrayValue(generationModels.edges);
+    const edges = arrayValue<PixaiModelEdge>(generationModels.edges);
     if (edges.length === 0) {
       log(t("modelPageEmpty"));
       break;

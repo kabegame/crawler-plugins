@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 站内关键词搜索与分页抓取。
 import { processDetailPage } from "./detail";
 import { coerceStr, openDocument, resolveUrl, textOf } from "./runtime";
@@ -6,39 +5,52 @@ import { t } from "./i18n";
 
 const { addProgress, warn } = Kabegame;
 
-function positivePage(value, fallback) {
+function positivePage(value: unknown, fallback: number): number {
   const page = Math.floor(Number(value));
   return Number.isFinite(page) && page >= 1 ? page : fallback;
 }
 
-function normalizeOrder(value) {
+function normalizeOrder(value: unknown): string {
   return coerceStr(value).toUpperCase() === "ASC" ? "ASC" : "DESC";
 }
 
-function normalizeOrderBy(value) {
+function normalizeOrderBy(value: unknown): string {
   return coerceStr(value) === "rand" ? "rand" : "post_date";
 }
 
-function searchPageUrl(baseUrl, query, order, orderBy, page) {
+function searchPageUrl(
+  baseUrl: string,
+  query: string,
+  order: string,
+  orderBy: string,
+  page: number,
+): string {
   const root = coerceStr(baseUrl).replace(/\/+$/, "");
   const path = page > 1 ? `/page/${page}` : "/";
   return `${root}${path}?s=${encodeURIComponent(query)}&order=${order}&orderby=${orderBy}`;
 }
 
-function collectSearchDetailHrefs(document, pageUrl) {
+function collectSearchDetailHrefs(document: Document, pageUrl: string): string[] {
   return Array.from(document.querySelectorAll(".post_box .posttitle a[href]"))
     .map((anchor) => resolveUrl(anchor.getAttribute("href"), pageUrl))
     .filter(Boolean);
 }
 
-function parseSearchTotalPages(document) {
+function parseSearchTotalPages(document: Document): number {
   const text = textOf(document.querySelector(".post_box2 .center"));
   const match = text.match(/\d+\s*\/\s*(\d+)/);
   const pages = match ? Number(match[1]) : 1;
   return pages > 0 ? pages : 1;
 }
 
-export async function crawlSearch(queryValue, orderValue, orderByValue, pageStart, pageEnd, baseUrl) {
+export async function crawlSearch(
+  queryValue: unknown,
+  orderValue: unknown,
+  orderByValue: unknown,
+  pageStart: number,
+  pageEnd: number,
+  baseUrl: string,
+): Promise<void> {
   const query = coerceStr(queryValue).trim();
   if (!query) {
     warn(t("searchQueryEmpty"));

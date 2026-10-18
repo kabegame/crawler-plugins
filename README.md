@@ -281,6 +281,14 @@ Zerochan 的标签是人工整理的，每个标签都分了类（画师 / 作�
 pnpm install
 ```
 
+检查全部插件源码的类型：
+
+```bash
+pnpm run check
+```
+
+`check` 使用仓库根目录的 `tsconfig.check.json`，覆盖 `plugins/*/src` 下的 TypeScript 源码（WebView 插件的 `crawl.js` 不在范围内）。全部插件已通过检查；已下线的 `twodwallpapers` 保留文件级 `// @ts-nocheck`。在主仓库中也可以运行 `deno task --cwd src-crawler-plugins check`。
+
 打包全部插件：
 
 ```bash

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // WBI 签名。算法照搬 yt-dlp `BilibiliBaseIE._get_wbi_key` / `_sign_wbi`
 // （ignore/yt-dlp/yt_dlp/extractor/bilibili.py），与 bilibili 专栏插件同源。
 import { md5 } from "@kabegame/plugin-sdk";
@@ -7,21 +6,43 @@ import { MIXIN_TAB, NAV_API } from "./consts";
 import { t } from "./i18n";
 import { coerceStr, fetchJson } from "./util";
 
-function wbiFilterValue(value) {
+/** nav 接口里 wbi_img 的两把钥匙。未登录时 code 是 -101，但字段照常下发。 */
+type WbiImg = {
+  img_url?: string | null;
+  sub_url?: string | null;
+};
+
+type NavData = {
+  isLogin?: boolean | null;
+  wbi_img?: WbiImg | null;
+};
+
+type NavResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: NavData | null;
+};
+
+function wbiFilterValue(value: unknown): string {
   return coerceStr(value).replace(/[!'()*]/g, "");
 }
 
-function getMixinKey(orig) {
+function getMixinKey(orig: string): string {
   return MIXIN_TAB.map((idx) => orig[idx] || "").join("").slice(0, 32);
 }
 
-function stemFromWbiUrl(url) {
+function stemFromWbiUrl(url: unknown): string {
   const name = coerceStr(url).split("/").pop() || "";
   return name.split(".", 1)[0] || "";
 }
 
 /** params 是普通对象；按 key 排序后签名（对应 yt-dlp 的 `sorted(params.items())`）。 */
-export function signQuery(baseUrl, params, img, sub) {
+export function signQuery(
+  baseUrl: string,
+  params: Record<string, string>,
+  img: string,
+  sub: string,
+): string {
   const mix = getMixinKey(`${img}${sub}`);
   const query = Object.keys(params)
     .sort()
@@ -30,10 +51,10 @@ export function signQuery(baseUrl, params, img, sub) {
   return `${baseUrl}?${query}&w_rid=${md5(query + mix)}`;
 }
 
-export async function getWbiKeys() {
-  const nav = await fetchJson(NAV_API);
+export async function getWbiKeys(): Promise<{ keys: { img: string; sub: string }; isLoggedIn: boolean }> {
+  const nav = await fetchJson<NavResponse>(NAV_API);
   // nav 未登录时返回 code -101，但 wbi_img 照样下发，所以这里不当作错误。
-  const wbi = nav?.data?.wbi_img || {};
+  const wbi: WbiImg = nav?.data?.wbi_img ?? {};
   const keys = { img: stemFromWbiUrl(wbi.img_url), sub: stemFromWbiUrl(wbi.sub_url) };
   if (!keys.img || !keys.sub) throw new Error(t("wbiKeysMissing"));
   return { keys, isLoggedIn: nav?.data?.isLogin === true };
@@ -43,16 +64,21 @@ export async function getWbiKeys() {
  * 播放器反爬指纹参数。来源见 yt-dlp bilibili.py `_dm_params`
  * （逆向自 bili-user-fingerprint.min.js）。鼠标轨迹相关的 dm_img_list 留空即可放行。
  */
-export function buildDmParams() {
+export function buildDmParams(): {
+  dm_img_list: string;
+  dm_img_str: string;
+  dm_cover_img_str: string;
+  dm_img_inter: string;
+} {
   const printable = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[]^_`{|}~";
-  const randChars = (len) => {
+  const randChars = (len: number): string => {
     let out = "";
     for (let i = 0; i < len; i += 1) {
       out += printable[Math.floor(Math.random() * printable.length)];
     }
     return out;
   };
-  const b64 = (text) => btoa(text).slice(0, -2);
+  const b64 = (text: string): string => btoa(text).slice(0, -2);
   const rnd = Math.floor(514 * Math.random());
   return {
     dm_img_list: "[]",

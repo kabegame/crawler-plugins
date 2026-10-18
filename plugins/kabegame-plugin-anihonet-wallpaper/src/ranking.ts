@@ -1,16 +1,21 @@
-// @ts-nocheck
 // 排行榜 URL 拼装与分页抓取。
 import { processDetailPage } from "./detail";
 import { openDocument, resolveUrl } from "./runtime";
 
 const { addProgress } = Kabegame;
 
-function rankingListSlug(period, category) {
+function rankingListSlug(period: string, category: string): string {
   const slugCategory = category === "img-pc" ? "imgpc" : category;
   return slugCategory === "all" ? `ranking-${period}` : `ranking-${period}-${slugCategory}`;
 }
 
-export async function crawlKind(kind, startPage, endPage, period, baseUrl) {
+export async function crawlKind(
+  kind: string,
+  startPage: number,
+  endPage: number,
+  period: string,
+  baseUrl: string,
+): Promise<void> {
   const totalPages = endPage - startPage + 1;
   const pctPerPage = totalPages > 0 ? 100.0 / totalPages : 0.0;
   const slug = rankingListSlug(period, kind);

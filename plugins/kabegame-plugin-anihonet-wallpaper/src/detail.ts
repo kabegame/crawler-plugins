@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 详情页图片命名、过滤、metadata 创建与下载。
 import { parseMetadata } from "./metadata";
 import { coerceStr, isImageUrl, openDocument, resolveUrl, textOf } from "./runtime";
@@ -7,7 +6,7 @@ import { t } from "./i18n";
 
 const { addProgress, createImageMetadata, downloadImage } = Kabegame;
 
-function cleanName(raw) {
+function cleanName(raw: unknown): string {
   return coerceStr(raw)
     .replace(/\([^)]*(?:画像サイズ|サイズ|最大長辺)[^)]*\)/g, "")
     .replace(/[\r\n\t]+/g, " ")
@@ -16,17 +15,17 @@ function cleanName(raw) {
     .replace(/^(縮小画像|画像をダウンロード)$/u, "");
 }
 
-function nameFromImageUrl(href, baseUrl) {
+function nameFromImageUrl(href: unknown, baseUrl: string): string {
   const full = resolveUrl(href, baseUrl);
   const file = full.split(/[?#]/, 1)[0].split("/").pop() || "";
   return file.replace(/\.(?:jpe?g|png|webp|gif)$/i, "").trim();
 }
 
-function collectCleanNames(values) {
+function collectCleanNames(values: string[]): string[] {
   return values.map(cleanName).filter(Boolean);
 }
 
-function parseNames(document, expectedCount) {
+function parseNames(document: Document, expectedCount: number): string[] {
   const h3Names = Array.from(document.querySelectorAll(".post h3, article h3"))
     .map(textOf)
     .filter(Boolean);
@@ -53,11 +52,17 @@ function parseNames(document, expectedCount) {
   );
 }
 
-function nameHasImageIndex(name, index) {
+function nameHasImageIndex(name: unknown, index: number): boolean {
   return coerceStr(name).includes(`【${index}】`) || coerceStr(name).includes(`${index}枚目`);
 }
 
-function buildDownloadOpts(baseName, index, total, metadataId, detailUrl) {
+function buildDownloadOpts(
+  baseName: unknown,
+  index: number,
+  total: number,
+  metadataId: number,
+  detailUrl: string,
+): KabegameDownloadImageOptions {
   let name = coerceStr(baseName).trim();
   if (total > 1) {
     if (name && nameHasImageIndex(name, index)) {
@@ -68,12 +73,17 @@ function buildDownloadOpts(baseName, index, total, metadataId, detailUrl) {
       name = `(${index})`;
     }
   }
-  const opts = { metadata_id: metadataId, url: detailUrl };
+  const opts: KabegameDownloadImageOptions = { metadata_id: metadataId, url: detailUrl };
   if (name) opts.name = name;
   return opts;
 }
 
-async function processDownloadHref(href, progressSlice, opts, baseUrl) {
+async function processDownloadHref(
+  href: unknown,
+  progressSlice: number,
+  opts: KabegameDownloadImageOptions,
+  baseUrl: string,
+): Promise<void> {
   const fullImage = resolveUrl(href, baseUrl);
   if (!fullImage || /resize/i.test(fullImage) || !isImageUrl(fullImage)) {
     if (progressSlice > 0.0) addProgress(progressSlice);
@@ -83,7 +93,13 @@ async function processDownloadHref(href, progressSlice, opts, baseUrl) {
   if (progressSlice > 0.0) addProgress(progressSlice);
 }
 
-export async function processDetailPage(href, workPctBudget, workIdx, workTotal, baseUrl) {
+export async function processDetailPage(
+  href: string,
+  workPctBudget: number,
+  workIdx: number,
+  workTotal: number,
+  baseUrl: string,
+): Promise<void> {
   const full = resolveUrl(href, baseUrl);
   console.log(t("detailOpen", { index: workIdx, total: workTotal, url: full }));
   const { document, finalUrl } = await openDocument(full);
@@ -91,7 +107,7 @@ export async function processDetailPage(href, workPctBudget, workIdx, workTotal,
   const metadataId = Number(
     createImageMetadata(metadata, { searchTexts: searchTextsFromMetadata(metadata) }),
   );
-  let downloadHrefs = Array.from(document.querySelectorAll("a.button.add-dl"))
+  let downloadHrefs: string[] = Array.from(document.querySelectorAll("a.button.add-dl"))
     .map((anchor) => anchor.getAttribute("href") || "")
     .filter(Boolean);
   if (downloadHrefs.length === 0) {

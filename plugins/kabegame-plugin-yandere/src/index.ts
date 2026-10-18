@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 import { t } from "./i18n";
 
@@ -13,52 +12,148 @@ const BASE_URL = "https://yande.re";
 const MAX_FAVORITED = 24;
 const MAX_COMMENTS = 30;
 
-function coerceStr(value) {
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type YandereVars = {
+  crawl_mode?: unknown;
+  quality?: unknown;
+  rating?: unknown;
+  sort_order?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+  mode_tag_value?: unknown;
+  popular_scale?: unknown;
+  popular_date?: unknown;
+  popular_periods?: unknown;
+  id_start?: unknown;
+  id_end?: unknown;
+};
+
+// 侧栏标签：类型缺失或不合规时按 general 处理
+type YandereSidebarTag = {
+  name: string;
+  type: string;
+  wiki_href: string;
+  post_href: string;
+  display: string;
+  count: string;
+};
+
+type YandereRelatedPost = {
+  href: string;
+  label: string;
+};
+
+type YandereFavoritedUser = {
+  href: string;
+  name: string;
+};
+
+type YandereComment = {
+  id: string;
+  author_name: string;
+  author_href: string;
+  date_text: string;
+  date_href: string;
+  date_title: string;
+  avatar_src: string;
+  avatar_href: string;
+  body: string;
+};
+
+type YandereStats = {
+  post_id: string;
+  size: string;
+  rating: string;
+  posted_date_href: string;
+  posted_date_text: string;
+  posted_date_title: string;
+  avatar_href: string;
+  avatar_src: string;
+  favorited: YandereFavoritedUser[];
+  favorited_total: number;
+};
+
+// 输出侧（metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface（interface 不满足
+// KabegameJsonValue 的索引签名）。
+type YandereMetadata = {
+  posted_by_name: string;
+  posted_by_href: string;
+  source_href: string;
+  score: string;
+  sidebar_tags: YandereSidebarTag[];
+  stats: YandereStats;
+  related: YandereRelatedPost[];
+  comments: YandereComment[];
+  comment_total: number;
+};
+
+type YandereComments = {
+  comments: YandereComment[];
+  total: number;
+};
+
+type OpenedPage = {
+  finalUrl: string;
+  document: Document;
+  html: string;
+};
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function trimText(value) {
+function trimText(value: unknown): string {
   return coerceStr(value).replace(/\s+/g, " ").trim();
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return trimText(el?.textContent || "");
 }
 
-function parseHtml(html) {
+// @kabegame/types 的 Element 只收录插件常用的最小集合，V8 的 deno-dom 实际还提供
+// nextElementSibling（"Related Posts" 标题后面那个 ul 就靠它取）。在 DOM 边界补一次收窄，
+// 运行时行为不变。
+type ElementWithSiblings = Element & { readonly nextElementSibling: Element | null };
+
+function nextElementSiblingOf(el: Element | null | undefined): Element | null {
+  const sibling = el ? (el as ElementWithSiblings).nextElementSibling : null;
+  return sibling ?? null;
+}
+
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
-async function openDocument(url) {
+async function openDocument(url: string): Promise<OpenedPage> {
   const finalUrl = await to(url);
   const html = await currentHtml();
   return { finalUrl, document: parseHtml(html), html };
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function normalizeTagToken(text) {
+function normalizeTagToken(text: unknown): string {
   return trimText(text).replace(/\s+/g, "_");
 }
 
 // 标签组合经 GUI 传进来是数组，但 kabegame-cli 的 --var 只能给字符串，
 // 所以字符串形态也要接：按逗号/空白/加号切开。
-function tagListOf(tagList) {
-  const items = Array.isArray(tagList) ? tagList : coerceStr(tagList).split(/[,+\s]+/);
+function tagListOf(tagList: unknown): string[] {
+  const items: unknown[] = Array.isArray(tagList) ? tagList : coerceStr(tagList).split(/[,+\s]+/);
   return items.map((tag) => normalizeTagToken(tag)).filter(Boolean);
 }
 
 // 站点搜索串：token 之间用 +，每个 token 单独编码（rating:safe 里的冒号要转义）
-function encodeTagsQuery(tokens) {
+function encodeTagsQuery(tokens: string[]): string {
   return tokens.map((token) => encodeURIComponent(token)).join("+");
 }
 
 // rating / order 都是站点的元标签，跟普通标签一样拼进搜索串
-function metaTokensOf(vars) {
-  const tokens = [];
+function metaTokensOf(vars: YandereVars): string[] {
+  const tokens: string[] = [];
   const rating = trimText(vars.rating);
   if (rating) tokens.push(`rating:${rating}`);
   const sort = trimText(vars.sort_order);
@@ -66,7 +161,7 @@ function metaTokensOf(vars) {
   return tokens;
 }
 
-function buildPostListUrl(baseUrl, tokens, page) {
+function buildPostListUrl(baseUrl: string, tokens: string[], page: number): string {
   const query = encodeTagsQuery(tokens);
   return query
     ? `${baseUrl}/post?tags=${query}&page=${page}`
@@ -77,7 +172,7 @@ function buildPostListUrl(baseUrl, tokens, page) {
 const TAG_TYPE_CLASS_RE = /(?:^|\s)tag-type-([\w-]+)(?:\s|$)/;
 
 // 从 /post?tags=xxx、/wiki/show?title=xxx、/artist/show?name=xxx 中取出标签标识
-function tagNameFromHref(href) {
+function tagNameFromHref(href: unknown): string {
   const matched = /[?&](?:tags|title|name)=([^&#]+)/.exec(coerceStr(href));
   if (!matched) return "";
   let raw = matched[1].replace(/\+/g, " ");
@@ -89,7 +184,7 @@ function tagNameFromHref(href) {
   return normalizeTagToken(raw);
 }
 
-function parseSidebarTags(document, pageUrl) {
+function parseSidebarTags(document: Document, pageUrl: string): YandereSidebarTag[] {
   return Array.from(document.querySelectorAll("#tag-sidebar li"))
     .map((li) => {
       const anchors = Array.from(li.querySelectorAll("a[href]"));
@@ -123,12 +218,12 @@ function parseSidebarTags(document, pageUrl) {
 // key 用站点自己的 tag 标识（小写、丢弃 key 字符集之外的字符），如 `hatsune_miku`；
 // 派生后为空或超长的直接跳过。metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本
 // （迁移运行在无 import 的裸 V8 里），改这里要同步改那里。
-function tagLabelType(type) {
+function tagLabelType(type: unknown): string {
   const value = String(type || "").trim().toLowerCase();
   return /^[a-z0-9_-]{1,64}$/.test(value) ? value : "general";
 }
 
-function tagLabelKey(name) {
+function tagLabelKey(name: unknown): string {
   const key = String(name || "")
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -137,10 +232,12 @@ function tagLabelKey(name) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromSidebarTags(tags) {
-  const labels = [];
+function labelsFromSidebarTags(
+  tags: YandereSidebarTag[] | null | undefined,
+): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   for (const tag of tags || []) {
-    const key = tagLabelKey(tag && tag.name);
+    const key = tagLabelKey(tag?.name);
     if (!key) continue;
     labels.push({
       key,
@@ -151,12 +248,12 @@ function labelsFromSidebarTags(tags) {
   return labels;
 }
 
-function parseRelatedPosts(document, pageUrl) {
+function parseRelatedPosts(document: Document, pageUrl: string): YandereRelatedPost[] {
   const heading = Array.from(document.querySelectorAll("h5")).find((el) =>
     /Related Posts/i.test(textOf(el)),
   );
-  const ul = heading?.nextElementSibling?.tagName === "UL" ? heading.nextElementSibling : null;
-  if (!ul) return [];
+  const ul = nextElementSiblingOf(heading);
+  if (!ul || ul.tagName !== "UL") return [];
   return Array.from(ul.querySelectorAll("a[href]")).map((a) => ({
     href: resolveUrl(a.getAttribute("href"), pageUrl),
     label: textOf(a),
@@ -167,7 +264,7 @@ function parseRelatedPosts(document, pageUrl) {
 // 必须走 .response-list 限定，否则会把菜单项当成一条评论）。
 // 每条形如：.author > h6 > a（作者）+ span.date[title] > a（时间）
 //          + .comment-avatar-container img.avatar（头像）；正文在 .content > .body。
-function parseComments(document, pageUrl) {
+function parseComments(document: Document, pageUrl: string): YandereComments {
   const rows = Array.from(document.querySelectorAll("#comments .response-list > .comment"));
   const comments = rows.slice(0, MAX_COMMENTS).map((row) => {
     const authorAnchor = row.querySelector(".author h6 a[href]");
@@ -191,7 +288,7 @@ function parseComments(document, pageUrl) {
   return { comments, total: rows.length };
 }
 
-function buildYandereMetadata(document, pageUrl) {
+function buildYandereMetadata(document: Document, pageUrl: string): YandereMetadata {
   const postedBy = document.querySelector("#stats ul li:nth-of-type(2) a[href*='/user/show/']");
   const source = document.querySelector("#stats ul li a[href^='http']");
   const score = textOf(document.querySelector("[id^='post-score-']"));
@@ -248,14 +345,14 @@ function buildYandereMetadata(document, pageUrl) {
 // 元数据搜索片段："yandere"、有标签时写 "tags"、作品 ID、每个标签（侧栏显示名与站点标识各一条，
 // 如 "hatsune miku" / "hatsune_miku"）、rating、上传者名称、喜欢者昵称、评论者名称、评论内容。
 // 规则在 src/index.ts 与 metadata_migrations/migrate.js 各有一份，改一处要同步改另一处。
-function searchTextsFromMetadata(meta) {
-  const out = ["yandere"];
-  const push = (value) => {
+function searchTextsFromMetadata(meta: YandereMetadata): string[] {
+  const out: string[] = ["yandere"];
+  const push = (value: unknown): void => {
     const text = String(value ?? "").trim();
     if (text) out.push(text);
   };
-  const tags = Array.isArray(meta?.sidebar_tags) ? meta.sidebar_tags : [];
-  const stats = meta?.stats || {};
+  const tags = Array.isArray(meta.sidebar_tags) ? meta.sidebar_tags : [];
+  const stats = meta.stats;
   if (tags.some((tag) => String(tag?.display || tag?.name || "").trim())) out.push("tags");
   push(stats.post_id);
   for (const tag of tags) {
@@ -263,16 +360,16 @@ function searchTextsFromMetadata(meta) {
     push(tag?.name);
   }
   push(stats.rating);
-  push(meta?.posted_by_name);
+  push(meta.posted_by_name);
   for (const user of Array.isArray(stats.favorited) ? stats.favorited : []) push(user?.name);
-  for (const comment of Array.isArray(meta?.comments) ? meta.comments : []) {
+  for (const comment of Array.isArray(meta.comments) ? meta.comments : []) {
     push(comment?.author_name);
     push(comment?.body);
   }
   return [...new Set(out)];
 }
 
-function metadataNonEmpty(meta) {
+function metadataNonEmpty(meta: YandereMetadata): boolean {
   return !!(
     meta.posted_by_name ||
     meta.posted_by_href ||
@@ -290,7 +387,7 @@ function metadataNonEmpty(meta) {
   );
 }
 
-async function processDetailPage(href, baseUrl, quality) {
+async function processDetailPage(href: string, baseUrl: string, quality: string): Promise<void> {
   const fullUrl = resolveUrl(href, baseUrl);
   const { document, finalUrl } = await openDocument(fullUrl);
   const meta = buildYandereMetadata(document, finalUrl);
@@ -307,7 +404,7 @@ async function processDetailPage(href, baseUrl, quality) {
     console.warn(t("imageMissing", { url: finalUrl }));
     return;
   }
-  const opts = { url: finalUrl };
+  const opts: KabegameDownloadImageOptions = { url: finalUrl };
   if (metadataNonEmpty(meta)) {
     opts.metadata = meta;
     opts.searchTexts = searchTextsFromMetadata(meta);
@@ -317,13 +414,13 @@ async function processDetailPage(href, baseUrl, quality) {
   await downloadImage(imageUrl, opts);
 }
 
-function collectPostHrefs(document, pageUrl) {
+function collectPostHrefs(document: Document, pageUrl: string): string[] {
   return Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
     .map((a) => resolveUrl(a.getAttribute("href"), pageUrl))
     .filter(Boolean);
 }
 
-function validatePageRange(startPage, endPage) {
+function validatePageRange(startPage: number, endPage: number): void {
   if (endPage >= startPage + 100) {
     throw new Error(t("pageRangeTooLarge"));
   }
@@ -331,7 +428,13 @@ function validatePageRange(startPage, endPage) {
 }
 
 // 列表页统一入口：给 URL 生成器，按页取详情页并均摊进度
-async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
+async function crawlListPages(
+  makePageUrl: (page: number) => string,
+  quality: string,
+  startPage: number,
+  endPage: number,
+  label: string,
+): Promise<void> {
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
@@ -351,7 +454,7 @@ async function crawlListPages(makePageUrl, quality, startPage, endPage, label) {
   }
 }
 
-async function crawlAll(baseUrl, quality, vars) {
+async function crawlAll(baseUrl: string, quality: string, vars: YandereVars): Promise<void> {
   await crawlListPages(
     (page) => buildPostListUrl(baseUrl, metaTokensOf(vars), page),
     quality,
@@ -361,7 +464,7 @@ async function crawlAll(baseUrl, quality, vars) {
   );
 }
 
-async function crawlByTags(baseUrl, quality, vars) {
+async function crawlByTags(baseUrl: string, quality: string, vars: YandereVars): Promise<void> {
   const tags = tagListOf(vars.mode_tag_value);
   if (tags.length === 0) throw new Error(t("tagsRequired"));
   const tokens = tags.concat(metaTokensOf(vars));
@@ -379,7 +482,7 @@ async function crawlByTags(baseUrl, quality, vars) {
 // 区间内的空号是已删除的作品，所以实际张数通常少于区间宽度。排序固定为 id，不拼 sort_order。
 const MAX_ID_SPAN = 5000;
 
-function parsePostId(value, label) {
+function parsePostId(value: unknown, label: string): number {
   const text = trimText(value);
   const id = /^\d+$/.test(text) ? Number(text) : NaN;
   if (!Number.isSafeInteger(id) || id < 1) {
@@ -388,7 +491,7 @@ function parsePostId(value, label) {
   return id;
 }
 
-function parseIdRange(vars) {
+function parseIdRange(vars: YandereVars): { startId: number; endId: number } {
   const startId = parsePostId(vars.id_start, t("startIdLabel"));
   const endId = parsePostId(vars.id_end, t("endIdLabel"));
   if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
@@ -401,7 +504,7 @@ function parseIdRange(vars) {
 }
 
 // post.xml 的根节点带结果总数，只用来摊进度和判断抓满；取不到就翻到空页为止
-async function countPosts(baseUrl, tokens) {
+async function countPosts(baseUrl: string, tokens: string[]): Promise<number | null> {
   try {
     const response = await fetch(`${baseUrl}/post.xml?tags=${encodeTagsQuery(tokens)}&limit=1`);
     if (!response.ok) return null;
@@ -412,7 +515,7 @@ async function countPosts(baseUrl, tokens) {
   }
 }
 
-async function crawlByIdRange(baseUrl, quality, vars) {
+async function crawlByIdRange(baseUrl: string, quality: string, vars: YandereVars): Promise<void> {
   const { startId, endId } = parseIdRange(vars);
   const rating = trimText(vars.rating);
   const tokens = [`id:${startId}..${endId}`, "order:id"].concat(rating ? [`rating:${rating}`] : []);
@@ -455,10 +558,10 @@ const POPULAR_RECENT_PERIODS = new Set(["1d", "1w", "1m", "1y"]);
 const POPULAR_CALENDAR_SCALES = new Set(["day", "week", "month"]);
 const MAX_POPULAR_PERIODS = 100;
 // 分级过滤的配置值 → Post.register 里的单字母 rating
-const RATING_LETTERS = { safe: "s", questionable: "q", explicit: "e" };
+const RATING_LETTERS: Record<string, string> = { safe: "s", questionable: "q", explicit: "e" };
 
 // 留空取本地今天。站点按自己的时区切日，跨日前后几小时「今天」的榜可能还是空的。
-function parsePopularDate(text) {
+function parsePopularDate(text: unknown): Date {
   const matched = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimText(text));
   const base = matched
     ? new Date(Number(matched[1]), Number(matched[2]) - 1, Number(matched[3]))
@@ -467,13 +570,13 @@ function parsePopularDate(text) {
 }
 
 // 往前第 k 期（0 = 指定日期所在的那一期）
-function shiftPopularDate(date, scale, k) {
+function shiftPopularDate(date: Date, scale: string, k: number): Date {
   if (scale === "day") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - k);
   if (scale === "week") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7 * k);
   return new Date(date.getFullYear(), date.getMonth() - k, 1);
 }
 
-function buildPopularUrl(baseUrl, scale, date) {
+function buildPopularUrl(baseUrl: string, scale: string, date: Date): string {
   if (POPULAR_RECENT_PERIODS.has(scale)) return `${baseUrl}/post/popular_recent?period=${scale}`;
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -483,11 +586,13 @@ function buildPopularUrl(baseUrl, scale, date) {
 
 // 榜单页不接受 tags 参数，分级只能在插件里筛。页面脚本里每张图独占一行
 // Post.register({...})，带单字母 rating（s / q / e）。
-function postRatingsOf(html) {
-  const ratings = new Map();
+type RawRegisteredPost = { id?: unknown; rating?: unknown };
+
+function postRatingsOf(html: unknown): Map<string, string> {
+  const ratings = new Map<string, string>();
   for (const matched of coerceStr(html).matchAll(/Post\.register\((\{.*\})\)/g)) {
     try {
-      const post = JSON.parse(matched[1]);
+      const post = JSON.parse(matched[1]) as RawRegisteredPost | null;
       if (post && post.id != null) ratings.set(String(post.id), coerceStr(post.rating));
     } catch {
       // 单行解析失败不影响其他行
@@ -496,12 +601,12 @@ function postRatingsOf(html) {
   return ratings;
 }
 
-function postIdOfHref(href) {
+function postIdOfHref(href: unknown): string {
   const matched = /\/post\/show\/(\d+)/.exec(coerceStr(href));
   return matched ? matched[1] : "";
 }
 
-async function crawlPopular(baseUrl, quality, vars) {
+async function crawlPopular(baseUrl: string, quality: string, vars: YandereVars): Promise<void> {
   const scale = coerceStr(vars.popular_scale || "day");
   const recent = POPULAR_RECENT_PERIODS.has(scale);
   if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) {
@@ -546,9 +651,13 @@ async function crawlPopular(baseUrl, quality, vars) {
   }
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = coerceStr(common?.baseUrl) || BASE_URL;
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars = (custom || {}) as YandereVars;
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const baseUrl = coerceStr(cfg.baseUrl) || BASE_URL;
   const quality = coerceStr(vars.quality || "high");
   const mode = coerceStr(vars.crawl_mode);
 

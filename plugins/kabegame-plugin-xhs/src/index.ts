@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 小红书爬虫（V8 后端）
 //
 // 数据来源：作品详情页 / 首页推荐页 HTML 里的 window.__INITIAL_STATE__。

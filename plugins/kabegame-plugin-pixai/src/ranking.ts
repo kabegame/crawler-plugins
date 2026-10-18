@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 排行榜：作品榜直接一次拉 100 条榜单；模型榜（SD / LoRA）则对每个上榜模型再走一遍作品流。
 //
 // 榜单接口不返回 media.urls，所以作品榜的下载走 media API（useMediaApi=true）。
@@ -7,12 +6,13 @@ import { ARTWORKS_QUERY, DEFAULT_RANKING_ARTWORK_PAGES, MODELS_QUERY, OPERATION_
 import { fetchGraphql } from "./api";
 import { processArtworks } from "./artworks";
 import { processArtworksEdgesForDownload } from "./download";
+import type { ListArtworksResponse, ListGenerationModelsResponse, PixaiArtworkEdge, PixaiModelEdge, PixaiVars } from "./types";
 import { arrayValue, coerceStr, log, toInt } from "./util";
 import { t } from "./i18n";
 
 const { addProgress } = Kabegame;
 
-async function runRankingArtworks(rankType, rankPeriod) {
+async function runRankingArtworks(rankType: string, rankPeriod: string): Promise<void> {
   const feed = rankPeriod === "today"
     ? "rankv2_daily"
     : rankPeriod === "weekly"
@@ -21,7 +21,7 @@ async function runRankingArtworks(rankType, rankPeriod) {
   const rankMediaType = rankType === "artwork" ? "ARTWORK" : "ARTWORK_ANIMATED";
   log(t("rankingArtworksStart", { rankType, rankPeriod, feed, rankMediaType }));
 
-  const res = await fetchGraphql(
+  const res = await fetchGraphql<ListArtworksResponse>(
     OPERATION_ARTWORKS,
     { rankMediaType, feed, first: 100, isNsfw: false },
     ARTWORKS_QUERY,
@@ -33,7 +33,7 @@ async function runRankingArtworks(rankType, rankPeriod) {
     return;
   }
 
-  const edges = arrayValue(artworks.edges);
+  const edges = arrayValue<PixaiArtworkEdge>(artworks.edges);
   if (edges.length === 0) {
     log(t("rankingArtworksEmpty"));
     addProgress(100.0);
@@ -54,7 +54,7 @@ async function runRankingArtworks(rankType, rankPeriod) {
   if (downloadCount === 0) addProgress(100.0);
 }
 
-async function runRankingModels(rankType, rankPeriod, vars) {
+async function runRankingModels(rankType: string, rankPeriod: string, vars: PixaiVars): Promise<void> {
   const modelType = rankType === "model" ? "ANY_MODEL" : "ANY_LORA";
   const orderBy = rankPeriod === "today"
     ? "-markInfo.artworkLikedCountAvgDaily"
@@ -64,7 +64,7 @@ async function runRankingModels(rankType, rankPeriod, vars) {
   const maxArtworkPagesRanking = toInt(vars.max_artwork_pages_ranking, DEFAULT_RANKING_ARTWORK_PAGES);
 
   log(t("rankingModelsStart", { rankType, rankPeriod, modelType, orderBy }));
-  const res = await fetchGraphql(
+  const res = await fetchGraphql<ListGenerationModelsResponse>(
     OPERATION_MODELS,
     { type: modelType, orderBy, first: 100 },
     MODELS_QUERY,
@@ -76,7 +76,7 @@ async function runRankingModels(rankType, rankPeriod, vars) {
     return;
   }
 
-  const edges = arrayValue(generationModels.edges);
+  const edges = arrayValue<PixaiModelEdge>(generationModels.edges);
   if (edges.length === 0) {
     log(t("rankingModelsEmpty"));
     addProgress(100.0);
@@ -110,7 +110,7 @@ async function runRankingModels(rankType, rankPeriod, vars) {
   if (downloadCount === 0) addProgress(100.0);
 }
 
-export async function runRanking(vars) {
+export async function runRanking(vars: PixaiVars): Promise<void> {
   const rankType = coerceStr(vars.rank_type) || "artwork";
   const rankPeriod = coerceStr(vars.rank_period) || "today";
   if (rankType === "artwork" || rankType === "animated") {

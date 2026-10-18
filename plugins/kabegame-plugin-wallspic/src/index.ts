@@ -1,32 +1,47 @@
-// @ts-nocheck
 import { t } from "./i18n";
 
 const { addProgress, currentHtml, downloadImage, to } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://wallspic.com";
 
-function coerceStr(value) {
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type WallspicVars = {
+  mode?: unknown;
+  tag?: unknown;
+  album?: unknown;
+  ranking?: unknown;
+  resolution_mode?: unknown;
+  resolution_group?: unknown;
+  res_ultra_hd?: unknown;
+  res_apple?: unknown;
+  res_android?: unknown;
+  res_widescreen?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function trim(value) {
+function trim(value: unknown): string {
   return coerceStr(value).trim();
 }
 
-function parseHtml(html) {
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
-async function openDocument(url) {
+async function openDocument(url: string): Promise<{ finalUrl: string; document: Document }> {
   const finalUrl = await to(url);
   return { finalUrl, document: parseHtml(await currentHtml()) };
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return (el?.textContent || "").replace(/\s+/g, " ").trim();
 }
 
-function getResolutionSlug(vars) {
+function getResolutionSlug(vars: WallspicVars): string {
   if (vars.resolution_mode === "all") return "";
   if (vars.resolution_mode === "for_mobile") return "for_mobile";
   if (vars.resolution_mode === "for_desktop") return "for_desktop";
@@ -39,7 +54,7 @@ function getResolutionSlug(vars) {
   return "";
 }
 
-function getBasePath(vars, baseUrl) {
+function getBasePath(vars: WallspicVars, baseUrl: string): string {
   if (vars.mode === "tag") {
     const tag = trim(vars.tag);
     return tag ? `${baseUrl}/tag/${encodeURIComponent(tag)}` : baseUrl;
@@ -49,7 +64,7 @@ function getBasePath(vars, baseUrl) {
   return album === "all" ? `${baseUrl}/album` : `${baseUrl}/album/${album}`;
 }
 
-function buildPageUrl(vars, baseUrl, page) {
+function buildPageUrl(vars: WallspicVars, baseUrl: string, page: number): string {
   let url = getBasePath(vars, baseUrl);
   if (vars.ranking) url += `/${vars.ranking}`;
   const resSlug = getResolutionSlug(vars);
@@ -57,13 +72,13 @@ function buildPageUrl(vars, baseUrl, page) {
   return `${url}?page=${page}`;
 }
 
-function maxPageFromInlineScript(scriptText) {
+function maxPageFromInlineScript(scriptText: string): number {
   if (!scriptText.includes("mainGalleryTarget")) return 0;
   const match = scriptText.match(/"pages"\s*:\s*(\d+)/);
   return match ? Number(match[1]) : 0;
 }
 
-function parseMaxPage(document) {
+function parseMaxPage(document: Document): number {
   const amount = textOf(document.querySelector(".pagination__amount"));
   const token = amount.split(/\s+/)[1];
   if (/^\d+$/.test(token || "")) return Number(token);
@@ -77,20 +92,21 @@ function parseMaxPage(document) {
   return 1;
 }
 
-function isImageUrl(url) {
+function isImageUrl(url: unknown): boolean {
   return /\.(?:avif|bmp|gif|jpe?g|png|webp)(?:[?#].*)?$/i.test(coerceStr(url));
 }
 
-function collectContentUrlsFromScripts(document) {
-  const urls = [];
+function collectContentUrlsFromScripts(document: Document): string[] {
+  const urls: string[] = [];
   for (const script of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
     const text = script.textContent || "";
     if (!text.trim()) continue;
     try {
-      const parsed = JSON.parse(text);
-      const items = Array.isArray(parsed) ? parsed : [parsed];
+      const parsed: unknown = JSON.parse(text);
+      const items: unknown[] = Array.isArray(parsed) ? parsed : [parsed];
       for (const item of items) {
-        const contentUrl = coerceStr(item?.contentUrl);
+        if (!item || typeof item !== "object" || !("contentUrl" in item)) continue;
+        const contentUrl = coerceStr(item.contentUrl);
         if (isImageUrl(contentUrl)) urls.push(contentUrl);
       }
     } catch {
@@ -100,9 +116,10 @@ function collectContentUrlsFromScripts(document) {
   return urls;
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
+export async function crawl(common: unknown, custom: unknown): Promise<void> {
+  const config = (common || {}) as { baseUrl?: string | null };
+  const vars = (custom || {}) as WallspicVars;
+  const baseUrl = config.baseUrl || DEFAULT_BASE_URL;
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   if (endPage < startPage) throw new Error(t("endPageBeforeStart"));

@@ -1,9 +1,12 @@
-// @ts-nocheck
-import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed, type PixivVars } from "../common";
 import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
-export async function runBookmark(vars) {
+type PixivBookmarkResponse = {
+  body?: { works?: Array<{ id?: string | number | null }> | null } | null;
+};
+
+export async function runBookmark(vars: PixivVars): Promise<void> {
   const userId = coerceStr(vars.user_id);
   if (!userId) throw new Error(t("bookmarkUserRequired"));
   ensurePixivCookie(t("labelBookmark"));
@@ -12,9 +15,9 @@ export async function runBookmark(vars) {
   let offset = 0;
   let done = 0;
   while (done < target) {
-    let json;
+    let json: PixivBookmarkResponse | null = null;
     try {
-      json = await fetchJson(
+      json = await fetchJson<PixivBookmarkResponse>(
         `https://www.pixiv.net/ajax/user/${userId}/illusts/bookmarks?tag=&offset=${offset}&limit=${limit}&rest=show&lang=zh`,
       );
     } catch (e) {
@@ -34,4 +37,3 @@ export async function runBookmark(vars) {
     offset += limit;
   }
 }
-

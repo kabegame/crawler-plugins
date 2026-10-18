@@ -248,6 +248,14 @@ node package-plugin.js anihonet-wallpaper
 node package-plugin.js --only single-file-import local-folder-import
 ```
 
+**全プラグインのソースを型チェック**:
+
+```bash
+pnpm run check
+```
+
+`tsconfig.check.json` で `plugins/*/src` の TypeScript ソースを検査します（WebView プラグインの `crawl.js` は対象外）。すべてのプラグインが通過済みで、終了済みの `twodwallpapers` はファイル単位の `// @ts-nocheck` を残しています。メインプロジェクトからは `deno task --cwd src-crawler-plugins check` でも実行できます。
+
 **プラグイン索引（index.json）の生成**:
 
 ```bash
@@ -293,22 +301,10 @@ pnpm run package-plugin crawler-plugins/plugins/kabegame-plugin-<プラグイン
 
 ### プラグイン開発ガイド
 
-- プラグインのディレクトリ構成
-- パッケージ方法
-- ファイル形式（manifest.json、config.json、crawl.rhai）
-- 変数タイプと設定
-
-📖 [README_PLUGIN_DEV.md](README_PLUGIN_DEV.md)
-
-### Rhai API
-
-- ナビゲーション・取得（`to()`, `back()`, `fetch_json()`）
-- ページ情報（`current_url()`, `current_html()`）
-- DOM クエリ（`query()`, `get_attr()`, `query_by_text()`）
-- URL・画像ヘルパー（`resolve_url()`, `is_image_url()`, `download_image()`）
-- 例と注意事項
-
-📖 [RHAI_API.md](RHAI_API.md)
+- [プラグイン形式](https://github.com/kabegame/kabegame/blob/main/docs/PLUGIN_FORMAT.md)
+- [プラグイン開発](https://kabegame.com/dev/overview/)
+- [V8 API](https://kabegame.com/dev/v8-api/)
+- [WebView API](https://kabegame.com/dev/webview-api/)
 
 ---
 
@@ -327,7 +323,7 @@ pnpm run package-plugin crawler-plugins/plugins/kabegame-plugin-<プラグイン
 2. 完全な manifest.json を用意する
 3. わかりやすい README.md とユーザー向け doc（README.md）を書く
 
-開発前にメインリポジトリの [プラグイン開発ガイド](https://github.com/kabegame/kabegame/tree/main/docs/README_PLUGIN_DEV.md) と [Rhai API](https://github.com/kabegame/kabegame/tree/main/docs/RHAI_API.md) を参照してください。
+開発前に [プラグイン開発ガイド](https://kabegame.com/dev/overview/) と [プラグイン形式](https://github.com/kabegame/kabegame/blob/main/docs/PLUGIN_FORMAT.md) を参照してください。
 
 ---
 

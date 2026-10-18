@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 作品列表分页与单作品抓取。
 import { processDetailPage } from "./detail";
 import { openDocument, resolveUrl, textOf } from "./runtime";
@@ -6,13 +5,13 @@ import { t } from "./i18n";
 
 const { addProgress, warn } = Kabegame;
 
-function collectDetailPageHrefs(document, pageUrl) {
+function collectDetailPageHrefs(document: Document, pageUrl: string): string[] {
   return Array.from(document.querySelectorAll(".itiran:last-of-type > a[href]"))
     .map((anchor) => resolveUrl(anchor.getAttribute("href"), pageUrl))
     .filter(Boolean);
 }
 
-function parseListPageTotalPages(document) {
+function parseListPageTotalPages(document: Document): number {
   const text = textOf(document.querySelector(".post_box2 .center"));
   const match = text.match(/\d+\s*\/\s*(\d+)/);
   const n = match ? Number(match[1]) : 1;
@@ -20,15 +19,15 @@ function parseListPageTotalPages(document) {
 }
 
 export async function crawlAnimeSeries(
-  seriesHref,
-  listPctBudget,
-  rowId,
-  idxInRow,
-  totalInRow,
-  userStart,
-  userEnd,
-  baseUrl,
-) {
+  seriesHref: string,
+  listPctBudget: number,
+  rowId: string,
+  idxInRow: number,
+  totalInRow: number,
+  userStart: number,
+  userEnd: number,
+  baseUrl: string,
+): Promise<void> {
   const full = resolveUrl(seriesHref, baseUrl);
   console.log(t("seriesListOpen", { rowId, index: idxInRow, total: totalInRow, url: full }));
   let { document, finalUrl } = await openDocument(full);

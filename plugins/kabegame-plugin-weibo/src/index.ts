@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 微博插件入口。
 //
 // 模块分工：
@@ -11,9 +10,31 @@ import { POST_DELAY_MS, TIMELINE_FEATURES } from "./consts";
 import { t } from "./i18n";
 import { albumSource, resolveUser, searchSource, supertopicSource, timelineSource } from "./modes";
 import { fetchPost, processPost } from "./post";
-import { LoginError, parsePostInput, parseSupertopicInput, pause, str } from "./util";
+import type { WeiboMblog, WeiboPostOptions, WeiboSource } from "./types";
+import { LoginError, errorMessage, parsePostInput, parseSupertopicInput, pause, str } from "./util";
 
 const { addProgress, requireCookie, setHeader, warn } = Kabegame;
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type WeiboVars = {
+  mode?: unknown;
+  post_url?: unknown;
+  user?: unknown;
+  timeline_filter?: unknown;
+  include_retweets?: unknown;
+  supertopic?: unknown;
+  supertopic_channel?: unknown;
+  supertopic_tag?: unknown;
+  keyword?: unknown;
+  search_sort?: unknown;
+  search_original?: unknown;
+  start_date?: unknown;
+  end_date?: unknown;
+  max_posts?: unknown;
+  max_comments?: unknown;
+  comment_images?: unknown;
+  live_photo?: unknown;
+};
 
 function setup() {
   const ua = Kabegame.cefUserAgent?.();
@@ -26,10 +47,10 @@ function setup() {
   }
 }
 
-async function runSingle(vars, opts) {
+async function runSingle(vars: WeiboVars, opts: WeiboPostOptions) {
   const id = parsePostInput(vars.post_url);
   if (!id) throw new Error(t("postInputRequired"));
-  const mblog = await fetchPost(id);
+  const mblog: WeiboMblog = await fetchPost(id);
   if (mblog?.ok === 0 || !mblog?.id) {
     throw new Error(t("postNotVisible", { id, reason: str(mblog?.message) || t("deletedOrNoPermission") }));
   }
@@ -44,7 +65,7 @@ async function runSingle(vars, opts) {
   addProgress(100);
 }
 
-async function sourceFor(vars) {
+async function sourceFor(vars: WeiboVars): Promise<WeiboSource> {
   const mode = str(vars.mode) || "album";
   if (mode === "album" || mode === "timeline") {
     const user = await resolveUser(vars.user);
@@ -67,10 +88,10 @@ async function sourceFor(vars) {
   throw new Error(t("unknownMode", { mode }));
 }
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+export async function crawl(_common: unknown, custom?: WeiboVars | null): Promise<void> {
+  const vars: WeiboVars = custom || {};
   setup();
-  const opts = {
+  const opts: WeiboPostOptions = {
     livePhoto: vars.live_photo !== false,
     maxComments: Math.max(0, Number(vars.max_comments ?? 20)),
     commentImages: vars.comment_images !== false,
@@ -81,7 +102,7 @@ export async function crawl(_common, custom) {
   const maxPosts = Math.max(1, Number(vars.max_posts ?? 20));
   const perPost = 100 / maxPosts;
   const source = await sourceFor(vars);
-  const done = new Set();
+  const done = new Set<string>();
   let posts = 0;
   let files = 0;
   let failed = 0;
@@ -101,7 +122,7 @@ export async function crawl(_common, custom) {
     } catch (e) {
       if (e instanceof LoginError) throw e;
       failed += 1;
-      warn(t("postFailed", { id: str(mblog?.mblogid) || mid, reason: e?.message ?? e }));
+      warn(t("postFailed", { id: str(mblog?.mblogid) || mid, reason: errorMessage(e) }));
     }
     if (posts >= maxPosts) break;
     await pause(POST_DELAY_MS);

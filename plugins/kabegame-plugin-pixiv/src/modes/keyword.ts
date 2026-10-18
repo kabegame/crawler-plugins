@@ -1,9 +1,14 @@
-// @ts-nocheck
-import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed, type PixivVars } from "../common";
 import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
-export async function runKeyword(vars) {
+type PixivSearchResponse = {
+  body?: {
+    illustManga?: { data?: Array<{ id?: string | number | null }> | null } | null;
+  } | null;
+};
+
+export async function runKeyword(vars: PixivVars): Promise<void> {
   const keyword = coerceStr(vars.keyword);
   if (!keyword) throw new Error(t("keywordRequired"));
   // 热门排序需 Premium 登录；r18/all 搜索会出 R18 结果需登录
@@ -18,9 +23,9 @@ export async function runKeyword(vars) {
   let done = 0;
 
   while (done < target) {
-    let json;
+    let json: PixivSearchResponse | null = null;
     try {
-      json = await fetchJson(
+      json = await fetchJson<PixivSearchResponse>(
         `https://www.pixiv.net/ajax/search/artworks/${kwEnc}?word=${kwEnc}&order=${orderParam}&mode=${vars.search_mode}&p=${page}&s_mode=s_tag_full&type=all&lang=zh`,
       );
     } catch (e) {
@@ -42,4 +47,3 @@ export async function runKeyword(vars) {
     page += 1;
   }
 }
-

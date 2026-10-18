@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 端点、常量表。改接口参数时只动这里。
 
 export const NAV_URL = "https://api.bilibili.com/x/web-interface/nav";

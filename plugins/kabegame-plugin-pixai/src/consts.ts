@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 端点、GraphQL 查询文本与固定请求头。改接口参数时只动这里。
 
 export const API_URL = "https://api.pixai.art/graphql";

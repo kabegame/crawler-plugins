@@ -1,22 +1,28 @@
-// @ts-nocheck
-import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed, type PixivVars } from "../common";
 import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
 const { setHeader, warn } = Kabegame;
 
-function effectiveContentForRanking(rankingMode, contentMode) {
-  return ["daily", "weekly", "monthly", "rookie"].includes(rankingMode)
+type PixivRankingResponse = {
+  contents?: Array<{ illust_id?: string | number | null }> | null;
+  next?: string | number | null;
+};
+
+// 配置值原样返回（类型未知），拼 URL 时由模板字符串还原原有 String() 语义。
+function effectiveContentForRanking(rankingMode: unknown, contentMode: unknown): unknown {
+  return typeof rankingMode === "string" &&
+      ["daily", "weekly", "monthly", "rookie"].includes(rankingMode)
     ? contentMode
     : "all";
 }
 
-function rankingPixivMode(rankingMode, ageMode) {
+function rankingPixivMode(rankingMode: unknown, ageMode: unknown): unknown {
   if (ageMode !== "r18") return rankingMode;
   return rankingMode === "daily_ai" ? "daily_r18_ai" : `${rankingMode}_r18`;
 }
 
-export async function runRanking(vars) {
+export async function runRanking(vars: PixivVars): Promise<void> {
   const effectiveContent = effectiveContentForRanking(
     vars.ranking_mode,
     vars.content_mode,
@@ -47,9 +53,9 @@ export async function runRanking(vars) {
     const refBase =
       `https://www.pixiv.net/ranking.php?mode=${apiMode}&content=${effectiveContent}${dateQ}`;
     setHeader("Referer", refBase);
-    let json;
+    let json: PixivRankingResponse | null = null;
     try {
-      json = await fetchJson(`${refBase}&p=${page}&format=json`);
+      json = await fetchJson<PixivRankingResponse>(`${refBase}&p=${page}&format=json`);
     } catch (e) {
       rethrowIfLoginFailed(e, t("labelR18Ranking"), vars.age_mode === "r18");
       break;
@@ -71,4 +77,3 @@ export async function runRanking(vars) {
     warn(t("rankingShort", { done, target }));
   }
 }
-

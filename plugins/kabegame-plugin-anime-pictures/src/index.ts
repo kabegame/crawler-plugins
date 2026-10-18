@@ -1,4 +1,3 @@
-// @ts-nocheck
 // anime-pictures V8 crawler：列表 / 详情走 api.anime-pictures.net 的 JSON API，原图走 oimages 直链。
 // 站点 HTML 页（/posts、/posts/<id>）受 Cloudflare 挑战，API 与 oimages 不受，因此无需畅游 Cookie。
 // metadata 仍产出 schema 1 结构（title / author / details / rating / tagGroups），
@@ -20,6 +19,99 @@ const POST_INTERVAL_MS = 5000;
 const DEFAULT_POSTS_PER_PAGE = 80;
 const ORDER_BY_VALUES = new Set(["date", "date_r", "rating", "views", "size", "tag_num", "stars_date"]);
 
+// 站点 JSON 的最小结构：字段都可能缺失，只在确实依赖处收窄。
+// 输出侧（metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface。
+type AnimePicturesApiPost = {
+  id: number;
+  md5?: string | null;
+  ext?: string | null;
+  datetime?: string | null;
+  pubtime?: string | null;
+  width?: number | null;
+  height?: number | null;
+  size?: number | null;
+  download_count?: number | null;
+  color?: number[] | null;
+  score_number?: number | null;
+};
+
+type AnimePicturesApiUser = {
+  id: number;
+  name?: string | null;
+  isavatar?: boolean | number | null;
+  avatar_version?: number | null;
+};
+
+type AnimePicturesApiModerator = {
+  id?: number | null;
+  name?: string | null;
+};
+
+type AnimePicturesApiTag = {
+  tag?: {
+    tag?: string | null;
+    type?: number | null;
+    num?: number | null;
+  } | null;
+  user?: { name?: string | null } | null;
+};
+
+type AnimePicturesApiDetail = {
+  post: AnimePicturesApiPost;
+  user?: AnimePicturesApiUser | null;
+  moderator?: AnimePicturesApiModerator | null;
+  source?: { url?: string | null } | null;
+  tags?: AnimePicturesApiTag[] | null;
+  original_download_blocked?: boolean | null;
+};
+
+type AnimePicturesListResponse = {
+  posts?: Array<{ id?: number }> | null;
+  posts_count?: number | null;
+  max_pages?: number | null;
+};
+
+type AnimePicturesDetailLink = {
+  text: string;
+  url: string;
+};
+
+type AnimePicturesDetailItem = {
+  text: string;
+  links?: AnimePicturesDetailLink[];
+  color?: string;
+};
+
+type AnimePicturesTag = {
+  name: string;
+  url: string;
+  type: string;
+  count: string;
+  by?: string;
+};
+
+type AnimePicturesTagGroup = {
+  name: string;
+  tags: AnimePicturesTag[];
+};
+
+type AnimePicturesAuthor = {
+  name: string;
+  profileUrl: string;
+  avatarUrl: string;
+};
+
+type AnimePicturesMetadata = {
+  schema: number;
+  title: string;
+  author: AnimePicturesAuthor | null;
+  details: AnimePicturesDetailItem[];
+  rating: { label: string; count: string };
+  tagGroups: AnimePicturesTagGroup[];
+};
+
+type Rgb = [number, number, number];
+
 const REQUEST_HEADERS = {
   Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
   "Accept-Language": "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7",
@@ -34,7 +126,7 @@ function setRequestHeaders() {
   }
 }
 
-function log(message, level) {
+function log(message: unknown, level?: string): void {
   if (level === "warn") {
     warn(String(message ?? ""));
     return;
@@ -42,22 +134,30 @@ function log(message, level) {
   console.log(String(message ?? ""));
 }
 
-function coerceStr(value) {
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-async function fetchJson(url) {
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null) return String(message);
+  }
+  return String(error);
+}
+
+async function fetchJson<T = unknown>(url: string): Promise<T> {
   const res = await fetch(url, { headers: { Accept: "application/json" } });
   if (!res.ok) {
     throw new Error(t("httpError", { status: res.status, url }));
   }
-  return res.json();
+  return (await res.json()) as T;
 }
 
 // ── 站点前端规则的移植 ──────────────────────────────────────────────
 
 // 标签类型编号 → HTML 时代的 class（3 / 5 / 6 三种版权同为 copyright，0 未知不归类）
-const TAG_TYPE_CLASS = {
+const TAG_TYPE_CLASS: Record<number, string> = {
   0: "",
   1: "character",
   2: "reference",
@@ -69,7 +169,7 @@ const TAG_TYPE_CLASS = {
 };
 
 // 标签类型编号 → 站点 zh-cn 文案（分组名）
-const TAG_TYPE_NAME = {
+const TAG_TYPE_NAME: Record<number, string> = {
   0: "未知",
   1: "角色",
   2: "参考",
@@ -81,7 +181,7 @@ const TAG_TYPE_NAME = {
 };
 
 // 站点的主色调色板与 redmean 距离，按最近色取颜色名
-const COLOR_PALETTE = [
+const COLOR_PALETTE: Array<[Rgb, string]> = [
   [[0, 0, 0], "black"],
   [[255, 255, 255], "white"],
   [[128, 0, 0], "maroon"],
@@ -105,7 +205,7 @@ const COLOR_PALETTE = [
   [[75, 0, 130], "indigo"],
 ];
 
-function colorDistance(a, b) {
+function colorDistance(a: Rgb, b: Rgb): number {
   const mean = Math.trunc((a[0] + b[0]) / 2);
   const r = a[0] - b[0];
   const g = a[1] - b[1];
@@ -113,7 +213,7 @@ function colorDistance(a, b) {
   return Math.sqrt((((512 + mean) * r * r) >> 8) + 4 * g * g + (((767 - mean) * bl * bl) >> 8));
 }
 
-function colorName(rgb) {
+function colorName(rgb: Rgb): string {
   let best = COLOR_PALETTE[0];
   let bestDist = colorDistance(best[0], rgb);
   for (const entry of COLOR_PALETTE.slice(1)) {
@@ -127,51 +227,53 @@ function colorName(rgb) {
 }
 
 // 标签计数缩写：564335 → "564K"
-function shortCount(n) {
+function shortCount(n: unknown): string {
+  const value = Number(n);
   const units = ["", "K", "M"];
-  if (!(n > 0)) return "0";
-  const i = Math.min(Math.floor(Math.log(n) / Math.log(1000)), units.length - 1);
-  return `${(n / 1000 ** i).toFixed(0)}${units[i]}`;
+  if (!(value > 0)) return "0";
+  const i = Math.min(Math.floor(Math.log(value) / Math.log(1000)), units.length - 1);
+  return `${(value / 1000 ** i).toFixed(0)}${units[i]}`;
 }
 
 // 文件大小：5546011 → "5.29MB"
-function formatBytes(n) {
-  if (!(n > 0)) return "0B";
+function formatBytes(n: unknown): string {
+  const value = Number(n);
+  if (!(value > 0)) return "0B";
   const units = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.min(Math.floor(Math.log(n) / Math.log(1024)), units.length - 1);
-  return `${(n / 1024 ** i).toFixed(2) * 1}${units[i]}`;
+  const i = Math.min(Math.floor(Math.log(value) / Math.log(1024)), units.length - 1);
+  return `${Number((value / 1024 ** i).toFixed(2))}${units[i]}`;
 }
 
 // API 时间为无时区标记的 UTC；按站点时区显示为 "YYYY/MM/DD HH:mm"
-function formatDate(iso) {
+function formatDate(iso: unknown): string {
   const raw = coerceStr(iso);
   if (!raw) return "";
   const ms = Date.parse(/[zZ]|[+-]\d\d:?\d\d$/.test(raw) ? raw : `${raw}Z`);
   if (Number.isNaN(ms)) return "";
   const d = new Date(ms + TZ_OFFSET_HOURS * 3600 * 1000);
-  const pad = (v) => String(v).padStart(2, "0");
+  const pad = (v: number): string => String(v).padStart(2, "0");
   return `${d.getUTCFullYear()}/${pad(d.getUTCMonth() + 1)}/${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
 }
 
-function siteUrl(path, params) {
+function siteUrl(path: string, params?: Iterable<readonly [string, string]>): string {
   const url = new URL(path, DEFAULT_BASE_URL);
   for (const [k, v] of params || []) url.searchParams.set(k, v);
   url.searchParams.set("lang", LANG);
   return url.toString();
 }
 
-function profileUrl(userId) {
+function profileUrl(userId: number): string {
   return `${DEFAULT_BASE_URL}/profile/${userId}?lang=${LANG}`;
 }
 
-function avatarUrl(user) {
+function avatarUrl(user: AnimePicturesApiUser | null | undefined): string {
   if (!user?.isavatar) return "";
   return `${AVATAR_BASE}/${Math.floor(user.id / 1000)}/${user.id}.png?v=${user.avatar_version ?? 0}`;
 }
 
 // ── 列表 / 详情 / 原图 ──────────────────────────────────────────────
 
-function listApiUrl(page, tag, postsPerPage, orderBy) {
+function listApiUrl(page: number, tag: string, postsPerPage: number, orderBy: string): string {
   const url = new URL(`${API_BASE}/posts`);
   url.searchParams.set("page", String(page));
   url.searchParams.set("lang", LANG);
@@ -181,15 +283,15 @@ function listApiUrl(page, tag, postsPerPage, orderBy) {
   return url.toString();
 }
 
-function detailApiUrl(id) {
+function detailApiUrl(id: number): string {
   return `${API_BASE}/posts/${id}?lang=${LANG}`;
 }
 
-function postPageUrl(id) {
+function postPageUrl(id: number): string {
   return `${DEFAULT_BASE_URL}/posts/${id}?lang=${LANG}`;
 }
 
-function originalUrl(post) {
+function originalUrl(post: AnimePicturesApiPost | null | undefined): string {
   const md5 = coerceStr(post?.md5);
   const ext = coerceStr(post?.ext);
   if (!/^[0-9a-f]{32}$/.test(md5) || !ext) return "";
@@ -199,38 +301,43 @@ function originalUrl(post) {
 // ── metadata（schema 1） ─────────────────────────────────────────────
 
 // 分组按首次出现顺序、组内保持 API 顺序（与站点详情页一致）
-function buildTagGroups(tags) {
-  const groups = [];
-  const byType = new Map();
+function buildTagGroups(tags: AnimePicturesApiTag[] | null | undefined): AnimePicturesTagGroup[] {
+  const groups: AnimePicturesTagGroup[] = [];
+  const byType = new Map<number, AnimePicturesTagGroup>();
   for (const item of tags || []) {
     const t = item?.tag;
-    const name = coerceStr(t?.tag).trim();
+    if (!t) continue;
+    const name = coerceStr(t.tag).trim();
     if (!name) continue;
-    let group = byType.get(t.type);
+    const typeCode = t.type ?? -1;
+    let group = byType.get(typeCode);
     if (!group) {
-      group = { name: TAG_TYPE_NAME[t.type] ?? "", tags: [] };
-      byType.set(t.type, group);
+      group = { name: TAG_TYPE_NAME[typeCode] ?? "", tags: [] };
+      byType.set(typeCode, group);
       groups.push(group);
     }
-    const tag = {
+    const tag: AnimePicturesTag = {
       name,
       url: siteUrl("/posts", [
         ["page", "0"],
         ["search_tag", name],
       ]),
-      type: TAG_TYPE_CLASS[t.type] ?? "",
+      type: TAG_TYPE_CLASS[typeCode] ?? "",
       count: shortCount(t.num),
     };
-    const by = coerceStr(item?.user?.name).trim();
+    const by = coerceStr(item.user?.name).trim();
     if (by) tag.by = by;
     group.tags.push(tag);
   }
   return groups;
 }
 
-function buildDetails(detail) {
+function buildDetails(detail: AnimePicturesApiDetail): AnimePicturesDetailItem[] {
   const post = detail.post;
-  const details = [];
+  const details: AnimePicturesDetailItem[] = [];
+  const width = Number(post.width);
+  const height = Number(post.height);
+  const size = Number(post.size);
 
   const moderator = detail.moderator;
   if (moderator?.name) {
@@ -244,9 +351,9 @@ function buildDetails(detail) {
   const published = formatDate(post.pubtime);
   if (published) details.push({ text: `发布日期: ${published}` });
 
-  if (post.width > 0 && post.height > 0) {
-    const res = `${post.width}x${post.height}`;
-    const aspect = (post.width / post.height).toFixed(2);
+  if (width > 0 && height > 0) {
+    const res = `${width}x${height}`;
+    const aspect = (width / height).toFixed(2);
     details.push({
       text: `${res} ${aspect}`,
       links: [
@@ -254,8 +361,8 @@ function buildDetails(detail) {
           text: res,
           url: siteUrl("/posts/", [
             ["page", "0"],
-            ["res_x", String(post.width)],
-            ["res_y", String(post.height)],
+            ["res_x", String(width)],
+            ["res_y", String(height)],
           ]),
         },
         {
@@ -268,11 +375,13 @@ function buildDetails(detail) {
       ],
     });
   }
-  if (post.size > 0) {
-    details.push({ text: `${formatBytes(post.size)} ${post.download_count ?? 0}` });
+  if (size > 0) {
+    details.push({ text: `${formatBytes(size)} ${post.download_count ?? 0}` });
   }
 
-  const rgb = Array.isArray(post.color) && post.color.length === 3 ? post.color : null;
+  const rgb: Rgb | null = Array.isArray(post.color) && post.color.length === 3
+    ? [Number(post.color[0]), Number(post.color[1]), Number(post.color[2])]
+    : null;
   if (rgb) {
     const name = colorName(rgb);
     const css = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
@@ -298,7 +407,7 @@ function buildDetails(detail) {
   return details;
 }
 
-function buildMetadata(detail, tagGroups) {
+function buildMetadata(detail: AnimePicturesApiDetail, tagGroups: AnimePicturesTagGroup[]): AnimePicturesMetadata {
   const post = detail.post;
   const user = detail.user;
   const firstCopyright = tagGroups.flatMap((g) => g.tags).find((t) => t.type === "copyright");
@@ -313,9 +422,9 @@ function buildMetadata(detail, tagGroups) {
 }
 
 // 展示名：作品 / 角色 / 画师
-function pickDisplayName(tagGroups) {
+function pickDisplayName(tagGroups: AnimePicturesTagGroup[]): string {
   const tags = tagGroups.flatMap((g) => g.tags);
-  const first = (type) => tags.find((t) => t.type === type)?.name || "";
+  const first = (type: string): string => tags.find((t) => t.type === type)?.name || "";
   const titleSeg = [first("copyright"), first("character")].filter(Boolean).join(" / ");
   return [titleSeg, first("artist")].filter(Boolean).join(" / ");
 }
@@ -327,7 +436,7 @@ function pickDisplayName(tagGroups) {
 // 无 import 的裸 V8 里），改这里要同步改那里。
 const LABEL_TAG_TYPES = ["copyright", "character", "artist", "reference", "object"];
 
-function tagLabelKey(name) {
+function tagLabelKey(name: unknown): string {
   const key = String(name || "")
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -336,7 +445,7 @@ function tagLabelKey(name) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromTagGroups(tagGroups) {
+function labelsFromTagGroups(tagGroups: AnimePicturesTagGroup[]): KabegameLabelInput[] {
   const labels = [];
   for (const group of tagGroups || []) {
     for (const tag of group.tags || []) {
@@ -351,9 +460,9 @@ function labelsFromTagGroups(tagGroups) {
 
 // ── 主流程 ───────────────────────────────────────────────────────────
 
-async function crawlPost(id, index, total, weight) {
+async function crawlPost(id: number, index: number, total: number, weight: number): Promise<void> {
   try {
-    const detail = await fetchJson(detailApiUrl(id));
+    const detail = await fetchJson<AnimePicturesApiDetail>(detailApiUrl(id));
     const post = detail?.post;
     const downloadUrl = originalUrl(post);
     if (!downloadUrl) {
@@ -381,7 +490,7 @@ async function crawlPost(id, index, total, weight) {
     );
 
     // 任务请求头（含 kira=1 Cookie）会随 downloadImage 一并发给 oimages
-    const opts = {
+    const opts: KabegameDownloadImageOptions = {
       url: postPageUrl(id),
       metadata,
       searchTexts: searchTextsFromMetadata(metadata),
@@ -391,13 +500,13 @@ async function crawlPost(id, index, total, weight) {
     if (labels.length > 0) opts.labels = labels;
     await downloadImage(downloadUrl, opts);
   } catch (e) {
-    log(t("postFailed", { index, total, id, error: e?.message ?? e }), "warn");
+    log(t("postFailed", { index, total, id, error: errorMessage(e) }), "warn");
   } finally {
     addProgress(weight);
   }
 }
 
-export async function crawl(common, custom) {
+export async function crawl(_common: unknown, custom: Record<string, unknown> | null | undefined): Promise<void> {
   setRequestHeaders();
 
   const startPage = Number(custom?.startPage ?? 0);
@@ -434,8 +543,10 @@ export async function crawl(common, custom) {
 
   for (let page = startPage; page <= endPage; page += 1) {
     await sleep(2000);
-    const list = await fetchJson(listApiUrl(page, tag, postsPerPage, orderBy));
-    const ids = (list?.posts || []).map((p) => p?.id).filter((id) => Number.isInteger(id));
+    const list = await fetchJson<AnimePicturesListResponse>(listApiUrl(page, tag, postsPerPage, orderBy));
+    const ids = (list.posts ?? [])
+      .map((p) => p?.id)
+      .filter((id): id is number => Number.isInteger(id));
     log(
       t("pageImages", {
         page,
@@ -447,8 +558,9 @@ export async function crawl(common, custom) {
 
     if (ids.length === 0) {
       addProgress(pageProgress);
-      if (Number.isInteger(list?.max_pages) && page >= list.max_pages) {
-        log(t("lastPageReached", { maxPage: list.max_pages }));
+      const maxPages = list.max_pages;
+      if (typeof maxPages === "number" && Number.isInteger(maxPages) && page >= maxPages) {
+        log(t("lastPageReached", { maxPage: maxPages }));
         addProgress(pageProgress * (endPage - page));
         break;
       }

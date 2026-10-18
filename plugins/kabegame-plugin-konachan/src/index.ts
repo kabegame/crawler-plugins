@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 import { t } from "./i18n";
 
@@ -6,8 +5,79 @@ const { addProgress, currentHtml, downloadImage, requireCookie, setHeader, to, w
 
 const DEFAULT_BASE_URL = "https://konachan.net";
 
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type KonachanVars = {
+  source_site?: unknown;
+  crawl_mode?: unknown;
+  quality?: unknown;
+  rating?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+  mode_tag_value?: unknown;
+  popular_scale?: unknown;
+  popular_date?: unknown;
+  popular_periods?: unknown;
+  id_start?: unknown;
+  id_end?: unknown;
+};
+
+type KonachanSite = {
+  baseUrl: string;
+  host: string;
+  browserIdentity: boolean;
+};
+
+type KonachanSidebarTag = {
+  name: string;
+  type: string;
+  wiki_href: string;
+  post_href: string;
+  display: string;
+  count: string;
+};
+
+type KonachanRelatedPost = {
+  href: string;
+  label: string;
+};
+
+type KonachanFavoritedUser = {
+  href: string;
+  name: string;
+};
+
+type KonachanStats = {
+  post_id: string;
+  size: string;
+  rating: string;
+  posted_date_href: string;
+  posted_date_text: string;
+  posted_date_title: string;
+  avatar_href: string;
+  avatar_src: string;
+  favorited: KonachanFavoritedUser[];
+};
+
+// 输出侧（metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface（interface 不满足
+// KabegameJsonValue 的索引签名）。
+type KonachanMetadata = {
+  posted_by_name: string;
+  posted_by_href: string;
+  source_href: string;
+  score: string;
+  sidebar_tags: KonachanSidebarTag[];
+  stats: KonachanStats;
+  related: KonachanRelatedPost[];
+};
+
+type OpenedPage = {
+  finalUrl: string;
+  document: Document;
+  html: string;
+};
+
 // 根据源站选项解析基础 URL：net = konachan.net，com = konachan.com
-function resolveBaseUrl(source, fallback) {
+function resolveBaseUrl(source: unknown, fallback: unknown): string {
   const site = coerceStr(source).trim().toLowerCase();
   if (site === "com") return "https://konachan.com";
   if (site === "net") return "https://konachan.net";
@@ -21,9 +91,10 @@ function resolveBaseUrl(source, fallback) {
 // 原图和页面同域，downloadImage 调用时快照任务请求头，所以浏览器身份全程保留、不必在下载前撤掉。
 const BROWSER_IDENTITY_HOSTS = new Set(["konachan.com"]);
 
-let site = null; // { baseUrl, host, browserIdentity }
+// { baseUrl, host, browserIdentity }；prepareSite 会在任何页面请求之前填充
+let site: KonachanSite = { baseUrl: DEFAULT_BASE_URL, host: "", browserIdentity: false };
 
-function prepareSite(baseUrl) {
+function prepareSite(baseUrl: string): void {
   const host = new URL(baseUrl).host;
   site = { baseUrl, host, browserIdentity: BROWSER_IDENTITY_HOSTS.has(host) };
   if (!site.browserIdentity) return;
@@ -37,40 +108,62 @@ function prepareSite(baseUrl) {
   }
 }
 
-function siteBlockedError(reason) {
+function siteBlockedError(reason: unknown): Error {
   const hint = site.browserIdentity
     ? t("surfChallengeHint", { baseUrl: site.baseUrl })
     : t("networkRetryHint");
   return new Error(t("cloudflareBlocked", { host: site.host, reason, hint }));
 }
 
-function isChallengePage(document) {
-  return /just a moment|attention required|checking your browser/i.test(trimText(document.title));
+function isChallengePage(document: Document): boolean {
+  // Document.title 未在 @kabegame/types 的最小 DOM 声明里，用 title 元素取同一段文本
+  return /just a moment|attention required|checking your browser/i.test(
+    textOf(document.querySelector("title")),
+  );
 }
 
-function coerceStr(value) {
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function trimText(value) {
+// catch 变量的统一收窄：保留原来 error?.message ?? error 的字符串回退语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message != null) return coerceStr(message);
+  }
+  return coerceStr(error);
+}
+
+function trimText(value: unknown): string {
   return coerceStr(value).replace(/\s+/g, " ").trim();
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return trimText(el?.textContent || "");
 }
 
-function parseHtml(html) {
+// @kabegame/types 的 Element 只收录插件常用的最小集合，V8 的 deno-dom 实际还提供
+// nextElementSibling（"Related Posts" 标题后面那个 ul 就靠它取）。在 DOM 边界补一次收窄，
+// 运行时行为不变。
+type ElementWithSiblings = Element & { readonly nextElementSibling: Element | null };
+
+function nextElementSiblingOf(el: Element | null | undefined): Element | null {
+  const sibling = el ? (el as ElementWithSiblings).nextElementSibling : null;
+  return sibling ?? null;
+}
+
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
-async function openDocument(url) {
+async function openDocument(url: string): Promise<OpenedPage> {
   let finalUrl;
   try {
     finalUrl = await to(url);
   } catch (error) {
     // 宿主把非 2xx 统一抛成 "HTTP error: <status>"，没有结构化的 status 字段
-    if (/HTTP error: 403\b/.test(coerceStr(error?.message ?? error))) {
+    if (/HTTP error: 403\b/.test(errorMessage(error))) {
       throw siteBlockedError(t("returned403"));
     }
     throw error;
@@ -81,31 +174,31 @@ async function openDocument(url) {
   return { finalUrl, document, html };
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function normalizeTagToken(text) {
+function normalizeTagToken(text: unknown): string {
   return trimText(text).replace(/\s+/g, "_");
 }
 
 // 标签组合经 GUI 传进来是数组，但 kabegame-cli 的 --var 只能给字符串，
 // 所以字符串形态也要接：按逗号/空白/加号切开。
-function tagListOf(tagList) {
-  const items = Array.isArray(tagList) ? tagList : coerceStr(tagList).split(/[,+\s]+/);
+function tagListOf(tagList: unknown): string[] {
+  const items: unknown[] = Array.isArray(tagList) ? tagList : coerceStr(tagList).split(/[,+\s]+/);
   return items.map((tag) => normalizeTagToken(tag)).filter(Boolean);
 }
 
 // 分级是站点的 rating: 元标签，跟普通标签一样拼进搜索串，过滤发生在服务端分页之前。
 // konachan.net 只收录全年龄内容，Questionable / Explicit 在那边查出来是空的。
-function metaTokensOf(vars) {
+function metaTokensOf(vars: KonachanVars): string[] {
   const rating = trimText(vars.rating);
   return rating ? [`rating:${rating}`] : [];
 }
 
 // 站点搜索串：token 之间用 +，每个 token 单独编码（rating:safe 里的冒号要转义）
-function buildPostListUrl(baseUrl, tokens, page) {
+function buildPostListUrl(baseUrl: string, tokens: string[], page: number): string {
   const query = tokens.map((token) => encodeURIComponent(token)).join("+");
   return query ? `${baseUrl}/post?tags=${query}&page=${page}` : `${baseUrl}/post?page=${page}`;
 }
@@ -114,7 +207,7 @@ function buildPostListUrl(baseUrl, tokens, page) {
 const TAG_TYPE_CLASS_RE = /(?:^|\s)tag-type-([\w-]+)(?:\s|$)/;
 
 // 从 /post?tags=xxx、/wiki/show?title=xxx、/artist/show?name=xxx 中取出标签标识
-function tagNameFromHref(href) {
+function tagNameFromHref(href: unknown): string {
   const matched = /[?&](?:tags|title|name)=([^&#]+)/.exec(coerceStr(href));
   if (!matched) return "";
   let raw = matched[1];
@@ -126,7 +219,7 @@ function tagNameFromHref(href) {
   return normalizeTagToken(raw);
 }
 
-function parseSidebarTags(document, pageUrl) {
+function parseSidebarTags(document: Document, pageUrl: string): KonachanSidebarTag[] {
   return Array.from(document.querySelectorAll("#tag-sidebar li"))
     .map((li) => {
       const anchors = Array.from(li.querySelectorAll("a[href]"));
@@ -160,12 +253,12 @@ function parseSidebarTags(document, pageUrl) {
 // key 用站点自己的 tag 标识（小写、丢弃 key 字符集之外的字符），如 `futaba_akane_(pentagon)`；
 // 派生后为空或超长的直接跳过。metadata_migrations/migrate.js 的 provideLabels 有一份同规则的副本
 // （迁移运行在无 import 的裸 V8 里），改这里要同步改那里。
-function tagLabelType(type) {
+function tagLabelType(type: unknown): string {
   const value = String(type || "").trim().toLowerCase();
   return /^[a-z0-9_-]{1,64}$/.test(value) ? value : "general";
 }
 
-function tagLabelKey(name) {
+function tagLabelKey(name: unknown): string {
   const key = String(name || "")
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -174,10 +267,12 @@ function tagLabelKey(name) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromSidebarTags(tags) {
-  const labels = [];
+function labelsFromSidebarTags(
+  tags: KonachanSidebarTag[] | null | undefined,
+): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   for (const tag of tags || []) {
-    const key = tagLabelKey(tag && tag.name);
+    const key = tagLabelKey(tag?.name);
     if (!key) continue;
     labels.push({
       key,
@@ -192,10 +287,10 @@ function labelsFromSidebarTags(tags) {
 // 每张图只写一个 `konachan`；每个有值的字段只写一个裸字段名标记词（如 `tags`，表示「有这一项」，
 // 可配合「非」找没有标签的图），值本身不带前缀。不要退回逐值加前缀（`konachan_tags_<名>`）：
 // 那样每张图多出几十个含 "konachan" / "tags" 的词条，搜这类词时要展开几十万行映射，查询慢一倍。
-function searchTextsFromMetadata(meta) {
-  const s = meta.stats || {};
-  const out = ["konachan"];
-  const field = (key, values) => {
+function searchTextsFromMetadata(meta: KonachanMetadata): string[] {
+  const s = meta.stats;
+  const out: string[] = ["konachan"];
+  const field = (key: string, values: unknown[]): void => {
     const list = values.map((value) => String(value ?? "").trim()).filter(Boolean);
     if (list.length) out.push(key, ...list);
   };
@@ -213,19 +308,19 @@ function searchTextsFromMetadata(meta) {
   return [...new Set(out)];
 }
 
-function parseRelatedPosts(document, pageUrl) {
+function parseRelatedPosts(document: Document, pageUrl: string): KonachanRelatedPost[] {
   const heading = Array.from(document.querySelectorAll("h5")).find((el) =>
     /Related Posts/i.test(textOf(el)),
   );
-  const ul = heading?.nextElementSibling?.tagName === "UL" ? heading.nextElementSibling : null;
-  if (!ul) return [];
+  const ul = nextElementSiblingOf(heading);
+  if (!ul || ul.tagName !== "UL") return [];
   return Array.from(ul.querySelectorAll("a[href]")).map((a) => ({
     href: resolveUrl(a.getAttribute("href"), pageUrl),
     label: textOf(a),
   })).filter((item) => item.href);
 }
 
-function buildKonachanMetadata(document, pageUrl) {
+function buildKonachanMetadata(document: Document, pageUrl: string): KonachanMetadata {
   const postedBy = document.querySelector("#stats ul li:nth-of-type(2) a[href*='/user/show/']");
   const source = document.querySelector("#stats ul li a[href^='http']");
   const score = textOf(document.querySelector("[id^='post-score-']"));
@@ -272,7 +367,7 @@ function buildKonachanMetadata(document, pageUrl) {
   };
 }
 
-function metadataNonEmpty(meta) {
+function metadataNonEmpty(meta: KonachanMetadata): boolean {
   return !!(
     meta.posted_by_name ||
     meta.posted_by_href ||
@@ -289,7 +384,7 @@ function metadataNonEmpty(meta) {
   );
 }
 
-async function processDetailPage(href, baseUrl, quality) {
+async function processDetailPage(href: string, baseUrl: string, quality: string): Promise<void> {
   const fullUrl = resolveUrl(href, baseUrl);
   const { document, finalUrl } = await openDocument(fullUrl);
   const meta = buildKonachanMetadata(document, finalUrl);
@@ -301,7 +396,7 @@ async function processDetailPage(href, baseUrl, quality) {
     imageUrl = resolveUrl(document.querySelector("#image")?.getAttribute("src"), finalUrl);
   }
   if (!imageUrl) return;
-  const opts = { url: finalUrl };
+  const opts: KabegameDownloadImageOptions = { url: finalUrl };
   if (metadataNonEmpty(meta)) {
     opts.metadata = meta;
     opts.searchTexts = searchTextsFromMetadata(meta);
@@ -311,20 +406,26 @@ async function processDetailPage(href, baseUrl, quality) {
   await downloadImage(imageUrl, opts);
 }
 
-function collectPostHrefs(document, pageUrl) {
+function collectPostHrefs(document: Document, pageUrl: string): string[] {
   return Array.from(document.querySelectorAll("#post-list-posts > li > div > a"))
     .map((a) => resolveUrl(a.getAttribute("href"), pageUrl))
     .filter(Boolean);
 }
 
-function validatePageRange(startPage, endPage) {
+function validatePageRange(startPage: number, endPage: number): void {
   if (endPage >= startPage + 100) {
     throw new Error(t("pageRangeTooLarge"));
   }
   if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
 }
 
-async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
+async function crawlQualityAll(
+  baseUrl: string,
+  quality: string,
+  startPage: number,
+  endPage: number,
+  tokens: string[],
+): Promise<void> {
   const totalPages = endPage - startPage + 1;
   const pageProgress = 90.0 / totalPages;
   for (let page = startPage; page <= endPage; page += 1) {
@@ -339,7 +440,7 @@ async function crawlQualityAll(baseUrl, quality, startPage, endPage, tokens) {
   }
 }
 
-async function crawlByTags(baseUrl, quality, vars) {
+async function crawlByTags(baseUrl: string, quality: string, vars: KonachanVars): Promise<void> {
   const tags = tagListOf(vars.mode_tag_value);
   if (tags.length === 0) throw new Error(t("tagsRequired"));
   const tokens = tags.concat(metaTokensOf(vars));
@@ -364,7 +465,7 @@ async function crawlByTags(baseUrl, quality, vars) {
 // 每页 40 张。区间内的空号是已删除的作品，所以实际张数通常远少于区间宽度。
 const MAX_ID_SPAN = 5000;
 
-function parsePostId(value, label) {
+function parsePostId(value: unknown, label: string): number {
   const text = trimText(value);
   if (!/^\d+$/.test(text)) throw new Error(t("positiveIntegerRequired", { label, value: text }));
   const id = Number(text);
@@ -374,7 +475,7 @@ function parsePostId(value, label) {
   return id;
 }
 
-function parseIdRange(vars) {
+function parseIdRange(vars: KonachanVars): { startId: number; endId: number } {
   const startId = parsePostId(vars.id_start, t("startIdLabel"));
   const endId = parsePostId(vars.id_end, t("endIdLabel"));
   if (endId < startId) throw new Error(t("endIdBeforeStart", { startId, endId }));
@@ -387,7 +488,7 @@ function parseIdRange(vars) {
 }
 
 // post.xml 的根节点带结果总数，只用来摊进度；取不到（如 konachan.com 未过验证）就按每页均摊
-async function countPosts(baseUrl, tokens) {
+async function countPosts(baseUrl: string, tokens: string[]): Promise<number | null> {
   const query = tokens.map((token) => encodeURIComponent(token)).join("+");
   try {
     const response = await fetch(`${baseUrl}/post.xml?tags=${query}&limit=1`);
@@ -399,7 +500,11 @@ async function countPosts(baseUrl, tokens) {
   }
 }
 
-async function crawlByIdRange(baseUrl, quality, vars) {
+async function crawlByIdRange(
+  baseUrl: string,
+  quality: string,
+  vars: KonachanVars,
+): Promise<void> {
   const { startId, endId } = parseIdRange(vars);
   const tokens = [`id:${startId}..${endId}`, "order:id"].concat(metaTokensOf(vars));
   const total = await countPosts(baseUrl, tokens);
@@ -441,10 +546,10 @@ const POPULAR_RECENT_PERIODS = new Set(["1d", "1w", "1m", "1y"]);
 const POPULAR_CALENDAR_SCALES = new Set(["day", "week", "month"]);
 const MAX_POPULAR_PERIODS = 100;
 // 分级过滤的配置值 → Post.register 里的单字母 rating
-const RATING_LETTERS = { safe: "s", questionable: "q", explicit: "e" };
+const RATING_LETTERS: Record<string, string> = { safe: "s", questionable: "q", explicit: "e" };
 
 // 留空取本地今天。站点按自己的时区切日，跨日前后几小时「今天」的榜可能还是空的。
-function parsePopularDate(text) {
+function parsePopularDate(text: unknown): Date {
   const matched = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(trimText(text));
   const base = matched
     ? new Date(Number(matched[1]), Number(matched[2]) - 1, Number(matched[3]))
@@ -453,13 +558,13 @@ function parsePopularDate(text) {
 }
 
 // 往前第 k 期（0 = 指定日期所在的那一期）
-function shiftPopularDate(date, scale, k) {
+function shiftPopularDate(date: Date, scale: string, k: number): Date {
   if (scale === "day") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - k);
   if (scale === "week") return new Date(date.getFullYear(), date.getMonth(), date.getDate() - 7 * k);
   return new Date(date.getFullYear(), date.getMonth() - k, 1);
 }
 
-function buildPopularUrl(baseUrl, scale, date) {
+function buildPopularUrl(baseUrl: string, scale: string, date: Date): string {
   if (POPULAR_RECENT_PERIODS.has(scale)) return `${baseUrl}/post/popular_recent?period=${scale}`;
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -469,11 +574,13 @@ function buildPopularUrl(baseUrl, scale, date) {
 
 // 榜单页不接受 tags 参数，分级只能在插件里筛。页面脚本里每张图独占一行
 // Post.register({...})，带单字母 rating（s / q / e）。
-function postRatingsOf(html) {
-  const ratings = new Map();
+type RawRegisteredPost = { id?: unknown; rating?: unknown };
+
+function postRatingsOf(html: unknown): Map<string, string> {
+  const ratings = new Map<string, string>();
   for (const matched of coerceStr(html).matchAll(/Post\.register\((\{.*\})\)/g)) {
     try {
-      const post = JSON.parse(matched[1]);
+      const post = JSON.parse(matched[1]) as RawRegisteredPost | null;
       if (post && post.id != null) ratings.set(String(post.id), coerceStr(post.rating));
     } catch {
       // 单行解析失败不影响其他行
@@ -482,12 +589,12 @@ function postRatingsOf(html) {
   return ratings;
 }
 
-function postIdOfHref(href) {
+function postIdOfHref(href: unknown): string {
   const matched = /\/post\/show\/(\d+)/.exec(coerceStr(href));
   return matched ? matched[1] : "";
 }
 
-async function crawlPopular(baseUrl, quality, vars) {
+async function crawlPopular(baseUrl: string, quality: string, vars: KonachanVars): Promise<void> {
   const scale = coerceStr(vars.popular_scale || "day");
   const recent = POPULAR_RECENT_PERIODS.has(scale);
   if (!recent && !POPULAR_CALENDAR_SCALES.has(scale)) {
@@ -532,9 +639,13 @@ async function crawlPopular(baseUrl, quality, vars) {
   }
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = resolveBaseUrl(vars.source_site, common?.baseUrl);
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars = (custom || {}) as KonachanVars;
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const baseUrl = resolveBaseUrl(vars.source_site, cfg.baseUrl);
   prepareSite(baseUrl);
   const quality = coerceStr(vars.quality || "high");
   if (vars.crawl_mode === "all") {

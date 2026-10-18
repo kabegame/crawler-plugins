@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 import { t } from "./i18n";
 
@@ -6,29 +5,66 @@ const { addProgress, currentHtml, downloadImage, to } = Kabegame;
 
 const DEFAULT_BASE_URL = "https://wallpaperscraft.com";
 
-function coerceStr(value) {
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type WallpaperVars = {
+  mode?: unknown;
+  category?: unknown;
+  tag?: unknown;
+  orderby?: unknown;
+  res_type?: unknown;
+  res_mobile?: unknown;
+  res_apple?: unknown;
+  res_fullscreen?: unknown;
+  res_widescreen?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+// 输出侧 metadata 必须保持 JSON 可序列化，所以用 type 而非 interface（interface 不满足
+// KabegameJsonValue 的索引签名）。
+type WallpaperMetadata = {
+  site_base: string;
+  detail_url: string;
+  wallpaper_title: string;
+  author: string;
+  license: string;
+  source_url: string;
+  rating: string;
+  votes_total: string;
+  original_resolution: string;
+  original_download_url: string;
+  views: string;
+  uploaded: string;
+};
+
+// 宿主公共配置（运行时只读到 baseUrl）
+type WallpaperCommon = {
+  baseUrl?: unknown;
+};
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function textOf(el) {
+function textOf(el: Element | null | undefined): string {
   return (el?.textContent || "").replace(/\s+/g, " ").trim();
 }
 
-function parseHtml(html) {
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
-async function openDocument(url) {
+async function openDocument(url: string): Promise<{ finalUrl: string; document: Document }> {
   const finalUrl = await to(url);
   return { finalUrl, document: parseHtml(await currentHtml()) };
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function getSelectedRes(vars) {
+function getSelectedRes(vars: WallpaperVars): string {
   if (vars.res_type === "none") return "";
   if (vars.res_type === "mobile") return coerceStr(vars.res_mobile);
   if (vars.res_type === "apple") return coerceStr(vars.res_apple);
@@ -37,7 +73,7 @@ function getSelectedRes(vars) {
   return "";
 }
 
-function buildPageUrl(vars, baseUrl, page, selectedRes) {
+function buildPageUrl(vars: WallpaperVars, baseUrl: string, page: number, selectedRes: string): string {
   // 下拉被清空（null）或随模式隐藏（undefined）时回落到清单默认值，避免把 null/undefined 拼进 URL
   const mode = vars.mode ?? "catalog";
   const category = coerceStr(vars.category) || "anime";
@@ -52,33 +88,33 @@ function buildPageUrl(vars, baseUrl, page, selectedRes) {
   return `${basePath}${sortPath}${resPath}/page${page}`;
 }
 
-function getMaxPage(document) {
+function getMaxPage(document: Document): number {
   const href = document.querySelector("li.pager__item:last-of-type > a")?.getAttribute("href") || "";
   const match = href.match(/(?:^|\/)page(\d+)(?:[/?#]|$)/);
   return match ? Number(match[1]) : 1;
 }
 
-function infoTextForThumb(infoTexts, idx) {
+function infoTextForThumb(infoTexts: string[], idx: number): string {
   const metaIndex = idx * 2;
   if (metaIndex < infoTexts.length) return infoTexts[metaIndex];
   return idx < infoTexts.length ? infoTexts[idx] : "";
 }
 
-function extractRes(infoText) {
+function extractRes(infoText: unknown): string {
   return coerceStr(infoText).match(/\b\d+x\d+\b/)?.[0] || "";
 }
 
-function makeFullUrl(thumbUrl, res) {
+function makeFullUrl(thumbUrl: unknown, res: string): string {
   return coerceStr(thumbUrl).replace(/_\d+x\d+/, `_${res}`);
 }
 
-function displayNameFromWallpaperTitle(titleRaw) {
+function displayNameFromWallpaperTitle(titleRaw: unknown): string {
   const title = coerceStr(titleRaw).trim();
   return title.startsWith("Wallpaper ") ? title.slice(10).trim() : title;
 }
 
-function detailItemTextMap(document) {
-  const out = {};
+function detailItemTextMap(document: Document): Record<string, string> {
+  const out: Record<string, string> = {};
   const cells = Array.from(document.querySelectorAll(".wallpaper-table .wallpaper-table__cell"))
     .map(textOf);
   for (let i = 0; i + 1 < cells.length; i += 2) {
@@ -87,7 +123,7 @@ function detailItemTextMap(document) {
   return out;
 }
 
-function fetchDetailMetadata(document, detailUrl, baseUrl) {
+function fetchDetailMetadata(document: Document, detailUrl: string, baseUrl: string): WallpaperMetadata {
   const title = textOf(document.querySelector(".content-main h1.gui-heading"));
   let author = "";
   let license = "";
@@ -117,7 +153,7 @@ function fetchDetailMetadata(document, detailUrl, baseUrl) {
   };
 }
 
-async function downloadWithDetail(fullUrl, detailRel, pageUrl, baseUrl) {
+async function downloadWithDetail(fullUrl: string, detailRel: string, pageUrl: string, baseUrl: string): Promise<void> {
   const detailAbs = resolveUrl(detailRel, pageUrl);
   if (!detailAbs) {
     await downloadImage(fullUrl);
@@ -127,14 +163,18 @@ async function downloadWithDetail(fullUrl, detailRel, pageUrl, baseUrl) {
   const { document } = await openDocument(detailAbs);
   const metadata = fetchDetailMetadata(document, detailAbs, baseUrl);
   const name = displayNameFromWallpaperTitle(metadata.wallpaper_title);
-  const opts = { metadata, url: detailAbs };
+  const opts: KabegameDownloadImageOptions = { metadata, url: detailAbs };
   if (name) opts.name = name;
   await downloadImage(fullUrl, opts);
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = common?.baseUrl || DEFAULT_BASE_URL;
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars = (custom || {}) as WallpaperVars;
+  const cfg = (common || {}) as WallpaperCommon;
+  const baseUrl = coerceStr(cfg.baseUrl) || DEFAULT_BASE_URL;
   const startPage = Number(vars.start_page ?? 1);
   const endPage = Number(vars.end_page ?? startPage);
   if (endPage < startPage) throw new Error(t("endPageBeforeStart"));

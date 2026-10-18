@@ -1,4 +1,5 @@
 // @ts-nocheck
+// 站点已下线：仅保留用于已有图片的索引与详情模板，不再做类型改造。
 import { resolveUrl as resolveSdkUrl } from "@kabegame/plugin-sdk";
 
 const { addProgress, currentHtml, downloadImage, to, warn } = Kabegame;

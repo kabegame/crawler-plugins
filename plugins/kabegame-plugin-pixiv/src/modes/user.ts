@@ -1,11 +1,14 @@
-// @ts-nocheck
-import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed } from "../common";
+import { addArtworkProgress, coerceStr, ensurePixivCookie, fetchJson, rethrowIfLoginFailed, type PixivVars } from "../common";
 import { t } from "../i18n";
 import { downloadIllust } from "../illust";
 
 const { setHeader, warn } = Kabegame;
 
-export async function runUser(vars) {
+type PixivProfileResponse = {
+  body?: { illusts?: Record<string, unknown> | null } | null;
+};
+
+export async function runUser(vars: PixivVars): Promise<void> {
   const artistId = coerceStr(vars.artist_id);
   const userId = coerceStr(vars.user_id);
   if (!artistId) throw new Error(t("artistRequired"));
@@ -13,9 +16,9 @@ export async function runUser(vars) {
   setHeader("x-user-id", userId);
   ensurePixivCookie(t("labelArtist"));
 
-  let json;
+  let json: PixivProfileResponse | null = null;
   try {
-    json = await fetchJson(
+    json = await fetchJson<PixivProfileResponse>(
       `https://www.pixiv.net/ajax/user/${artistId}/profile/all?lang=zh`,
     );
   } catch (e) {
@@ -51,4 +54,3 @@ export async function runUser(vars) {
     addArtworkProgress(selectedTotal);
   }
 }
-

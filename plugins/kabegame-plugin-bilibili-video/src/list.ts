@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 合集 / 系列 / 收藏夹三种列表页。对应 yt-dlp 的
 // BilibiliCollectionListIE / BilibiliSeriesListIE / BilibiliFavoritesListIE。
 //
@@ -8,9 +7,71 @@ import { sleep } from "@kabegame/plugin-sdk";
 
 import { FAV_IDS_API, FAV_LIST_API, LIST_PAGE_SIZE, SEASON_API, SERIES_API, SPACE_BASE } from "./consts";
 import { t } from "./i18n";
+import type { BilibiliVars, ListEntry } from "./types";
 import { checkBilibiliRisk, coerceStr, fetchJson, isUnavailableTitle } from "./util";
 
 const { warn } = Kabegame;
+
+/** 列表页类型；"" 表示链接无法识别。 */
+type ListKind = "favlist" | "series" | "season" | "";
+
+/** 从列表页链接解析出的目标。 */
+type ListTarget = {
+  kind: ListKind;
+  mid: string;
+  sid: string;
+};
+
+type ArchiveItem = {
+  bvid?: string | null;
+  title?: string | null;
+};
+
+type ArchivesPage = {
+  page?: {
+    page_size?: number | null;
+    size?: number | null;
+    total?: number | null;
+  } | null;
+  archives?: ArchiveItem[] | null;
+  meta?: {
+    name?: string | null;
+  } | null;
+};
+
+type ArchivesResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: ArchivesPage | null;
+};
+
+type FavInfoResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: {
+    info?: {
+      title?: string | null;
+    } | null;
+  } | null;
+};
+
+type FavResource = {
+  type?: number | null;
+  bvid?: string | null;
+};
+
+type FavIdsResponse = {
+  code?: number | null;
+  message?: string | null;
+  data?: FavResource[] | null;
+};
+
+type ArchivesPageResult = {
+  archives: ArchiveItem[];
+  total: number;
+  pageSize: number;
+  name: string;
+};
 
 /**
  * 从列表页链接解析出类型与 id。支持：
@@ -20,7 +81,7 @@ const { warn } = Kabegame;
  *   space.bilibili.com/<mid>/favlist?fid=<fid>
  *   bilibili.com/medialist/detail/ml<fid>
  */
-export function parseListUrl(raw) {
+export function parseListUrl(raw: unknown): ListTarget {
   const work = coerceStr(raw).trim();
   const mid = work.match(/space\.bilibili\.com\/(\d+)/)?.[1] || "";
 
@@ -37,7 +98,7 @@ export function parseListUrl(raw) {
   const lists = work.match(/\/lists\/(\d+)/)?.[1];
   if (lists) {
     // /lists/<sid> 默认是合集；只有显式 type=series 才是系列。
-    const kind = /[?&]type=series\b/.test(work) ? "series" : "season";
+    const kind: ListKind = /[?&]type=series\b/.test(work) ? "series" : "season";
     return { kind, mid, sid: lists };
   }
 
@@ -46,7 +107,11 @@ export function parseListUrl(raw) {
 
 // 合集与系列返回结构几乎一样，只有分页字段名不同：
 // season → page.page_size，series → page.size。
-async function fetchArchivesPage(target, pageNo, referer) {
+async function fetchArchivesPage(
+  target: ListTarget,
+  pageNo: number,
+  referer: string,
+): Promise<ArchivesPageResult> {
   const isSeason = target.kind === "season";
   const url = isSeason
     ? `${SEASON_API}?mid=${target.mid}&season_id=${target.sid}`
@@ -54,7 +119,7 @@ async function fetchArchivesPage(target, pageNo, referer) {
     : `${SERIES_API}?mid=${target.mid}&series_id=${target.sid}`
       + `&pn=${pageNo}&ps=${LIST_PAGE_SIZE}`;
 
-  const json = await fetchJson(url, { Referer: referer });
+  const json = await fetchJson<ArchivesResponse>(url, { Referer: referer });
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
     throw new Error(t("archivesFailed", {
@@ -66,15 +131,21 @@ async function fetchArchivesPage(target, pageNo, referer) {
 
   const data = json.data;
   const pageSize = Number((isSeason ? data?.page?.page_size : data?.page?.size) ?? LIST_PAGE_SIZE);
+  const archives = data?.archives;
   return {
-    archives: Array.isArray(data?.archives) ? data.archives : [],
+    archives: Array.isArray(archives) ? archives : [],
     total: Number(data?.page?.total ?? 0),
     pageSize: pageSize > 0 ? pageSize : LIST_PAGE_SIZE,
     name: coerceStr(data?.meta?.name),
   };
 }
 
-async function collectArchives(target, vars, intervalMs, referer) {
+async function collectArchives(
+  target: ListTarget,
+  vars: BilibiliVars,
+  intervalMs: number,
+  referer: string,
+): Promise<ListEntry[]> {
   if (!target.mid) {
     throw new Error(t("archivesMidRequired"));
   }
@@ -83,7 +154,7 @@ async function collectArchives(target, vars, intervalMs, referer) {
   const endPage = Math.max(startPage, Number(vars.end_page ?? startPage));
   const maxVideos = Math.max(1, Number(vars.max_videos ?? 5));
 
-  const entries = [];
+  const entries: ListEntry[] = [];
   let dead = 0;
   let total = 0;
   let pageCount = 0;
@@ -133,8 +204,15 @@ async function collectArchives(target, vars, intervalMs, referer) {
  * 收藏夹的 ids 接口一次返回全部条目、不分页，所以这里用「起始页」换算 offset，
  * 再按 max_videos 截断——保持和其他列表模式一致的翻页语义。
  */
-async function collectFavlist(target, vars, referer) {
-  const info = await fetchJson(`${FAV_LIST_API}?media_id=${target.sid}&pn=1&ps=20`, { Referer: referer });
+async function collectFavlist(
+  target: ListTarget,
+  vars: BilibiliVars,
+  referer: string,
+): Promise<ListEntry[]> {
+  const info = await fetchJson<FavInfoResponse>(
+    `${FAV_LIST_API}?media_id=${target.sid}&pn=1&ps=20`,
+    { Referer: referer },
+  );
   if (info?.code === -403) {
     throw new Error(t("privateFavlist"));
   }
@@ -144,13 +222,16 @@ async function collectFavlist(target, vars, referer) {
   }
   const name = coerceStr(info?.data?.info?.title);
 
-  const ids = await fetchJson(`${FAV_IDS_API}?media_id=${target.sid}`, { Referer: referer });
+  const ids = await fetchJson<FavIdsResponse>(`${FAV_IDS_API}?media_id=${target.sid}`, {
+    Referer: referer,
+  });
   if (ids?.code !== 0) {
     checkBilibiliRisk(ids?.code);
     throw new Error(t("favIdsFailed", { code: ids?.code, message: coerceStr(ids?.message) }));
   }
 
-  const all = Array.isArray(ids?.data) ? ids.data : [];
+  const idList = ids?.data;
+  const all: FavResource[] = Array.isArray(idList) ? idList : [];
   if (all.length === 0) {
     throw new Error(t("favEmpty", { name: name || target.sid }));
   }
@@ -159,7 +240,7 @@ async function collectFavlist(target, vars, referer) {
   const maxVideos = Math.max(1, Number(vars.max_videos ?? 5));
   const offset = (startPage - 1) * LIST_PAGE_SIZE;
 
-  const entries = [];
+  const entries: ListEntry[] = [];
   for (const item of all.slice(offset)) {
     if (entries.length >= maxVideos) break;
     // type 2 = 普通视频稿件；其它（音频、专栏等）本插件处理不了。
@@ -182,7 +263,10 @@ async function collectFavlist(target, vars, referer) {
 }
 
 /** 统一入口：按链接自动识别合集 / 系列 / 收藏夹，返回 [{ bvid, title }]。 */
-export async function collectListEntries(vars, intervalMs) {
+export async function collectListEntries(
+  vars: BilibiliVars,
+  intervalMs: number,
+): Promise<ListEntry[]> {
   const target = parseListUrl(vars.list_url);
   if (!target.kind) {
     throw new Error(t("listUrlUnrecognized"));

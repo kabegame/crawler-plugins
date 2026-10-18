@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 番剧 / 剧集（PGC）下载。对应 yt-dlp 的 BiliBiliBangumiIE / BiliBiliBangumiSeasonIE /
 // BiliBiliBangumiMediaIE（ignore/yt-dlp/yt_dlp/extractor/bilibili.py）。
 //
@@ -15,12 +14,132 @@ import {
 } from "./consts";
 import { t } from "./i18n";
 import { ingestDash } from "./ingest";
-import { checkBilibiliRisk, coerceStr, fetchJson } from "./util";
+import type {
+  BilibiliVars,
+  Dash,
+  DashStream,
+  FormatMetadata,
+  PlayDataWithFormats,
+  TaggedError,
+} from "./types";
+import { checkBilibiliRisk, coerceStr, errorMessage, fetchJson, hasNoRetry, hasSkipEpisode } from "./util";
 
 const { addProgress, warn } = Kabegame;
 
+/** 番剧 id 类型；"" 表示链接无法识别。 */
+type BangumiKind = "ep" | "ss" | "md" | "";
+
+type BangumiTarget = {
+  kind: BangumiKind;
+  id: string;
+};
+
+/** season 接口里的单集。 */
+type BiliEpisode = {
+  id?: number | null;
+  aid?: number | null;
+  bvid?: string | null;
+  cid?: number | string | null;
+  title?: string | null;
+  long_title?: string | null;
+  show_title?: string | null;
+  cover?: string | null;
+  share_url?: string | null;
+  pub_time?: number | null;
+  duration?: number | null;
+};
+
+type BiliSection = {
+  episodes?: BiliEpisode[] | null;
+};
+
+type SeasonSeries = {
+  series_id?: number | null;
+  series_title?: string | null;
+};
+
+/** season 接口 result（整季：正片 episodes + season 信息 + section 花絮）。 */
+type BiliSeason = {
+  season_id?: number | null;
+  title?: string | null;
+  season_title?: string | null;
+  series?: SeasonSeries | null;
+  episodes?: BiliEpisode[] | null;
+  section?: BiliSection[] | null;
+};
+
+type SeasonResponse = {
+  code?: number | null;
+  message?: string | null;
+  result?: BiliSeason | null;
+};
+
+type MediaResponse = {
+  code?: number | null;
+  message?: string | null;
+  result?: {
+    media?: {
+      season_id?: number | null;
+    } | null;
+  } | null;
+};
+
+type BangumiPlugin = {
+  name?: string | null;
+  config?: {
+    is_block?: boolean | null;
+  } | null;
+};
+
+type BangumiPlayCheck = {
+  play_detail?: string | null;
+};
+
+/** playurl 的 video_info：dash 流 + support_formats + 试看标志。 */
+type BangumiVideoInfo = PlayDataWithFormats & {
+  is_preview?: number | null;
+  dash?: Dash | null;
+};
+
+/**
+ * PGC playurl 的响应（含三种嵌套形态）。
+ * `raw` / `data` / `result` 都是同类信封，fetchEpisodePlayInfo 按 yt-dlp 的顺序归一。
+ */
+type BangumiPlayInfo = {
+  code?: number | null;
+  message?: string | null;
+  video_info?: BangumiVideoInfo | null;
+  plugins?: BangumiPlugin[] | null;
+  play_check?: BangumiPlayCheck | null;
+  play_video_type?: string | null;
+  raw?: BangumiPlayInfo | null;
+  data?: BangumiPlayInfo | null;
+  result?: BangumiPlayInfo | null;
+};
+
+/** metadata。aid / season_id / series_id 可能缺失，保持 undefined 而非补 null。 */
+type BangumiMetadata = {
+  schema: number;
+  source: string;
+  ep_id: number;
+  aid?: number | null;
+  bvid: string;
+  cid: string;
+  title: string;
+  episode: string;
+  episode_number: string;
+  season_id?: number | null;
+  season_title: string;
+  series_id?: number | null;
+  series_title: string;
+  pub_time: number;
+  duration: number;
+  cover: string;
+  format: FormatMetadata;
+};
+
 /** 从链接或编号解析 ep / ss / md。ep 优先：播放页链接同时含 ss 时以 ep 为准。 */
-export function parseBangumiId(raw) {
+export function parseBangumiId(raw: unknown): BangumiTarget {
   const work = coerceStr(raw).trim();
   const ep = work.match(/(?:^|\/)ep(\d+)/i)?.[1];
   if (ep) return { kind: "ep", id: ep };
@@ -32,8 +151,11 @@ export function parseBangumiId(raw) {
 }
 
 /** season 信息：ep_id / season_id 均可查，返回整季（正片 episodes + seasons + section）。 */
-async function fetchSeason(query, referer) {
-  const json = await fetchJson(`${BANGUMI_SEASON_API}?${query}`, { Referer: referer });
+async function fetchSeason(
+  query: string,
+  referer: string,
+): Promise<BiliSeason | null | undefined> {
+  const json = await fetchJson<SeasonResponse>(`${BANGUMI_SEASON_API}?${query}`, { Referer: referer });
   if (json?.code !== 0) {
     checkBilibiliRisk(json?.code);
     throw new Error(t("seasonFailed", { code: json?.code, message: coerceStr(json?.message) }));
@@ -42,8 +164,8 @@ async function fetchSeason(query, referer) {
 }
 
 /** md（剧集页）没有直接的剧集列表接口，先经 review/user 换出 season_id。 */
-async function mediaToSeasonId(mdId) {
-  const json = await fetchJson(
+async function mediaToSeasonId(mdId: string): Promise<string> {
+  const json = await fetchJson<MediaResponse>(
     `${BANGUMI_MEDIA_API}?media_id=${mdId}`,
     { Referer: `${WEB_BASE}/bangumi/media/md${mdId}` },
   );
@@ -60,12 +182,14 @@ async function mediaToSeasonId(mdId) {
  * PGC playurl。响应嵌套形态不止一种（yt-dlp 记录了三种：result.video_info /
  * raw.data.video_info / data.result.video_info），这里照它的顺序归一。
  */
-async function fetchEpisodePlayInfo(epId) {
-  const json = await fetchJson(
+async function fetchEpisodePlayInfo(
+  epId: string,
+): Promise<{ code: number | null | undefined; info: BangumiPlayInfo | null | undefined }> {
+  const json = await fetchJson<BangumiPlayInfo>(
     `${BANGUMI_PLAYURL_API}?fnval=${FNVAL_BANGUMI}&ep_id=${epId}`,
     { Referer: `${WEB_BASE}/bangumi/play/ep${epId}` },
   );
-  let info = json;
+  let info: BangumiPlayInfo | null | undefined = json;
   let code = info?.code;
   if (info?.raw) info = info.raw;
   if (info?.data) info = info.data;
@@ -75,14 +199,23 @@ async function fetchEpisodePlayInfo(epId) {
 }
 
 /** 集的展示名：优先接口给的 show_title（如「第1话 残酷」），缺了就自己拼。 */
-function episodeDisplayName(season, ep) {
+function episodeDisplayName(
+  season: BiliSeason | null | undefined,
+  ep: BiliEpisode | null | undefined,
+): string {
   const epLabel = coerceStr(ep?.show_title)
     || [coerceStr(ep?.title), coerceStr(ep?.long_title)].filter(Boolean).join(" ");
   const seasonTitle = coerceStr(season?.title);
   return epLabel && seasonTitle ? `${seasonTitle} ${epLabel}` : (epLabel || seasonTitle || `ep${ep?.id}`);
 }
 
-function buildEpisodeMetadata(season, ep, video, audio, qualityLabel) {
+function buildEpisodeMetadata(
+  season: BiliSeason | null | undefined,
+  ep: BiliEpisode | null | undefined,
+  video: DashStream,
+  audio: DashStream,
+  qualityLabel: string,
+): BangumiMetadata {
   return {
     schema: 1,
     source: "bilibili_bangumi",
@@ -113,18 +246,23 @@ function buildEpisodeMetadata(season, ep, video, audio, qualityLabel) {
 }
 
 /** 下载一集。会员专享/地区限制抛 noRetry 错误（前者带 skipEpisode 标记，整季模式计为跳过）。 */
-async function processEpisode(season, ep, vars, budget) {
+async function processEpisode(
+  season: BiliSeason | null | undefined,
+  ep: BiliEpisode | null | undefined,
+  vars: BilibiliVars,
+  budget: number,
+): Promise<void> {
   const epId = String(ep?.id ?? "");
   const displayName = episodeDisplayName(season, ep);
   const { code, info } = await fetchEpisodePlayInfo(epId);
-  const videoInfo = info?.video_info || {};
+  const videoInfo: BangumiVideoInfo = info?.video_info ?? {};
 
   // 门禁一：地区限制（yt-dlp：plugins 里出现 AreaLimitPanel 且 is_block）。
   const geoBlocked = (info?.plugins || []).some(
     (p) => p?.name === "AreaLimitPanel" && p?.config?.is_block,
   );
   if (geoBlocked) {
-    const error = new Error(t("geoBlocked", { name: displayName }));
+    const error: TaggedError = new Error(t("geoBlocked", { name: displayName }));
     error.noRetry = true;
     throw error;
   }
@@ -135,7 +273,7 @@ async function processEpisode(season, ep, vars, budget) {
     || info?.play_video_type === "preview"
     || Number(videoInfo?.is_preview ?? 0) === 1;
   if (code === -10403 || preview) {
-    const error = new Error(t("vipOnly", { name: displayName }));
+    const error: TaggedError = new Error(t("vipOnly", { name: displayName }));
     error.noRetry = true;
     error.skipEpisode = true;
     throw error;
@@ -163,16 +301,23 @@ async function processEpisode(season, ep, vars, budget) {
   });
 }
 
-async function processEpisodeWithRetry(season, ep, vars, budget, intervalMs, retries) {
+async function processEpisodeWithRetry(
+  season: BiliSeason | null | undefined,
+  ep: BiliEpisode | null | undefined,
+  vars: BilibiliVars,
+  budget: number,
+  intervalMs: number,
+  retries: number,
+): Promise<void> {
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
       await processEpisode(season, ep, vars, budget);
       return;
     } catch (error) {
-      if (attempt >= retries || error?.noRetry) throw error;
+      if (attempt >= retries || hasNoRetry(error)) throw error;
       warn(t("retryLater", {
         label: `ep${coerceStr(ep?.id)}`,
-        error: coerceStr(error?.message ?? error),
+        error: errorMessage(error),
         seconds: Math.round(intervalMs / 1000),
         attempt: attempt + 1,
         total: retries,
@@ -183,13 +328,17 @@ async function processEpisodeWithRetry(season, ep, vars, budget, intervalMs, ret
 }
 
 /** 番剧模式入口：ep 下载单集；ss / md 按正片列表批量（不含 PV / 花絮等 section）。 */
-export async function crawlBangumi(vars, intervalMs, retries) {
+export async function crawlBangumi(
+  vars: BilibiliVars,
+  intervalMs: number,
+  retries: number,
+): Promise<void> {
   const target = parseBangumiId(vars.bangumi_url);
   if (!target.kind) {
     throw new Error(t("bangumiUrlUnrecognized"));
   }
 
-  let seasonQuery;
+  let seasonQuery: string;
   if (target.kind === "md") {
     seasonQuery = `season_id=${await mediaToSeasonId(target.id)}`;
   } else if (target.kind === "ss") {
@@ -198,12 +347,12 @@ export async function crawlBangumi(vars, intervalMs, retries) {
     seasonQuery = `ep_id=${target.id}`;
   }
   const season = await fetchSeason(seasonQuery, `${WEB_BASE}/bangumi/play/${target.kind}${target.id}`);
-  const mainEpisodes = Array.isArray(season?.episodes) ? season.episodes : [];
+  const mainEpisodes: BiliEpisode[] = Array.isArray(season?.episodes) ? season.episodes : [];
 
   if (target.kind === "ep") {
     const epId = Number(target.id);
     // 正片里找不到就翻 section（声优节目、预告等花絮也有独立 ep 页）。
-    let ep = mainEpisodes.find((e) => Number(e?.id) === epId);
+    let ep: BiliEpisode | undefined = mainEpisodes.find((e) => Number(e?.id) === epId);
     if (!ep) {
       for (const section of season?.section || []) {
         ep = (section?.episodes || []).find((e) => Number(e?.id) === epId);
@@ -252,9 +401,9 @@ export async function crawlBangumi(vars, intervalMs, retries) {
     try {
       await processEpisodeWithRetry(season, ep, vars, budget, intervalMs, retries);
     } catch (error) {
-      if (error?.skipEpisode) skipped += 1;
+      if (hasSkipEpisode(error)) skipped += 1;
       else failed += 1;
-      warn(t("epError", { ep: coerceStr(ep?.id), error: coerceStr(error?.message ?? error) }));
+      warn(t("epError", { ep: coerceStr(ep?.id), error: errorMessage(error) }));
       addProgress(budget);
     }
   }

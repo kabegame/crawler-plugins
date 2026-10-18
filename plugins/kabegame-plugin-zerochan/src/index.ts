@@ -1,4 +1,3 @@
-// @ts-nocheck
 // zerochan.net V8 crawler：站点是纯 SSR，列表/详情全在首屏 HTML 里，
 // 所以整条链路是 fetch + DOMParser，不需要 WebView。
 import { resolveUrl as resolveSdkUrl, sleep } from "@kabegame/plugin-sdk";
@@ -25,53 +24,165 @@ const REQUEST_HEADERS = {
 // 发 xbotcheck，然后 onload 里 reload。这里手工走同一套。
 const BOT_CHECK_RE = /\/?totally-innocent-logo-image\.svg\?[A-Za-z0-9_-]+/;
 
-/** 任务内的 cookie jar，写回任务默认 Cookie 头后 fetch/downloadImage 都会带上 */
-const cookieJar = new Map();
+// @kabegame/types 的 fetch 声明只收录插件常用的最小集合，V8 宿主（deno 兼容层）实际还提供
+// Headers.getSetCookie() 与 Body.bytes()。在 fetch 边界补一次收窄，运行时行为不变。
+type HeadersWithSetCookie = Headers & { getSetCookie(): string[] };
+type ResponseWithBytes = Response & { bytes(): Promise<Uint8Array> };
 
-function coerceStr(value) {
+/** 任务内的 cookie jar，写回任务默认 Cookie 头后 fetch/downloadImage 都会带上 */
+const cookieJar = new Map<string, string>();
+
+// ---- 站点数据结构 ----
+// 详情页 metadata 最终要赋给 KabegameJsonValue，所以统一用 type（interface 没有隐式索引签名）。
+type ZerochanTag = {
+  tag: string;
+  label: string;
+  type: string;
+  icon: string;
+  url: string;
+  by: string;
+  fav: boolean;
+  primary: boolean;
+};
+
+type ZerochanBreadcrumb = {
+  tag: string;
+  label: string;
+  type: string;
+  url: string;
+};
+
+type ZerochanSource = {
+  url: string;
+  icon: string;
+};
+
+type ZerochanShare = {
+  permalink: string;
+  bbcode: string;
+  html: string;
+};
+
+type ZerochanStats = {
+  width: number;
+  height: number;
+  megapixels: string;
+  favorites: number;
+  tag_count: number;
+};
+
+type ZerochanImageInfo = {
+  file_size: string;
+  file_ext: string;
+};
+
+type ZerochanUploader = {
+  name: string;
+  url: string;
+  avatar: string;
+};
+
+type ZerochanMangaka = {
+  name: string;
+  url: string;
+};
+
+type ZerochanMetadata = {
+  schema: number;
+  post_id: string;
+  title: string;
+  permalink: string;
+  breadcrumbs: ZerochanBreadcrumb[];
+  mangaka: ZerochanMangaka | null;
+  uploader: ZerochanUploader | null;
+  uploaded_at: string;
+  width: number;
+  height: number;
+  file_size: string;
+  file_ext: string;
+  tags_string: string;
+  tags: ZerochanTag[];
+  source: ZerochanSource | null;
+  share: ZerochanShare | null;
+  stats: ZerochanStats;
+  full_url: string;
+  sample_url: string;
+};
+
+type FetchedDocument = {
+  finalUrl: string;
+  document: Document;
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type ZerochanVars = {
+  crawl_mode?: unknown;
+  tag?: unknown;
+  search_query?: unknown;
+  sort_order?: unknown;
+  popular_range?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+  quality?: unknown;
+};
+
+// downloadImage 的下载 Cookie 来自 setHeader / requireCookie，不需要额外选项。
+type ZerochanDownloadOptions = KabegameDownloadImageOptions;
+
+function coerceStr(value: unknown): string {
   return value == null ? "" : String(value);
 }
 
-function trimText(value) {
+function trimText(value: unknown): string {
   return coerceStr(value).replace(/\s+/g, " ").trim();
 }
 
-function textOf(el) {
+// catch 变量的 message 回退：保持原 `error?.message || error` 的字符串语义
+function errorMessage(error: unknown): string {
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (message) return String(message);
+  }
+  return String(error);
+}
+
+function textOf(el: Element | null | undefined): string {
   return trimText(el?.textContent || "");
 }
 
-function attrOf(el, name) {
+function attrOf(el: Element | null | undefined, name: string): string {
   return trimText(el?.getAttribute(name) || "");
 }
 
-function resolveUrl(url, base) {
+function resolveUrl(url: unknown, base: string): string {
   const raw = coerceStr(url).trim();
   return raw ? resolveSdkUrl(raw, base) : "";
 }
 
-function parseHtml(html) {
+function parseHtml(html: unknown): Document {
   return new DOMParser().parseFromString(coerceStr(html), "text/html");
 }
 
-function parseIntOrZero(text) {
+function parseIntOrZero(text: unknown): number {
   const token = trimText(text).replace(/[,\s]/g, "");
   return /^\d+$/.test(token) ? Number(token) : 0;
 }
 
-function applyRequestHeaders() {
+function applyRequestHeaders(): void {
   for (const [key, value] of Object.entries(REQUEST_HEADERS)) setHeader(key, value);
 }
 
-function writeCookieHeader() {
+function writeCookieHeader(): void {
   if (cookieJar.size === 0) return;
-  const pairs = [];
+  const pairs: string[] = [];
   for (const [name, value] of cookieJar) pairs.push(`${name}=${value}`);
   setHeader("Cookie", pairs.join("; "));
 }
 
-function absorbSetCookie(response) {
-  const cookies = typeof response.headers?.getSetCookie === "function"
-    ? response.headers.getSetCookie()
+function absorbSetCookie(response: Response): boolean {
+  const headers = response.headers as HeadersWithSetCookie;
+  const cookies = typeof headers?.getSetCookie === "function"
+    ? headers.getSetCookie()
     : [];
   let changed = false;
   for (const line of cookies) {
@@ -92,17 +203,17 @@ function absorbSetCookie(response) {
  * 走一次 xbotcheck：拉挑战页里的 svg，把 Set-Cookie 收进 jar。
  * 自己不抛错——取 cookie 这一步也可能超时，失败就交回调用方按普通网络失败重试。
  */
-async function solveBotCheck(challengeHtml, pageUrl) {
+async function solveBotCheck(challengeHtml: unknown, pageUrl: string): Promise<boolean> {
   const matched = BOT_CHECK_RE.exec(coerceStr(challengeHtml));
   if (!matched) return false;
   const probeUrl = resolveUrl(matched[0], pageUrl);
   console.log(t("botCheckTriggered", { url: probeUrl }));
-  let response;
+  let response: Response;
   try {
     response = await fetch(probeUrl, { headers: { Accept: "image/svg+xml,image/*,*/*;q=0.8" } });
-    await response.bytes();
+    await (response as ResponseWithBytes).bytes();
   } catch (error) {
-    warn(t("botCheckFailed", { error: String(error?.message || error) }));
+    warn(t("botCheckFailed", { error: errorMessage(error) }));
     return false;
   }
   const ok = absorbSetCookie(response);
@@ -116,17 +227,17 @@ const MAX_NETWORK_RETRIES = 5;
 const MAX_BOT_CHECKS = 2;
 
 /** 取一个页面的 HTML；遇 503 挑战页自动过闸后重试，连接层失败退避重试 */
-async function fetchDocument(url) {
+async function fetchDocument(url: string): Promise<FetchedDocument> {
   let networkRetries = 0;
   let botChecks = 0;
   let lastError = "";
 
   while (true) {
-    let response;
+    let response: Response;
     try {
       response = await fetch(url, { headers: { Accept: REQUEST_HEADERS.Accept } });
     } catch (error) {
-      lastError = String(error?.message || error);
+      lastError = errorMessage(error);
       if (networkRetries >= MAX_NETWORK_RETRIES) break;
       networkRetries += 1;
       warn(t("requestRetry", { error: lastError, delay: networkRetries * 3, url }));
@@ -171,7 +282,7 @@ const THUMB_LINK_SELECTOR = THUMB_CONTAINERS
   .map((id) => `${id} > li[data-id] a.thumb[href]`)
   .join(", ");
 
-function collectPostHrefs(document, pageUrl) {
+function collectPostHrefs(document: Document, pageUrl: string): string[] {
   const hrefs = Array.from(document.querySelectorAll(THUMB_LINK_SELECTOR))
     .map((a) => resolveUrl(a.getAttribute("href"), pageUrl))
     .filter(Boolean);
@@ -184,7 +295,7 @@ function collectPostHrefs(document, pageUrl) {
 }
 
 /** 站内标签路径段：空格转 +，其余按 URL 编码（站点自己就是这么拼的） */
-function encodeTagPath(tag) {
+function encodeTagPath(tag: unknown): string {
   return encodeURIComponent(trimText(tag)).replace(/%20/g, "+");
 }
 
@@ -194,7 +305,7 @@ function encodeTagPath(tag) {
  * search 模式必须先真跑一次 /search：站点会 302 到最匹配的标签页并**只保留 q=**，
  * 把 s= 和 p= 都丢掉。所以不能直接给 /search 拼分页参数，否则排序失效、永远停在第 1 页。
  */
-async function resolveListBase(baseUrl, mode, keyword) {
+async function resolveListBase(baseUrl: string, mode: string, keyword: string): Promise<string> {
   if (mode === "tag") return `${baseUrl}/${encodeTagPath(keyword)}`;
   if (mode !== "search") return `${baseUrl}/`;
 
@@ -208,12 +319,19 @@ async function resolveListBase(baseUrl, mode, keyword) {
   return finalUrl;
 }
 
-// 排序键 → i18n 展示文案；键本身也用来校验配置值
+// 排序键 → i18n 展示文案；键本身也用来校验配置值。
+// 保留字面量键（t() 的 key 是 i18n 表的字面量联合类型），用类型守卫收窄配置值。
 const SORT_LABELS = {
   id: "sortNewest",
   fav: "sortPopular",
   random: "sortRandom",
 } as const;
+
+type SortOrder = keyof typeof SORT_LABELS;
+
+function isSortOrder(value: string): value is SortOrder {
+  return Object.prototype.hasOwnProperty.call(SORT_LABELS, value);
+}
 
 // 首页人气榜的时间范围 t：1 = 近一周，2 = 近三个月。
 // 站点的「全部时间」（t=0，也是不带 t 时的默认）在首页上返回 500（2026-10 实测，
@@ -221,13 +339,13 @@ const SORT_LABELS = {
 const POPULAR_RANGES = new Set(["1", "2"]);
 const DEFAULT_POPULAR_RANGE = "2";
 
-function popularRangeOf(mode, sortOrder, vars) {
+function popularRangeOf(mode: string, sortOrder: string, vars: ZerochanVars): string {
   if (mode !== "all" || sortOrder !== "fav") return "";
   const range = trimText(vars.popular_range);
   return POPULAR_RANGES.has(range) ? range : DEFAULT_POPULAR_RANGE;
 }
 
-function buildListUrl(listBase, sortOrder, page, timeRange) {
+function buildListUrl(listBase: string, sortOrder: string, page: number, timeRange: string): string {
   const url = new URL(listBase);
   url.searchParams.set("s", sortOrder);
   if (timeRange) url.searchParams.set("t", timeRange);
@@ -250,7 +368,7 @@ const TAG_STATE_CLASSES = new Set([
   "highlight",
 ]);
 
-function tagTypeOf(li) {
+function tagTypeOf(li: Element): string {
   const classes = coerceStr(li.getAttribute("class")).split(/\s+/).filter(Boolean);
   for (const name of classes) {
     if (!TAG_STATE_CLASSES.has(name)) return name;
@@ -259,7 +377,7 @@ function tagTypeOf(li) {
 }
 
 // 侧栏 <s class="medium X"> 是 sprite 图标名，模板按同一套名字还原图标
-function tagIconOf(li) {
+function tagIconOf(li: Element): string {
   const icon = li.querySelector("s");
   if (!icon) return "";
   return coerceStr(icon.getAttribute("class"))
@@ -269,13 +387,13 @@ function tagIconOf(li) {
 }
 
 // title 形如 "Added by eric_fe" 或 "(Salmonbb Poni) Added by eric_fe"
-function tagAddedBy(li) {
+function tagAddedBy(li: Element): string {
   const title = attrOf(li, "title");
   const matched = /Added by\s+(.+)$/i.exec(title);
   return matched ? trimText(matched[1]) : "";
 }
 
-function parseSidebarTags(document, pageUrl) {
+function parseSidebarTags(document: Document, pageUrl: string): ZerochanTag[] {
   return Array.from(document.querySelectorAll("#tags > li[data-tag]"))
     .map((li) => {
       const anchor = li.querySelector("a[href]");
@@ -295,7 +413,7 @@ function parseSidebarTags(document, pageUrl) {
     .filter((tag) => tag.tag);
 }
 
-function parseBreadcrumbs(document, pageUrl) {
+function parseBreadcrumbs(document: Document, pageUrl: string): ZerochanBreadcrumb[] {
   return Array.from(document.querySelectorAll(".breadcrumbs > span[data-tag]"))
     .map((span) => {
       const anchor = span.querySelector("a[href]");
@@ -310,7 +428,7 @@ function parseBreadcrumbs(document, pageUrl) {
 }
 
 // 来源块：<p id="source-url"><s class="medium pixiv source-icon"></s>https://…</p>
-function parseSource(document) {
+function parseSource(document: Document): ZerochanSource | null {
   const el = document.querySelector("#source-url");
   if (!el) return null;
   const iconEl = el.querySelector("s");
@@ -324,11 +442,11 @@ function parseSource(document) {
   return { url: text, icon };
 }
 
-function parseShare(document) {
+function parseShare(document: Document): ZerochanShare | null {
   const form = document.querySelector("#share-form");
   if (!form) return null;
-  const valueOf = (name) => attrOf(form.querySelector(`input[name='${name}']`), "value");
-  const share = {
+  const valueOf = (name: string) => attrOf(form.querySelector(`input[name='${name}']`), "value");
+  const share: ZerochanShare = {
     permalink: valueOf("permalink"),
     bbcode: valueOf("bbthumb"),
     html: valueOf("htmlthumb"),
@@ -338,9 +456,9 @@ function parseShare(document) {
 
 // Stats 三行是本地化文案（"29 favorites" / "29 收藏"），只取数字，
 // 文案交给 description.ejs 按应用 locale 重新渲染。
-function parseStats(document) {
+function parseStats(document: Document): ZerochanStats {
   const items = Array.from(document.querySelectorAll("#image-stats > li")).map(textOf);
-  const stats = { width: 0, height: 0, megapixels: "", favorites: 0, tag_count: 0 };
+  const stats: ZerochanStats = { width: 0, height: 0, megapixels: "", favorites: 0, tag_count: 0 };
   for (const line of items) {
     const size = /(\d+)\s*[×x✕]\s*(\d+)/i.exec(line);
     if (size) {
@@ -360,9 +478,9 @@ function parseStats(document) {
 }
 
 // #image-info 两行："2399×4096" / "6,749kB jpg"
-function parseImageInfo(document) {
+function parseImageInfo(document: Document): ZerochanImageInfo {
   const items = Array.from(document.querySelectorAll("#image-info > li")).map(textOf);
-  const info = { file_size: "", file_ext: "" };
+  const info: ZerochanImageInfo = { file_size: "", file_ext: "" };
   for (const line of items) {
     const matched = /^([\d,]+\s*[kKmMgG]?[bB])\s+([a-z0-9]+)$/.exec(line);
     if (matched) {
@@ -373,7 +491,7 @@ function parseImageInfo(document) {
   return info;
 }
 
-function parseUploader(document, pageUrl) {
+function parseUploader(document: Document, pageUrl: string): ZerochanUploader | null {
   const anchor = document.querySelector("#content a.user[href]");
   if (!anchor) return null;
   const avatar = anchor.querySelector("img");
@@ -385,7 +503,7 @@ function parseUploader(document, pageUrl) {
 }
 
 // 首段形如 "Mangaka: <a>Poni Arknights</a>, Uploaded by <a>eric_fe</a> on Apr 29, 2023,"
-function parseMangaka(document, pageUrl) {
+function parseMangaka(document: Document, pageUrl: string): ZerochanMangaka | null {
   const anchor = document.querySelector("#content > p > a[href^='/']:not(.user)");
   if (!anchor) return null;
   const name = textOf(anchor);
@@ -393,12 +511,12 @@ function parseMangaka(document, pageUrl) {
   return { name, url: resolveUrl(anchor.getAttribute("href"), pageUrl) };
 }
 
-function parseUploadedAt(document) {
+function parseUploadedAt(document: Document): string {
   const span = document.querySelector("#content a.user + span, #content a.user ~ span");
   return textOf(span).replace(/^on\s+/i, "");
 }
 
-function buildMetadata(document, pageUrl) {
+function buildMetadata(document: Document, pageUrl: string): ZerochanMetadata {
   const tags = parseSidebarTags(document, pageUrl);
   const stats = parseStats(document);
   const info = parseImageInfo(document);
@@ -442,12 +560,12 @@ const LABEL_TYPES = new Set([
   "outfit", "theme", "ecchi", "meta", "media", "source-copyright", "source", "artbook",
 ]);
 
-function tagLabelType(type) {
+function tagLabelType(type: unknown): string {
   const value = String(type || "").trim().toLowerCase();
   return LABEL_TYPES.has(value) ? value : "theme";
 }
 
-function tagLabelKey(name) {
+function tagLabelKey(name: unknown): string {
   const key = String(name || "")
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
@@ -459,9 +577,9 @@ function tagLabelKey(name) {
   return key && key.length <= 64 ? key : "";
 }
 
-function labelsFromTags(tags) {
-  const labels = [];
-  const seen = new Set();
+function labelsFromTags(tags: ZerochanTag[] | null | undefined): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
+  const seen = new Set<string>();
   for (const tag of tags || []) {
     const key = tagLabelKey(tag && tag.tag);
     if (!key) continue;
@@ -476,24 +594,24 @@ function labelsFromTags(tags) {
 }
 
 /** 展示名：主标签（角色/作品）+ 画师，跟站点 h1 的构成一致 */
-function pickDisplayName(metadata) {
+function pickDisplayName(metadata: ZerochanMetadata): string {
   const primary = metadata.tags.find((tag) => tag.primary);
   const character = metadata.breadcrumbs.find((item) => item.type === "character");
   const work = metadata.breadcrumbs.find((item) => item.type !== "character");
   const subject = primary?.tag || character?.tag || work?.tag || "";
-  const parts = [];
+  const parts: string[] = [];
   if (work && work.tag !== subject) parts.push(`${subject} (${work.tag})`);
   else if (subject) parts.push(subject);
   if (metadata.mangaka?.name) parts.push(metadata.mangaka.name);
   return parts.join(" / ");
 }
 
-function pickImageUrl(metadata, quality) {
+function pickImageUrl(metadata: ZerochanMetadata, quality: string): string {
   if (quality === "medium") return metadata.sample_url || metadata.full_url;
   return metadata.full_url || metadata.sample_url;
 }
 
-async function processDetailPage(url, quality) {
+async function processDetailPage(url: string, quality: string): Promise<void> {
   const { finalUrl, document } = await fetchDocument(url);
   const metadata = buildMetadata(document, finalUrl);
   const imageUrl = pickImageUrl(metadata, quality);
@@ -501,7 +619,7 @@ async function processDetailPage(url, quality) {
     warn(t("imageMissing", { url: finalUrl }));
     return;
   }
-  const opts = { cookie: true, url: finalUrl, metadata };
+  const opts: ZerochanDownloadOptions = { url: finalUrl, metadata };
   const name = pickDisplayName(metadata);
   if (name) opts.name = name;
   const labels = labelsFromTags(metadata.tags);
@@ -511,14 +629,14 @@ async function processDetailPage(url, quality) {
 
 // ---------------------------------------------------------------- 入口
 
-function validatePageRange(startPage, endPage) {
+function validatePageRange(startPage: number, endPage: number): void {
   if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
   if (endPage >= startPage + 100) {
     throw new Error(t("pageRangeTooLarge"));
   }
 }
 
-function resolveKeyword(mode, vars) {
+function resolveKeyword(mode: string, vars: ZerochanVars): string {
   if (mode === "tag") {
     const tag = trimText(vars.tag);
     if (!tag) throw new Error(t("tagRequired"));
@@ -532,9 +650,13 @@ function resolveKeyword(mode, vars) {
   return "";
 }
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const baseUrl = (coerceStr(common?.base_url || common?.baseUrl) || DEFAULT_BASE_URL).replace(/\/+$/, "");
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars = (custom || {}) as ZerochanVars;
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const baseUrl = (coerceStr(cfg.baseUrl) || DEFAULT_BASE_URL).replace(/\/+$/, "");
   const mode = coerceStr(vars.crawl_mode || "all");
   const sortOrder = coerceStr(vars.sort_order || "id");
   const quality = coerceStr(vars.quality || "high");
@@ -544,7 +666,7 @@ export async function crawl(common, custom) {
   if (mode !== "all" && mode !== "tag" && mode !== "search") {
     throw new Error(t("unknownMode", { mode }));
   }
-  if (!SORT_LABELS[sortOrder]) throw new Error(t("unknownSort", { sort: sortOrder }));
+  if (!isSortOrder(sortOrder)) throw new Error(t("unknownSort", { sort: sortOrder }));
   const timeRange = popularRangeOf(mode, sortOrder, vars);
   validatePageRange(startPage, endPage);
   const keyword = resolveKeyword(mode, vars);
@@ -582,7 +704,7 @@ export async function crawl(common, custom) {
       } catch (error) {
         // 单张图打不开（走代理连该站超时并不罕见）不该把整个任务带走：
         // 列表页失败才是致命的，详情页记一条 WARN 跳过就行。
-        warn(t("skipPost", { error: String(error?.message || error) }));
+        warn(t("skipPost", { error: errorMessage(error) }));
       }
       addProgress(itemProgress);
     }

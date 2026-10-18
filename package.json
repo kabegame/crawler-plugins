@@ -11,6 +11,7 @@
     "package": "deno run -A package-plugin.ts",
     "package:single": "deno run -A package-plugin.ts",
     "generate-index": "deno run -A generate-index.ts",
+    "check": "node ./node_modules/typescript/bin/tsc -p tsconfig.check.json",
     "release": "deno task package && deno task generate-index",
     "prepare": "husky"
   },

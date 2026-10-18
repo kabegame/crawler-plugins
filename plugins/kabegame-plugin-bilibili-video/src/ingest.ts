@@ -1,13 +1,25 @@
-// @ts-nocheck
 // DASH 流的共享入库链路：挑流 → 分块下载 → 合流 → 入库。
 // UGC（video.ts）与番剧 PGC（bangumi.ts）的 playurl 接口不同，但拿到 dash 之后
 // 的处理完全同构，所以从 processPart 抽出来共用。
 import { qualityLabels, pickAudio, pickVideo, streamUrls } from "./formats";
 import { t } from "./i18n";
+import type { BilibiliVars, Dash, DashStream, PlayDataWithFormats } from "./types";
 import { coerceStr } from "./util";
 import { downloadStreamToVfs, removeQuietly } from "./vfs";
 
 const { addProgress, downloadImage, ffmpeg, fs, warn } = Kabegame;
+
+/** ingestDash 的入参。buildMeta 返回的 metadata 必须可 JSON 序列化。 */
+export type IngestDashInput = {
+  dash: Dash;
+  formatSource: PlayDataWithFormats | null | undefined;
+  displayName: string;
+  stem: string;
+  pageUrl: string;
+  buildMeta: (video: DashStream, audio: DashStream, qualityLabel: string) => KabegameJsonValue;
+  vars: BilibiliVars;
+  budget: number;
+};
 
 /**
  * 把一组 DASH 流下载合流并提交入库。
@@ -17,7 +29,16 @@ const { addProgress, downloadImage, ffmpeg, fs, warn } = Kabegame;
  *   buildMeta    (video, audio, qualityLabel) => metadata 对象
  *   budget       本条目可用的进度额度
  */
-export async function ingestDash({ dash, formatSource, displayName, stem, pageUrl, buildMeta, vars, budget }) {
+export async function ingestDash({
+  dash,
+  formatSource,
+  displayName,
+  stem,
+  pageUrl,
+  buildMeta,
+  vars,
+  budget,
+}: IngestDashInput): Promise<void> {
   const video = pickVideo(dash, Number(vars.max_quality ?? 0), vars.prefer_avc !== false);
   const audio = pickAudio(dash);
   if (!video) throw new Error(t("noVideoStream"));
@@ -41,7 +62,7 @@ export async function ingestDash({ dash, formatSource, displayName, stem, pageUr
   try {
     // 进度切分：视频 60% / 音频 20% / 合流 10% / 入库 10%。
     let reported = 0;
-    const reportChunk = (share) => (received, total) => {
+    const reportChunk = (share: number) => (received: number, total: number): void => {
       const step = (received / total) * budget * share;
       reported += step;
       addProgress(step);
@@ -63,11 +84,12 @@ export async function ingestDash({ dash, formatSource, displayName, stem, pageUr
       warn(t("muxNotBrowserSafe", { name: displayName, mime: coerceStr(probe.mimeType) }));
     }
 
-    await downloadImage(outputPath, {
+    const opts: KabegameDownloadImageOptions = {
       name: displayName,
       metadata: buildMeta(video, audio, qualityLabel),
       url: pageUrl,
-    });
+    };
+    await downloadImage(outputPath, opts);
 
     // 补齐本条目剩余额度（分块进度是估算，未必刚好加满）。
     addProgress(Math.max(0, budget - reported));

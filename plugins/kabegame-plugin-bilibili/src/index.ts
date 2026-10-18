@@ -1,4 +1,3 @@
-// @ts-nocheck
 // bilibili 专栏 / 图文插件入口。
 //
 // 模块分工：
@@ -13,16 +12,30 @@ import { UA } from "./consts";
 import { collectFavOpusIds, collectSpaceOpusIds } from "./feed";
 import { t } from "./i18n";
 import { processOneOpus } from "./opus";
-import { collectArticleIds, signSearchUrl } from "./search";
 import {
-  coerceStr, checkBilibiliRisk, fetchWith509Retry, parseCvIdFromInput, parseMidFromInput, parseOpusIdFromInput,
+  collectArticleIds, signSearchUrl, type ArticleIdRow, type SearchResponse, type SearchVars,
+} from "./search";
+import {
+  coerceStr, checkBilibiliRisk, errorMessage, fetchWith509Retry, isRecord, parseCvIdFromInput,
+  parseMidFromInput, parseOpusIdFromInput,
 } from "./util";
-import { getWbiKeys } from "./wbi";
+import { getWbiKeys, type WbiKeys } from "./wbi";
 
 const { addProgress, requireCookie, setHeader, warn } = Kabegame;
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+/** 插件配置：GUI 字段可能有类型，CLI --var 一定是字符串，统一按 unknown 收窄。 */
+type BilibiliVars = SearchVars & {
+  mode?: unknown;
+  live_photo?: unknown;
+  cv_id_or_url?: unknown;
+  max_articles?: unknown;
+  mid?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+export async function crawl(_common: unknown, custom: unknown): Promise<void> {
+  const vars: BilibiliVars = isRecord(custom) ? custom : {};
   setHeader("User-Agent", UA);
   setHeader("Referer", "https://www.bilibili.com/");
   setHeader("Origin", "https://www.bilibili.com");
@@ -38,7 +51,7 @@ export async function crawl(_common, custom) {
   if (vars.mode === "single") {
     const opusId = parseOpusIdFromInput(vars.cv_id_or_url);
     if (opusId) {
-      let keys = { img: "", sub: "" };
+      let keys: WbiKeys = { img: "", sub: "" };
       try {
         keys = await getWbiKeys();
       } catch {
@@ -52,14 +65,14 @@ export async function crawl(_common, custom) {
 
   if (vars.mode === "space" || vars.mode === "favlist") {
     // WBI 只服务于 opus 关联 cv 的元数据与评论，拿不到也不阻断批量取图。
-    let keys = { img: "", sub: "" };
+    let keys: WbiKeys = { img: "", sub: "" };
     try {
       keys = await getWbiKeys();
     } catch {
       // 同上。
     }
     const maxArticles = Math.max(1, Number(vars.max_articles ?? 20));
-    let opusIds;
+    let opusIds: string[];
     if (vars.mode === "space") {
       const mid = parseMidFromInput(vars.mid);
       if (!mid) throw new Error(t("midRequired"));
@@ -79,7 +92,7 @@ export async function crawl(_common, custom) {
         await processOneOpus(opusIds[index], perOpus, keys.img, keys.sub, livePhoto);
       } catch (error) {
         failed += 1;
-        warn(t("opusDownloadFailed", { opusId: opusIds[index], reason: coerceStr(error?.message ?? error) }));
+        warn(t("opusDownloadFailed", { opusId: opusIds[index], reason: errorMessage(error) }));
         addProgress(perOpus);
       }
     }
@@ -90,7 +103,7 @@ export async function crawl(_common, custom) {
   }
 
   const keys = await getWbiKeys();
-  const allIds = [];
+  const allIds: ArticleIdRow[] = [];
   if (vars.mode === "single") {
     const cvId = parseCvIdFromInput(vars.cv_id_or_url);
     if (!cvId) throw new Error(t("singleInputRequired"));
@@ -100,7 +113,7 @@ export async function crawl(_common, custom) {
     const endPage = Number(vars.end_page ?? startPage);
     if (endPage < startPage) throw new Error(t("endPageBeforeStart"));
     for (let page = startPage; page <= endPage; page += 1) {
-      const search = await fetchWith509Retry(
+      const search = await fetchWith509Retry<SearchResponse>(
         () => signSearchUrl(vars, page, keys.img, keys.sub),
         t("searchApiLabel"),
       );

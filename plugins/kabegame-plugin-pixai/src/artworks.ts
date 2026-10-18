@@ -1,4 +1,3 @@
-// @ts-nocheck
 // 作品分页遍历。全站 / 标签 / 模型 / 作者四种流的翻页逻辑完全一致，
 // 只有 GraphQL 变量和日志措辞不同，所以统一收在 crawlArtworkPages 里。
 //
@@ -7,11 +6,20 @@
 import { ARTWORKS_QUERY, OPERATION_ARTWORKS } from "./consts";
 import { fetchGraphql } from "./api";
 import { processArtworksEdgesForDownload } from "./download";
+import type {
+  ListArtworksResponse,
+  PixaiArtworkEdge,
+  PixaiArtworkQueryKey,
+  PixaiArtworkVariables,
+} from "./types";
 import { arrayValue, coerceStr, log } from "./util";
 import { t } from "./i18n";
 
 /** 把排序选项翻成 listArtworks 的 feed / orderBy / first / last。 */
-export function applyArtworkSortVariables(variables, artworkSort) {
+export function applyArtworkSortVariables(
+  variables: PixaiArtworkVariables,
+  artworkSort: string,
+): void {
   switch (artworkSort) {
     case "trending":
       Object.assign(variables, { first: 24, feed: "trending1" });
@@ -40,6 +48,18 @@ export function applyArtworkSortVariables(variables, artworkSort) {
   }
 }
 
+type CrawlArtworkPagesParams = {
+  baseVariables: PixaiArtworkVariables;
+  label: string;
+  downloadLabel: string;
+  scopeDesc: string;
+  contextId: string;
+  maxPages: number;
+  perItemProgress: number;
+  artworkSort: string;
+  skipPages: number;
+};
+
 /**
  * 遍历一条作品流并下载。
  *
@@ -56,7 +76,7 @@ async function crawlArtworkPages({
   perItemProgress,
   artworkSort,
   skipPages,
-}) {
+}: CrawlArtworkPagesParams): Promise<number> {
   let cursor = "";
   let artworkPage = 0;
   let downloaded = 0;
@@ -80,18 +100,18 @@ async function crawlArtworkPages({
       }));
     }
 
-    const variables = { ...baseVariables };
+    const variables: PixaiArtworkVariables = { ...baseVariables };
     applyArtworkSortVariables(variables, artworkSort);
     if (cursor) variables[useBeforePagination ? "before" : "after"] = cursor;
 
-    const res = await fetchGraphql(OPERATION_ARTWORKS, variables, ARTWORKS_QUERY);
+    const res = await fetchGraphql<ListArtworksResponse>(OPERATION_ARTWORKS, variables, ARTWORKS_QUERY);
     const artworks = res?.data?.artworks;
     if (!artworks) {
       log(t("artworksMissing", { label, scope: scopeDesc }));
       break;
     }
 
-    const edges = arrayValue(artworks.edges);
+    const edges = arrayValue<PixaiArtworkEdge>(artworks.edges);
     if (edges.length === 0) {
       log(artworkPage === 0
         ? t("noArtworkData", { label, scope: scopeDesc })
@@ -138,16 +158,23 @@ async function crawlArtworkPages({
  * 全站 / 标签 / 模型流：queryKey 为空即全站，否则是 tackId / loraId 之一。
  */
 export async function processArtworks(
-  queryKey,
-  id,
-  label,
-  maxPages,
-  perItemProgress,
-  artworkSort,
-  skipPages,
-) {
-  const baseVariables = { isSafeSearch: true };
-  if (queryKey && id) baseVariables[queryKey] = id;
+  queryKey: PixaiArtworkQueryKey | "",
+  id: string,
+  label: string,
+  maxPages: number,
+  perItemProgress: number,
+  artworkSort: string,
+  skipPages: number,
+): Promise<number> {
+  const baseVariables: PixaiArtworkVariables = { isSafeSearch: true };
+  // 显式映射而不是 `baseVariables[queryKey]`：动态键会把索引签名的口子重新打开
+  if (queryKey && id) {
+    if (queryKey === "tackId") {
+      baseVariables.tackId = id;
+    } else {
+      baseVariables.loraId = id;
+    }
+  }
   return crawlArtworkPages({
     baseVariables,
     label,
@@ -166,14 +193,14 @@ export async function processArtworks(
  * 这里不带 isSafeSearch —— 作者页本来就是定向抓取，交给站点默认口径。
  */
 export async function processAuthorArtworks(
-  authorId,
-  types,
-  artworkTypeLabel,
-  maxPages,
-  perItemProgress,
-  artworkSort,
-  skipPages,
-) {
+  authorId: string,
+  types: string[],
+  artworkTypeLabel: string,
+  maxPages: number,
+  perItemProgress: number,
+  artworkSort: string,
+  skipPages: number,
+): Promise<number> {
   return crawlArtworkPages({
     baseVariables: { authorId, types },
     label: t("labelAuthorFlow"),

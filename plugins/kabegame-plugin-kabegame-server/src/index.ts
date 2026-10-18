@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Kabegame 服务器 V8 爬虫：经另一个 Kabegame 的 Web 服务（Web 版 / 桌面端 Web 服务器）的
 // JSON-RPC `POST /rpc` 复制图片。两种模式都是「一条 images:// 路径 + 分页尾」：
 //   - 全站：`gallery/[hide/]sort/<by-id | by-time/<倒序> | random-<种子>>`，种子每次运行生成；
@@ -27,17 +26,102 @@ const LABEL_PAGE_SIZE = 1000;
 const RPC_CONCURRENCY = 8;
 const METADATA_SCHEMA = 1;
 
+// ---- 类型 ----
+// 服务器 JSON-RPC 返回的图片行：字段都可能缺失，只在真正依赖处收窄。
+// 输出侧（plugin_data / metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface。
+type ServerImage = {
+  id?: number | string | null;
+  local_path?: string | null;
+  url?: string | null;
+  display_name?: string | null;
+  post_url?: string | null;
+  plugin_id?: string | null;
+  plugin_version?: number | string | null;
+  surf_record_id?: number | string | null;
+  metadata_id?: number | string | null;
+};
+
+// albums://…/album_kind/label 返回的画册行，只有标签画册带 label_path / label_key。
+type ServerAlbum = {
+  type?: string | null;
+  label_path?: string | null;
+  label_key?: string | null;
+  name?: string | null;
+};
+
+type PluginDetail = {
+  name?: string | null;
+  version?: string | null;
+  descriptionTemplate?: unknown;
+};
+
+type RpcErrorPayload = {
+  code?: number | string | null;
+  message?: string | null;
+};
+
+type RpcEnvelope<T> = {
+  error?: RpcErrorPayload | null;
+  result?: T;
+};
+
+type EntrypointResult = {
+  total?: unknown;
+};
+
+type MetadataFullResult = {
+  data?: KabegameJsonValue;
+  pluginVersion?: unknown;
+};
+
+type ImageMetadataRow = {
+  schema: number;
+  server: string;
+  source: {
+    pluginId: string | null;
+    pluginVersion: number | null;
+    surfRecordId: number | string | null;
+    metadataId: number | string | null;
+  };
+  metadata: KabegameJsonValue;
+};
+
+// 配置字段来自 GUI（可能有类型）或 CLI --var（一定是字符串），统一按 unknown 收窄
+type ServerVars = {
+  mode?: unknown;
+  server_url?: unknown;
+  pathql?: unknown;
+  sort?: unknown;
+  include_hidden?: unknown;
+  page_size?: unknown;
+  start_page?: unknown;
+  end_page?: unknown;
+};
+
+// 服务器方言：labelKey 是 i18n 键（保留字面量，便于 t() 校验）
+type Dialect = {
+  labelKey: "dialectKb" | "dialectLegacy";
+  fc: string;
+  desc: string;
+  page: (size: number, page: number) => string;
+};
+
 // [kabegame-server] 前缀写在 i18n 文案里，这里只做直通，不再拼接。
-function log(message) {
+function log(message: string): void {
   console.log(message);
 }
 
-function errText(e) {
-  return e?.message ?? String(e);
+// 保持原来 `e?.message ?? String(e)` 的字符串回退语义
+function errText(e: unknown): string {
+  if (e && typeof e === "object" && "message" in e) {
+    const message = (e as { message?: unknown }).message;
+    if (message != null) return String(message);
+  }
+  return String(e);
 }
 
 // 允许带路径前缀（反向代理挂在子路径下）；缺协议时按 https 补全。
-function normalizeServer(raw) {
+function normalizeServer(raw: unknown): string {
   let s = String(raw ?? "").trim() || DEFAULT_SERVER;
   if (!/^https?:\/\//i.test(s)) s = `https://${s}`;
   const u = new URL(s);
@@ -45,14 +129,14 @@ function normalizeServer(raw) {
 }
 
 // 服务器画廊续接段的两种方言：4.5.1 起全局化为 `_kb_*`，之前是裸段名。
-const DIALECTS = {
+const DIALECTS: { kb: Dialect; legacy: Dialect } = {
   kb: { labelKey: "dialectKb", fc: "_kb_fc", desc: "_kb_desc", page: (n, p) => `_kb_x${n}x/${p}` },
   legacy: { labelKey: "dialectLegacy", fc: "filter_comb", desc: "desc", page: (n, p) => `x${n}x/${p}` },
 };
 
 // 各取一张图试两种分页尾；先试新语法。两种都失败时把两条错误一起报出来。
-async function detectDialect(server) {
-  const errors = [];
+async function detectDialect(server: string): Promise<Dialect> {
+  const errors: string[] = [];
   for (const d of [DIALECTS.kb, DIALECTS.legacy]) {
     try {
       await rpc(server, "pathql_fetch", { path: `images://gallery/all/${d.page(1, 1)}` });
@@ -66,7 +150,7 @@ async function detectDialect(server) {
 
 // 全站模式的排序段。随机种子每次运行生成一次，同一次运行的各页共用同一个排列，翻页不重复；
 // 服务器的 random-<seed> 只接受 1–18 位数字。
-function siteSortSegment(sort, dialect) {
+function siteSortSegment(sort: unknown, dialect: Dialect): string {
   if (sort === "time") return `sort/by-time/${dialect.desc}`;
   if (sort === "id") return "sort/by-id";
   // 默认随机
@@ -76,7 +160,7 @@ function siteSortSegment(sort, dialect) {
 // 过滤模式：接受「高级查询」弹窗里复制的路径（`images://gallery/…/sort/by-time/_kb_desc/_kb_x100x/2`，
 // 旧版服务器是 `…/sort/by-time/desc/x100x/2`）。只剥末尾分页 `[(_kb_)x<N>x/]<页码>`，排序与倒序
 // 原样保留；省略 scheme 时按画廊路径补全。
-function normalizeFilterPath(raw) {
+function normalizeFilterPath(raw: unknown): string {
   let s = String(raw ?? "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
   if (!s) throw new Error(t("filterPathRequired"));
   if (!s.includes("://")) s = `images://gallery/${s.replace(/^\/+/, "")}`;
@@ -93,14 +177,14 @@ function normalizeFilterPath(raw) {
 
 // 把另一方言的组合 / 倒序段改写成服务器方言：粘贴的路径可能来自另一版本的服务器。
 // 只作为原样路径解析失败后的候选，避免把恰好叫 `desc` 的搜索词误改。
-function translateFilterPath(path, dialect) {
+function translateFilterPath(path: string, dialect: Dialect): string {
   const other = dialect === DIALECTS.kb ? DIALECTS.legacy : DIALECTS.kb;
   const segs = path.slice("images://".length).split("/");
   const out = segs.map((seg) => (seg === other.fc ? dialect.fc : seg === other.desc ? dialect.desc : seg));
   return `images://${out.join("/")}`;
 }
 
-function clampInt(v, def, min, max) {
+function clampInt(v: unknown, def: number, min: number, max: number): number {
   // 清空的数字字段收到 null；Number(null) === 0 会被夹到下限（如每页 1 张），先按未填写回落
   if (v == null || v === "") return def;
   const n = Math.floor(Number(v));
@@ -110,20 +194,28 @@ function clampInt(v, def, min, max) {
 
 let rpcSeq = 0;
 
-async function rpc(server, method, params = {}) {
+async function rpc<T = unknown>(
+  server: string,
+  method: string,
+  params: Record<string, KabegameJsonValue> = {},
+): Promise<T | undefined> {
   const res = await fetch(`${server}/rpc`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: ++rpcSeq, method, params }),
   });
   if (!res.ok) throw new Error(`${method}: HTTP ${res.status}`);
-  const body = await res.json();
+  const body = (await res.json()) as RpcEnvelope<T>;
   if (body?.error) throw new Error(`${method}: ${body.error.message ?? "error"} (${body.error.code})`);
   return body?.result;
 }
 
 // 固定并发地依次处理 items，单项失败由 worker 自己兜住。
-async function runPool(items, limit, worker) {
+async function runPool<T>(
+  items: T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<void> | void,
+): Promise<void> {
   let next = 0;
   const runners = Array.from({ length: Math.min(limit, items.length) }, async () => {
     while (next < items.length) {
@@ -134,7 +226,7 @@ async function runPool(items, limit, worker) {
   await Promise.all(runners);
 }
 
-function mediaUrl(server, image) {
+function mediaUrl(server: string, image: ServerImage): string {
   const p = String(image.local_path ?? "").trim();
   if (/^https?:\/\//i.test(p)) return p;
   if (p) {
@@ -146,8 +238,8 @@ function mediaUrl(server, image) {
 }
 
 // label_path 形如 `konachan/character/hayase_yuuka`：末段是 key，其余是 category。
-function labelsFromAlbums(rows) {
-  const labels = [];
+function labelsFromAlbums(rows: ServerAlbum[] | null | undefined): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
   for (const a of rows || []) {
     if (a?.type !== "label") continue;
     const path = String(a.label_path ?? "").trim();
@@ -164,18 +256,41 @@ function labelsFromAlbums(rows) {
 
 // plugin_data 结构：{ schema, servers: { [server]: { plugins: { [pluginId]: Entry } } } }
 // Entry = { name, version, template, data, updatedAt }；template 为 null 表示服务器上没有模板。
-function createSourceCache(server) {
-  const store = pluginData() || {};
+type SourceEntry = {
+  name: string | null;
+  version: string | null;
+  template: string | null;
+  data: KabegameJsonValue;
+  updatedAt: number;
+};
+
+type SourceServerEntry = {
+  plugins: Record<string, SourceEntry>;
+};
+
+type SourceStore = {
+  schema?: number;
+  servers?: Record<string, SourceServerEntry>;
+};
+
+function createSourceCache(server: string) {
+  const store: SourceStore = pluginData<SourceStore>() || {};
   if (!store.servers || typeof store.servers !== "object") store.servers = {};
   const serverEntry = (store.servers[server] ||= { plugins: {} });
   serverEntry.plugins ||= {};
   store.schema = 1;
-  const refreshed = new Map(); // 本次任务已刷新过的插件 → Promise
+  const refreshed = new Map<string, Promise<void>>(); // 本次任务已刷新过的插件 → Promise
 
-  async function fetchEntry(pluginId) {
-    const entry = { name: null, version: null, template: null, data: null, updatedAt: Date.now() };
+  async function fetchEntry(pluginId: string): Promise<void> {
+    const entry: SourceEntry = {
+      name: null,
+      version: null,
+      template: null,
+      data: null,
+      updatedAt: Date.now(),
+    };
     try {
-      const detail = await rpc(server, "get_plugin_detail", { pluginId });
+      const detail = await rpc<PluginDetail>(server, "get_plugin_detail", { pluginId });
       entry.name = detail?.name ?? null;
       entry.version = detail?.version ?? null;
       entry.template = typeof detail?.descriptionTemplate === "string" ? detail.descriptionTemplate : null;
@@ -184,8 +299,11 @@ function createSourceCache(server) {
       log(t("pluginDetailMissing", { plugin: pluginId, error: errText(e) }));
     }
     try {
-      const data = await rpc(server, "get_plugin_data", { pluginId });
-      entry.data = data && typeof data === "object" && !Array.isArray(data) ? data : {};
+      const data = await rpc<unknown>(server, "get_plugin_data", { pluginId });
+      entry.data =
+        data && typeof data === "object" && !Array.isArray(data)
+          ? (data as { [key: string]: KabegameJsonValue })
+          : {};
     } catch (e) {
       warn(t("pluginDataReadFailed", { plugin: pluginId, error: errText(e) }));
       entry.data = serverEntry.plugins[pluginId]?.data ?? {};
@@ -202,28 +320,32 @@ function createSourceCache(server) {
   }
 
   return {
-    ensure(pluginId) {
+    ensure(pluginId: string | null | undefined): Promise<void> {
       if (!pluginId) return Promise.resolve();
-      if (!refreshed.has(pluginId)) refreshed.set(pluginId, fetchEntry(pluginId));
-      return refreshed.get(pluginId);
+      let pending = refreshed.get(pluginId);
+      if (!pending) {
+        pending = fetchEntry(pluginId);
+        refreshed.set(pluginId, pending);
+      }
+      return pending;
     },
   };
 }
 
 // ── 元数据 ──────────────────────────────────────────────────────────────────
 
-function createMetadataCache(server) {
-  const byKey = new Map(); // 服务器 metadata 行 / 无元数据的插件 → Promise<本地 metadata id>
+function createMetadataCache(server: string) {
+  const byKey = new Map<string, Promise<number>>(); // 服务器 metadata 行 / 无元数据的插件 → Promise<本地 metadata id>
 
-  async function build(image) {
-    let data = null;
-    let pluginVersion = typeof image.plugin_version === "number" ? image.plugin_version : null;
+  async function build(image: ServerImage): Promise<number> {
+    let data: KabegameJsonValue = null;
+    let pluginVersion: number | null = typeof image.plugin_version === "number" ? image.plugin_version : null;
     if (image.metadata_id != null) {
-      const full = await rpc(server, "get_image_metadata_full", { imageId: String(image.id) });
+      const full = await rpc<MetadataFullResult>(server, "get_image_metadata_full", { imageId: String(image.id) });
       data = full?.data ?? null;
       if (typeof full?.pluginVersion === "number") pluginVersion = full.pluginVersion;
     }
-    const metadata = {
+    const metadata: ImageMetadataRow = {
       schema: METADATA_SCHEMA,
       server,
       source: {
@@ -238,27 +360,33 @@ function createMetadataCache(server) {
   }
 
   return {
-    get(image) {
+    get(image: ServerImage): Promise<number> {
       const key =
         image.metadata_id != null
           ? `m:${image.metadata_id}`
           : `p:${image.plugin_id ?? ""}:${image.surf_record_id ?? ""}:${image.plugin_version ?? ""}`;
-      if (!byKey.has(key)) {
-        const p = build(image);
+      let pending = byKey.get(key);
+      if (!pending) {
+        pending = build(image);
         // 失败不缓存，下一张同 metadata 的图会重试
-        p.catch(() => byKey.delete(key));
-        byKey.set(key, p);
+        pending.catch(() => byKey.delete(key));
+        byKey.set(key, pending);
       }
-      return byKey.get(key);
+      return pending;
     },
   };
 }
 
 // ── 入口 ────────────────────────────────────────────────────────────────────
 
-export async function crawl(common, custom) {
-  const vars = custom || {};
-  const server = normalizeServer(vars.server_url || common?.base_url);
+export async function crawl(
+  common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars = (custom || {}) as ServerVars;
+  const cfg = (common || {}) as { baseUrl?: unknown };
+  const serverInput = vars.server_url ? vars.server_url : cfg.baseUrl;
+  const server = normalizeServer(serverInput);
   const pageSize = clampInt(vars.page_size, 20, 1, MAX_PAGE_SIZE);
   const startPage = clampInt(vars.start_page, 1, 1, Number.MAX_SAFE_INTEGER);
   const endPage = Math.max(startPage, clampInt(vars.end_page, startPage, 1, Number.MAX_SAFE_INTEGER));
@@ -274,7 +402,7 @@ export async function crawl(common, custom) {
   const dialect = await detectDialect(server);
 
   const filterMode = vars.mode === "filter";
-  let candidates;
+  let candidates: string[];
   if (filterMode) {
     const raw = normalizeFilterPath(vars.pathql);
     candidates = [...new Set([raw, translateFilterPath(raw, dialect)])];
@@ -283,12 +411,12 @@ export async function crawl(common, custom) {
     candidates = [`images://gallery/${includeHidden ? "" : "hide/"}${siteSortSegment(vars.sort, dialect)}`];
   }
 
-  let basePath = null;
-  let total = null;
-  let firstError = null;
+  let basePath: string | null = null;
+  let total: number | null = null;
+  let firstError: unknown = null;
   for (const path of candidates) {
     try {
-      const entry = await rpc(server, "pathql_entry", { path });
+      const entry = await rpc<EntrypointResult>(server, "pathql_entry", { path });
       basePath = path;
       total = typeof entry?.total === "number" ? entry.total : null;
       break;
@@ -325,15 +453,15 @@ export async function crawl(common, custom) {
   const perPage = 100 / (finalPage - startPage + 1);
 
   for (let page = startPage; page <= finalPage; page++) {
-    let rows;
+    let raw: ServerImage[] | undefined;
     try {
-      rows = await rpc(server, "pathql_fetch", { path: `${basePath}/${dialect.page(pageSize, page)}` });
+      raw = await rpc<ServerImage[]>(server, "pathql_fetch", { path: `${basePath}/${dialect.page(pageSize, page)}` });
     } catch (e) {
       warn(t("pageReadFailed", { page, error: errText(e) }));
       addProgress(perPage);
       continue;
     }
-    rows = Array.isArray(rows) ? rows : [];
+    const rows = Array.isArray(raw) ? raw : [];
     log(
       t("pageFetched", {
         page,
@@ -353,7 +481,7 @@ export async function crawl(common, custom) {
       try {
         const [metadataId, albums] = await Promise.all([
           metadataCache.get(image),
-          rpc(server, "pathql_fetch", {
+          rpc<ServerAlbum[]>(server, "pathql_fetch", {
             path: `albums://of_image_${encodeURIComponent(String(image.id))}/album_kind/label/x${LABEL_PAGE_SIZE}x/1`,
           }),
           sources.ensure(image.plugin_id),
@@ -361,12 +489,13 @@ export async function crawl(common, custom) {
         const url = mediaUrl(server, image);
         if (!url) throw new Error(t("noDownloadUrl"));
         const postUrl = String(image.post_url ?? "").trim();
-        await downloadImage(url, {
+        const opts: KabegameDownloadImageOptions = {
           name: image.display_name || null,
           url: postUrl || null,
           metadata_id: metadataId,
           labels: labelsFromAlbums(albums),
-        });
+        };
+        await downloadImage(url, opts);
         ok++;
       } catch (e) {
         warn(t("imageFailed", { id: image.id, error: errText(e) }));

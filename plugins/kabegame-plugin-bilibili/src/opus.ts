@@ -1,22 +1,55 @@
-// @ts-nocheck
 // 图文帖（opus）：详情页 INITIAL_STATE 结构化取图（含实况图 live_url），
 // 失败回退正则抠 bfs 链接；关联到 cv 时复用专栏的 metadata / 评论链路。
-import { buildArticleMetadata, signViewUrl } from "./article";
+import { buildArticleMetadata, signViewUrl, type ArticleViewData, type ArticleViewResponse } from "./article";
 import { OPUS_DETAIL_API } from "./consts";
 import { t } from "./i18n";
 import { labelsFromMetadata, searchTextsFromMetadata } from "./metadata-derived";
-import { fetchArticleReplies } from "./replies";
+import { fetchArticleReplies, type ArticleReplies } from "./replies";
 import {
   checkBilibiliRisk, coerceStr, collectImageUrlsFromContent, ensureHttpsBfs, fetchJson, fetchWith509Retry,
+  type BilibiliResponse,
 } from "./util";
 
 const { addProgress, createImageMetadata, downloadImage, setHeader, warn } = Kabegame;
+
+// 页面 INITIAL_STATE 与 detail API 的最小结构：字段都可能缺失。
+type OpusPic = {
+  url?: string | null;
+  live_url?: string | null;
+};
+
+type OpusModule = {
+  module_type?: string | null;
+  module_blocked?: { hint_message?: string | null } | null;
+  module_top?: { display?: { album?: { pics?: OpusPic[] | null } | null } | null } | null;
+  module_content?: { paragraphs?: { pic?: { pics?: OpusPic[] | null } | null }[] | null } | null;
+};
+
+type OpusInitialState = {
+  detail?: { modules?: OpusModule[] | null } | null;
+};
+
+type OpusDetailData = {
+  item?: {
+    modules?: {
+      module_dynamic?: { major?: { opus?: { pics?: OpusPic[] | null } | null } | null } | null;
+    } | null;
+  } | null;
+};
+
+type OpusDetailResponse = BilibiliResponse<OpusDetailData>;
+
+/** 一张待下载的图：静态图 URL 与可选的实况图视频轨。 */
+type OpusPicEntry = {
+  url: string;
+  liveUrl: string;
+};
 
 /**
  * 解析 opus 页内嵌的 `window.__INITIAL_STATE__`（gallery-dl BilibiliAPI.article 同法）。
  * 页面偶发下发风控壳页（window._riskdata_），此时没有该对象，返回 null 走正则回退。
  */
-function parseOpusInitialState(html) {
+function parseOpusInitialState(html: unknown): OpusInitialState | null {
   const marker = "window.__INITIAL_STATE__=";
   const text = coerceStr(html);
   const idx = text.indexOf(marker);
@@ -25,7 +58,8 @@ function parseOpusInitialState(html) {
   const end = seg.indexOf("};");
   if (end < 0) return null;
   try {
-    return JSON.parse(seg.slice(0, end + 1));
+    // 页面内嵌 JSON，是外部数据边界。解析失败按风控壳页处理。
+    return JSON.parse(seg.slice(0, end + 1)) as OpusInitialState;
   } catch {
     return null;
   }
@@ -36,10 +70,10 @@ function parseOpusInitialState(html) {
  * liveUrl 是实况图（LivePhoto）的视频轨，普通图片没有。
  * 相比正则抠 HTML 的优势：拿得到 live_url，且不受评论区里贴图的干扰。
  */
-function collectOpusPicsFromState(state) {
-  const out = [];
-  const seen = new Set();
-  const push = (pic) => {
+function collectOpusPicsFromState(state: OpusInitialState | null): OpusPicEntry[] {
+  const out: OpusPicEntry[] = [];
+  const seen = new Set<string>();
+  const push = (pic: OpusPic): void => {
     const url = ensureHttpsBfs(pic?.url);
     if (!url || seen.has(url)) return;
     seen.add(url);
@@ -59,14 +93,14 @@ function collectOpusPicsFromState(state) {
   return out;
 }
 
-function parseCvIdFromOpusHtml(html) {
+function parseCvIdFromOpusHtml(html: unknown): string {
   const idx = coerceStr(html).indexOf("opus-module-copyright__right");
   const slice = idx >= 0 ? coerceStr(html).slice(idx, idx + 4000) : coerceStr(html);
   return slice.match(/cv(\d+)/i)?.[1] || "";
 }
 
 /** url 的文件名部分，用作两个数据源之间的图片配对键（域名/协议可能不同）。 */
-function picFileName(url) {
+function picFileName(url: unknown): string {
   return coerceStr(url).split(/[?#]/, 1)[0].split("/").pop() || "";
 }
 
@@ -76,15 +110,15 @@ function picFileName(url) {
  * 再拉 detail API（features=itemOpusStyle 的 major.opus.pics）按文件名合并。
  * best-effort：失败只影响实况视频，静态图照常。
  */
-async function fillLiveUrlsFromDetail(opusId, pics) {
+async function fillLiveUrlsFromDetail(opusId: string, pics: OpusPicEntry[]): Promise<void> {
   const hasLive = pics.some((p) => p.liveUrl);
   const looksLive = pics.some((p) => picFileName(p.url).startsWith("live_"));
   if (hasLive || !looksLive) return;
   try {
-    const json = await fetchJson(`${OPUS_DETAIL_API}?id=${opusId}&features=itemOpusStyle`);
+    const json = await fetchJson<OpusDetailResponse>(`${OPUS_DETAIL_API}?id=${opusId}&features=itemOpusStyle`);
     if (json?.code !== 0) return;
     const detailPics = json?.data?.item?.modules?.module_dynamic?.major?.opus?.pics || [];
-    const byName = new Map();
+    const byName = new Map<string, string>();
     for (const pic of detailPics) {
       const live = ensureHttpsBfs(pic?.live_url || "");
       if (live) byName.set(picFileName(pic?.url), live);
@@ -97,7 +131,13 @@ async function fillLiveUrlsFromDetail(opusId, pics) {
   }
 }
 
-export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
+export async function processOneOpus(
+  opusId: string,
+  perTotal: number,
+  img: string,
+  sub: string,
+  livePhoto: boolean,
+): Promise<void> {
   const pageUrl = `https://www.bilibili.com/opus/${opusId}`;
   setHeader("Referer", pageUrl);
   setHeader("Origin", "https://www.bilibili.com");
@@ -122,11 +162,14 @@ export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
   if (livePhoto) await fillLiveUrlsFromDetail(opusId, pics);
 
   const cvId = parseCvIdFromOpusHtml(html);
-  let vd = null;
-  let repliesData = null;
+  let vd: ArticleViewData | null = null;
+  let repliesData: ArticleReplies | null = null;
   if (cvId && img && sub) {
-    const view = await fetchWith509Retry(() => signViewUrl(cvId, img, sub), `opus ${opusId} cv ${cvId} view`);
-    if (view?.code === 0) vd = view.data;
+    const view = await fetchWith509Retry<ArticleViewResponse>(
+      () => signViewUrl(cvId, img, sub),
+      `opus ${opusId} cv ${cvId} view`,
+    );
+    if (view?.code === 0) vd = view.data ?? null;
     else {
       checkBilibiliRisk(view?.code);
       warn(t("opusCvViewFailed", {
@@ -148,12 +191,12 @@ export async function processOneOpus(opusId, perTotal, img, sub, livePhoto) {
   const perFile = perTotal / (pics.length + liveCount);
   for (let index = 0; index < pics.length; index += 1) {
     const name = pics.length > 1 ? `${base}(${index + 1})` : base;
-    const opts = { name, metadata_id: metadataId, url: pageUrl };
+    const opts: KabegameDownloadImageOptions = { name, metadata_id: metadataId, url: pageUrl };
     if (labels.length > 0) opts.labels = labels;
     await downloadImage(pics[index].url, opts);
     addProgress(perFile);
     if (livePhoto && pics[index].liveUrl) {
-      const liveOpts = { name: `${name}(live)`, metadata_id: metadataId, url: pageUrl };
+      const liveOpts: KabegameDownloadImageOptions = { name: `${name}(live)`, metadata_id: metadataId, url: pageUrl };
       if (labels.length > 0) liveOpts.labels = labels;
       await downloadImage(pics[index].liveUrl, liveOpts);
       addProgress(perFile);

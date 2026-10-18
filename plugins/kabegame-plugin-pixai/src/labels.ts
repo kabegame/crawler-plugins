@@ -1,9 +1,9 @@
-// @ts-nocheck
 // PixAI 作品标签：tack 使用归一化后的 codeName（无法派生时退回稳定 id），作者使用用户 id。
 
+import type { PixaiArtworkDetail, PixaiTack } from "./types";
 import { arrayValue, coerceStr } from "./util";
 
-function labelKey(value) {
+function labelKey(value: unknown): string {
   const key = coerceStr(value)
     .toLowerCase()
     .replace(/[^a-z0-9_\-() \t\n\r]/g, "")
@@ -12,7 +12,7 @@ function labelKey(value) {
   return key && key.length <= 64 ? key : "";
 }
 
-function tackLabel(tack) {
+function tackLabel(tack: PixaiTack | null | undefined): KabegameLabelInput | null {
   const fallbackId = labelKey(tack?.id);
   const key = labelKey(tack?.codeName) || fallbackId;
   if (!key) return null;
@@ -24,7 +24,7 @@ function tackLabel(tack) {
   return { key, category: "pixai/tag", name };
 }
 
-function artistLabel(detail) {
+function artistLabel(detail: PixaiArtworkDetail | null | undefined): KabegameLabelInput | null {
   const author = detail?.author;
   const key = labelKey(author?.id) || labelKey(detail?.authorId);
   if (!key) return null;
@@ -32,10 +32,10 @@ function artistLabel(detail) {
   return { key, category: "pixai/artist", name };
 }
 
-export function labelsFromArtworkDetail(detail) {
-  const labels = [];
-  const seen = new Set();
-  for (const tack of arrayValue(detail?.tacks)) {
+export function labelsFromArtworkDetail(detail: PixaiArtworkDetail | null | undefined): KabegameLabelInput[] {
+  const labels: KabegameLabelInput[] = [];
+  const seen = new Set<string>();
+  for (const tack of arrayValue<PixaiTack>(detail?.tacks)) {
     const label = tackLabel(tack);
     if (!label) continue;
     const identity = `${label.category}/${label.key}`.toLowerCase();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // bilibili 视频下载插件入口。
 //
 // 接口与签名算法参照 yt-dlp 的 BilibiliBaseIE / BiliBiliIE / BilibiliSpaceVideoIE
@@ -19,7 +18,8 @@ import { UA, WEB_BASE } from "./consts";
 import { collectListEntries } from "./list";
 import { collectSearchEntries } from "./search";
 import { collectSpaceEntries } from "./space";
-import { coerceStr, parseVideoId } from "./util";
+import type { BilibiliVars, ListEntry, WbiKeysState } from "./types";
+import { errorMessage, parseVideoId } from "./util";
 import { cleanupStaleTmp } from "./vfs";
 import { downloadWithRetry } from "./video";
 import { getWbiKeys } from "./wbi";
@@ -27,7 +27,13 @@ import { getWbiKeys } from "./wbi";
 const { addProgress, fs, requireCookie, setHeader, warn } = Kabegame;
 
 /** 批量模式共用的下载循环：逐个下、间隔等待、单个失败不中断整批。 */
-async function runBatch(entries, keys, vars, intervalMs, retries) {
+async function runBatch(
+  entries: ListEntry[],
+  keys: WbiKeysState,
+  vars: BilibiliVars,
+  intervalMs: number,
+  retries: number,
+): Promise<void> {
   const budget = 100.0 / entries.length;
   let failed = 0;
 
@@ -44,7 +50,7 @@ async function runBatch(entries, keys, vars, intervalMs, retries) {
       await downloadWithRetry(entry, keys, vars, budget, 1, intervalMs, retries);
     } catch (error) {
       failed += 1;
-      warn(t("itemFailedFinal", { bvid: entry.bvid, error: coerceStr(error?.message ?? error) }));
+      warn(t("itemFailedFinal", { bvid: entry.bvid, error: errorMessage(error) }));
       addProgress(budget);
     }
   }
@@ -53,8 +59,11 @@ async function runBatch(entries, keys, vars, intervalMs, retries) {
   if (failed > 0) warn(t("someVideosFailed", { total: entries.length, failed }));
 }
 
-export async function crawl(_common, custom) {
-  const vars = custom || {};
+export async function crawl(
+  _common: unknown,
+  custom: Record<string, unknown> | null | undefined,
+): Promise<void> {
+  const vars: BilibiliVars = custom || {};
   setHeader("User-Agent", UA);
   setHeader("Referer", `${WEB_BASE}/`);
   setHeader("Origin", WEB_BASE);
@@ -72,7 +81,7 @@ export async function crawl(_common, custom) {
   const { keys: wbiKeys, isLoggedIn } = await getWbiKeys();
   // 未登录靠 try_look（试看）通常仍能拿到 1080P，但 4K / HDR / 杜比等档位必然缺席。
   if (!isLoggedIn) warn(t("notLoggedIn"));
-  const keys = { ...wbiKeys, isLoggedIn };
+  const keys: WbiKeysState = { ...wbiKeys, isLoggedIn };
 
   if (vars.mode === "space") {
     await runBatch(await collectSpaceEntries(vars, keys, intervalMs), keys, vars, intervalMs, retries);
