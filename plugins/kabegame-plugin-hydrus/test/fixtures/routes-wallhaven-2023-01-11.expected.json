@@ -1,0 +1,32 @@
+[
+ [
+  "https://wallhaven.cc/api/v1/search?q=cute",
+  "https://wallhaven.cc/api/v1/search?apikey=myPersonalApiToken&categories=111&order=desc&page=1&purity=111&q=cute&sorting=date_added",
+  "wallhaven.cc gallery parser"
+ ],
+ [
+  "https://wallhaven.cc/api/v1/search?q=blue_eyes+blonde_hair&page=3",
+  "https://wallhaven.cc/api/v1/search?apikey=myPersonalApiToken&categories=111&order=desc&page=3&purity=111&q=blue_eyes+blonde_hair&sorting=date_added",
+  "wallhaven.cc gallery parser"
+ ],
+ [
+  "https://wallhaven.cc/search?q=cute&categories=111&purity=100&sorting=relevance&order=desc&page=1",
+  "https://wallhaven.cc/api/v1/search?apikey=myPersonalApiToken&categories=111&order=desc&page=1&purity=100&q=cute&sorting=relevance",
+  "wallhaven.cc gallery parser"
+ ],
+ [
+  "https://wallhaven.cc/w/d8vrwm",
+  "https://wallhaven.cc/api/v1/w/d8vrwm?apikey=myPersonalApiToken",
+  "wallhaven.cc post parser"
+ ],
+ [
+  "https://wallhaven.cc/api/v1/w/d8vrwm",
+  "https://wallhaven.cc/api/v1/w/d8vrwm?apikey=myPersonalApiToken",
+  "wallhaven.cc post parser"
+ ],
+ [
+  "https://w.wallhaven.cc/full/d8/wallhaven-d8vrwm.jpg",
+  null,
+  "Could not find a URL class for https://w.wallhaven.cc/full/d8/wallhaven-d8vrwm.jpg!"
+ ]
+]

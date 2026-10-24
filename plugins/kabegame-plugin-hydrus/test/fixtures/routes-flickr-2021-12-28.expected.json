@@ -1,0 +1,102 @@
+[
+ [
+  "https://api.flickr.com/services/rest/?group_id=10184953@N00&method=flickr.groups.pools.getPhotos&format=json&nojsoncallback=1&api_key=00eb9ad842dafb5895c83d3a0323123b",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&group_id=10184953@N00&method=flickr.groups.pools.getPhotos&nojsoncallback=1&page=1",
+  "flickr group photos api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?gallery_id=72157719532472701&method=flickr.galleries.getPhotos&format=json&nojsoncallback=1&api_key=00eb9ad842dafb5895c83d3a0323123b",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&gallery_id=72157719532472701&method=flickr.galleries.getPhotos&nojsoncallback=1",
+  "flickr curated gallery api parser"
+ ],
+ [
+  "https://www.flickr.com/photos/183893986@N07/galleries/72157710885870421/",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&gallery_id=72157710885870421&method=flickr.galleries.getPhotos&nojsoncallback=1&page=1",
+  "flickr curated gallery api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.favorites.getList&nojsoncallback=1&user_id=186269826@N02&page=1",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.favorites.getList&nojsoncallback=1&page=1&user_id=186269826@N02",
+  "flickr favourites api parser"
+ ],
+ [
+  "https://www.flickr.com/groups/surreal-life/pool/",
+  "https://flickr.com/groups/surreal-life/pool/",
+  "flickr group photos page parser"
+ ],
+ [
+  "https://www.flickr.com/photos/monegka/albums/72157702563271624",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157702563271624",
+  "flickr album api parser"
+ ],
+ [
+  "https://flickr.com/photos/monegka",
+  "https://flickr.com/photos/monegka",
+  "flickr artist parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.people.getPhotos&nojsoncallback=1&page=1&user_id=141371676@N06",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.people.getPhotos&nojsoncallback=1&page=1&user_id=141371676@N06",
+  "flickr artist api parser"
+ ],
+ [
+  "https://www.flickr.com/photos/186269826@N02/favorites",
+  "https://flickr.com/photos/186269826@N02/favorites",
+  "flickr favourites parser"
+ ],
+ [
+  "https://flickr.com/photos/86954319@N04/50390069077/",
+  "https://flickr.com/photos/86954319@N04/50390069077/",
+  "flickr file parser (photo + video if found)"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photos.getSizes&nojsoncallback=1&photo_id=5019045354",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photos.getSizes&nojsoncallback=1&photo_id=5019045354",
+  "flickr file api parser (video only)"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&photoset_id=72157719470576594&page=1",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157719470576594",
+  "flickr album api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157702563271624",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157702563271624",
+  "flickr album api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157719470576594",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photosets.getPhotos&nojsoncallback=1&page=1&photoset_id=72157719470576594",
+  "flickr album api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.favorites.getList&nojsoncallback=1&page=1&user_id=186269826@N02",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.favorites.getList&nojsoncallback=1&page=1&user_id=186269826@N02",
+  "flickr favourites api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photos.getSizes&nojsoncallback=1&photo_id=50059248451",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.photos.getSizes&nojsoncallback=1&photo_id=50059248451",
+  "flickr file api parser (video only)"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?group_id=13232693@N00&method=flickr.groups.pools.getPhotos&format=json&nojsoncallback=1&api_key=00eb9ad842dafb5895c83d3a0323123b&page=1",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&group_id=13232693@N00&method=flickr.groups.pools.getPhotos&nojsoncallback=1&page=1",
+  "flickr group photos api parser"
+ ],
+ [
+  " https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.people.getPhotos&nojsoncallback=1&page=1&user_id=141371676@N06",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&method=flickr.people.getPhotos&nojsoncallback=1&page=1&user_id=141371676@N06",
+  "flickr artist api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?gallery_id=72157710885870421&method=flickr.galleries.getPhotos&format=json&nojsoncallback=1&api_key=00eb9ad842dafb5895c83d3a0323123b&page=1",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&gallery_id=72157710885870421&method=flickr.galleries.getPhotos&nojsoncallback=1&page=1",
+  "flickr curated gallery api parser"
+ ],
+ [
+  "https://api.flickr.com/services/rest/?gallery_id=72157719532472701&method=flickr.galleries.getPhotos&format=json&nojsoncallback=1&api_key=00eb9ad842dafb5895c83d3a0323123b&page=1",
+  "https://api.flickr.com/services/rest/?api_key=00eb9ad842dafb5895c83d3a0323123b&format=json&gallery_id=72157719532472701&method=flickr.galleries.getPhotos&nojsoncallback=1&page=1",
+  "flickr curated gallery api parser"
+ ]
+]

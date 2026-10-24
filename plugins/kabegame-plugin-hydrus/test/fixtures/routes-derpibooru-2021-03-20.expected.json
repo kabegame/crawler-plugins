@@ -1,0 +1,17 @@
+[
+ [
+  "https://www.derpibooru.org/api/v1/json/search/images?filter_id=56027&page=1&per_page=50&q=safe,cute",
+  "https://derpibooru.org/api/v1/json/search/images?filter_id=56027&page=1&per_page=50&q=safe,cute",
+  "derpibooru gallery page parser"
+ ],
+ [
+  "https://derpibooru.org/images/3916158",
+  "https://derpibooru.org/images/3916158",
+  "derpibooru file page parser"
+ ],
+ [
+  "https://derpibooru.org/images/3916158?q=cute",
+  "https://derpibooru.org/images/3916158",
+  "derpibooru file page parser"
+ ]
+]

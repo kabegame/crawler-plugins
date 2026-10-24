@@ -1,0 +1,322 @@
+{
+  "name": "kabegame-plugin-hydrus",
+  "version": "0.1.0",
+  "private": true,
+  "name.zh": "hydrus 下载器",
+  "name.en": "hydrus downloader",
+  "name.ja": "hydrus ダウンローダー",
+  "name.ko": "hydrus 다운로더",
+  "name.zhtw": "hydrus 下載器",
+  "description": "运行 hydrus network 的下载器，或导入现有 hydrus 数据库",
+  "description.zh": "运行 hydrus network 的下载器，或导入现有 hydrus 数据库",
+  "description.en": "Run hydrus network downloaders, or import an existing hydrus database",
+  "description.ja": "hydrus network のダウンローダーを実行、または既存の hydrus データベースを取り込みます",
+  "description.ko": "hydrus network 다운로더를 실행하거나 기존 hydrus 데이터베이스를 가져옵니다",
+  "description.zhtw": "執行 hydrus network 的下載器，或匯入現有 hydrus 資料庫",
+  "author": "Kabegame",
+  "kbPackageVersion": 3,
+  "engines": {
+    "kabegame": ">=4.6.1"
+  },
+  "main": "dist/main.js",
+  "kbBackend": "v8",
+  "scripts": {
+    "build": "rspack build"
+  },
+  "kbBaseUrl": "",
+  "kbConfig": [
+    {
+      "key": "mode",
+      "type": "options",
+      "required": true,
+      "name": "Mode",
+      "name.zh": "模式",
+      "name.ja": "モード",
+      "name.ko": "모드",
+      "name.zhtw": "模式",
+      "descripts": "Import a downloader png and search, download from URLs with the downloader library, or import files from an existing hydrus database.",
+      "descripts.zh": "导入下载器 png 并搜索、用下载器库处理网址，或导入现有 hydrus 数据库里的文件。",
+      "descripts.ja": "ダウンローダー png を取り込んで検索、ダウンローダーライブラリで URL を処理、または既存の hydrus データベースのファイルを取り込みます。",
+      "descripts.ko": "다운로더 png를 가져와 검색, 다운로더 라이브러리로 URL 처리, 또는 기존 hydrus 데이터베이스의 파일 가져오기.",
+      "descripts.zhtw": "匯入下載器 png 並搜尋、用下載器庫處理網址，或匯入現有 hydrus 資料庫裡的檔案。",
+      "default": "png",
+      "options": [
+        {
+          "name": "Import png and search",
+          "name.zh": "导入 png 并搜索",
+          "name.ja": "png を取り込んで検索",
+          "name.ko": "png 가져와 검색",
+          "name.zhtw": "匯入 png 並搜尋",
+          "variable": "png"
+        },
+        {
+          "name": "URLs",
+          "name.zh": "输入网址",
+          "name.ja": "URL を入力",
+          "name.ko": "URL 입력",
+          "name.zhtw": "輸入網址",
+          "variable": "url"
+        },
+        {
+          "name": "Import hydrus database",
+          "name.zh": "导入 hydrus 数据库",
+          "name.ja": "hydrus データベースを取り込む",
+          "name.ko": "hydrus 데이터베이스 가져오기",
+          "name.zhtw": "匯入 hydrus 資料庫",
+          "variable": "hydrus_db"
+        }
+      ]
+    },
+    {
+      "key": "png",
+      "type": "file",
+      "name": "Downloader png",
+      "name.zh": "下载器 png",
+      "name.ja": "ダウンローダー png",
+      "name.ko": "다운로더 png",
+      "name.zhtw": "下載器 png",
+      "descripts": "A hydrus downloader exported as png (network > downloaders > export downloaders). It is added to the plugin's downloader library like hydrus's import downloaders; may be left empty to search with a GUG already in the library.",
+      "descripts.zh": "hydrus 导出的下载器 png（network > downloaders > export downloaders）。会像 hydrus 的「导入下载器」一样加入插件的下载器库；用库里已有的 GUG 搜索时可以不选。",
+      "descripts.ja": "hydrus からエクスポートしたダウンローダー png（network > downloaders > export downloaders）。hydrus の「ダウンローダーの取り込み」と同じくプラグインのダウンローダーライブラリに追加されます。ライブラリにある GUG で検索するなら空欄で構いません。",
+      "descripts.ko": "hydrus에서 내보낸 다운로더 png(network > downloaders > export downloaders). hydrus의 다운로더 가져오기처럼 플러그인의 다운로더 라이브러리에 추가됩니다. 라이브러리에 있는 GUG로 검색할 때는 비워 둘 수 있습니다.",
+      "descripts.zhtw": "hydrus 匯出的下載器 png（network > downloaders > export downloaders）。會像 hydrus 的「匯入下載器」一樣加入外掛的下載器庫；用庫裡已有的 GUG 搜尋時可以不選。",
+      "options": [
+        "png"
+      ],
+      "when": {
+        "mode": [
+          "png"
+        ]
+      }
+    },
+    {
+      "key": "query",
+      "type": "string",
+      "name": "Search",
+      "name.zh": "搜索",
+      "name.ja": "検索",
+      "name.ko": "검색",
+      "name.zhtw": "搜尋",
+      "descripts": "Search text; terms are separated by spaces, as in hydrus. Leave empty to only import the png.",
+      "descripts.zh": "搜索内容，与 hydrus 一样用空格分隔多个词。留空则只导入 png。",
+      "descripts.ja": "検索語。hydrus と同じくスペースで区切ります。空欄なら png の取り込みだけ行います。",
+      "descripts.ko": "검색어. hydrus처럼 공백으로 구분합니다. 비워 두면 png만 가져옵니다.",
+      "descripts.zhtw": "搜尋內容，與 hydrus 一樣用空格分隔多個詞。留空則只匯入 png。",
+      "when": {
+        "mode": [
+          "png"
+        ]
+      }
+    },
+    {
+      "key": "gug",
+      "type": "string",
+      "name": "Gallery URL generator",
+      "name.zh": "搜索入口（GUG）",
+      "name.ja": "検索入口（GUG）",
+      "name.ko": "검색 입구(GUG)",
+      "name.zhtw": "搜尋入口（GUG）",
+      "descripts": "Name of a GUG or NGUG in the downloader library. Leave empty when the png has only one; a wrong name lists the available ones in the task log.",
+      "descripts.zh": "下载器库里的 GUG 或 NGUG 名称。png 里只有一个时可留空；填错时任务日志会列出可选名称。",
+      "descripts.ja": "ダウンローダーライブラリ内の GUG または NGUG の名前。png に 1 つだけなら空欄で構いません。誤っているとタスクログに候補を表示します。",
+      "descripts.ko": "다운로더 라이브러리의 GUG 또는 NGUG 이름. png에 하나뿐이면 비워 두세요. 틀리면 작업 로그에 후보를 표시합니다.",
+      "descripts.zhtw": "下載器庫裡的 GUG 或 NGUG 名稱。png 裡只有一個時可留空；填錯時任務日誌會列出可選名稱。",
+      "when": {
+        "mode": [
+          "png"
+        ]
+      }
+    },
+    {
+      "key": "urls",
+      "type": "list",
+      "required": true,
+      "name": "URLs",
+      "name.zh": "网址",
+      "name.ja": "URL",
+      "name.ko": "URL",
+      "name.zhtw": "網址",
+      "descripts": "Post, gallery or file URLs, handled like hydrus's URL import: galleries fetch a single page.",
+      "descripts.zh": "帖子、列表页或文件地址，按 hydrus 的网址导入处理：列表页只抓一页。",
+      "descripts.ja": "投稿・一覧・ファイルの URL。hydrus の URL インポートと同じく、一覧は 1 ページだけ取得します。",
+      "descripts.ko": "게시물·목록·파일 URL. hydrus의 URL 가져오기처럼 목록은 한 페이지만 가져옵니다.",
+      "descripts.zhtw": "貼文、列表頁或檔案網址，按 hydrus 的網址匯入處理：列表頁只抓一頁。",
+      "when": {
+        "mode": [
+          "url"
+        ]
+      }
+    },
+    {
+      "key": "url_params",
+      "type": "list",
+      "name": "URL parameter defaults",
+      "name.zh": "URL 参数默认值",
+      "name.ja": "URL パラメータの既定値",
+      "name.ko": "URL 매개변수 기본값",
+      "name.zhtw": "URL 參數預設值",
+      "descripts": "Override default values of URL class parameters, one name=value per item, like editing the URL class in hydrus. An empty value (e.g. apikey=) drops that default. Some downloaders ship placeholder API keys that must be replaced or dropped.",
+      "descripts.zh": "覆盖 URL class 里参数的默认值，每项一个「参数名=值」，相当于在 hydrus 里编辑 URL class。值留空（如 apikey=）表示不再补这个参数。有的下载器自带占位的 API key，需要替换或去掉。",
+      "descripts.ja": "URL class のパラメータ既定値を上書きします。1 項目に「名前=値」を 1 つ。hydrus で URL class を編集するのと同じです。値を空にすると（例 apikey=）その既定値を外します。プレースホルダーの API key を含むダウンローダーでは差し替えか削除が必要です。",
+      "descripts.ko": "URL class 매개변수의 기본값을 덮어씁니다. 항목마다 「이름=값」 하나, hydrus에서 URL class를 편집하는 것과 같습니다. 값을 비우면(예: apikey=) 그 기본값을 빼냅니다. 자리표시자 API key가 들어 있는 다운로더는 바꾸거나 빼야 합니다.",
+      "descripts.zhtw": "覆寫 URL class 裡參數的預設值，每項一個「參數名=值」，相當於在 hydrus 裡編輯 URL class。值留空（如 apikey=）表示不再補這個參數。有的下載器自帶佔位的 API key，需要替換或去掉。",
+      "when": {
+        "mode": [
+          "png",
+          "url"
+        ]
+      }
+    },
+    {
+      "key": "max_pages",
+      "type": "int",
+      "name": "Max gallery pages",
+      "name.zh": "最多列表页数",
+      "name.ja": "最大一覧ページ数",
+      "name.ko": "최대 목록 페이지 수",
+      "name.zhtw": "最多列表頁數",
+      "descripts": "Counted separately for each GUG an NGUG expands to, each gallery URL and each sub-gallery; only next pages share the count.",
+      "descripts.zh": "NGUG 展开出的每个 GUG、每个列表页网址、每个子列表页分别计算，只有翻下一页才累计。",
+      "descripts.ja": "NGUG が展開する GUG ごと、一覧 URL ごと、サブ一覧ごとに別々に数え、次ページへ進むときだけ加算します。",
+      "descripts.ko": "NGUG가 펼치는 GUG마다, 목록 URL마다, 하위 목록마다 따로 세며 다음 페이지로 넘어갈 때만 누적됩니다.",
+      "descripts.zhtw": "NGUG 展開出的每個 GUG、每個列表頁網址、每個子列表頁分別計算，只有翻下一頁才累計。",
+      "default": 1,
+      "min": 1,
+      "max": 1000,
+      "width": 2,
+      "when": {
+        "mode": [
+          "png",
+          "url"
+        ]
+      }
+    },
+    {
+      "key": "max_files",
+      "type": "int",
+      "name": "Max files",
+      "name.zh": "最多文件数",
+      "name.ja": "最大ファイル数",
+      "name.ko": "최대 파일 수",
+      "name.zhtw": "最多檔案數",
+      "default": 20,
+      "min": 1,
+      "max": 100000,
+      "width": 2,
+      "when": {
+        "mode": [
+          "png",
+          "url"
+        ]
+      }
+    },
+    {
+      "key": "db_dir",
+      "type": "folder",
+      "required": true,
+      "name": "hydrus db folder",
+      "name.zh": "hydrus db 目录",
+      "name.ja": "hydrus db フォルダ",
+      "name.ko": "hydrus db 폴더",
+      "name.zhtw": "hydrus db 目錄",
+      "descripts": "hydrus's db folder, which contains client.db. Read only. Closing hydrus first is recommended.",
+      "descripts.zh": "hydrus 的 db 目录，里面有 client.db。只读，建议先关闭 hydrus。",
+      "descripts.ja": "client.db がある hydrus の db フォルダ。読み取りのみです。先に hydrus を閉じることをおすすめします。",
+      "descripts.ko": "client.db가 있는 hydrus의 db 폴더. 읽기만 합니다. 먼저 hydrus를 닫는 것을 권장합니다.",
+      "descripts.zhtw": "hydrus 的 db 目錄，裡面有 client.db。唯讀，建議先關閉 hydrus。",
+      "when": {
+        "mode": [
+          "hydrus_db"
+        ]
+      }
+    },
+    {
+      "key": "files_dir",
+      "type": "folder",
+      "name": "File storage folder",
+      "name.zh": "文件目录",
+      "name.ja": "ファイル保存フォルダ",
+      "name.ko": "파일 저장 폴더",
+      "name.zhtw": "檔案目錄",
+      "descripts": "Only needed when hydrus stores files outside the db folder: choose the folder containing f00, f01 and so on.",
+      "descripts.zh": "只在 hydrus 把文件放在 db 目录以外时需要：选择里面是 f00、f01 等文件夹的那个目录。",
+      "descripts.ja": "hydrus がファイルを db フォルダの外に保存している場合だけ必要です。f00、f01 などが入っているフォルダを選びます。",
+      "descripts.ko": "hydrus가 파일을 db 폴더 밖에 저장할 때만 필요합니다. f00, f01 등이 들어 있는 폴더를 고르세요.",
+      "descripts.zhtw": "只在 hydrus 把檔案放在 db 目錄以外時需要：選擇裡面是 f00、f01 等資料夾的那個目錄。",
+      "when": {
+        "mode": [
+          "hydrus_db"
+        ]
+      }
+    },
+    {
+      "key": "import_files",
+      "type": "boolean",
+      "name": "Import files",
+      "name.zh": "导入文件",
+      "name.ja": "ファイルを取り込む",
+      "name.ko": "파일 가져오기",
+      "name.zhtw": "匯入檔案",
+      "descripts": "Import the images and videos in hydrus with their tags, URLs, notes and times. Files already in Kabegame are skipped by content.",
+      "descripts.zh": "导入 hydrus 里的图片和视频，连同标签、网址、备注和时间。Kabegame 里已有的文件按内容去重。",
+      "descripts.ja": "hydrus の画像と動画を、タグ・URL・メモ・日時とともに取り込みます。Kabegame にあるファイルは内容で重複を除きます。",
+      "descripts.ko": "hydrus의 이미지와 동영상을 태그·URL·메모·시간과 함께 가져옵니다. Kabegame에 이미 있는 파일은 내용으로 중복을 제거합니다.",
+      "descripts.zhtw": "匯入 hydrus 裡的圖片和影片，連同標籤、網址、備註和時間。Kabegame 裡已有的檔案按內容去重。",
+      "default": true,
+      "when": {
+        "mode": [
+          "hydrus_db"
+        ]
+      }
+    },
+    {
+      "key": "merge_downloaders",
+      "type": "boolean",
+      "name": "Merge downloaders",
+      "name.zh": "合并下载器",
+      "name.ja": "ダウンローダーを統合",
+      "name.ko": "다운로더 병합",
+      "name.zhtw": "合併下載器",
+      "descripts": "Also add hydrus's downloaders to the plugin's downloader library, like importing them all at once. Existing ones are kept; credential headers are not copied.",
+      "descripts.zh": "同时把 hydrus 里的下载器加入插件的下载器库，相当于一次导入全部，已有的不会被覆盖；凭据类请求头不复制。",
+      "descripts.ja": "hydrus のダウンローダーもプラグインのダウンローダーライブラリに追加します。まとめて取り込むのと同じで、既存のものは上書きしません。認証情報のヘッダーはコピーしません。",
+      "descripts.ko": "hydrus의 다운로더도 플러그인의 다운로더 라이브러리에 추가합니다. 한 번에 모두 가져오는 것과 같으며 기존 것은 덮어쓰지 않습니다. 자격 증명 헤더는 복사하지 않습니다.",
+      "descripts.zhtw": "同時把 hydrus 裡的下載器加入外掛的下載器庫，相當於一次匯入全部，已有的不會被覆蓋；憑據類請求標頭不複製。",
+      "default": false,
+      "when": {
+        "mode": [
+          "hydrus_db"
+        ]
+      }
+    },
+    {
+      "key": "include_trash",
+      "type": "boolean",
+      "name": "Include trash",
+      "name.zh": "包括回收站",
+      "name.ja": "ゴミ箱を含める",
+      "name.ko": "휴지통 포함",
+      "name.zhtw": "包括回收站",
+      "default": false,
+      "when": {
+        "mode": [
+          "hydrus_db"
+        ]
+      }
+    }
+  ],
+  "kbIcon": "icon.png",
+  "kbDoc": {
+    "default": "README.md"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "devDependencies": {
+    "@kabegame/plugin-sdk": "file:../../../packages/kabegame-plugin-sdk",
+    "@kabegame/types": "file:../../../packages/kabegame-types",
+    "@rspack/cli": "^1",
+    "@rspack/core": "^1",
+    "typescript": "^5.5.0"
+  }
+}

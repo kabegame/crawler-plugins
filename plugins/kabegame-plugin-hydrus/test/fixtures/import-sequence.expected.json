@@ -1,0 +1,628 @@
+{
+ "steps": [
+  {
+   "png": "wallhaven-2020-03-01.png",
+   "duplicates": 0
+  },
+  {
+   "png": "wallhaven-2023-01-11.png",
+   "duplicates": 0
+  },
+  {
+   "png": "wallhaven-2023-01-11.png",
+   "duplicates": 7
+  },
+  {
+   "png": "danbooru-2026-09-29.png",
+   "duplicates": 0
+  },
+  {
+   "png": "gelbooru-0.2.5-file-page-parser.png",
+   "duplicates": 0
+  },
+  {
+   "png": "ngug-danbooru-gelbooru-2018-09-20.png",
+   "duplicates": 0
+  },
+  {
+   "png": "newgrounds-2021-03-22.png",
+   "duplicates": 0
+  },
+  {
+   "png": "zerochan-2025-05-03.png",
+   "duplicates": 0
+  },
+  {
+   "png": "derpibooru-2021-03-20.png",
+   "duplicates": 0
+  },
+  {
+   "png": "yuni-2021-01-14.png",
+   "duplicates": 0
+  },
+  {
+   "png": "ehentai-2022-01-16.png",
+   "duplicates": 0
+  },
+  {
+   "png": "ehentai-2023-04-24.png",
+   "duplicates": 16
+  },
+  {
+   "png": "sankaku-beta-2024-04-06.png",
+   "duplicates": 0
+  }
+ ],
+ "gugs": [
+  [
+   "wallhaven.cc search tags",
+   "https://wallhaven.cc/search?q=blue_eyes+blonde_hair&categories=111&purity=100&sorting=relevance&order=desc&page=1"
+  ],
+  [
+   "wallhaven.cc search tags (1)",
+   "https://wallhaven.cc/api/v1/search?q=blue_eyes+blonde_hair"
+  ],
+  [
+   "danbooru.donmai.us tag search",
+   "https://danbooru.donmai.us/posts?page=1&tags=blue_eyes+blonde_hair"
+  ],
+  [
+   "danbooru & gelbooru tag search",
+   [
+    null,
+    null
+   ]
+  ],
+  [
+   "newgrounds artist art lookup",
+   "https://captainkirb.newgrounds.com/art/"
+  ],
+  [
+   "newgrounds artist games lookup",
+   "https://matt-likes-swords.newgrounds.com/games/"
+  ],
+  [
+   "newgrounds artist lookup",
+   [
+    "newgrounds artist art lookup",
+    "newgrounds artist games lookup",
+    "newgrounds artist movies lookup"
+   ]
+  ],
+  [
+   "newgrounds artist movies lookup",
+   "https://sambakza.newgrounds.com/movies/"
+  ],
+  [
+   "zerochan.net tag search",
+   "https://www.zerochan.net/kimetsu+no+yaiba?p=1"
+  ],
+  [
+   "derpibooru tag search",
+   "https://www.derpibooru.org/api/v1/json/search/images?filter_id=56027&page=1&per_page=50&q=safe%2Chuman"
+  ],
+  [
+   "yuni.us archive page number",
+   "https://yuni.us/?p=1"
+  ],
+  [
+   "yuni.us search",
+   "https://yuni.us/?q=penis"
+  ],
+  [
+   "e-hentai hash lookup",
+   "https://e-hentai.org/?f_sh=on&f_shash=d8205a767438815dba67458278d2303b983210e2&page=0"
+  ],
+  [
+   "e-hentai tag search",
+   "https://e-hentai.org/?f_search=blue_eyes+blonde_hair&page=0"
+  ],
+  [
+   "e-hentai.org gallery lookup (full url)",
+   "https://e-hentai.org/g/https:%2F%2Fe-hentai.org%2Fg%2F857304%2Ff3b4bef5d4%2F"
+  ],
+  [
+   "exhentai.org gallery lookup (full url)",
+   "https://exhentai.org/g/https:%2F%2Fexhentai.org%2Fg%2F857304%2Ff3b4bef5d4%2F"
+  ],
+  [
+   "sankaku chan beta book(pool) search",
+   "https://beta.sankakucomplex.com/books/254757"
+  ],
+  [
+   "sankaku chan beta pool search",
+   "https://capi-v2.sankakucomplex.com/pools/254757"
+  ],
+  [
+   "sankaku chan beta pool search by name",
+   "https://capi-v2.sankakucomplex.com/pools?name=blue_eyes+blonde_hair:all"
+  ],
+  [
+   "sankaku chan beta pool search by tags",
+   "https://capi-v2.sankakucomplex.com/pools?tags=blue_eyes+blonde_hair"
+  ],
+  [
+   "sankaku chan beta tag search",
+   "https://capi-v2.sankakucomplex.com/posts?lang=english&page=1&limit=100&tags=blue_eyes+blonde_hair"
+  ],
+  [
+   "sankaku idol beta pool search",
+   "https://iapi.sankakucomplex.com/post/index.json?page=1&limit=60&tags=pool:246"
+  ],
+  [
+   "sankaku idol beta tag search",
+   "https://iapi.sankakucomplex.com/post/index.json?page=1&limit=60&tags=blue_eyes+blonde_hair"
+  ]
+ ],
+ "urlClasses": [
+  "danbooru.donmai.us file page",
+  "danbooru.donmai.us gallery page",
+  "derpibooru api gallery page",
+  "derpibooru file page",
+  "e-hentai.org file page",
+  "e-hentai.org file page original-res",
+  "e-hentai.org frontpage (url recognition for companion)",
+  "e-hentai.org gallery page (1 of 2) gug",
+  "e-hentai.org gallery page (2 of 2)",
+  "exhentai.org file page",
+  "exhentai.org file page original-res",
+  "exhentai.org frontpage (url recognition for companion)",
+  "exhentai.org gallery page (1 of 2) gug",
+  "exhentai.org gallery page (2 of 2)",
+  "newgrounds art",
+  "newgrounds art gallery page",
+  "newgrounds art gallery page overflow",
+  "newgrounds file page",
+  "newgrounds games gallery page",
+  "newgrounds games gallery page overflow",
+  "newgrounds movies gallery page",
+  "newgrounds movies gallery page overflow",
+  "sankaku chan beta books page api",
+  "sankaku chan beta file page api",
+  "sankaku chan beta gallery page api",
+  "sankaku chan beta pool by name api",
+  "sankaku chan beta pool by tags api",
+  "sankaku chan beta pool page api",
+  "sankaku chan beta post page",
+  "sankaku chan beta tag page",
+  "sankaku chan file",
+  "sankaku chan file (new 2)",
+  "sankaku chan file (new)",
+  "sankaku chan gallery page",
+  "sankaku chan pool page api",
+  "sankaku chan post page",
+  "sankaku chan post page (alphanum id)",
+  "sankaku idol beta gallery page api",
+  "sankaku idol file",
+  "sankaku idol file page",
+  "sankaku idol gallery page",
+  "sankaku wp",
+  "sankaku wp id",
+  "sankaku wp image",
+  "sankaku wp json media",
+  "sankaku wp json post",
+  "wallhaven.cc gallery",
+  "wallhaven.cc gallery api",
+  "wallhaven.cc post",
+  "wallhaven.cc post api",
+  "yuni.us file url",
+  "yuni.us gallery page",
+  "yuni.us post page",
+  "yuni.us search page",
+  "zerochan.net gallery url",
+  "zerochan.net post url",
+  "zzz - renamed due to auto-import - e-hentai galleries",
+  "zzz - renamed due to auto-import - exhentai galleries",
+  "zzz - renamed due to auto-import - wallhaven.cc gallery url class",
+  "zzz - renamed due to auto-import - wallhaven.cc post url class"
+ ],
+ "parsers": [
+  [
+   "danbooru.donmai.us file page parser",
+   [
+    "https://danbooru.donmai.us/posts/2982422"
+   ]
+  ],
+  [
+   "danbooru.donmai.us gallery page parser",
+   [
+    "https://danbooru.donmai.us/posts?page=4&tags=touhou"
+   ]
+  ],
+  [
+   "derpibooru file page parser",
+   [
+    "https://derpibooru.org/images/1788231",
+    "https://derpibooru.org/images/788231?q=bikini"
+   ]
+  ],
+  [
+   "derpibooru gallery page parser",
+   [
+    "https://www.derpibooru.org/api/v1/json/search/images?filter_id=56027&page=1&per_page=50&q=safe"
+   ]
+  ],
+  [
+   "e-hentai galleries page parser",
+   [
+    "https://e-hentai.org/?page=0"
+   ]
+  ],
+  [
+   "ex/e-hentai.org gallery page parser",
+   [
+    "https://e-hentai.org/g/1412913/07c8cfedd2",
+    "https://e-hentai.org/g/1412913/07c8cfedd2?p=0",
+    "https://exhentai.org/g/1264932/a353f38312/",
+    "https://exhentai.org/g/1264932/a353f38312?p=0"
+   ]
+  ],
+  [
+   "ex/e-hentai.org post page parser",
+   [
+    "https://e-hentai.org/s/55b2600978/1412913-2",
+    "https://exhentai.org/s/ef0bbeb659/1264932-1"
+   ]
+  ],
+  [
+   "gelbooru 0.2.5 file page parser",
+   [
+    "https://gelbooru.com/index.php?id=10118626&page=post&s=view",
+    "https://gelbooru.com/index.php?page=post&s=view&id=4163910"
+   ]
+  ],
+  [
+   "newgrounds art parser",
+   [
+    "https://www.newgrounds.com/art/view/mrpecu/io-calla"
+   ]
+  ],
+  [
+   "newgrounds file page parser",
+   [
+    "https://www.newgrounds.com/portal/view/404612",
+    "https://www.newgrounds.com/portal/view/713908"
+   ]
+  ],
+  [
+   "newgrounds gallery page parser",
+   [
+    "https://accelartofficial.newgrounds.com/art/",
+    "https://accelartofficial.newgrounds.com/art/page/2",
+    "https://captainkirb.newgrounds.com/art/",
+    "https://captainkirb.newgrounds.com/art/page/2",
+    "https://matt-likes-swords.newgrounds.com/games/",
+    "https://matt-likes-swords.newgrounds.com/games/page/2",
+    "https://sambakza.newgrounds.com/movies/",
+    "https://sambakza.newgrounds.com/movies/page/2"
+   ]
+  ],
+  [
+   "sankaku chan beta gallery page api parser",
+   [
+    "https://capi-v2.sankakucomplex.com/posts?lang=english&page=9&limit=100&tags=threshold:1+hide_posts_in_books:in-larger-tags"
+   ]
+  ],
+  [
+   "sankaku chan beta pool page api parser",
+   [
+    "https://capi-v2.sankakucomplex.com/pools/254757"
+   ]
+  ],
+  [
+   "sankaku chan beta pools to pool parser",
+   [
+    "https://capi-v2.sankakucomplex.com/pools?limit=100&page=1&name=Chitai+Gashuu+Hinadori:all",
+    "https://capi-v2.sankakucomplex.com/pools?limit=100&page=1&tags=anal"
+   ]
+  ],
+  [
+   "sankaku chan beta post page api parser",
+   [
+    "https://capi-v2.sankakucomplex.com/posts?lang=english&page=1&limit=1&tags=id_range:16216367"
+   ]
+  ],
+  [
+   "sankaku chan beta post page api parser (1)",
+   [
+    "https://capi-v2.sankakucomplex.com/posts?lang=english&page=1&limit=1&tags=id_range:16216367"
+   ]
+  ],
+  [
+   "sankaku file page parser",
+   [
+    "https://chan.sankakucomplex.com/post/show/6909508",
+    "https://idol.sankakucomplex.com/post/show/698092"
+   ]
+  ],
+  [
+   "sankaku gallery page parser",
+   [
+    "https://chan.sankakucomplex.com/?tags=symbol-shaped_pupils&page=5",
+    "https://idol.sankakucomplex.com/?tags=black_hair&page=2"
+   ]
+  ],
+  [
+   "sankaku idol beta gallery page api parser",
+   [
+    "https://iapi.sankakucomplex.com/post/index.json?page=2&limit=60&tags=rating:safe"
+   ]
+  ],
+  [
+   "sankaku wp json media",
+   [
+    "https://www.sankakucomplex.com/?rest_route=/wp/v2/media&page=1&per_page=100&parent=908399"
+   ]
+  ],
+  [
+   "sankaku wp json post",
+   [
+    "https://www.sankakucomplex.com/?rest_route=/wp/v2/posts&_embed=true&slug=kuroinu-olga-discordia-cosplay-by-aqua-gloriously-enticing"
+   ]
+  ],
+  [
+   "sankaku wp post",
+   [
+    "https://www.sankakucomplex.com/2019/09/12/naughty-nyotengu-cosplay-by-saku-palatially-descends?pg=X",
+    "https://www.sankakucomplex.com/?p=798205"
+   ]
+  ],
+  [
+   "wallhaven.cc gallery parser",
+   [
+    "https://alpha.wallhaven.cc/search?q=color&categories=111&purity=100&sorting=relevance&order=desc&page=3",
+    "https://wallhaven.cc/search?q=cute&categories=111&purity=100&sorting=relevance&order=desc&page=1"
+   ]
+  ],
+  [
+   "wallhaven.cc gallery parser (1)",
+   [
+    "https://wallhaven.cc/api/v1/search?q=cute&categories=111&purity=100&sorting=relevance&order=desc&page=1"
+   ]
+  ],
+  [
+   "wallhaven.cc post parser",
+   [
+    "https://alpha.wallhaven.cc/wallpaper/2645",
+    "https://wallhaven.cc/w/nkjkp6"
+   ]
+  ],
+  [
+   "wallhaven.cc post parser (1)",
+   [
+    "https://wallhaven.cc/api/v1/w/nkjkp6"
+   ]
+  ],
+  [
+   "yuni.us gallery page parser (gets whole site when used with gug)",
+   [
+    "https://yuni.us/",
+    "https://yuni.us/?p=1",
+    "https://yuni.us/?q=penis"
+   ]
+  ],
+  [
+   "yuni.us post page parser",
+   [
+    "https://yuni.us/happy-pretzel-day"
+   ]
+  ],
+  [
+   "zerochan.net gallery parser",
+   [
+    "https://www.zerochan.net/Hatsune+Miku?o=1",
+    "https://www.zerochan.net/Hatsune+Miku?p=1&s=id",
+    "https://www.zerochan.net/Kimetsu+no+Yaiba?o=3100696",
+    "https://www.zerochan.net/Original",
+    "https://www.zerochan.net/Original?p=1"
+   ]
+  ],
+  [
+   "zerochan.net post parser",
+   [
+    "https://www.zerochan.net/2376147",
+    "https://www.zerochan.net/2626378",
+    "https://www.zerochan.net/3329631",
+    "https://www.zerochan.net/3892806",
+    "https://www.zerochan.net/3943765"
+   ]
+  ]
+ ],
+ "links": [
+  [
+   "danbooru.donmai.us file page",
+   "danbooru.donmai.us file page parser"
+  ],
+  [
+   "danbooru.donmai.us gallery page",
+   "danbooru.donmai.us gallery page parser"
+  ],
+  [
+   "derpibooru api gallery page",
+   "derpibooru gallery page parser"
+  ],
+  [
+   "derpibooru file page",
+   "derpibooru file page parser"
+  ],
+  [
+   "e-hentai.org file page",
+   "ex/e-hentai.org post page parser"
+  ],
+  [
+   "e-hentai.org gallery page (2 of 2)",
+   "ex/e-hentai.org gallery page parser"
+  ],
+  [
+   "exhentai.org file page",
+   "ex/e-hentai.org post page parser"
+  ],
+  [
+   "exhentai.org gallery page (2 of 2)",
+   "ex/e-hentai.org gallery page parser"
+  ],
+  [
+   "newgrounds art",
+   "newgrounds art parser"
+  ],
+  [
+   "newgrounds art gallery page",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "newgrounds art gallery page overflow",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "newgrounds file page",
+   "newgrounds file page parser"
+  ],
+  [
+   "newgrounds games gallery page",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "newgrounds games gallery page overflow",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "newgrounds movies gallery page",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "newgrounds movies gallery page overflow",
+   "newgrounds gallery page parser"
+  ],
+  [
+   "sankaku chan beta gallery page api",
+   "sankaku chan beta gallery page api parser"
+  ],
+  [
+   "sankaku chan beta pool by name api",
+   "sankaku chan beta pools to pool parser"
+  ],
+  [
+   "sankaku chan beta pool by tags api",
+   "sankaku chan beta pools to pool parser"
+  ],
+  [
+   "sankaku chan beta pool page api",
+   "sankaku chan beta pool page api parser"
+  ],
+  [
+   "sankaku idol beta gallery page api",
+   "sankaku idol beta gallery page api parser"
+  ],
+  [
+   "sankaku idol file page",
+   "sankaku file page parser"
+  ],
+  [
+   "sankaku wp",
+   "sankaku wp post"
+  ],
+  [
+   "sankaku wp id",
+   "sankaku wp post"
+  ],
+  [
+   "sankaku wp json media",
+   "sankaku wp json media"
+  ],
+  [
+   "sankaku wp json post",
+   "sankaku wp json post"
+  ],
+  [
+   "wallhaven.cc gallery api",
+   "wallhaven.cc gallery parser (1)"
+  ],
+  [
+   "wallhaven.cc post api",
+   "wallhaven.cc post parser (1)"
+  ],
+  [
+   "yuni.us gallery page",
+   "yuni.us gallery page parser (gets whole site when used with gug)"
+  ],
+  [
+   "yuni.us post page",
+   "yuni.us post page parser"
+  ],
+  [
+   "yuni.us search page",
+   "yuni.us gallery page parser (gets whole site when used with gug)"
+  ],
+  [
+   "zerochan.net gallery url",
+   "zerochan.net gallery parser"
+  ],
+  [
+   "zerochan.net post url",
+   "zerochan.net post parser"
+  ],
+  [
+   "zzz - renamed due to auto-import - e-hentai galleries",
+   "e-hentai galleries page parser"
+  ],
+  [
+   "zzz - renamed due to auto-import - wallhaven.cc gallery url class",
+   "wallhaven.cc gallery parser"
+  ],
+  [
+   "zzz - renamed due to auto-import - wallhaven.cc post url class",
+   "wallhaven.cc post parser"
+  ]
+ ],
+ "headers": {
+  "capi-v2.sankakucomplex.com": [
+   [
+    "Authorization",
+    "<replace this>"
+   ]
+  ],
+  "iapi.sankakucomplex.com": [
+   [
+    "User-Agent",
+    "SCChannelApp/3.0 (Android; idol)"
+   ]
+  ],
+  "sankakucomplex.com": [
+   [
+    "User-Agent",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:71.0) Gecko/20100101 Firefox/71.0"
+   ]
+  ]
+ },
+ "bandwidth": {
+  "exhentai.org": [
+   [
+    0,
+    86400,
+    53687091200
+   ],
+   [
+    1,
+    2,
+    1
+   ]
+  ],
+  "yuni.us": [
+   [
+    0,
+    86400,
+    2147483648
+   ],
+   [
+    1,
+    1,
+    1
+   ],
+   [
+    1,
+    60,
+    50
+   ]
+  ]
+ }
+}

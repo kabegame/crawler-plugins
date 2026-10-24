@@ -1,0 +1,68 @@
+[
+ {
+  "urls": [
+   {
+    "url": "https://img4.gelbooru.com//images/40/3a/403a84311eac67d0e2ead55b3d2e3570.jpg",
+    "urlType": 7,
+    "priority": 50
+   },
+   {
+    "url": "https://img4.gelbooru.com/images/40/3a/403a84311eac67d0e2ead55b3d2e3570.jpg",
+    "urlType": 7,
+    "priority": 75
+   },
+   {
+    "url": "https://x.com/iamlaurael/status/2079340437370802682",
+    "urlType": 8,
+    "priority": 0
+   }
+  ],
+  "tags": [
+   "creator:laura el",
+   "meta:commentary",
+   "meta:english commentary",
+   "meta:highres",
+   "rating:General",
+   "series:original",
+   "1girl",
+   "black gloves",
+   "black hair",
+   "bush",
+   "cat",
+   "dress",
+   "elbow gloves",
+   "from side",
+   "full body",
+   "gloves",
+   "hair bun",
+   "holding",
+   "holding umbrella",
+   "outdoors",
+   "plant",
+   "rain",
+   "red dress",
+   "scenery",
+   "solo",
+   "standing",
+   "tree",
+   "umbrella"
+  ],
+  "titles": [],
+  "notes": [],
+  "hashes": [
+   {
+    "type": "md5",
+    "encoding": "hex",
+    "value": "403a84311eac67d0e2ead55b3d2e3570"
+   }
+  ],
+  "timestamps": [
+   {
+    "type": 0,
+    "value": 1792449106
+   }
+  ],
+  "headers": [],
+  "others": []
+ }
+]

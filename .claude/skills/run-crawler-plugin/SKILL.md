@@ -40,6 +40,10 @@ deno run -A .claude/skills/run-crawler-plugin/driver.mjs kemono \
   --var creator_page_start=1 --var creator_page_end=1
 
 # 只看最终配置解析成什么，不建任务、不联网（秒回）
+deno run -A .claude/skills/run-crawler-plugin/driver.mjs kemono --print-config \
+  --var source=tag --var tag=nsfw
+
+# 完整执行插件逻辑，但不下载或入库
 deno run -A .claude/skills/run-crawler-plugin/driver.mjs kemono --dry-run \
   --var source=tag --var tag=nsfw
 
@@ -56,7 +60,8 @@ driver 干三件事：**打包投放 → 跑 → 摘要**。
 | 选项 | 说明 |
 |---|---|
 | `--var KEY=VALUE` | 覆盖 `kbConfig` 项，可重复。值按 kbConfig 里声明的类型自动转换，所以 `--var page=3` 会变成数字。key 写错会直接报错并列出所有可用 key。 |
-| `--dry-run` | 只解析并打印最终配置 |
+| `--print-config` | 只解析并打印最终配置 |
+| `--dry-run` | 完整执行插件逻辑，但不下载或入库 |
 | `--no-repack` | 跳过打包，跑已安装的那份 |
 | `--output-dir <目录>` | 图片落盘位置，**强烈建议测试时指定**（见 Gotchas） |
 | `--data dev\|prod` | 默认 `dev` = 仓库内 `.kabegame/debug` |
@@ -143,7 +148,7 @@ driver 干三件事：**打包投放 → 跑 → 摘要**。
 | `插件 X 没有配置项 \`k\`。可用的有：…` | `--var` 的 key 拼错了，照它列出的改。 |
 | `非法 KGPG 包：容器版本 2 过低` | 数据目录里有旧容器的包。多半是漏了 `--data dev` 跑到 prod 目录去了。 |
 | `rusty_ffmpeg … No linking method set!` / `'errno.h' file not found` | 裸 `cargo build` 少了环境注入，见「前置：构建 CLI」。 |
-| 跑完 `下载 0 张` 但没有 error | 先 `--dry-run` 看配置是不是真按预期解析的；再看摘要的「问题分类」，通常是附件被过滤规则全滤掉了。 |
+| 跑完 `下载 0 张` 但没有 error | 先 `--print-config` 看配置是不是真按预期解析的；再看摘要的「问题分类」，通常是附件被过滤规则全滤掉了。 |
 | 退出码 124 | 撞上 `--timeout`（默认 300s）。爬多页时加 `--timeout 900`。 |
 
 ## driver

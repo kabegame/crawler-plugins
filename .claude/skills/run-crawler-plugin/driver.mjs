@@ -16,7 +16,8 @@
  *     --var source=creator --var service=patreon --var creator_id=44096704 \
  *     --var creator_page_start=1 --var creator_page_end=1
  *
- *   ... --dry-run          # 只解析并打印最终配置，不建任务、不联网
+ *   ... --print-config     # 只解析并打印最终配置，不建任务、不联网
+ *   ... --dry-run          # 执行插件逻辑，但不下载或入库
  *   ... --no-repack        # 跳过打包，直接跑已安装的那份
  *   ... --timeout 600      # 默认 300 秒
  *   ... --data prod        # 改用系统数据目录（默认 dev）
@@ -71,7 +72,8 @@ function usage() {
 
 选项:
   --var KEY=VALUE   覆盖插件 kbConfig 项，可重复
-  --dry-run         只打印最终配置，不建任务
+  --print-config    只打印最终配置，不建任务
+  --dry-run         执行插件逻辑，但不下载或入库
   --no-repack       跳过打包，直接跑已安装的版本
   --data dev|prod   数据目录（默认 dev = 仓库内 .kabegame/debug）
   --output-dir <目录> 图片落盘目录。**不传的话图片会进 <Pictures>/Kabegame**，
@@ -91,7 +93,7 @@ if (argv.length === 0 || argv.includes("-h") || argv.includes("--help")) {
 
 let plugin = null;
 const vars = [];
-let dryRun = false, noRepack = false, raw = false;
+let printConfig = false, dryRun = false, noRepack = false, raw = false;
 let dataMode = "dev";
 let timeoutSec = 300;
 let outputDir = null;
@@ -103,7 +105,8 @@ for (let i = 0; i < argv.length; i++) {
     if (!v) die("--var 需要一个 KEY=VALUE");
     if (!v.includes("=")) die(`--var 需要 KEY=VALUE 形式，收到：${v}`);
     vars.push(v);
-  } else if (a === "--dry-run") dryRun = true;
+  } else if (a === "--print-config") printConfig = true;
+  else if (a === "--dry-run") dryRun = true;
   else if (a === "--no-repack") noRepack = true;
   else if (a === "--raw") raw = true;
   else if (a === "--data") dataMode = argv[++i];
@@ -163,6 +166,7 @@ if (!noRepack) {
 // ── 2. 跑 ─────────────────────────────────────────────────────────────
 const runArgs = ["plugin", "run", plugin, "--data", dataMode, "--plain"];
 if (outputDir) runArgs.push("--output-dir", outputDir);
+if (printConfig) runArgs.push("--print-config");
 if (dryRun) runArgs.push("--dry-run");
 for (const v of vars) runArgs.push("--var", v);
 
