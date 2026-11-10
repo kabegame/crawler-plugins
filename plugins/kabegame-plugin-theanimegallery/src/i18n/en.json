@@ -1,0 +1,17 @@
+{
+  "openPage": "[theanimegallery] Opening page: {url}",
+  "listHttpError": "Page request failed: HTTP {status}",
+  "noNextData": "__NEXT_DATA__ not found in page; the site may have changed",
+  "listReadFailed": "[theanimegallery] Failed to read list: {error}",
+  "listSummary": "[theanimegallery] {what}: {count} wallpapers",
+  "sourceHome": "Home featured",
+  "sourceCategory": "Category \"{category}\"",
+  "sourceSearch": "Keyword \"{keyword}\"",
+  "itemDone": "[theanimegallery] {index}/{count} {title}",
+  "noImageUrl": "[theanimegallery] Record {id} has no image URL, skipped",
+  "downloadFailed": "[theanimegallery] Download failed {id}: {error}",
+  "unknownMode": "[theanimegallery] Unknown mode: {mode}",
+  "categoryRequired": "[theanimegallery] Category is empty; nothing to crawl",
+  "keywordRequired": "[theanimegallery] Keyword is empty; nothing to search",
+  "done": "[theanimegallery] Done"
+}

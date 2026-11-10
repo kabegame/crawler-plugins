@@ -1,0 +1,17 @@
+{
+  "openPage": "[theanimegallery] ページを開いています：{url}",
+  "listHttpError": "ページのリクエストに失敗しました：HTTP {status}",
+  "noNextData": "ページに __NEXT_DATA__ が見つかりません。サイトが変更された可能性があります",
+  "listReadFailed": "[theanimegallery] リストの読み取りに失敗しました：{error}",
+  "listSummary": "[theanimegallery] {what}：{count} 枚の壁紙",
+  "sourceHome": "ホームの注目",
+  "sourceCategory": "カテゴリ「{category}」",
+  "sourceSearch": "キーワード「{keyword}」",
+  "itemDone": "[theanimegallery] {index}/{count} {title}",
+  "noImageUrl": "[theanimegallery] レコード {id} に画像 URL がないためスキップします",
+  "downloadFailed": "[theanimegallery] ダウンロード失敗 {id}：{error}",
+  "unknownMode": "[theanimegallery] 不明なモード：{mode}",
+  "categoryRequired": "[theanimegallery] カテゴリが空のため取得できません",
+  "keywordRequired": "[theanimegallery] キーワードが空のため検索できません",
+  "done": "[theanimegallery] 完了"
+}

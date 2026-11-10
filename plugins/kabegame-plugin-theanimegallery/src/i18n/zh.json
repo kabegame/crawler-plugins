@@ -1,0 +1,17 @@
+{
+  "openPage": "[theanimegallery] 打开页面：{url}",
+  "listHttpError": "页面请求失败：HTTP {status}",
+  "noNextData": "页面里找不到 __NEXT_DATA__，站点可能已改版",
+  "listReadFailed": "[theanimegallery] 读取列表失败：{error}",
+  "listSummary": "[theanimegallery] {what}共 {count} 张壁纸",
+  "sourceHome": "首页精选",
+  "sourceCategory": "分类「{category}」",
+  "sourceSearch": "关键词「{keyword}」",
+  "itemDone": "[theanimegallery] {index}/{count} {title}",
+  "noImageUrl": "[theanimegallery] 记录 {id} 缺少原图 URL，跳过",
+  "downloadFailed": "[theanimegallery] 下载失败 {id}：{error}",
+  "unknownMode": "[theanimegallery] 未知模式：{mode}",
+  "categoryRequired": "[theanimegallery] 分类为空，无法抓取",
+  "keywordRequired": "[theanimegallery] 关键词为空，无法搜索",
+  "done": "[theanimegallery] 完成"
+}

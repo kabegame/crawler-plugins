@@ -1,0 +1,17 @@
+{
+  "openPage": "[theanimegallery] 開啟頁面：{url}",
+  "listHttpError": "頁面請求失敗：HTTP {status}",
+  "noNextData": "頁面裡找不到 __NEXT_DATA__，站點可能已改版",
+  "listReadFailed": "[theanimegallery] 讀取列表失敗：{error}",
+  "listSummary": "[theanimegallery] {what}共 {count} 張桌布",
+  "sourceHome": "首頁精選",
+  "sourceCategory": "分類「{category}」",
+  "sourceSearch": "關鍵字「{keyword}」",
+  "itemDone": "[theanimegallery] {index}/{count} {title}",
+  "noImageUrl": "[theanimegallery] 記錄 {id} 缺少原圖 URL，跳過",
+  "downloadFailed": "[theanimegallery] 下載失敗 {id}：{error}",
+  "unknownMode": "[theanimegallery] 未知模式：{mode}",
+  "categoryRequired": "[theanimegallery] 分類為空，無法抓取",
+  "keywordRequired": "[theanimegallery] 關鍵字為空，無法搜尋",
+  "done": "[theanimegallery] 完成"
+}

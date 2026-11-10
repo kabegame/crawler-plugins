@@ -1,0 +1,83 @@
+<%
+  // 还原 theanimegallery.com 详情页右栏：#标签、标题、彩色标签 chips、描述与更新时间。
+  // chips 的五色循环与悬停光晕取自源站 MUI 内联样式（#ffbe0b/#fb5607/#ff006e/#8338ec/#3a86ff）。
+  // 数据来自 src/index.ts 的 buildMetadata（schema 1）。
+  const m = metadata || {};
+  const BASE = 'https://theanimegallery.com';
+  const tags = Array.isArray(m.tags) ? m.tags : [];
+  const labels = Array.isArray(m.labels) ? m.labels : [];
+  const CHIP_COLORS = ['#ffbe0b', '#fb5607', '#ff006e', '#8338ec', '#3a86ff'];
+  function chipColor(i) { return CHIP_COLORS[i % CHIP_COLORS.length]; }
+  function searchHref(term) {
+    return BASE + '/tags/' + encodeURIComponent(String(term || '').toLowerCase().replace(/\s+/g, '-'));
+  }
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    if (!iso || isNaN(d)) return '';
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
+      ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+  const headTag = tags.length ? tags[0] : (m.category || '');
+  const titleMain = m.collection || m.title || '';
+  const titleSuffix = labels.length ? ', ' + labels.join(', ') : '';
+%>
+<style>
+.tag-page{
+  --tag-fg:#111;--tag-muted:#555;--tag-border:#e5e7eb;--tag-card:#fff;
+  font-family:"Roboto","Helvetica","Arial",-apple-system,"Segoe UI",sans-serif;
+  font-size:14px;line-height:1.5;color:var(--tag-fg);background:var(--tag-card);
+}
+.tag-page a{color:inherit;text-decoration:none;}
+.tag-hash{font-family:ui-monospace,Consolas,monospace;font-size:.95rem;color:var(--tag-fg);margin-bottom:.4rem;}
+.tag-title{font-size:1.5rem;font-weight:700;line-height:1.25;margin:0 0 .9rem;}
+.tag-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem;}
+.tag-chip{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:16px;
+  color:#fff;font-size:.8125rem;font-weight:500;white-space:nowrap;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;transition:box-shadow .3s;}
+.tag-chip:hover{box-shadow:0 0 10px 4px var(--glow);}
+.tag-desc{font-family:ui-monospace,Consolas,monospace;font-size:.85rem;color:var(--tag-fg);
+  margin-bottom:1rem;word-break:break-word;}
+.tag-updated{font-size:.8rem;color:var(--tag-muted);margin-bottom:1rem;}
+.tag-info{border-top:1px solid var(--tag-border);padding-top:.75rem;font-size:.875rem;}
+.tag-info-row{display:flex;gap:.75rem;padding:.25rem 0;}
+.tag-info-row dt{flex:none;width:6.5em;font-weight:600;color:var(--tag-muted);margin:0;}
+.tag-info-row dd{margin:0;word-break:break-word;}
+.tag-info a{color:#1976d2;}
+.tag-info a:hover{text-decoration:underline;}
+.tag-link{display:block;margin-top:.75rem;padding:.6rem 0;border-top:1px solid var(--tag-border);
+  color:var(--tag-muted)!important;font-size:.875rem;}
+.tag-link:hover{text-decoration:underline;}
+</style>
+<div class="tag-page">
+  <% if (headTag) { %><div class="tag-hash">#<%= headTag %></div><% } %>
+  <h1 class="tag-title"><%= titleMain %> - Anime Wallpapers<%= titleSuffix %></h1>
+
+  <% if (tags.length) { %>
+  <div class="tag-chips">
+    <% tags.forEach(function (tag, i) { %>
+    <a class="tag-chip" style="background-color:<%= chipColor(i) %>;--glow:<%= chipColor(i) %>66"
+       href="<%= searchHref(tag) %>" target="_blank" rel="noopener noreferrer"><%= tag %></a>
+    <% }); %>
+  </div>
+  <% } %>
+
+  <% if (m.description) { %><div class="tag-desc"><%= m.description %></div><% } %>
+  <% if (m.timestamp) { %><div class="tag-updated">Last Updated: <%= fmtDate(m.timestamp) %></div><% } %>
+
+  <dl class="tag-info">
+    <% if (m.category) { %>
+    <div class="tag-info-row"><dt>Category</dt><dd><a href="<%= BASE %>/category/<%= encodeURIComponent(m.category) %>" target="_blank" rel="noopener noreferrer"><%= m.category %></a></dd></div>
+    <% } %>
+    <% if (m.collection) { %>
+    <div class="tag-info-row"><dt>Collection</dt><dd><%= m.collection %></dd></div>
+    <% } %>
+    <% if (labels.length) { %>
+    <div class="tag-info-row"><dt>Labels</dt><dd><% labels.forEach(function (l, i) { %><%= i ? ', ' : '' %><a href="<%= searchHref(l) %>" target="_blank" rel="noopener noreferrer"><%= l %></a><% }); %></dd></div>
+    <% } %>
+    <% if (m.id) { %>
+    <div class="tag-info-row"><dt>ID</dt><dd><%= m.id %></dd></div>
+    <% } %>
+  </dl>
+
+  <% if (m.page_url) { %><a class="tag-link" href="<%= m.page_url %>" target="_blank" rel="noopener noreferrer">View on The Anime Gallery</a><% } %>
+</div>

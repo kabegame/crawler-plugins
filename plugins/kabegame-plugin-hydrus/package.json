@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-hydrus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "name.zh": "hydrus 下载器",
   "name.en": "hydrus downloader",
