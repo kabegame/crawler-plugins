@@ -24,5 +24,10 @@
   "pageFetched": "[kabegame-server] 第 {page} 页：{count} 张（id {first} … {last}）",
   "imageFailed": "[kabegame-server] 图片 #{id} 失败：{error}",
   "noDownloadUrl": "没有可下载的地址",
-  "pageDone": "[kabegame-server] 第 {page} 页完成：入队 {ok}/{count}"
+  "pageDone": "[kabegame-server] 第 {page} 页完成：入队 {ok}/{count}",
+  "wpeServerTooOld": "服务器不支持传输 Wallpaper Engine 壁纸，需要 Kabegame 4.7.0 或更高版本的桌面端",
+  "wpeListingFailed": "读取壁纸文件清单失败：HTTP {status}",
+  "wpeListingInvalid": "壁纸文件清单格式无效",
+  "wpeListing": "[kabegame-server] 壁纸 #{id}「{name}」：{count} 个文件，共 {size}",
+  "wpeFileDone": "[kabegame-server] 壁纸 #{id}：{index}/{total} {path}"
 }

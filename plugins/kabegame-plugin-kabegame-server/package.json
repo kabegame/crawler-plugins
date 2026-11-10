@@ -1,6 +1,6 @@
 {
   "name": "kabegame-plugin-kabegame-server",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "private": true,
   "name.zh": "Kabegame 服务器",
   "name.en": "Kabegame Server",
@@ -16,7 +16,7 @@
   "author": "Kabegame",
   "kbPackageVersion": 3,
   "engines": {
-    "kabegame": ">=4.5.2"
+    "kabegame": ">=4.7.0"
   },
   "main": "dist/main.js",
   "kbBackend": "v8",

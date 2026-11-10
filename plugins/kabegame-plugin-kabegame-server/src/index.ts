@@ -9,9 +9,13 @@
 //   - 元数据：`get_image_metadata_full`，按服务器 metadata 行共用一行本地 metadata（多图帖子不重复存）；
 //   - 标签：`albums://of_image_<id>/album_kind/label` 的 label_path 原样拆成 category + key；
 //   - 帖子地址：服务器的 post_url，没有就留空，不填服务器自己的地址。
+//   - Wallpaper Engine 壁纸（`x-wpe/*`）：一行是一个目录。`/file/<目录>` 返回文件清单，再经 SDK 的
+//     `downloadWpeWallpaper` 逐个文件下到任务 VFS、整目录交给宿主移走；这类行的 metadata 由宿主
+//     取 `project.json`，不从服务器取。
 // 详情模板执行来源插件自己的 description.ejs：模板文本与该插件的 plugin_data 由这里抓下来存进
 // 本插件的 plugin_data，templates/description.src.ejs 在 iframe 里读出后用同版本 ejs 渲染。
 
+import { downloadWpeWallpaper } from "@kabegame/plugin-sdk";
 import { t } from "./i18n";
 
 const { addProgress, downloadImage, createImageMetadata, warn, pluginData, setPluginData } = Kabegame;
@@ -31,6 +35,8 @@ const METADATA_SCHEMA = 1;
 // 输出侧（plugin_data / metadata）必须保持 JSON 可序列化，所以全部用 type 而非 interface。
 type ServerImage = {
   id?: number | string | null;
+  // 格式键，如 `image/png`、`video/mp4`、`x-wpe/scene`
+  type?: string | null;
   local_path?: string | null;
   url?: string | null;
   display_name?: string | null;
@@ -68,6 +74,14 @@ type RpcEnvelope<T> = {
 type EntrypointResult = {
   total?: unknown;
 };
+
+// `/file/<WPE 壁纸目录>` 返回的文件清单
+type WpeListing = {
+  type?: unknown;
+  files?: unknown;
+};
+
+type WpeFile = { path: string; size?: number };
 
 type MetadataFullResult = {
   data?: KabegameJsonValue;
@@ -237,6 +251,72 @@ function mediaUrl(server: string, image: ServerImage): string {
   return String(image.url ?? "").trim();
 }
 
+function isWpeImage(image: ServerImage): boolean {
+  return String(image.type ?? "").trim().toLowerCase().startsWith("x-wpe/");
+}
+
+// 取 WPE 壁纸目录的文件清单。4.7.0 之前的服务器对这类行固定返回 404。
+async function fetchWpeListing(rootUrl: string): Promise<WpeFile[]> {
+  const res = await fetch(rootUrl);
+  if (res.status === 404) throw new Error(t("wpeServerTooOld"));
+  if (!res.ok) throw new Error(t("wpeListingFailed", { status: res.status }));
+  let body: WpeListing | null = null;
+  try {
+    body = (await res.json()) as WpeListing;
+  } catch {
+    // 不是 JSON（例如 Web 版的 CDN 直链），按格式无效处理
+  }
+  if (!body || !Array.isArray(body.files)) throw new Error(t("wpeListingInvalid"));
+  const files: WpeFile[] = [];
+  for (const entry of body.files as { path?: unknown; size?: unknown }[]) {
+    if (typeof entry?.path !== "string") throw new Error(t("wpeListingInvalid"));
+    files.push({ path: entry.path, size: typeof entry.size === "number" ? entry.size : undefined });
+  }
+  return files;
+}
+
+function formatBytes(bytes: number): string {
+  const units = ["B", "KB", "MB", "GB", "TB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit++;
+  }
+  return `${unit === 0 ? value : value.toFixed(1)} ${units[unit]}`;
+}
+
+// 壁纸文件由插件自己逐个下载，不经下载队列的并发闸门：一次只传一张，避免几张几个 GB 的壁纸同时下。
+let wpeChain: Promise<void> = Promise.resolve();
+
+function copyWpeWallpaper(
+  server: string,
+  image: ServerImage,
+  opts: { postUrl: string; labels: KabegameLabelInput[]; dryRun: boolean },
+): Promise<void> {
+  const run = async (): Promise<void> => {
+    const rootUrl = mediaUrl(server, image);
+    if (!rootUrl) throw new Error(t("noDownloadUrl"));
+    const files = await fetchWpeListing(rootUrl);
+    const name = String(image.display_name ?? "").trim();
+    const totalBytes = files.reduce((sum, file) => sum + (file.size ?? 0), 0);
+    log(t("wpeListing", { id: image.id, name, count: files.length, size: formatBytes(totalBytes) }));
+    await downloadWpeWallpaper({
+      rootUrl,
+      files,
+      name: name || null,
+      dryRun: opts.dryRun,
+      downloadOptions: { url: opts.postUrl || null, labels: opts.labels },
+      onFileDone: (file, index, total) =>
+        log(t("wpeFileDone", { id: image.id, index: index + 1, total, path: file.path })),
+    });
+  };
+  const pending = wpeChain.then(run);
+  // 一张失败不拖住后面的
+  wpeChain = pending.catch(() => {});
+  return pending;
+}
+
 // label_path 形如 `konachan/character/hayase_yuuka`：末段是 key，其余是 category。
 function labelsFromAlbums(rows: ServerAlbum[] | null | undefined): KabegameLabelInput[] {
   const labels: KabegameLabelInput[] = [];
@@ -384,7 +464,8 @@ export async function crawl(
   custom: Record<string, unknown> | null | undefined,
 ): Promise<void> {
   const vars = (custom || {}) as ServerVars;
-  const cfg = (common || {}) as { baseUrl?: unknown };
+  const cfg = (common || {}) as { baseUrl?: unknown; isDryRun?: unknown };
+  const dryRun = cfg.isDryRun === true;
   const serverInput = vars.server_url ? vars.server_url : cfg.baseUrl;
   const server = normalizeServer(serverInput);
   const pageSize = clampInt(vars.page_size, 20, 1, MAX_PAGE_SIZE);
@@ -479,6 +560,20 @@ export async function crawl(
     let ok = 0;
     await runPool(rows, RPC_CONCURRENCY, async (image) => {
       try {
+        if (isWpeImage(image)) {
+          // 壁纸目录：标签与帖子地址照搬；metadata 是 project.json，由宿主在入库时读取
+          const albums = await rpc<ServerAlbum[]>(server, "pathql_fetch", {
+            path: `albums://of_image_${encodeURIComponent(String(image.id))}/album_kind/label/x${LABEL_PAGE_SIZE}x/1`,
+          });
+          await copyWpeWallpaper(server, image, {
+            postUrl: String(image.post_url ?? "").trim(),
+            labels: labelsFromAlbums(albums),
+            dryRun,
+          });
+          ok++;
+          addProgress(perImage);
+          return;
+        }
         const [metadataId, albums] = await Promise.all([
           metadataCache.get(image),
           rpc<ServerAlbum[]>(server, "pathql_fetch", {

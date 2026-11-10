@@ -10,6 +10,7 @@
 
 ### Changed
 - hydrus（0.1.1）：插件图标换成 hydrus 官方的 Ψ 标志（白底黑字，256×256）。
+- kabegame-server（0.3.0）：可以复制 Wallpaper Engine 壁纸（`x-wpe/video` / `x-wpe/web` / `x-wpe/scene`），例如把 Windows 上的壁纸传到 macOS。这类行是一个目录：先请求 `/file/<目录>` 取文件清单，再经 SDK 新增的 `downloadWpeWallpaper` 逐个文件下到任务 VFS 的 `tmp/wpe`，最后以 `downloadImage(目录, { relocate: true })` 整目录交给宿主移进下载目录；任务日志逐文件打印进度。标签与帖子地址照搬，metadata 由宿主取壁纸自己的 `project.json`（不取服务器的 metadata 行）；本机已有相同内容的壁纸时按目录哈希计入去重，下载下来的目录随即删除。壁纸一次只传一张。源服务器需为 4.7.0 或更高版本的桌面端，清单请求返回 404 时提示服务器版本过低并跳过这张；`engines.kabegame` 提到 `>=4.7.0`。
 
 ## 【4.6.0.1】
 ### Added

@@ -24,5 +24,10 @@
   "pageFetched": "[kabegame-server] {page}페이지: {count}장 (id {first} … {last})",
   "imageFailed": "[kabegame-server] 이미지 #{id} 실패: {error}",
   "noDownloadUrl": "다운로드할 주소가 없습니다",
-  "pageDone": "[kabegame-server] {page}페이지 완료: {ok}/{count}개 대기열에 추가"
+  "pageDone": "[kabegame-server] {page}페이지 완료: {ok}/{count}개 대기열에 추가",
+  "wpeServerTooOld": "서버가 Wallpaper Engine 배경화면 전송을 지원하지 않습니다. Kabegame 데스크톱 4.7.0 이상이 필요합니다",
+  "wpeListingFailed": "배경화면 파일 목록 읽기 실패: HTTP {status}",
+  "wpeListingInvalid": "배경화면 파일 목록 형식이 올바르지 않습니다",
+  "wpeListing": "[kabegame-server] 배경화면 #{id} 「{name}」: 파일 {count}개, 총 {size}",
+  "wpeFileDone": "[kabegame-server] 배경화면 #{id}: {index}/{total} {path}"
 }

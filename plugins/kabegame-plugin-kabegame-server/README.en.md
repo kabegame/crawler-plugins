@@ -18,7 +18,8 @@ Copies images from another Kabegame web service: either the web edition (default
 ## What gets copied
 
 - The image file: from the CDN for the web edition, or through `/file` on the same port for a desktop web server.
-- Metadata, copied as is; metadata shared by several images on the server stays shared locally.
+- Wallpaper Engine wallpapers (video, web, scene): the whole wallpaper folder is downloaded file by file and imported as one wallpaper, for example to bring wallpapers from Windows to macOS. The source server must be a desktop app 4.7.0 or later; wallpapers are transferred one at a time, and a wallpaper whose content is already in your library is not stored twice.
+- Metadata, copied as is; metadata shared by several images on the server stays shared locally. For a Wallpaper Engine wallpaper the metadata is its own `project.json`.
 - Labels, attached under the same label paths as on the server (for example `konachan/character/…`).
 - Post URL from the server; left empty when the server has none, never replaced with the server's own address.
 - Detail panel: rendered with the source plugin's own detail template, with the same script permissions Kabegame itself grants. The template and the source plugin's private data are cached while copying.

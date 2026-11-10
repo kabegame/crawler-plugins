@@ -24,5 +24,10 @@
   "pageFetched": "[kabegame-server] {page} ページ目：{count} 件（id {first} … {last}）",
   "imageFailed": "[kabegame-server] 画像 #{id} に失敗しました：{error}",
   "noDownloadUrl": "ダウンロードできるアドレスがありません",
-  "pageDone": "[kabegame-server] {page} ページ目完了：{ok}/{count} 件をキューに追加"
+  "pageDone": "[kabegame-server] {page} ページ目完了：{ok}/{count} 件をキューに追加",
+  "wpeServerTooOld": "サーバーが Wallpaper Engine 壁紙の転送に対応していません。Kabegame デスクトップ版 4.7.0 以降が必要です",
+  "wpeListingFailed": "壁紙のファイル一覧の読み取りに失敗しました：HTTP {status}",
+  "wpeListingInvalid": "壁紙のファイル一覧の形式が正しくありません",
+  "wpeListing": "[kabegame-server] 壁紙 #{id}「{name}」：{count} ファイル、合計 {size}",
+  "wpeFileDone": "[kabegame-server] 壁紙 #{id}：{index}/{total} {path}"
 }
