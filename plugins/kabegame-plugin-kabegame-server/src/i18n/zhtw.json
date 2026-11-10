@@ -24,5 +24,10 @@
   "pageFetched": "[kabegame-server] 第 {page} 頁：{count} 張（id {first} … {last}）",
   "imageFailed": "[kabegame-server] 圖片 #{id} 失敗：{error}",
   "noDownloadUrl": "沒有可下載的位址",
-  "pageDone": "[kabegame-server] 第 {page} 頁完成：入列 {ok}/{count}"
+  "pageDone": "[kabegame-server] 第 {page} 頁完成：入列 {ok}/{count}",
+  "wpeServerTooOld": "伺服器不支援傳輸 Wallpaper Engine 桌布，需要 Kabegame 4.7.0 或更高版本的桌面端",
+  "wpeListingFailed": "讀取桌布檔案清單失敗：HTTP {status}",
+  "wpeListingInvalid": "桌布檔案清單格式無效",
+  "wpeListing": "[kabegame-server] 桌布 #{id}「{name}」：{count} 個檔案，共 {size}",
+  "wpeFileDone": "[kabegame-server] 桌布 #{id}：{index}/{total} {path}"
 }

@@ -24,5 +24,10 @@
   "pageFetched": "[kabegame-server] Page {page}: {count} image(s) (id {first} … {last})",
   "imageFailed": "[kabegame-server] Image #{id} failed: {error}",
   "noDownloadUrl": "No downloadable URL",
-  "pageDone": "[kabegame-server] Page {page} done: {ok}/{count} queued"
+  "pageDone": "[kabegame-server] Page {page} done: {ok}/{count} queued",
+  "wpeServerTooOld": "The server cannot transfer Wallpaper Engine wallpapers; it needs the Kabegame desktop app 4.7.0 or later",
+  "wpeListingFailed": "Failed to read the wallpaper file list: HTTP {status}",
+  "wpeListingInvalid": "The wallpaper file list is malformed",
+  "wpeListing": "[kabegame-server] Wallpaper #{id} “{name}”: {count} file(s), {size} in total",
+  "wpeFileDone": "[kabegame-server] Wallpaper #{id}: {index}/{total} {path}"
 }
